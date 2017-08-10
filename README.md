@@ -9,6 +9,75 @@
 
 A starter project that makes creating a TypeScript library extremely easy.
 
+## Object Mapper
+
+#### Decorators
+Decorators are used to add some metadata to our model classes required by the mapper for some special cases.
+
+This is an experimental feature and requires to set the
+ 
+- "experimentalDecorators": true
+- "emitDecoratorMetadata": true
+
+compiler options.
+Additionally we rely on the reflect-metadata (https://www.npmjs.com/package/reflect-metadata) package for reflection api.
+
+To get started with decorators just add a @Model() Decorator to any ts class. By default this enables the custom mapping functionality
+and will get you started to work with Dynamo DB.
+
+We make heavy usage of compile time informations about our models and the property types.
+ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get, so we need some extra info.
+
+Along the way we will probably need some extra features. Here is a list of these:
+
+**Custom TableName**
+@Model({tableName: tableName})
+
+
+#### Types
+The type defines how a value will be mapped. Types can be defined using decorators (for complex types) or we use one of the following methods:
+fromDB  ->  use default for DynamoDB type (see type table)
+toDB    ->  use property value to resolve the type
+
+design:type
+String, Number, Boolean, Undefined, Object
+
+unsupported
+Set, Map, Date, moment.Moment
+
+
+#### Dynamo DB
+
+To map an js object into the attribute map required by dynamodb requests, we implement our very oppinionated custom mapper.
+We use the DynamoDB Document Mapper to map all «default» types to dynamodb attribute values.
+
+There are some custom requirements for these cases:
+
+- MomentJs Dates
+- Use ES6 Map, Set types
+
+Mapper Strategy:
+
+-> To DB
+1) check if we have some property metadata
+      
+      YES                                                      NO
+      
+      isCustomType                                             document client can map (check with typeof propertyValue for additional security)
+      
+      YES                 NO
+      
+      custom mapping      document client can map
+-> From DB
+
+
+## Open Tasks
+Null Values?
+How does DynamoDb treat empty lists, sets or emtpy strings?
+
+## Node Project Template
+
+
 ### Usage
 
 ```bash

@@ -2,5 +2,9 @@
   "extends": [
     "tslint-config-standard",
     "tslint-config-prettier"
-  ]
+  ],
+  "rules": {
+    "no-angle-bracket-type-assertion": false,
+    "max-line-length": 170
+  }
 }
