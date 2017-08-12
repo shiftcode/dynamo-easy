@@ -1,20 +1,15 @@
-import {
-  PutItemInput,
-  BatchGetItemInput,
-  DeleteItemInput,
-  AttributeMap
-} from "aws-sdk/clients/dynamodb"
-import { Observable } from "rxjs/Observable"
-import { MetadataHelper } from "./decorators/metadata"
-import { DynamoRx } from "./dynamo-rx"
-import { Mapper } from "./mapper/mapper"
-import { QueryRequest } from "./requests/query/query-request"
-import { ScanRequest } from "./requests/scan/scan-request"
-import { ModelClass } from "./model/model"
-import * as Debug from "debug"
+import { PutItemInput, BatchGetItemInput, DeleteItemInput, AttributeMap } from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs/Observable'
+import { MetadataHelper } from './decorators/metadata'
+import { DynamoRx } from './dynamo-rx'
+import { Mapper } from './mapper/mapper'
+import { QueryRequest } from './requests/query/query-request'
+import { ScanRequest } from './requests/scan/scan-request'
+import { ModelClass } from './model/model'
+import * as Debug from 'debug'
 
 export class DynamoStore<T> {
-  private readonly debug: Debug.IDebugger = Debug("dynamo-store")
+  private readonly debug: Debug.IDebugger = Debug('dynamo-store')
   private readonly dynamoRx: DynamoRx
   private readonly tableName: string
   private readonly mapper: Mapper
@@ -90,11 +85,8 @@ export class DynamoStore<T> {
     return new QueryRequest(this.dynamoRx, this.modelClazz)
   }
 
-  makeRequest<Z>(
-    operation: string,
-    params?: { [key: string]: any }
-  ): Observable<Z> {
-    this.debug("makeRequest")
+  makeRequest<Z>(operation: string, params?: { [key: string]: any }): Observable<Z> {
+    this.debug('makeRequest')
     return this.dynamoRx.makeRequest(operation, params)
   }
 

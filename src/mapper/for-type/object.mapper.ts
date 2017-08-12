@@ -1,6 +1,6 @@
-import { MapperForType } from "./base.mapper"
-import { AttributeValue, MapAttributeValue } from "aws-sdk/clients/dynamodb"
-import { Mapper } from "../mapper"
+import { MapperForType } from './base.mapper'
+import { AttributeValue, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
+import { Mapper } from '../mapper'
 
 export class ObjectMapper<T> implements MapperForType<any> {
   constructor() {}

@@ -1,4 +1,4 @@
-import { ConsumedCapacity, Integer, Key } from "aws-sdk/clients/dynamodb"
+import { ConsumedCapacity, Integer, Key } from 'aws-sdk/clients/dynamodb'
 
 /**
  * copied from aws-sdk/cliets/dynamoDb QueryOutput but added generics, because we process the items and map them

@@ -1,19 +1,19 @@
-import { Model } from "../../src/decorators/model.decorator"
-import { PartitionKey } from "../../src/decorators/partition-key.decorator"
-import { SortKey } from "../../src/decorators/sort-key.decorator"
-import { Type } from "../../src/decorators/type.decorator"
-import { Employee } from "./employee.model"
-import { Transient } from "../../src/decorators/transient.decorator"
-import moment from "moment"
+import { Model } from '../../src/decorators/model.decorator'
+import { PartitionKey } from '../../src/decorators/partition-key.decorator'
+import { SortKey } from '../../src/decorators/sort-key.decorator'
+import { Type } from '../../src/decorators/type.decorator'
+import { Employee } from './employee.model'
+import { Transient } from '../../src/decorators/transient.decorator'
+import moment from 'moment'
 
-@Model({ tableName: "Organization" })
+@Model({ tableName: 'Organization' })
 export class Organization {
   // String
   @PartitionKey() id: string
 
   @SortKey() createdAtDate: moment.Moment
 
-  @Type("moment") lastUpdated: moment.Moment
+  @Type('moment') lastUpdated: moment.Moment
 
   employees: Employee[]
 

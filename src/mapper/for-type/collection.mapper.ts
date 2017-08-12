@@ -1,8 +1,8 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodb"
-import { AttributeCollectionType } from "../attribute-type.type"
-import { Mapper } from "../mapper"
-import { Util } from "../util"
-import { MapperForType } from "./base.mapper"
+import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { AttributeCollectionType } from '../attribute-type.type'
+import { Mapper } from '../mapper'
+import { Util } from '../util'
+import { MapperForType } from './base.mapper'
 
 export class CollectionMapper implements MapperForType<any[] | Set<any>> {
   fromDb(attributeValue: AttributeValue): any[] | Set<any> {
@@ -27,9 +27,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
   toDb(propertyValue: any[] | Set<any>): AttributeValue {
     if (Array.isArray(propertyValue) || Util.isSet(propertyValue)) {
       const attributeValue: AttributeValue = {}
-      const collectionType: AttributeCollectionType = Util.detectCollectionType(
-        propertyValue
-      )
+      const collectionType: AttributeCollectionType = Util.detectCollectionType(propertyValue)
 
       // convert to array if we deal with a set
       if (Util.isSet(propertyValue)) {
@@ -38,19 +36,17 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
 
       let propertyValue2
       switch (collectionType) {
-        case "SS":
+        case 'SS':
           propertyValue2 = propertyValue
           break
-        case "NS":
+        case 'NS':
           propertyValue2 = (<number[]>propertyValue).map(num => num.toString())
           break
-        case "BS":
+        case 'BS':
           propertyValue2 = propertyValue
           break
-        case "L":
-          propertyValue2 = (<any[]>propertyValue).map(value =>
-            Mapper.mapToDbOne(value)
-          )
+        case 'L':
+          propertyValue2 = (<any[]>propertyValue).map(value => Mapper.mapToDbOne(value))
           break
       }
       attributeValue[collectionType] = propertyValue2

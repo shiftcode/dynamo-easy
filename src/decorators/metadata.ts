@@ -1,7 +1,7 @@
-import { ModelClass } from "../model/model"
-import { ModelMetadata } from "./model-metadata.model"
-import { KEY_MODEL } from "./model.decorator"
-import { PropertyMetadata } from "./property-metadata.model"
+import { ModelClass } from '../model/model'
+import { ModelMetadata } from './model-metadata.model'
+import { KEY_MODEL } from './model.decorator'
+import { PropertyMetadata } from './property-metadata.model'
 
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata
@@ -14,9 +14,7 @@ export class Metadata<T> {
     let options: PropertyMetadata | undefined
 
     if (this.modelOptions.properties) {
-      options = this.modelOptions.properties.find(
-        property => property.key === propertyKey
-      )
+      options = this.modelOptions.properties.find(property => property.key === propertyKey)
     }
 
     return options
@@ -32,17 +30,12 @@ export class MetadataHelper {
     return Reflect.getMetadata(KEY_MODEL, modelClass)
   }
 
-  static forProperty<T>(
-    modelClass: ModelClass<T>,
-    propertyKey: keyof T
-  ): PropertyMetadata {
+  static forProperty<T>(modelClass: ModelClass<T>, propertyKey: keyof T): PropertyMetadata {
     let modelOptions = Reflect.getMetadata(KEY_MODEL, modelClass)
 
     let options: PropertyMetadata | undefined
     if (modelOptions.properties) {
-      options = modelOptions.properties.find(
-        property => property.key === propertyKey
-      )
+      options = modelOptions.properties.find(property => property.key === propertyKey)
     }
 
     return options

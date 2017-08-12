@@ -1,6 +1,6 @@
-import moment from "moment"
-import { PropertyType } from "./property-type.type"
-import { AttributeModelTypeName } from "../mapper/attribute-model-type.type"
+import moment from 'moment'
+import { PropertyType } from './property-type.type'
+import { AttributeModelTypeName } from '../mapper/attribute-model-type.type'
 
 export interface PropertyMetadata {
   // key of the property on js side

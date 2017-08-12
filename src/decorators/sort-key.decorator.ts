@@ -1,4 +1,4 @@
-import { initOrUpdateProperty } from "./property.decorator"
+import { initOrUpdateProperty } from './property.decorator'
 
 export function SortKey(): PropertyDecorator {
   return function(target: Object, propertyKey: string) {

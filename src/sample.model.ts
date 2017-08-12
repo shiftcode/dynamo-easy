@@ -1,6 +1,6 @@
-import { Model } from "./decorators/model.decorator"
-import { Property } from "./decorators/property.decorator"
-import { Employee } from "../test/models/employee.model"
+import { Model } from './decorators/model.decorator'
+import { Property } from './decorators/property.decorator'
+import { Employee } from '../test/models/employee.model'
 
 /**
  * add interfaces for indexes
@@ -9,9 +9,9 @@ export class NestedModel {
   id: string
 }
 
-@Model({ tableName: "sample" })
+@Model({ tableName: 'sample' })
 export class SampleModel {
-  @Property({ name: "id" })
+  @Property({ name: 'id' })
   // @PartitionKey()
   // @RangeKey()
   id: string

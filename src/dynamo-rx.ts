@@ -1,5 +1,5 @@
-import * as AWS from "aws-sdk"
-import * as DynamoDB from "aws-sdk/clients/dynamodb"
+import * as AWS from 'aws-sdk'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
   BatchGetItemInput,
   BatchGetItemOutput,
@@ -15,8 +15,8 @@ import {
   ScanOutput,
   UpdateItemInput,
   UpdateItemOutput
-} from "aws-sdk/clients/dynamodb"
-import { Observable } from "rxjs/Observable"
+} from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs/Observable'
 
 /**
  * Simply brings the standard dynamodb operations into the rx world by wrapping the node callbacks into observables
@@ -51,12 +51,8 @@ export class DynamoRx {
     return Observable.fromPromise(this.dynamoDb.deleteItem(params).promise())
   }
 
-  batchWriteItem(
-    params: BatchWriteItemInput
-  ): Observable<BatchWriteItemOutput> {
-    return Observable.fromPromise(
-      this.dynamoDb.batchWriteItem(params).promise()
-    )
+  batchWriteItem(params: BatchWriteItemInput): Observable<BatchWriteItemOutput> {
+    return Observable.fromPromise(this.dynamoDb.batchWriteItem(params).promise())
   }
 
   batchGetItems(params: BatchGetItemInput): Observable<BatchGetItemOutput> {
@@ -69,15 +65,13 @@ export class DynamoRx {
 
   query(params: QueryInput): Observable<QueryOutput> {
     if (!params.KeyConditionExpression) {
-      throw new Error("key condition expression must be defined")
+      throw new Error('key condition expression must be defined')
     }
 
     return Observable.fromPromise(this.dynamoDb.query(params).promise())
   }
 
   makeRequest(operation: string, params?: { [key: string]: any }): any {
-    return Observable.fromPromise(
-      this.dynamoDb.makeRequest(operation, params).promise()
-    )
+    return Observable.fromPromise(this.dynamoDb.makeRequest(operation, params).promise())
   }
 }
