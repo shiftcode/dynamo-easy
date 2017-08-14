@@ -2,7 +2,7 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "target": "es6",
-    "module": "es2015",
+    "module": "es6",
     "lib": [
       "es6"
     ],
@@ -13,10 +13,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declarationDir": "dist/types",
-    "outDir": "compiled",
-    "typeRoots": [
-      "node_modules/@types"
-    ]
+    "outDir": "compiled"
   },
   "include": [
     "src"
