@@ -1,57 +1,50 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodb"
-import { isNumber, isString } from "lodash"
-import moment from "moment"
-import { Binary } from "../decorator/binary.type"
-import { Moment } from "../decorator/moment.type"
-import {
-  AttributeModelType,
-  NullType,
-  UndefinedType,
-} from "./attribute-model-type.type"
-import { AttributeCollectionType, AttributeType } from "./attribute-type.type"
+import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { isNumber, isString } from 'lodash'
+import moment from 'moment'
+import { Binary } from '../decorator/binary.type'
+import { Moment } from '../decorator/moment.type'
+import { AttributeModelType, NullType, UndefinedType } from './attribute-model-type.type'
+import { AttributeCollectionType, AttributeType } from './attribute-type.type'
 
-export type TypesByConvention = "date"
+export type TypesByConvention = 'date'
 
 export class Util {
   static REGEX_CONVENTIONS: { [key in TypesByConvention]: RegExp } = {
     date: /^(?:date|[\w]+(?:Date|At)(?:[A-Z]{1}[\w]+)?)$/,
   }
 
+  // tslint:disable-next-line:max-line-length
   static DATE_TIME_ISO8601 = /^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$/
 
   // TODO should we handle duplicates, switch from set to list?
-  static detectCollectionType(
-    collection: any[] | Set<any>
-  ): AttributeCollectionType | null {
+  static detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType | null {
     if (Array.isArray(collection)) {
       if (collection.every(isString)) {
-        return "SS"
+        return 'SS'
       }
 
       if (collection.every(isNumber)) {
-        return "NS"
+        return 'NS'
       }
 
       if (collection.every(Util.isBinary)) {
-        return "BS"
+        return 'BS'
       }
 
-      return "L"
+      return 'L'
     } else if (Util.isSet(collection)) {
-      const firstValueType = collection.size
-        ? collection.values().next().value
-        : null
+      const firstValueType = collection.size ? collection.values().next().value : null
       const type: AttributeType = Util.detectType(firstValueType)
 
       switch (type) {
-        case "S":
-          return "SS"
-        case "N":
-          return "NS"
-        case "B":
-          return "BS"
+        case 'S':
+          return 'SS'
+        case 'N':
+          return 'NS'
+        case 'B':
+          return 'BS'
         default:
-          return "L"
+          return 'L'
       }
     } else {
       return null
@@ -74,13 +67,7 @@ export class Util {
   }
 
   static isSet(value: any): value is Set<any> {
-    return (
-      (value !== null &&
-        value !== undefined &&
-        value.hasOwnProperty("name") &&
-        (<any>value).name === "Set") ||
-      value instanceof Set
-    )
+    return (value !== null && value !== undefined && value.hasOwnProperty('name') && (<any>value).name === 'Set') || value instanceof Set
   }
 
   // FIXME should we handle duplicates -> switch to L(ist) instead of S(et)
@@ -89,27 +76,27 @@ export class Util {
       return Util.detectCollectionType(value)
     } else {
       if (isString(value)) {
-        return "S"
+        return 'S'
       }
 
       if (isNumber(value)) {
-        return "N"
+        return 'N'
       }
 
       if (Util.isBinary(value)) {
-        return "B"
+        return 'B'
       }
 
       if (value === null) {
-        return "NULL"
+        return 'NULL'
       }
 
-      if (typeof value === "boolean") {
-        return "BOOL"
+      if (typeof value === 'boolean') {
+        return 'BOOL'
       }
 
-      if (typeof value === "object") {
-        return "M"
+      if (typeof value === 'object') {
+        return 'M'
       }
     }
   }
@@ -138,15 +125,15 @@ export class Util {
         return Binary
       } else {
         switch (typeof data) {
-          case "string":
+          case 'string':
             return String
-          case "number":
+          case 'number':
             return Number
-          case "boolean":
+          case 'boolean':
             return Boolean
-          case "undefined":
+          case 'undefined':
             return UndefinedType
-          case "object":
+          case 'object':
             return Object
         }
       }
@@ -157,35 +144,31 @@ export class Util {
    * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
    * should we work with string match
    */
-  static typeOfFromDb(
-    attributeValue: AttributeValue
-  ): AttributeModelType | null {
+  static typeOfFromDb(attributeValue: AttributeValue): AttributeModelType | null {
     if (attributeValue) {
-      let dynamoType: AttributeType = <AttributeType>Object.keys(
-        attributeValue
-      )[0]
+      let dynamoType: AttributeType = <AttributeType>Object.keys(attributeValue)[0]
       switch (dynamoType) {
-        case "S":
+        case 'S':
           if (Util.DATE_TIME_ISO8601.test(attributeValue.S)) {
             return Moment
           } else {
             return String
           }
-        case "N":
+        case 'N':
           return Number
-        case "B":
+        case 'B':
           return Binary
-        case "BOOL":
+        case 'BOOL':
           return Boolean
-        case "SS":
-        case "NS":
-        case "BS":
+        case 'SS':
+        case 'NS':
+        case 'BS':
           return Set
-        case "L":
+        case 'L':
           return Array
-        case "M":
+        case 'M':
           return Object
-        case "NULL":
+        case 'NULL':
           return NullType
       }
     }
@@ -199,20 +182,20 @@ export class Util {
       return Buffer.isBuffer(data)
     } else {
       const types = [
-        "Buffer",
-        "File",
-        "Blob",
-        "ArrayBuffer",
-        "DataView",
-        "Int8Array",
-        "Uint8Array",
-        "Uint8ClampedArray",
-        "Int16Array",
-        "Uint16Array",
-        "Int32Array",
-        "Uint32Array",
-        "Float32Array",
-        "Float64Array",
+        'Buffer',
+        'File',
+        'Blob',
+        'ArrayBuffer',
+        'DataView',
+        'Int8Array',
+        'Uint8Array',
+        'Uint8ClampedArray',
+        'Int16Array',
+        'Uint16Array',
+        'Int32Array',
+        'Uint32Array',
+        'Float32Array',
+        'Float64Array',
       ]
 
       types.forEach(type => {
@@ -230,8 +213,8 @@ export class Util {
    */
   static isType(obj, type): boolean {
     // handle cross-"frame" objects
-    if (typeof type === "function") type = Util.typeName(type)
-    return Object.prototype.toString.call(obj) === "[object " + type + "]"
+    if (typeof type === 'function') type = Util.typeName(type)
+    return Object.prototype.toString.call(obj) === '[object ' + type + ']'
   }
 
   static isBrowser() {
@@ -247,9 +230,9 @@ export class Util {
    * @param type
    * @returns {string}
    */
-  static typeName(type: any): "Null" | "Undefined" | string {
+  static typeName(type: any): 'Null' | 'Undefined' | string {
     if (type !== null && type !== undefined) {
-      if (Object.prototype.hasOwnProperty.call(type, "name")) {
+      if (Object.prototype.hasOwnProperty.call(type, 'name')) {
         return type.name
       } else {
         let str = type.toString()
@@ -258,9 +241,9 @@ export class Util {
       }
     } else {
       if (type === null) {
-        return "Null"
+        return 'Null'
       } else if (type === undefined) {
-        return "Undefined"
+        return 'Undefined'
       }
     }
   }

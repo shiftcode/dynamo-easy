@@ -1,4 +1,4 @@
-import { PropertyMetadata } from "./property-metadata.model"
+import { PropertyMetadata } from './property-metadata.model'
 
 export interface ModelData {
   tableName?: string

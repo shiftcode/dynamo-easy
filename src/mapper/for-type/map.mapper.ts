@@ -1,7 +1,7 @@
-import { MapperForType } from "./base.mapper"
+import { MapperForType } from './base.mapper'
 import construct = Reflect.construct
-import { AttributeValue } from "aws-sdk/clients/dynamodb"
-import { Mapper } from "../mapper"
+import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { Mapper } from '../mapper'
 
 export class MapMapper implements MapperForType<Map<any, any>> {
   constructor() {}

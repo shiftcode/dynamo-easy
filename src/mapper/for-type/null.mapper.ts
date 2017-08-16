@@ -1,6 +1,6 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodb"
-import moment from "moment"
-import { MapperForType } from "./base.mapper"
+import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import moment from 'moment'
+import { MapperForType } from './base.mapper'
 
 export class NullMapper implements MapperForType<null> {
   constructor() {}

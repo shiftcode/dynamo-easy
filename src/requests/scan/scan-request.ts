@@ -1,7 +1,7 @@
-import { Observable } from "rxjs/Observable"
-import { DynamoRx } from "../../dynamo-rx"
-import { Request } from "../request.model"
-import { Response } from "../response.model"
+import { Observable } from 'rxjs/Observable'
+import { DynamoRx } from '../../dynamo-rx'
+import { Request } from '../request.model'
+import { Response } from '../response.model'
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/scan.js
 export class ScanRequest<T> extends Request<T> {
@@ -41,9 +41,7 @@ export class ScanRequest<T> extends Request<T> {
     return this.dynamoRx.scan(this.params).map(queryResponse => {
       let response: Response<T> = {}
       Object.assign(response, queryResponse)
-      response.Items = queryResponse.Items.map(item =>
-        this.mapFromDb(<any>item)
-      )
+      response.Items = queryResponse.Items.map(item => this.mapFromDb(<any>item))
 
       return response
     })
@@ -52,22 +50,18 @@ export class ScanRequest<T> extends Request<T> {
   exec(): Observable<T[]> {
     delete this.params.Select
 
-    return this.dynamoRx
-      .scan(this.params)
-      .map(response => response.Items.map(item => this.mapFromDb(<any>item)))
+    return this.dynamoRx.scan(this.params).map(response => response.Items.map(item => this.mapFromDb(<any>item)))
   }
 
   execSingle(): Observable<T | null> {
     delete this.params.Select
 
-    return this.dynamoRx
-      .scan(this.params)
-      .map(response => this.mapFromDb(<any>response.Items[0]))
+    return this.dynamoRx.scan(this.params).map(response => this.mapFromDb(<any>response.Items[0]))
   }
 
   execCount(): Observable<number> {
     let params = { ...this.params }
-    params.Select = "COUNT"
+    params.Select = 'COUNT'
 
     return this.dynamoRx.scan(params).map(response => response.Count)
   }

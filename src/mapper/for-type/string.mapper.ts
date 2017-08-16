@@ -1,5 +1,5 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodb"
-import { MapperForType } from "./base.mapper"
+import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { MapperForType } from './base.mapper'
 
 export class StringMapper implements MapperForType<string> {
   constructor() {}
