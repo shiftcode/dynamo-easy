@@ -1,7 +1,7 @@
-import moment from "moment"
-import { ModelConstructor } from "../model/model-constructor"
-import { MapperForType } from "../mapper/for-type/base.mapper"
-import { KeyType } from "aws-sdk/clients/dynamodb"
+import moment from 'moment'
+import { ModelConstructor } from '../model/model-constructor'
+import { MapperForType } from '../mapper/for-type/base.mapper'
+import { KeyType } from 'aws-sdk/clients/dynamodb'
 
 export interface TypeInfo<T> {
   type: ModelConstructor<T>
@@ -43,13 +43,6 @@ export interface PropertyMetadata<T> {
   transient?: boolean
 }
 
-export function hasGenericType(
-  propertyMetadata: PropertyMetadata<any>
-): boolean {
-  return !!(
-    propertyMetadata &&
-    propertyMetadata.typeInfo &&
-    propertyMetadata.typeInfo.genericTypes &&
-    propertyMetadata.typeInfo.genericTypes.length
-  )
+export function hasGenericType(propertyMetadata: PropertyMetadata<any>): boolean {
+  return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericTypes && propertyMetadata.typeInfo.genericTypes.length)
 }

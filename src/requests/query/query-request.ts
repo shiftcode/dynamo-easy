@@ -1,10 +1,10 @@
-import { QueryInput } from "aws-sdk/clients/dynamodb"
-import * as _ from "lodash"
-import { Observable } from "rxjs/Observable"
-import { DynamoRx } from "../../dynamo-rx"
-import { Request } from "../request.model"
-import { MetadataHelper } from "../../decorator/metadata"
-import { Response } from "../response.model"
+import { QueryInput } from 'aws-sdk/clients/dynamodb'
+import * as _ from 'lodash'
+import { Observable } from 'rxjs/Observable'
+import { DynamoRx } from '../../dynamo-rx'
+import { Request } from '../request.model'
+import { MetadataHelper } from '../../decorator/metadata'
+import { Response } from '../response.model'
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/query.js
 export class QueryRequest<T> extends Request<T> {
@@ -90,7 +90,7 @@ export class QueryRequest<T> extends Request<T> {
 
   execCount(): Observable<number> {
     let params = _.clone(this.params)
-    params.Select = "COUNT"
+    params.Select = 'COUNT'
 
     return this.dynamoRx.query(params).map(response => response.Count)
   }
@@ -99,25 +99,19 @@ export class QueryRequest<T> extends Request<T> {
     return this.dynamoRx.query(this.params).map(queryResponse => {
       let response: Response<T> = {}
       Object.assign(response, queryResponse)
-      response.Items = queryResponse.Items.map(item =>
-        this.mapFromDb(<any>item)
-      )
+      response.Items = queryResponse.Items.map(item => this.mapFromDb(<any>item))
 
       return response
     })
   }
 
   exec(): Observable<T[]> {
-    return this.dynamoRx
-      .query(this.params)
-      .map(response => response.Items.map(item => this.mapFromDb(<any>item)))
+    return this.dynamoRx.query(this.params).map(response => response.Items.map(item => this.mapFromDb(<any>item)))
   }
 
   execSingle(): Observable<T> {
     this.limit(1)
 
-    return this.dynamoRx
-      .query(this.params)
-      .map(response => this.mapFromDb(<any>response.Items[0]))
+    return this.dynamoRx.query(this.params).map(response => this.mapFromDb(<any>response.Items[0]))
   }
 }

@@ -1,12 +1,12 @@
-import { kebabCase } from "lodash"
-import { getMetadataType } from "./decorators"
-import { ModelData, ModelMetadata } from "./model-metadata.model"
-import { PropertyMetadata } from "./property-metadata.model"
-import { KEY_PROPERTY } from "./property.decorator"
+import { kebabCase } from 'lodash'
+import { getMetadataType } from './decorators'
+import { ModelData, ModelMetadata } from './model-metadata.model'
+import { PropertyMetadata } from './property-metadata.model'
+import { KEY_PROPERTY } from './property.decorator'
 // FIXME should be optional dependency
-import moment from "moment"
+import moment from 'moment'
 
-export const KEY_MODEL = "sc-reflect:model"
+export const KEY_MODEL = 'sc-reflect:model'
 
 /*
  * FIXME add validation for tableName
@@ -26,23 +26,11 @@ export function Model<T>(opts: ModelData = {}): ClassDecorator {
 
     // FIXME would better typing help with something
     // get all the properties with @Property() annotation
-    const properties: PropertyMetadata<any>[] = Reflect.getOwnMetadata(
-      KEY_PROPERTY,
-      constructor
-    )
+    const properties: PropertyMetadata<any>[] = Reflect.getOwnMetadata(KEY_PROPERTY, constructor)
 
-    const transientProperties: string[] =
-      properties && properties.length
-        ? properties
-            .filter(property => property.transient === true)
-            .map(property => property.name)
-        : []
+    const transientProperties: string[] = properties && properties.length ? properties.filter(property => property.transient === true).map(property => property.name) : []
 
-    const finalOpts = Object.assign<
-      Partial<ModelMetadata<T>>,
-      Partial<ModelMetadata<T>>,
-      Partial<ModelMetadata<T>>
-    >(
+    const finalOpts = Object.assign<Partial<ModelMetadata<T>>, Partial<ModelMetadata<T>>, Partial<ModelMetadata<T>>>(
       {},
       {
         clazz: constructor,

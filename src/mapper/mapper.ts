@@ -1,35 +1,29 @@
-import { AttributeValue } from "aws-sdk/clients/dynamodb"
+import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 // FIXME make this dependency optional
-import moment from "moment"
-import * as UUID from "uuid"
-import { AttributeMap } from "../../attribute-map.type"
-import { Metadata, MetadataHelper } from "../decorator/metadata"
-import { PropertyMetadata } from "../decorator/property-metadata.model"
-import { ModelConstructor } from "../model/model-constructor"
-import { ScDynamoObjectMapper } from "../sc-dynamo-object-mapper"
-import { AttributeModelType, NullType } from "./attribute-model-type.type"
-import { MapperForType } from "./for-type/base.mapper"
-import { BooleanMapper } from "./for-type/boolean.mapper"
-import { CollectionMapper } from "./for-type/collection.mapper"
-import { DateMapper } from "./for-type/date.mapper"
-import { MapMapper } from "./for-type/map.mapper"
-import { MomentMapper } from "./for-type/moment.mapper"
-import { NullMapper } from "./for-type/null.mapper"
-import { NumberMapper } from "./for-type/number.mapper"
-import { ObjectMapper } from "./for-type/object.mapper"
-import { StringMapper } from "./for-type/string.mapper"
-import { Util } from "./util"
-import { Binary } from "../decorator/binary.type"
-import { Moment } from "../decorator/moment.type"
-import { ObjectType } from "aws-sdk/clients/clouddirectory"
+import moment from 'moment'
+import * as UUID from 'uuid'
+import { AttributeMap } from '../../attribute-map.type'
+import { Metadata, MetadataHelper } from '../decorator/metadata'
+import { PropertyMetadata } from '../decorator/property-metadata.model'
+import { ModelConstructor } from '../model/model-constructor'
+import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
+import { AttributeModelType, NullType } from './attribute-model-type.type'
+import { MapperForType } from './for-type/base.mapper'
+import { BooleanMapper } from './for-type/boolean.mapper'
+import { CollectionMapper } from './for-type/collection.mapper'
+import { DateMapper } from './for-type/date.mapper'
+import { MapMapper } from './for-type/map.mapper'
+import { MomentMapper } from './for-type/moment.mapper'
+import { NullMapper } from './for-type/null.mapper'
+import { NumberMapper } from './for-type/number.mapper'
+import { ObjectMapper } from './for-type/object.mapper'
+import { StringMapper } from './for-type/string.mapper'
+import { Util } from './util'
+import { Binary } from '../decorator/binary.type'
+import { Moment } from '../decorator/moment.type'
+import { ObjectType } from 'aws-sdk/clients/clouddirectory'
 
-export type PropertyMapperName =
-  | Boolean
-  | String
-  | Number
-  | Object
-  | Date
-  | "moment"
+export type PropertyMapperName = Boolean | String | Number | Object | Date | 'moment'
 
 /**
  * For the base convertion we use the DynamoDB converter.
@@ -38,10 +32,7 @@ export type PropertyMapperName =
 export class Mapper {
   static mapperForType: Map<PropertyMapperName, MapperForType<any>> = new Map()
 
-  static toDb<T>(
-    item: T,
-    modelConstructor?: ModelConstructor<T>
-  ): AttributeMap<T> {
+  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): AttributeMap<T> {
     let mapped: AttributeMap<T> = <AttributeMap<T>>{}
 
     if (modelConstructor) {
@@ -53,11 +44,7 @@ export class Mapper {
       if (metadata) {
         metadata.getKeysWithUUID().forEach(propertyMetadata => {
           if (item[propertyMetadata.name]) {
-            throw Error(
-              `property where a UUID decorator is present can not have any other value ${JSON.stringify(
-                propertyMetadata
-              )}`
-            )
+            throw Error(`property where a UUID decorator is present can not have any other value ${JSON.stringify(propertyMetadata)}`)
           }
 
           item[propertyMetadata.name] = UUID.v1()
@@ -65,16 +52,12 @@ export class Mapper {
       }
     }
 
-    const propertyNames: (keyof T)[] =
-      (<(keyof T)[]>Object.getOwnPropertyNames(item)) || []
+    const propertyNames: (keyof T)[] = (<(keyof T)[]>Object.getOwnPropertyNames(item)) || []
     propertyNames.forEach(propertyKey => {
       /*
        * 1) get the value of the property
        */
-      let propertyDescriptor = Object.getOwnPropertyDescriptor(
-        item,
-        propertyKey
-      )
+      let propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
 
       // use get accessor if available otherwise use value property of descriptor
       let propertyValue: any
@@ -91,17 +74,14 @@ export class Mapper {
 
       let propertyMetadata: PropertyMetadata<any>
       if (modelConstructor) {
-        propertyMetadata = MetadataHelper.forProperty(
-          modelConstructor,
-          propertyKey
-        )
+        propertyMetadata = MetadataHelper.forProperty(modelConstructor, propertyKey)
       }
 
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
           // skip transient property
           // TODO replace with logger
-          console.log("transient property -> skip")
+          console.log('transient property -> skip')
         } else {
           /*
            * 3a) property metadata is defined
@@ -127,25 +107,16 @@ export class Mapper {
       }
 
       if (attributeValue) {
-        mapped[
-          propertyMetadata ? propertyMetadata.nameDb : propertyKey
-        ] = attributeValue
+        mapped[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
       }
     })
 
     return mapped
   }
 
-  static toDbOne(
-    propertyValue: any,
-    propertyMetadata?: PropertyMetadata<any>
-  ): AttributeValue {
+  static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): AttributeValue {
     const explicitType: AttributeModelType | null =
-      propertyMetadata &&
-      propertyMetadata.typeInfo &&
-      propertyMetadata.typeInfo.isCustom
-        ? propertyMetadata.typeInfo.type
-        : null
+      propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom ? propertyMetadata.typeInfo.type : null
     const type: AttributeModelType = explicitType || Util.typeOf(propertyValue)
 
     // some basic validation
@@ -153,51 +124,32 @@ export class Mapper {
     if (
       propertyMetadata &&
       propertyMetadata.key &&
-      propertyMetadata.key.type === "HASH" &&
+      propertyMetadata.key.type === 'HASH' &&
       !propertyMetadata.mapper &&
       type !== String &&
       type !== Number &&
       type !== Binary
     ) {
-      throw new Error(
-        `make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key`
-      )
+      throw new Error(`make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key`)
     }
 
-    if (
-      type === "Moment" &&
-      (!propertyMetadata ||
-        (propertyMetadata &&
-          propertyMetadata.typeInfo &&
-          !propertyMetadata.typeInfo.isCustom))
-    ) {
+    if (type === 'Moment' && (!propertyMetadata || (propertyMetadata && propertyMetadata.typeInfo && !propertyMetadata.typeInfo.isCustom))) {
       // TODO there is gonna be a problem when we have to map back from db and we have no property metadata, we could introduce some regex matching, do we want that?
     }
 
     if (propertyMetadata && propertyMetadata.mapper) {
       // custom mapper
-      return new propertyMetadata.mapper().toDb(
-        propertyValue,
-        explicitType ? propertyMetadata : null
-      )
+      return new propertyMetadata.mapper().toDb(propertyValue, explicitType ? propertyMetadata : null)
     } else {
       // mapper by type
-      return Mapper.forType(type).toDb(
-        propertyValue,
-        explicitType ? propertyMetadata : null
-      )
+      return Mapper.forType(type).toDb(propertyValue, explicitType ? propertyMetadata : null)
     }
   }
 
-  static fromDb<T>(
-    attributeMap: AttributeMap<T>,
-    modelClass?: ModelConstructor<T>
-  ): T {
+  static fromDb<T>(attributeMap: AttributeMap<T>, modelClass?: ModelConstructor<T>): T {
     let model: T = <T>{}
 
-    let propertyNames: (keyof T)[] = <(keyof T)[]>Object.getOwnPropertyNames(
-      attributeMap
-    )
+    let propertyNames: (keyof T)[] = <(keyof T)[]>Object.getOwnPropertyNames(attributeMap)
     propertyNames.forEach(propertyKey => {
       /*
        * 1) get the value of the property
@@ -217,7 +169,7 @@ export class Mapper {
         if (propertyMetadata.transient) {
           // skip transient property
           // TODO replace with logger
-          console.log("transient property -> skip")
+          console.log('transient property -> skip')
         } else {
           /*
            * 3a) property metadata is defined
@@ -249,24 +201,13 @@ export class Mapper {
     return model
   }
 
-  static fromDbOne<T>(
-    attributeValue: AttributeValue,
-    propertyMetadata?: PropertyMetadata<any>
-  ): T {
+  static fromDbOne<T>(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): T {
     const explicitType: AttributeModelType | null =
-      propertyMetadata &&
-      propertyMetadata.typeInfo &&
-      propertyMetadata.typeInfo.isCustom
-        ? propertyMetadata.typeInfo.type
-        : null
-    const type: AttributeModelType =
-      explicitType || Util.typeOfFromDb(attributeValue)
+      propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom ? propertyMetadata.typeInfo.type : null
+    const type: AttributeModelType = explicitType || Util.typeOfFromDb(attributeValue)
 
     console.log(`mapFromDbOne for type ${type}`)
-    return Mapper.forType(type).fromDb(
-      attributeValue,
-      explicitType ? propertyMetadata : null
-    )
+    return Mapper.forType(type).fromDb(attributeValue, explicitType ? propertyMetadata : null)
   }
 
   // static mapperForConvention<T>(typeFromConvention: 'date'): MapperForType<Date | moment.Moment> {
@@ -322,7 +263,7 @@ export class Mapper {
           break
         case Binary:
           // TODO add binary mapper
-          throw new Error("no mapper for binary type implemented yet")
+          throw new Error('no mapper for binary type implemented yet')
         default:
           mapperForType = new ObjectMapper()
       }

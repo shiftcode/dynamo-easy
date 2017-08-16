@@ -1,11 +1,11 @@
-import { Key, QueryInput, ScanInput } from "aws-sdk/clients/dynamodb"
-import { Observable } from "rxjs/Observable"
-import { MetadataHelper } from "../decorator/metadata"
-import { DynamoRx } from "../dynamo-rx"
-import { Mapper } from "../mapper/mapper"
-import { ModelConstructor } from "../model/model-constructor"
-import { Response } from "./response.model"
-import { AttributeMap } from "../../attribute-map.type"
+import { Key, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs/Observable'
+import { MetadataHelper } from '../decorator/metadata'
+import { DynamoRx } from '../dynamo-rx'
+import { Mapper } from '../mapper/mapper'
+import { ModelConstructor } from '../model/model-constructor'
+import { Response } from './response.model'
+import { AttributeMap } from '../../attribute-map.type'
 
 export abstract class Request<T> {
   static DEFAULT_LIMIT = 10
