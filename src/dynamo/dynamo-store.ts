@@ -2,15 +2,15 @@ import {
   PutItemInput,
   BatchGetItemInput,
   DeleteItemInput,
-  AttributeMap
+  AttributeMap,
 } from "aws-sdk/clients/dynamodb"
 import { Observable } from "rxjs/Observable"
-import { MetadataHelper } from "./decorators/metadata"
+import { MetadataHelper } from "./decorator/metadata"
 import { DynamoRx } from "./dynamo-rx"
 import { Mapper } from "./mapper/mapper"
 import { QueryRequest } from "./requests/query/query-request"
 import { ScanRequest } from "./requests/scan/scan-request"
-import { ModelClass } from "./model/model"
+import { ModelConstructor } from "./model/model-constructor"
 import * as Debug from "debug"
 
 export class DynamoStore<T> {
@@ -19,14 +19,14 @@ export class DynamoStore<T> {
   private readonly tableName: string
   private readonly mapper: Mapper
 
-  constructor(logger: Logger, private modelClazz: ModelClass<T>) {
+  constructor(logger: Logger, private modelClazz: ModelConstructor<T>) {
     this.dynamoRx = new DynamoRx()
     this.tableName = MetadataHelper.get(this.modelClazz).modelOptions.tableName
   }
 
   put(item: T, ifNotExists?: boolean): Observable<void> {
     let params: any = Object.assign({}, this.createBaseParams(), {
-      Item: Mapper.mapToDb(item, this.modelClazz)
+      Item: Mapper.toDb(item, this.modelClazz),
     })
 
     // FIXME add ifNotExists condition
@@ -100,7 +100,7 @@ export class DynamoStore<T> {
 
   private createBaseParams(): { TableName: string } {
     let params: { TableName: string } = {
-      TableName: this.tableName
+      TableName: this.tableName,
     }
 
     return params

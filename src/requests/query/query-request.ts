@@ -3,7 +3,7 @@ import * as _ from "lodash"
 import { Observable } from "rxjs/Observable"
 import { DynamoRx } from "../../dynamo-rx"
 import { Request } from "../request.model"
-import { MetadataHelper } from "../../decorators/metadata"
+import { MetadataHelper } from "../../decorator/metadata"
 import { Response } from "../response.model"
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/query.js

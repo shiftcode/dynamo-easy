@@ -3,8 +3,6 @@ import moment from "moment"
 import { MapperForType } from "./base.mapper"
 
 export class MomentMapper implements MapperForType<moment.Moment> {
-  constructor() {}
-
   fromDb(value: AttributeValue): moment.Moment {
     let parsed: moment.Moment = moment(value.S, moment.ISO_8601)
     if (!parsed.isValid()) {
@@ -20,7 +18,7 @@ export class MomentMapper implements MapperForType<moment.Moment> {
     if (moment.isMoment(value)) {
       if (value.isValid()) {
         // always store in utc, default format is ISO_8601
-        return { S: value.clone().utc().format(moment.defaultFormat) }
+        return { S: value.clone().utc().format() }
       } else {
         throw new Error(
           `cannot map property value ${value}, because it is not a valid moment date`

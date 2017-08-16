@@ -1,6 +1,6 @@
-import { Model } from "../../src/decorators/model.decorator"
 import moment from "moment"
-import { Type } from "../../src/decorators/type.decorator"
+import { Model } from "../../src/decorator/model.decorator"
+import { SortedSet } from "../../src/decorator/sorted-set.decorator"
 
 @Model()
 export class Employee {
@@ -8,11 +8,21 @@ export class Employee {
 
   age: number
 
-  @Type("moment") createdAt: moment.Moment
+  createdAt: moment.Moment
 
-  constructor(name: string, age: number, createdAt: moment.Moment) {
+  @SortedSet() sortedSet: Set<string>
+
+  constructor(
+    name: string,
+    age: number,
+    createdAt: moment.Moment,
+    sortedListValues: any[]
+  ) {
     this.name = name
     this.age = age
     this.createdAt = createdAt
+    if (sortedListValues) {
+      this.sortedSet = new Set(sortedListValues)
+    }
   }
 }

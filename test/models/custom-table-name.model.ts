@@ -1,4 +1,4 @@
-import { Model } from "../../src/decorators/model.decorator"
+import { Model } from "../../src/decorator/model.decorator"
 
 @Model({ tableName: "myCustomName" })
 export class CustomTableNameModel {}

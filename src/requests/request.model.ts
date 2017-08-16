@@ -1,9 +1,9 @@
 import { Key, QueryInput, ScanInput } from "aws-sdk/clients/dynamodb"
 import { Observable } from "rxjs/Observable"
-import { MetadataHelper } from "../decorators/metadata"
+import { MetadataHelper } from "../decorator/metadata"
 import { DynamoRx } from "../dynamo-rx"
 import { Mapper } from "../mapper/mapper"
-import { ModelClass } from "../model/model"
+import { ModelConstructor } from "../model/model-constructor"
 import { Response } from "./response.model"
 import { AttributeMap } from "../../attribute-map.type"
 
@@ -13,12 +13,12 @@ export abstract class Request<T> {
 
   protected readonly dynamoRx: DynamoRx
   protected readonly params: QueryInput | ScanInput
-  protected readonly modelClazz: ModelClass<T>
+  protected readonly modelClazz: ModelConstructor<T>
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelClass<T>) {
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     this.dynamoRx = dynamoRx
     this.params = {
-      TableName: MetadataHelper.get(modelClazz).modelOptions.tableName
+      TableName: MetadataHelper.get(modelClazz).modelOptions.tableName,
     }
     this.modelClazz = modelClazz
   }
@@ -40,7 +40,7 @@ export abstract class Request<T> {
   }
 
   mapFromDb(attributeMap: AttributeMap<T>): T {
-    return Mapper.mapFromDb(attributeMap, this.modelClazz)
+    return Mapper.fromDb(attributeMap, this.modelClazz)
   }
 
   // TODO resolve remove old dynamo implementation

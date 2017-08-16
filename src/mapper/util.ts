@@ -1,30 +1,45 @@
 import { AttributeValue } from "aws-sdk/clients/dynamodb"
 import { isNumber, isString } from "lodash"
-import { AttributeModelTypeName } from "./attribute-model-type.type"
+import moment from "moment"
+import { Binary } from "../decorator/binary.type"
+import { Moment } from "../decorator/moment.type"
+import {
+  AttributeModelType,
+  NullType,
+  UndefinedType,
+} from "./attribute-model-type.type"
 import { AttributeCollectionType, AttributeType } from "./attribute-type.type"
 
+export type TypesByConvention = "date"
+
 export class Util {
-  // FIXME should we handle duplicates, switch from set to list?
+  static REGEX_CONVENTIONS: { [key in TypesByConvention]: RegExp } = {
+    date: /^(?:date|[\w]+(?:Date|At)(?:[A-Z]{1}[\w]+)?)$/,
+  }
+
+  static DATE_TIME_ISO8601 = /^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$/
+
+  // TODO should we handle duplicates, switch from set to list?
   static detectCollectionType(
     collection: any[] | Set<any>
   ): AttributeCollectionType | null {
     if (Array.isArray(collection)) {
-      if ((<any[]>collection).every(isString)) {
+      if (collection.every(isString)) {
         return "SS"
       }
 
-      if ((<any[]>collection).every(isNumber)) {
+      if (collection.every(isNumber)) {
         return "NS"
       }
 
-      if ((<any[]>collection).every(Util.isBinary)) {
+      if (collection.every(Util.isBinary)) {
         return "BS"
       }
 
       return "L"
     } else if (Util.isSet(collection)) {
-      const firstValueType = (<Set<any>>collection).size
-        ? (<Set<any>>collection).values().next().value
+      const firstValueType = collection.size
+        ? collection.values().next().value
         : null
       const type: AttributeType = Util.detectType(firstValueType)
 
@@ -43,20 +58,34 @@ export class Util {
     }
   }
 
+  static typeByConvention(propertyKey: string): TypesByConvention | undefined {
+    let type: TypesByConvention
+    Object.keys(Util.REGEX_CONVENTIONS).forEach(key => {
+      if (Util.REGEX_CONVENTIONS[key].test(propertyKey)) {
+        type = <TypesByConvention>key
+      }
+    })
+
+    return type
+  }
+
   static isCollection(value: any): boolean {
     return value && (Array.isArray(value) || Util.isSet(value))
   }
 
-  static isSet(value: any): boolean {
+  static isSet(value: any): value is Set<any> {
     return (
-      (value.hasOwnProperty("name") && (<any>value).name === "Set") ||
+      (value !== null &&
+        value !== undefined &&
+        value.hasOwnProperty("name") &&
+        (<any>value).name === "Set") ||
       value instanceof Set
     )
   }
 
   // FIXME should we handle duplicates -> switch to L(ist) instead of S(et)
   static detectType(value: any): AttributeType {
-    if (Array.isArray(value) || Util.isSet(value)) {
+    if (Util.isCollection(value)) {
       return Util.detectCollectionType(value)
     } else {
       if (isString(value)) {
@@ -85,50 +114,86 @@ export class Util {
     }
   }
 
+  /**
+   * Will resolve the type based on given data.
+   *
+   * @param data
+   * @returns {AttributeModelTypeName}
+   */
+  static typeOf(data: any): AttributeModelType {
+    if (data === null) {
+      return NullType
+    } else {
+      if (Array.isArray(data)) {
+        return Array
+      } else if (data instanceof Set) {
+        return Set
+      } else if (data instanceof Map) {
+        return Map
+      } else if (data instanceof Date) {
+        return Date
+      } else if (moment.isMoment(data)) {
+        return Moment
+      } else if (Util.isBinary(data)) {
+        return Binary
+      } else {
+        switch (typeof data) {
+          case "string":
+            return String
+          case "number":
+            return Number
+          case "boolean":
+            return Boolean
+          case "undefined":
+            return UndefinedType
+          case "object":
+            return Object
+        }
+      }
+    }
+  }
+
   /*
    * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
+   * should we work with string match
    */
-  static typeOf(data): AttributeModelTypeName {
-    if (data === null && typeof data === "object") {
-      return "Null"
-    } else if (data !== undefined && Util.isBinary(data)) {
-      return "Binary"
-    } else if (data !== undefined && data.constructor) {
-      return Util.typeName(data.constructor)
-    } else if (data !== undefined && typeof data === "object") {
-      // this object is the result of Object.create(null), hence the absence of a
-      // defined constructor
-      return "Object"
-    } else {
-      return "Undefined"
+  static typeOfFromDb(
+    attributeValue: AttributeValue
+  ): AttributeModelType | null {
+    if (attributeValue) {
+      let dynamoType: AttributeType = <AttributeType>Object.keys(
+        attributeValue
+      )[0]
+      switch (dynamoType) {
+        case "S":
+          if (Util.DATE_TIME_ISO8601.test(attributeValue.S)) {
+            return Moment
+          } else {
+            return String
+          }
+        case "N":
+          return Number
+        case "B":
+          return Binary
+        case "BOOL":
+          return Boolean
+        case "SS":
+        case "NS":
+        case "BS":
+          return Set
+        case "L":
+          return Array
+        case "M":
+          return Object
+        case "NULL":
+          return NullType
+      }
     }
+
+    return null
   }
 
-  static typeOfFromDb(attributeValue: AttributeValue): AttributeModelTypeName {
-    let dynamoType: AttributeType = <AttributeType>Object.keys(
-      attributeValue
-    )[0]
-    switch (dynamoType) {
-      case "S":
-        return "String"
-      case "N":
-        return "Number"
-      case "B":
-        return "Binary"
-      case "BOOL":
-        return "Boolean"
-      case "SS":
-      case "NS":
-      case "BS":
-        return "Set"
-      case "L":
-        return "Array"
-      case "NULL":
-        return "Null"
-    }
-  }
-
-  static isBinary(data) {
+  static isBinary(data): boolean {
     if (Util.isNode()) {
       // FIXME should add || data instanceof Stream
       return Buffer.isBuffer(data)
@@ -147,7 +212,7 @@ export class Util {
         "Int32Array",
         "Uint32Array",
         "Float32Array",
-        "Float64Array"
+        "Float64Array",
       ]
 
       types.forEach(type => {
@@ -163,7 +228,7 @@ export class Util {
   /*
    * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/util.js
    */
-  static isType(obj, type) {
+  static isType(obj, type): boolean {
     // handle cross-"frame" objects
     if (typeof type === "function") type = Util.typeName(type)
     return Object.prototype.toString.call(obj) === "[object " + type + "]"
@@ -177,14 +242,26 @@ export class Util {
     return !Util.isBrowser()
   }
 
-  static typeName(type) {
-    if (Object.prototype.hasOwnProperty.call(type, "name")) return type.name
-    let str = type.toString()
-    let match = str.match(/^\s*function (.+)\(/)
-    return match ? match[1] : str
-  }
-
-  private static test(arr: any[], fn: (arrValue: any) => boolean): boolean {
-    return arr.every(fn)
+  /**
+   * Returns the name of the given Type. null and undefined are special cases were we return 'Null' vs. 'Undefined'
+   * @param type
+   * @returns {string}
+   */
+  static typeName(type: any): "Null" | "Undefined" | string {
+    if (type !== null && type !== undefined) {
+      if (Object.prototype.hasOwnProperty.call(type, "name")) {
+        return type.name
+      } else {
+        let str = type.toString()
+        let match = str.match(/^\s*function (.+)\(/)
+        return match ? match[1] : str
+      }
+    } else {
+      if (type === null) {
+        return "Null"
+      } else if (type === undefined) {
+        return "Undefined"
+      }
+    }
   }
 }

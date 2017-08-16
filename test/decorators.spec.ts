@@ -1,24 +1,18 @@
-import { Metadata, MetadataHelper } from "../src/decorators/metadata"
-import { Model } from "../src/decorators/model.decorator"
-import { PartitionKey } from "../src/decorators/partition-key.decorator"
-import { Property } from "../src/decorators/property.decorator"
-import { Transient } from "../src/decorators/transient.decorator"
-import { Type } from "../src/decorators/type.decorator"
-import { ModelMetadata } from "../src/decorators/model-metadata.model"
-import { PropertyMetadata } from "../src/decorators/property-metadata.model"
-import { SortKey } from "../src/decorators/sort-key.decorator"
 import { ScDynamoObjectMapper } from "../src/sc-dynamo-object-mapper"
 import { ModelWithDate } from "./models/model-with-date.model"
 import { ModelWithDateMoment } from "./models/model-with-date-moment.model"
 import { ComplexModel, NestedObject } from "./models/complex.model"
 import { SimpleModel } from "./models/simple.model"
 import { CustomTableNameModel } from "./models/custom-table-name.model"
+import { Moment } from "../src/decorator/moment.type"
 import moment from "moment"
-import { AttributeModelTypeName } from "../src/mapper/attribute-model-type.type"
+import { MetadataHelper } from "../src/decorator/metadata"
+import { ModelMetadata } from "../src/decorator/model-metadata.model"
+import { PropertyMetadata } from "../src/decorator/property-metadata.model"
 
 describe("Decorators should add correct metadata", () => {
   describe("for simple model", () => {
-    let modelOptions: ModelMetadata
+    let modelOptions: ModelMetadata<SimpleModel>
 
     beforeEach(() => {
       modelOptions = MetadataHelper.get(SimpleModel).modelOptions
@@ -37,7 +31,7 @@ describe("Decorators should add correct metadata", () => {
   })
 
   describe("for custom table name", () => {
-    let modelOptions: ModelMetadata
+    let modelOptions: ModelMetadata<CustomTableNameModel>
 
     beforeEach(() => {
       modelOptions = MetadataHelper.get(CustomTableNameModel).modelOptions
@@ -87,51 +81,55 @@ describe("Decorators should add correct metadata", () => {
   // })
 
   describe("for model with dates (type MomentJS)", () => {
-    let modelOptions: ModelMetadata
+    let modelOptions: ModelMetadata<ModelWithDateMoment>
 
     beforeEach(() => {
       modelOptions = MetadataHelper.get(ModelWithDateMoment).modelOptions
     })
 
     it("id", () => {
-      let prop: PropertyMetadata = getProperty(modelOptions, "id")
+      let prop = getProperty(modelOptions, "id")
       expect(prop).toBeDefined()
-      expect(prop.key).toBe("id")
       expect(prop.name).toBe("id")
-      expect(prop.partitionKey).toBeTruthy()
-      expect(prop.sortKey).toBeFalsy()
-      expect(prop.customType).toBeFalsy()
+      expect(prop.nameDb).toBe("id")
+      expect(prop.key).toBeDefined()
+      expect(prop.key.type).toBe("HASH")
+      expect(prop.key.uuid).toBeFalsy()
       expect(prop.transient).toBeFalsy()
-      expect(prop.type).toBe(String)
+      expect(prop.typeInfo).toBeDefined()
+      expect(prop.typeInfo.isCustom).toBeFalsy()
+      expect(prop.typeInfo.type).toBe(String)
     })
 
     it("creationDate", () => {
-      let prop: PropertyMetadata = getProperty(modelOptions, "creationDate")
+      let prop = getProperty(modelOptions, "creationDate")
       expect(prop).toBeDefined()
-      expect(prop.key).toBe("creationDate")
       expect(prop.name).toBe("creationDate")
-      expect(prop.partitionKey).toBeFalsy()
-      expect(prop.sortKey).toBeTruthy()
-      expect(prop.customType).toBeTruthy()
+      expect(prop.nameDb).toBe("creationDate")
+      expect(prop.key).toBeDefined()
+      expect(prop.key.type).toBe("RANGE")
+      expect(prop.key.uuid).toBeFalsy()
       expect(prop.transient).toBeFalsy()
-      expect(prop.type).toBe("moment")
+      expect(prop.typeInfo).toBeDefined()
+      expect(prop.typeInfo.isCustom).toBeTruthy()
+      expect(prop.typeInfo.type).toBe(Moment)
     })
 
     it("lastUpdated", () => {
-      let prop: PropertyMetadata = getProperty(modelOptions, "lastUpdated")
+      let prop = getProperty(modelOptions, "lastUpdated")
       expect(prop).toBeDefined()
-      expect(prop.key).toBe("lastUpdated")
       expect(prop.name).toBe("lastUpdated")
-      expect(prop.partitionKey).toBeFalsy()
-      expect(prop.sortKey).toBeFalsy()
-      expect(prop.customType).toBeTruthy()
+      expect(prop.nameDb).toBe("lastUpdated")
+      expect(prop.key).toBeUndefined()
       expect(prop.transient).toBeFalsy()
-      expect(prop.type).toBe("moment")
+      expect(prop.typeInfo).toBeDefined()
+      expect(prop.typeInfo.isCustom).toBeTruthy()
+      expect(prop.typeInfo.type).toBe(Moment)
     })
   })
 
   describe("for complex model", () => {
-    let modelOptions: ModelMetadata
+    let modelOptions: ModelMetadata<ComplexModel>
 
     beforeEach(() => {
       modelOptions = MetadataHelper.get(ComplexModel).modelOptions
@@ -145,7 +143,7 @@ describe("Decorators should add correct metadata", () => {
 
     it("with correct properties", () => {
       expect(modelOptions.properties).toBeDefined()
-      expect(modelOptions.properties.length).toBe(9)
+      expect(modelOptions.properties.length).toBe(10)
     })
 
     it("with correct transient properties", () => {
@@ -155,133 +153,162 @@ describe("Decorators should add correct metadata", () => {
 
     describe("with correct property metdata", () => {
       it("ids", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "ids")
+        let prop = getProperty(modelOptions, "id")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("ids")
-        expect(prop.name).toBe("ids")
-        expect(prop.partitionKey).toBeTruthy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeFalsy()
+        expect(prop.name).toBe("id")
+        expect(prop.nameDb).toBe("id")
+        expect(prop.key).toBeDefined()
+        expect(prop.key.type).toBe("HASH")
+        expect(prop.key.uuid).toBeFalsy()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe(String)
-        expect(prop.typeName).toBe("String")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeFalsy()
+        expect(prop.typeInfo.type).toBe(String)
       })
 
       it("creationDate", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "creationDate")
+        let prop = getProperty(modelOptions, "creationDate")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("creationDate")
         expect(prop.name).toBe("creationDate")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeTruthy()
-        expect(prop.customType).toBeTruthy()
+        expect(prop.nameDb).toBe("creationDate")
+        expect(prop.key).toBeDefined()
+        expect(prop.key.type).toBe("RANGE")
+        expect(prop.key.uuid).toBeFalsy()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe("moment")
-        expect(prop.typeName).toBe("Moment")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(Moment)
       })
 
       it("lastUpdated", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "lastUpdated")
+        let prop = getProperty(modelOptions, "lastUpdated")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("lastUpdated")
         expect(prop.name).toBe("lastUpdated")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeTruthy()
+        expect(prop.nameDb).toBe("lastUpdated")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe("moment")
-        expect(prop.typeName).toBe("Moment")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(Moment)
       })
 
       it("active", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "active")
+        let prop = getProperty(modelOptions, "active")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("active")
-        expect(prop.name).toBe("isActive")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeFalsy()
+        expect(prop.name).toBe("active")
+        expect(prop.nameDb).toBe("isActive")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe(Boolean)
-        expect(prop.typeName).toBe("Boolean")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeFalsy()
+        expect(prop.typeInfo.type).toBe(Boolean)
       })
 
       it("set", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "set")
+        let prop = getProperty(modelOptions, "set")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("set")
         expect(prop.name).toBe("set")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeTruthy()
+        expect(prop.nameDb).toBe("set")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe(Set)
-        expect(prop.typeName).toBe("Set")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(Set)
       })
 
-      it("myMap", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "myMap")
+      // TODO decide if we support map or not
+      // xit("myMap", () => {
+      //   let prop = getProperty(modelOptions, "myMap")
+      //   expect(prop).toBeDefined()
+      //   expect(prop.key).toBe("myMap")
+      //   expect(prop.name).toBe("myMap")
+      //   expect(prop.partitionKey).toBeFalsy()
+      //   expect(prop.sortKey).toBeFalsy()
+      //   expect(prop.transient).toBeFalsy()
+      //   expect(prop.typeInfo).toBeDefined()
+      //   expect(prop.typeInfo.isCustom).toBeTruthy()
+      //   expect(prop.typeInfo.type).toBe(Map)
+      //   expect(prop.typeInfo.typeName).toBe("Map")
+      // })
+
+      it("sortedSet", () => {
+        let prop = getProperty(modelOptions, "sortedSet")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("myMap")
-        expect(prop.name).toBe("myMap")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeTruthy()
+        expect(prop.name).toBe("sortedSet")
+        expect(prop.nameDb).toBe("sortedSet")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe(Map)
-        expect(prop.typeName).toBe("Map")
+        expect(prop.isSortedCollection).toBeTruthy()
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(Set)
+      })
+
+      it("sortedComplexSet", () => {
+        let prop = getProperty(modelOptions, "sortedComplexSet")
+        expect(prop).toBeDefined()
+        expect(prop.name).toBe("sortedComplexSet")
+        expect(prop.nameDb).toBe("sortedComplexSet")
+        expect(prop.key).toBeUndefined()
+        expect(prop.transient).toBeFalsy()
+        expect(prop.isSortedCollection).toBeTruthy()
+
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(Set)
+
+        expect(prop.typeInfo.genericTypes).toBeDefined()
+        expect(prop.typeInfo.genericTypes.length).toBe(1)
+        expect(prop.typeInfo.genericTypes[0]).toBe(NestedObject)
       })
 
       it("mapWithNoType", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "mapWithNoType")
+        let prop = getProperty(modelOptions, "mapWithNoType")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("mapWithNoType")
         expect(prop.name).toBe("mapWithNoType")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeTruthy()
+        expect(prop.nameDb).toBe("mapWithNoType")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe(Object)
-        expect(prop.typeName).toBe("Object")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(Object)
       })
 
       it("transientField", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "transientField")
+        let prop = getProperty(modelOptions, "transientField")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("transientField")
         expect(prop.name).toBe("transientField")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeFalsy()
+        expect(prop.nameDb).toBe("transientField")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeTruthy()
-        expect(prop.type).toBe(String)
-        expect(prop.typeName).toBe("String")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeFalsy()
+        expect(prop.typeInfo.type).toBe(String)
       })
 
       it("simpleProperty", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "simpleProperty")
+        let prop = getProperty(modelOptions, "simpleProperty")
         expect(prop).toBeUndefined()
       })
 
       it("nestedObject", () => {
-        let prop: PropertyMetadata = getProperty(modelOptions, "nestedObj")
+        let prop = getProperty(modelOptions, "nestedObj")
         expect(prop).toBeDefined()
-        expect(prop.key).toBe("nestedObj")
         expect(prop.name).toBe("nestedObj")
-        expect(prop.partitionKey).toBeFalsy()
-        expect(prop.sortKey).toBeFalsy()
-        expect(prop.customType).toBeTruthy()
+        expect(prop.nameDb).toBe("nestedObj")
+        expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
-        expect(prop.type).toBe(NestedObject)
-        expect(prop.typeName).toBe("NestedObject")
+        expect(prop.typeInfo).toBeDefined()
+        expect(prop.typeInfo.isCustom).toBeTruthy()
+        expect(prop.typeInfo.type).toBe(NestedObject)
       })
     })
   })
 })
 
-function getProperty(
-  modelOptions: ModelMetadata,
-  propertyKey: string
-): PropertyMetadata | undefined {
-  return modelOptions.properties.find(property => property.key === propertyKey)
+function getProperty<T, K extends keyof T>(
+  modelOptions: ModelMetadata<T>,
+  propertyKey: K
+): PropertyMetadata<T[K]> | undefined {
+  return modelOptions.properties.find(property => property.name === propertyKey)
 }

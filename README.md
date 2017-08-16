@@ -19,22 +19,66 @@ This is an experimental feature and requires to set the
 - "experimentalDecorators": true
 - "emitDecoratorMetadata": true
 
-compiler options.
-Additionally we rely on the reflect-metadata (https://www.npmjs.com/package/reflect-metadata) package for reflection api.
+typescript compiler options.
+
+Additionally we rely on the reflect-metadata (https://www.npmjs.com/package/reflect-metadata) library for reflection api.
 
 To get started with decorators just add a @Model() Decorator to any ts class. By default this enables the custom mapping functionality
-and will get you started to work with Dynamo DB.
+and will get you started to work with Dynamo DB and simple types (like String, Number, Boolean etc. but no custom classes for example)
 
 We make heavy usage of compile time informations about our models and the property types.
-ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get, so we need some extra info.
+Here is a list of the types that can be retrieved from compile time information for the key design:type. (The metadata will only be added if at least one decorator is
+present on a property)
 
-Along the way we will probably need some extra features. Here is a list of these:
+String
+Number
+Boolean
+Array (no generics)
+Custom Types
+
+Map / Set will be Object
+
+Generic information is never available due to some serialization limitations at the time of writing.
+
+ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get(design:type), so we need some extra info.
+
+**** Collections *****
+
+#Array
+Javascript Arrays with a a items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
+If an item of an Array has a complex type the type can be defined using the @TypedArray() Decorator.
+
+#Set
+es6 Set types will be marshalled to dynamoDb set type if the type of the set is supported, if the type is not supported it will be
+marshalled to an dynamoDB List.  
+
+When one of the following decorators is added, the value is marshalled to a List type.
+@SortedSet(), @Set(complexType?)
+
 
 **Custom TableName**
 @Model({tableName: tableName})
 
 
 #### Types
+
+Simple Type (no decorators requried to work)
+- String
+- Number
+- Boolean
+- Null
+- Array
+
+- Date (moment) is mapped by convention (see TODO:addLink Dates)
+
+Complex Types (properties with these types need some decorators to work properly)
+- Set<simpleType | complexType>
+- Map
+- Array<complexType>
+
+##### Date #####
+Two Date types are supported. Default JS Date and moment dates.
+
 The type defines how a value will be mapped. Types can be defined using decorators (for complex types) or we use one of the following methods:
 fromDB  ->  use default for DynamoDB type (see type table)
 toDB    ->  use property value to resolve the type

@@ -14,7 +14,7 @@ import {
   ScanInput,
   ScanOutput,
   UpdateItemInput,
-  UpdateItemOutput
+  UpdateItemOutput,
 } from "aws-sdk/clients/dynamodb"
 import { Observable } from "rxjs/Observable"
 

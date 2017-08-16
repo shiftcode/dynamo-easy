@@ -8,10 +8,10 @@ export interface ModelData {
  * Options provided to model
  * decorator annotation
  */
-export interface ModelMetadata {
+export interface ModelMetadata<T> {
   clazzName?: string
   clazz?: any
   tableName?: string
-  properties?: PropertyMetadata[]
+  properties?: PropertyMetadata<T[keyof T]>[]
   transientProperties?: string[]
 }

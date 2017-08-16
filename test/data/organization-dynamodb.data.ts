@@ -22,10 +22,10 @@ export const organization1Employee2CreatedAt: moment.Moment = moment(
 export const organizationFromDb: AttributeMap<Organization> = <any>{
   id: { S: "myId" },
   createdAtDate: {
-    S: organization1CreatedAt.clone().utc().format(moment.defaultFormat)
+    S: organization1CreatedAt.clone().utc().format(moment.defaultFormat),
   },
   lastUpdated: {
-    S: organization1LastUpdated.clone().utc().format(moment.defaultFormat)
+    S: organization1LastUpdated.clone().utc().format(moment.defaultFormat),
   },
   active: { BOOL: true },
   count: { N: "52" },
@@ -39,9 +39,10 @@ export const organizationFromDb: AttributeMap<Organization> = <any>{
             S: organization1Employee1CreatedAt
               .clone()
               .utc()
-              .format(moment.defaultFormat)
-          }
-        }
+              .format(moment.defaultFormat),
+          },
+          sortedSet: { L: [{ S: "first" }, { S: "third" }, { S: "second" }] },
+        },
       },
       {
         M: {
@@ -51,13 +52,15 @@ export const organizationFromDb: AttributeMap<Organization> = <any>{
             S: organization1Employee2CreatedAt
               .clone()
               .utc()
-              .format(moment.defaultFormat)
-          }
-        }
-      }
-    ]
+              .format(moment.defaultFormat),
+          },
+          sortedSet: { L: [{ S: "first" }, { S: "third" }, { S: "second" }] },
+        },
+      },
+    ],
   },
   cities: { SS: ["zürich", "bern"] },
   awardWinningYears: { NS: ["2002", "2015", "2017"] },
-  mixedList: { L: [{ S: "sample" }, { N: "26" }, { BOOL: true }] }
+  mixedList: { L: [{ S: "sample" }, { N: "26" }, { BOOL: true }] },
+  sortedSet: { L: [{ S: "1" }, { S: "2" }] },
 }

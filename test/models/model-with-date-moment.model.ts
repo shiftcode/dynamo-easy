@@ -1,7 +1,8 @@
-import { Model } from "../../src/decorators/model.decorator"
-import { PartitionKey } from "../../src/decorators/partition-key.decorator"
-import { SortKey } from "../../src/decorators/sort-key.decorator"
-import { Type } from "../../src/decorators/type.decorator"
+import { Model } from "../../src/decorator/model.decorator"
+import { PartitionKey } from "../../src/decorator/partition-key.decorator"
+import { SortKey } from "../../src/decorator/sort-key.decorator"
+import { Moment } from "../../src/moment.type"
+import { Date } from "../../src/decorator/date.decorator"
 import moment from "moment"
 
 @Model()
@@ -10,5 +11,5 @@ export class ModelWithDateMoment {
 
   @SortKey() creationDate: moment.Moment
 
-  @Type("moment") lastUpdated: moment.Moment
+  @Date() lastUpdated: moment.Moment
 }

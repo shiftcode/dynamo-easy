@@ -17,7 +17,7 @@ export class MapMapper implements MapperForType<Map<any, any>> {
     }
 
     return {
-      M: Mapper.mapToDb<any>(obj)
+      M: Mapper.toDb<any>(obj),
     }
   }
 }
