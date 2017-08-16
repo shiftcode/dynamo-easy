@@ -1,10 +1,10 @@
 import { QueryInput } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
 import { Observable } from 'rxjs/Observable'
-import { DynamoRx } from '../../dynamo-rx'
 import { Request } from '../request.model'
 import { MetadataHelper } from '../../decorator/metadata'
 import { Response } from '../response.model'
+import { DynamoRx } from '../../dynamo/dynamo-rx'
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/query.js
 export class QueryRequest<T> extends Request<T> {

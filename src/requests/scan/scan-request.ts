@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable'
-import { DynamoRx } from '../../dynamo-rx'
 import { Request } from '../request.model'
 import { Response } from '../response.model'
+import { DynamoRx } from '../../dynamo/dynamo-rx'
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/scan.js
 export class ScanRequest<T> extends Request<T> {

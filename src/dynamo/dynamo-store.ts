@@ -1,12 +1,12 @@
-import { PutItemInput, BatchGetItemInput, DeleteItemInput, AttributeMap } from 'aws-sdk/clients/dynamodb'
+import { BatchGetItemInput, DeleteItemInput, AttributeMap } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
-import { MetadataHelper } from './decorator/metadata'
 import { DynamoRx } from './dynamo-rx'
-import { Mapper } from './mapper/mapper'
-import { QueryRequest } from './requests/query/query-request'
-import { ScanRequest } from './requests/scan/scan-request'
-import { ModelConstructor } from './model/model-constructor'
 import * as Debug from 'debug'
+import { Mapper } from '../mapper/mapper'
+import { ModelConstructor } from '../model/model-constructor'
+import { MetadataHelper } from '../decorator/metadata'
+import { QueryRequest } from '../requests/query/query-request'
+import { ScanRequest } from '../requests/scan/scan-request'
 
 export class DynamoStore<T> {
   private readonly debug: Debug.IDebugger = Debug('dynamo-store')
