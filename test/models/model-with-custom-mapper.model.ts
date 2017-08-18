@@ -10,7 +10,7 @@ export class Id {
   counter: number
   year: number
 
-  constructor(counter: number, year: number) {
+  constructor(counter?: number, year?: number) {
     this.counter = counter
     this.year = year
   }
@@ -21,8 +21,8 @@ export class IdMapper implements MapperForType<Id> {
     const id: Id = new Id()
 
     const idString = attributeValue.S
-    id.counter = Number.parseInt(idString.slice(0, 4).replace('0', ''))
-    id.year = Number.parseInt(idString.slice(4, 8))
+    id.counter = parseInt(idString.slice(0, 4).replace('0', ''), 10)
+    id.year = parseInt(idString.slice(4, 8), 10)
 
     return id
   }
