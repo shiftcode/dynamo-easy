@@ -1,5 +1,5 @@
-import { PropertyMetadata } from './property-metadata.model'
 import { SecondaryIndex } from './model.decorator'
+import { PropertyMetadata } from './property-metadata.model'
 
 export interface ModelData {
   tableName?: string

@@ -1,5 +1,5 @@
-import { Model } from "../../src/decorator/model.decorator"
-import { SortedSet } from "../../src/decorator/sorted-set.decorator"
+import { Model } from '../../src/decorator/model.decorator'
+import { SortedSet } from '../../src/decorator/sorted-set.decorator'
 
 @Model()
 export class NestedComplexModel {
@@ -7,6 +7,6 @@ export class NestedComplexModel {
   @SortedSet() sortedSet: Set<string>
 
   constructor() {
-    this.sortedSet = new Set(["firstValue", "secondeValue"])
+    this.sortedSet = new Set(['firstValue', 'secondeValue'])
   }
 }

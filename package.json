@@ -31,11 +31,11 @@
     "commit": "git-cz",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-    "precommit": "lint-staged"
+    "prettier:all": "prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5 '+(src|test|e2e)/**/*.ts'",
   },
   "lint-staged": {
-    "{src,test}/**/*.ts": [
-      "prettier --print-width 170 --single-quote --no-semi --write --trailing-comma es5",
+    "*.ts": [
+      "prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5",
       "git add"
     ]
   },

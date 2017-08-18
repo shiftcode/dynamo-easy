@@ -5,7 +5,14 @@ import { PropertyMetadata } from '../src/decorator/property-metadata.model'
 import { ComplexModel, NestedObject } from './models/complex.model'
 import { CustomTableNameModel } from './models/custom-table-name.model'
 import { ModelWithDateMoment } from './models/model-with-date-moment.model'
-import { DifferentModel, INDEX_ACTIVE_CREATED_AT, INDEX_COUNT, ModelWithABunchOfIndexes, ModelWithGSI, ModelWithWrongIndexes } from './models/model-with-indexes.model'
+import {
+  DifferentModel,
+  INDEX_ACTIVE_CREATED_AT,
+  INDEX_COUNT,
+  ModelWithABunchOfIndexes,
+  ModelWithGSI,
+  ModelWithWrongIndexes,
+} from './models/model-with-indexes.model'
 import { SimpleModel } from './models/simple.model'
 
 describe('Decorators should add correct metadata', () => {
@@ -376,6 +383,9 @@ describe('Decorators should add correct metadata', () => {
   })
 })
 
-function getProperty<T, K extends keyof T>(modelOptions: ModelMetadata<T>, propertyKey: K): PropertyMetadata<T[K]> | undefined {
+function getProperty<T, K extends keyof T>(
+  modelOptions: ModelMetadata<T>,
+  propertyKey: K
+): PropertyMetadata<T[K]> | undefined {
   return modelOptions.properties.find(property => property.name === propertyKey)
 }

@@ -42,7 +42,10 @@ export class Metadata<T> {
     return null
   }
 
-  private filterBy<R>(predicate: (property: PropertyMetadata<any>) => boolean, defaultValue: R = null): Array<PropertyMetadata<any>> | R {
+  private filterBy<R>(
+    predicate: (property: PropertyMetadata<any>) => boolean,
+    defaultValue: R = null
+  ): Array<PropertyMetadata<any>> | R {
     if (this.modelOptions && this.modelOptions.properties) {
       const properties = this.modelOptions.properties.filter(predicate)
       if (properties && properties.length) {
@@ -68,9 +71,12 @@ export class MetadataHelper {
     return Reflect.getMetadata(KEY_MODEL, modelClass)
   }
 
-  static forProperty<T, K extends keyof T>(modelClass: ModelConstructor<T>, propertyKey: K): PropertyMetadata<T[K]> | null {
+  static forProperty<T, K extends keyof T>(
+    modelClass: ModelConstructor<T>,
+    propertyKey: K
+  ): PropertyMetadata<T[K]> | null {
     if (modelClass) {
-      let modelMetadata: ModelMetadata<T> = Reflect.getMetadata(KEY_MODEL, modelClass)
+      const modelMetadata: ModelMetadata<T> = Reflect.getMetadata(KEY_MODEL, modelClass)
 
       if (modelClass && !modelMetadata) {
         throw new Error(

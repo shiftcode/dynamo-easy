@@ -9,7 +9,15 @@ import { Condition } from './condition.model'
 export class Expressions {
   static actionWords = ['SET', 'ADD', 'REMOVE', 'DELETE']
 
-  static functionOperators = ['attribute_exists', 'attribute_not_exists', 'attribute_type', 'begins_with', 'contains', 'NOT contains', 'size']
+  static functionOperators = [
+    'attribute_exists',
+    'attribute_not_exists',
+    'attribute_type',
+    'begins_with',
+    'contains',
+    'NOT contains',
+    'size',
+  ]
 
   static regexMap = <{ [key: string]: RegExp }>_.reduce(
     Expressions.actionWords,
@@ -42,7 +50,10 @@ export class Expressions {
   }
 
   static isFunctionOperator(operator: ConditionOperator): boolean {
-    return _.includes(['attribute_exists', 'attribute_not_exists', 'attribute_type', 'begins_with', 'contains', 'NOT contains', 'size'], operator)
+    return _.includes(
+      ['attribute_exists', 'attribute_not_exists', 'attribute_type', 'begins_with', 'contains', 'NOT contains', 'size'],
+      operator
+    )
   }
 
   static uniqAttributeValueName(key: string, existingValueNames: string[]): string {

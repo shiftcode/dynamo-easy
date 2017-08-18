@@ -32,7 +32,11 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
       partitionKey = this.metaData.getPartitionKey()
     }
 
-    return ConditionBuilder.addKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData.forProperty(partitionKey)).equals(partitionKeyValue)
+    return ConditionBuilder.addKeyCondition<QueryRequest<T>>(
+      partitionKey,
+      this,
+      this.metaData.forProperty(partitionKey)
+    ).equals(partitionKeyValue)
   }
 
   /**

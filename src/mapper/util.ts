@@ -67,7 +67,10 @@ export class Util {
   }
 
   static isSet(value: any): value is Set<any> {
-    return (value !== null && value !== undefined && value.hasOwnProperty('name') && (<any>value).name === 'Set') || value instanceof Set
+    return (
+      (value !== null && value !== undefined && value.hasOwnProperty('name') && (<any>value).name === 'Set') ||
+      value instanceof Set
+    )
   }
 
   // FIXME should we handle duplicates -> switch to L(ist) instead of S(et)
@@ -146,7 +149,7 @@ export class Util {
    */
   static typeOfFromDb(attributeValue: AttributeValue): AttributeModelType | null {
     if (attributeValue) {
-      let dynamoType: AttributeType = <AttributeType>Object.keys(attributeValue)[0]
+      const dynamoType: AttributeType = <AttributeType>Object.keys(attributeValue)[0]
       switch (dynamoType) {
         case 'S':
           if (Util.DATE_TIME_ISO8601.test(attributeValue.S)) {
@@ -235,8 +238,8 @@ export class Util {
       if (Object.prototype.hasOwnProperty.call(type, 'name')) {
         return type.name
       } else {
-        let str = type.toString()
-        let match = str.match(/^\s*function (.+)\(/)
+        const str = type.toString()
+        const match = str.match(/^\s*function (.+)\(/)
         return match ? match[1] : str
       }
     } else {

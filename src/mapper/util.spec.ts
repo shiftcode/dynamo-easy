@@ -1,8 +1,8 @@
 import moment from 'moment'
 import { Employee } from '../../test/models/employee.model'
-import { Util } from './util'
 import { Moment } from '../decorator/moment.type'
 import { NullType, UndefinedType } from './attribute-model-type.type'
+import { Util } from './util'
 
 xdescribe('Util', () => {
   describe('matches convention', () => {
@@ -140,7 +140,7 @@ xdescribe('Util', () => {
     })
 
     it('number (NaN)', () => {
-      let nan: number = NaN
+      const nan = NaN
       expect(Util.typeOf(nan)).toBe(Number)
     })
 

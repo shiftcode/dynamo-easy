@@ -1,15 +1,15 @@
-import { TypedArray } from "../../src/decorator/array.decorator"
-import { Model } from "../../src/decorator/model.decorator"
-import { PartitionKey } from "../../src/decorator/partition-key.decorator"
-import { TypedSet } from "../../src/decorator/typed-set.decorator"
-import { SortKey } from "../../src/decorator/sort-key.decorator"
-import { SortedSet } from "../../src/decorator/sorted-set.decorator"
-import { Transient } from "../../src/decorator/transient.decorator"
-import { NestedModel } from "../../src/sample.model"
-import { Employee } from "./employee.model"
-import { Date } from "../../src/decorator/date.decorator"
-import { Property } from "../../src/decorator/property.decorator"
-import moment from "moment"
+import moment from 'moment'
+import { TypedArray } from '../../src/decorator/array.decorator'
+import { Date } from '../../src/decorator/date.decorator'
+import { Model } from '../../src/decorator/model.decorator'
+import { PartitionKey } from '../../src/decorator/partition-key.decorator'
+import { Property } from '../../src/decorator/property.decorator'
+import { SortKey } from '../../src/decorator/sort-key.decorator'
+import { SortedSet } from '../../src/decorator/sorted-set.decorator'
+import { Transient } from '../../src/decorator/transient.decorator'
+import { TypedSet } from '../../src/decorator/typed-set.decorator'
+import { NestedModel } from '../../src/sample.model'
+import { Employee } from './employee.model'
 
 // @Model()
 // export class Award {
@@ -38,9 +38,7 @@ export class Birthday {
   constructor(date: moment.Moment, ...gifts: string[]) {
     this.date = date
     const giftArr: Gift[] = []
-    gifts.forEach(giftDescription =>
-      giftArr.push({ description: giftDescription })
-    )
+    gifts.forEach(giftDescription => giftArr.push({ description: giftDescription }))
     this.presents = giftArr
   }
 }
@@ -49,7 +47,7 @@ export class Birthday {
 export class OrganizationEvent {
   name: string
 
-  @Property({ name: "participantCount" })
+  @Property({ name: 'participantCount' })
   participants: number
 
   constructor(name: string, participants: number) {
@@ -58,7 +56,7 @@ export class OrganizationEvent {
   }
 }
 
-@Model({ tableName: "Organization" })
+@Model({ tableName: 'Organization' })
 export class Organization {
   // String
   @PartitionKey() id: string

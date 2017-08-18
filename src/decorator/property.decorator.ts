@@ -10,7 +10,7 @@ import { PropertyMetadata, TypeInfo } from './property-metadata.model'
 
 export const KEY_PROPERTY = 'sc-reflect:property'
 
-export type AttributeModelTypes = String | Number | Boolean | Date | Moment | Set<any> | Array<any>
+export type AttributeModelTypes = String | Number | Boolean | Date | Moment | Set<any> | any[]
 
 export interface IndexData {
   name: string
@@ -35,10 +35,16 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
   let propertyMetadata: Partial<PropertyMetadata<any>>
   switch (indexType) {
     case IndexType.GSI:
-      propertyMetadata = initOrUpdateGSI(existingProperty && existingProperty.keyForGSI ? existingProperty.keyForGSI : {}, indexData)
+      propertyMetadata = initOrUpdateGSI(
+        existingProperty && existingProperty.keyForGSI ? existingProperty.keyForGSI : {},
+        indexData
+      )
       break
     case IndexType.LSI:
-      propertyMetadata = initOrUpdateLSI(existingProperty && existingProperty.sortKeyForLSI ? existingProperty.sortKeyForLSI : [], indexData)
+      propertyMetadata = initOrUpdateLSI(
+        existingProperty && existingProperty.sortKeyForLSI ? existingProperty.sortKeyForLSI : [],
+        indexData
+      )
       break
   }
 
@@ -47,7 +53,9 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
 
 function initOrUpdateGSI(indexes: { [key: string]: KeyType }, indexData: IndexData): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
-    throw new Error('the property with name is already registered as key for index - one property can only define one key per index')
+    throw new Error(
+      'the property with name is already registered as key for index - one property can only define one key per index'
+    )
   } else {
     indexes[indexData.name] = indexData.keyType
   }
@@ -60,7 +68,11 @@ function initOrUpdateLSI(indexes: string[], indexData: IndexData): Partial<Prope
   return { sortKeyForLSI: indexes }
 }
 
-export function initOrUpdateProperty(propertyMetadata: Partial<PropertyMetadata<any>> = {}, target: any, propertyKey: string): void {
+export function initOrUpdateProperty(
+  propertyMetadata: Partial<PropertyMetadata<any>> = {},
+  target: any,
+  propertyKey: string
+): void {
   // Update the attribute array
 
   const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
@@ -80,7 +92,11 @@ export function initOrUpdateProperty(propertyMetadata: Partial<PropertyMetadata<
   Reflect.defineMetadata(KEY_PROPERTY, properties, target.constructor)
 }
 
-function createNewProperty(propertyOptions: Partial<PropertyMetadata<any>> = {}, target: any, propertyKey: string): PropertyMetadata<any> {
+function createNewProperty(
+  propertyOptions: Partial<PropertyMetadata<any>> = {},
+  target: any,
+  propertyKey: string
+): PropertyMetadata<any> {
   let propertyType: AttributeModelType = getMetadataType(target, propertyKey)
   let customType = isCustomType(propertyType)
 
@@ -117,15 +133,12 @@ function createNewProperty(propertyOptions: Partial<PropertyMetadata<any>> = {},
 
   // console.log(`#### propertyKey: ${propertyKey} / typeInfo: ${JSON.stringify(typeInfo)}`);
 
-  propertyOptions = Object.assign<any, Partial<PropertyMetadata<any>>, Partial<PropertyMetadata<any>>>(
-    {},
-    {
+  propertyOptions = {
       name: propertyKey,
       nameDb: propertyKey,
       typeInfo,
-    },
-    propertyOptions
-  )
+    ...propertyOptions
+  }
 
   return <PropertyMetadata<any>>propertyOptions
 }

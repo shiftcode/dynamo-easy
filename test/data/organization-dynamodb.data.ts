@@ -1,26 +1,14 @@
-import moment from "moment"
-import { AttributeMap } from "../../attribute-map.type"
-import { Organization } from "../models/organization.model"
+import moment from 'moment'
+import { AttributeMap } from '../../attribute-map.type'
+import { Organization } from '../models/organization.model'
 
-export const organization1CreatedAt: moment.Moment = moment(
-  "2017-05-15",
-  "YYYY-MM-DD"
-)
-export const organization1LastUpdated: moment.Moment = moment(
-  "2017-07-25",
-  "YYYY-MM-DD"
-)
-export const organization1Employee1CreatedAt: moment.Moment = moment(
-  "2015-02-15",
-  "YYYY-MM-DD"
-)
-export const organization1Employee2CreatedAt: moment.Moment = moment(
-  "2015-07-03",
-  "YYYY-MM-DD"
-)
+export const organization1CreatedAt: moment.Moment = moment('2017-05-15', 'YYYY-MM-DD')
+export const organization1LastUpdated: moment.Moment = moment('2017-07-25', 'YYYY-MM-DD')
+export const organization1Employee1CreatedAt: moment.Moment = moment('2015-02-15', 'YYYY-MM-DD')
+export const organization1Employee2CreatedAt: moment.Moment = moment('2015-07-03', 'YYYY-MM-DD')
 
 export const organizationFromDb: AttributeMap<Organization> = <any>{
-  id: { S: "myId" },
+  id: { S: 'myId' },
   createdAtDate: {
     S: organization1CreatedAt.clone().utc().format(moment.defaultFormat),
   },
@@ -28,39 +16,33 @@ export const organizationFromDb: AttributeMap<Organization> = <any>{
     S: organization1LastUpdated.clone().utc().format(moment.defaultFormat),
   },
   active: { BOOL: true },
-  count: { N: "52" },
+  count: { N: '52' },
   employees: {
     L: [
       {
         M: {
-          name: { S: "max" },
-          age: { N: "50" },
+          name: { S: 'max' },
+          age: { N: '50' },
           createdAt: {
-            S: organization1Employee1CreatedAt
-              .clone()
-              .utc()
-              .format(moment.defaultFormat),
+            S: organization1Employee1CreatedAt.clone().utc().format(moment.defaultFormat),
           },
-          sortedSet: { L: [{ S: "first" }, { S: "third" }, { S: "second" }] },
+          sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },
       },
       {
         M: {
-          name: { S: "anna" },
-          age: { N: "27" },
+          name: { S: 'anna' },
+          age: { N: '27' },
           createdAt: {
-            S: organization1Employee2CreatedAt
-              .clone()
-              .utc()
-              .format(moment.defaultFormat),
+            S: organization1Employee2CreatedAt.clone().utc().format(moment.defaultFormat),
           },
-          sortedSet: { L: [{ S: "first" }, { S: "third" }, { S: "second" }] },
+          sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },
       },
     ],
   },
-  cities: { SS: ["zürich", "bern"] },
-  awardWinningYears: { NS: ["2002", "2015", "2017"] },
-  mixedList: { L: [{ S: "sample" }, { N: "26" }, { BOOL: true }] },
-  sortedSet: { L: [{ S: "1" }, { S: "2" }] },
+  cities: { SS: ['zürich', 'bern'] },
+  awardWinningYears: { NS: ['2002', '2015', '2017'] },
+  mixedList: { L: [{ S: 'sample' }, { N: '26' }, { BOOL: true }] },
+  sortedSet: { L: [{ S: '1' }, { S: '2' }] },
 }

@@ -1,7 +1,7 @@
 import { Util } from '../mapper/util'
 import { ModelConstructor } from '../model/model-constructor'
-import { initOrUpdateProperty } from './property.decorator'
 import { TypeInfo } from './property-metadata.model'
+import { initOrUpdateProperty } from './property.decorator'
 
 /**
  * Makes sure the property will be marshalled to a S(et) type. The modelClass is required for additional type saftey
@@ -25,6 +25,6 @@ export function TypedSet(modelClass?: ModelConstructor<any>): PropertyDecorator 
       typeInfo.genericTypes = [modelClass]
     }
 
-    initOrUpdateProperty({ typeInfo: typeInfo }, target, propertyKey)
+    initOrUpdateProperty({ typeInfo }, target, propertyKey)
   }
 }

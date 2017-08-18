@@ -1,17 +1,21 @@
+import { ExpressionAttributeValueMap, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
+import { isEmpty, isString } from 'lodash'
+import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Request } from '../request.model'
 import { ConditionFunction, ConditionFunctionA } from './condition-function'
 import { ConditionOperator } from './condition-operator.type'
-import { Expressions } from './expressions'
 import { Condition } from './condition.model'
-import { ExpressionAttributeValueMap, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash'
-import { PropertyMetadata } from '../../decorator/property-metadata.model'
+import { Expressions } from './expressions'
 import { ParamUtil } from './param-util'
 import { RangeKeyConditionFunction } from './range-key-condition-function'
 
 export class ConditionBuilder {
-  static addCondition<T extends Request<any, any>>(keyName: string, request: T, propetyMetadata?: PropertyMetadata<any>): ConditionFunction<T> {
+  static addCondition<T extends Request<any, any>>(
+    keyName: string,
+    request: T,
+    propetyMetadata?: PropertyMetadata<any>
+  ): ConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (/* values */): T => {
         const copy = Array.prototype.slice.call(arguments)
@@ -41,7 +45,11 @@ export class ConditionBuilder {
     }
   }
 
-  static addKeyCondition<T extends Request<any, any>>(keyName: string, request: T, propetyMetadata?: PropertyMetadata<any>): RangeKeyConditionFunction<T> {
+  static addKeyCondition<T extends Request<any, any>>(
+    keyName: string,
+    request: T,
+    propetyMetadata?: PropertyMetadata<any>
+  ): RangeKeyConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (/* values */): T => {
         const copy = Array.prototype.slice.call(arguments)
@@ -65,7 +73,11 @@ export class ConditionBuilder {
     }
   }
 
-  static build<T>(keyName: string, propertyMetadata: PropertyMetadata<any>, expressionAttributeValues?: ExpressionAttributeValueMap): ConditionFunctionA {
+  static build<T>(
+    keyName: string,
+    propertyMetadata: PropertyMetadata<any>,
+    expressionAttributeValues?: ExpressionAttributeValueMap
+  ): ConditionFunctionA {
     const f = (operator: ConditionOperator) => {
       return (/* values */): Condition => {
         const copy = Array.prototype.slice.call(arguments)

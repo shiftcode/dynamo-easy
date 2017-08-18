@@ -1,7 +1,7 @@
-import { MapperForType } from './base.mapper'
 import construct = Reflect.construct
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { Mapper } from '../mapper'
+import { MapperForType } from './base.mapper'
 
 export class MapMapper implements MapperForType<Map<any, any>> {
   constructor() {}
@@ -11,8 +11,8 @@ export class MapMapper implements MapperForType<Map<any, any>> {
   }
 
   toDb(propertyValue: Map<any, any>): AttributeValue {
-    let obj: { [key: string]: string } = {}
-    for (let [key, value] of propertyValue) {
+    const obj: { [key: string]: string } = {}
+    for (const [key, value] of propertyValue) {
       obj[key] = value
     }
 

@@ -6,9 +6,9 @@ import 'rxjs/add/observable/fromPromise'
 import 'rxjs/add/observable/of'
 //
 import 'rxjs/add/operator/map'
-import { QueryRequest } from './requests/query/query-request'
-import { DynamoRx } from './dynamo/dynamo-rx'
 import { INDEX_ACTIVE_CREATED_AT, ModelWithGSI } from '../test/models/model-with-indexes.model'
+import { DynamoRx } from './dynamo/dynamo-rx'
+import { QueryRequest } from './requests/query/query-request'
 
 // 'default' means we use js Date object or momentjs implementation for 'momentjs'
 export type DateTypes = 'default' | 'moment'
@@ -18,7 +18,7 @@ export class ScDynamoObjectMapper {
   static config: { dateType: DateTypes } = { dateType: 'moment' }
 
   constructor() {
-    let map: Map<string, string> = new Map()
+    const map: Map<string, string> = new Map()
 
     // const qReq = new QueryRequest(new DynamoRx(), ModelWithGSI);
     // qReq.index(INDEX_ACTIVE_CREATED_AT)

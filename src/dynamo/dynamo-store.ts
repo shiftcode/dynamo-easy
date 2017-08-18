@@ -1,12 +1,12 @@
-import { BatchGetItemInput, DeleteItemInput, AttributeMap } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
-import { DynamoRx } from './dynamo-rx'
+import { AttributeMap, BatchGetItemInput, DeleteItemInput } from 'aws-sdk/clients/dynamodb'
 import * as Debug from 'debug'
+import { Observable } from 'rxjs/Observable'
+import { MetadataHelper } from '../decorator/metadata'
 import { Mapper } from '../mapper/mapper'
 import { ModelConstructor } from '../model/model-constructor'
-import { MetadataHelper } from '../decorator/metadata'
 import { QueryRequest } from '../requests/query/query-request'
 import { ScanRequest } from '../requests/scan/scan-request'
+import { DynamoRx } from './dynamo-rx'
 
 export class DynamoStore<T> {
   private readonly debug: Debug.IDebugger = Debug('dynamo-store')
@@ -20,9 +20,8 @@ export class DynamoStore<T> {
   }
 
   put(item: T, ifNotExists?: boolean): Observable<void> {
-    let params: any = Object.assign({}, this.createBaseParams(), {
-      Item: Mapper.toDb(item, this.modelClazz),
-    })
+    const params: any = {...this.createBaseParams(), 
+      Item: Mapper.toDb(item, this.modelClazz)}
 
     // FIXME add ifNotExists condition
     return this.dynamoRx.putItem(params).map(() => {

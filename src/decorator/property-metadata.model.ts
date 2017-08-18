@@ -10,7 +10,7 @@ export interface TypeInfo<T> {
   // true if we use a non native type for dynamo document client
   isCustom?: boolean
   // FIXME should we support only one generic type for now?
-  genericTypes?: ModelConstructor<any>[]
+  genericTypes?: Array<ModelConstructor<any>>
   // genericNames?: AttributeModelTypeName[];
 }
 
@@ -53,5 +53,10 @@ export interface PropertyMetadata<T> {
 }
 
 export function hasGenericType(propertyMetadata: PropertyMetadata<any>): boolean {
-  return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericTypes && propertyMetadata.typeInfo.genericTypes.length)
+  return !!(
+    propertyMetadata &&
+    propertyMetadata.typeInfo &&
+    propertyMetadata.typeInfo.genericTypes &&
+    propertyMetadata.typeInfo.genericTypes.length
+  )
 }

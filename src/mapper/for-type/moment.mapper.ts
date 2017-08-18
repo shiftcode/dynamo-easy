@@ -4,7 +4,7 @@ import { MapperForType } from './base.mapper'
 
 export class MomentMapper implements MapperForType<moment.Moment> {
   fromDb(value: AttributeValue): moment.Moment {
-    let parsed: moment.Moment = moment(value.S, moment.ISO_8601)
+    const parsed: moment.Moment = moment(value.S, moment.ISO_8601)
     if (!parsed.isValid()) {
       throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
     }

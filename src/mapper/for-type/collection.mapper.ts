@@ -26,7 +26,12 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
 
     if (attributeValue.L) {
       let arr: any[]
-      if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericTypes && propertyMetadata.typeInfo.genericTypes.length) {
+      if (
+        propertyMetadata &&
+        propertyMetadata.typeInfo &&
+        propertyMetadata.typeInfo.genericTypes &&
+        propertyMetadata.typeInfo.genericTypes.length
+      ) {
         arr = attributeValue.L.map(item => Mapper.fromDb(item.M, propertyMetadata.typeInfo.genericTypes[0]))
       } else {
         arr = attributeValue.L.map(value => Mapper.fromDbOne(value))

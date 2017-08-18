@@ -1,11 +1,11 @@
-import { Condition } from './condition.model'
 import { QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
 import { isEmpty, isString } from 'lodash'
+import { Condition } from './condition.model'
 
 export class ParamUtil {
   static addFilterCondition<T>(condition: Condition, params: QueryInput | ScanInput) {
-    const expressionAttributeNames = Object.assign({}, condition.attributeNames, params.ExpressionAttributeNames)
-    const expressionAttributeValues = Object.assign({}, condition.attributeMap, params.ExpressionAttributeValues)
+    const expressionAttributeNames = {...condition.attributeNames, ...params.ExpressionAttributeNames}
+    const expressionAttributeValues = {...condition.attributeMap, ...params.ExpressionAttributeValues}
 
     if (!isEmpty(expressionAttributeNames)) {
       params.ExpressionAttributeNames = expressionAttributeNames
@@ -23,8 +23,8 @@ export class ParamUtil {
   }
 
   static addKeyCondition<T>(condition: Condition, params: QueryInput) {
-    const expressionAttributeNames = Object.assign({}, condition.attributeNames, params.ExpressionAttributeNames)
-    const expressionAttributeValues = Object.assign({}, condition.attributeMap, params.ExpressionAttributeValues)
+    const expressionAttributeNames = {...condition.attributeNames, ...params.ExpressionAttributeNames}
+    const expressionAttributeValues = {...condition.attributeMap, ...params.ExpressionAttributeValues}
 
     if (!isEmpty(expressionAttributeNames)) {
       params.ExpressionAttributeNames = expressionAttributeNames

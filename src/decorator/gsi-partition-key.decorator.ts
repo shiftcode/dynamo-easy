@@ -1,9 +1,9 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { Util } from '../mapper/util'
 import { ModelConstructor } from '../model/model-constructor'
+import { IndexType } from './index-type.enum'
 import { TypeInfo } from './property-metadata.model'
 import { initOrUpdateIndex, initOrUpdateProperty } from './property.decorator'
-import { IndexType } from './index-type.enum'
 
 export function GSIPartitionKey(indexName: string): PropertyDecorator {
   return (target: any, propertyKey: string) => {

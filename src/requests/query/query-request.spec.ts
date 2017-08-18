@@ -1,8 +1,8 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs/Observable'
 import { ComplexModel } from '../../../test/models/complex.model'
 import { DynamoRx } from '../../dynamo/dynamo-rx'
 import { QueryRequest } from './query-request'
-import { Observable } from 'rxjs/Observable'
 
 const DYNAMO_RX_MOCK = {
   query(params: QueryInput): Observable<QueryOutput> {

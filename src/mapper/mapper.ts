@@ -1,9 +1,12 @@
+import { ObjectType } from 'aws-sdk/clients/clouddirectory'
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 // FIXME make this dependency optional
 import moment from 'moment'
 import * as UUID from 'uuid'
 import { AttributeMap } from '../../attribute-map.type'
+import { Binary } from '../decorator/binary.type'
 import { Metadata, MetadataHelper } from '../decorator/metadata'
+import { Moment } from '../decorator/moment.type'
 import { PropertyMetadata } from '../decorator/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
 import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
@@ -19,9 +22,6 @@ import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
 import { StringMapper } from './for-type/string.mapper'
 import { Util } from './util'
-import { Binary } from '../decorator/binary.type'
-import { Moment } from '../decorator/moment.type'
-import { ObjectType } from 'aws-sdk/clients/clouddirectory'
 
 export type PropertyMapperName = Boolean | String | Number | Object | Date | 'moment'
 
@@ -33,10 +33,10 @@ export class Mapper {
   static mapperForType: Map<PropertyMapperName, MapperForType<any>> = new Map()
 
   static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): AttributeMap<T> {
-    let mapped: AttributeMap<T> = <AttributeMap<T>>{}
+    const mapped: AttributeMap<T> = <AttributeMap<T>>{}
 
     if (modelConstructor) {
-      let metadata: Metadata<T> = MetadataHelper.get(modelConstructor)
+      const metadata: Metadata<T> = MetadataHelper.get(modelConstructor)
 
       /*
        * initialize possible properties with auto generated uuid
@@ -44,7 +44,11 @@ export class Mapper {
       if (metadata) {
         metadata.getKeysWithUUID().forEach(propertyMetadata => {
           if (item[propertyMetadata.name]) {
-            throw Error(`property where a UUID decorator is present can not have any other value ${JSON.stringify(propertyMetadata)}`)
+            throw Error(
+              `property where a UUID decorator is present can not have any other value ${JSON.stringify(
+                propertyMetadata
+              )}`
+            )
           }
 
           item[propertyMetadata.name] = UUID.v1()
@@ -52,12 +56,12 @@ export class Mapper {
       }
     }
 
-    const propertyNames: (keyof T)[] = (<(keyof T)[]>Object.getOwnPropertyNames(item)) || []
+    const propertyNames: Array<keyof T> = (<Array<keyof T>>Object.getOwnPropertyNames(item)) || []
     propertyNames.forEach(propertyKey => {
       /*
        * 1) get the value of the property
        */
-      let propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
+      const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
 
       // use get accessor if available otherwise use value property of descriptor
       let propertyValue: any
@@ -116,7 +120,9 @@ export class Mapper {
 
   static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): AttributeValue {
     const explicitType: AttributeModelType | null =
-      propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom ? propertyMetadata.typeInfo.type : null
+      propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
+        ? propertyMetadata.typeInfo.type
+        : null
     const type: AttributeModelType = explicitType || Util.typeOf(propertyValue)
 
     // some basic validation
@@ -130,10 +136,15 @@ export class Mapper {
       type !== Number &&
       type !== Binary
     ) {
-      throw new Error(`make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key`)
+      throw new Error(
+        `make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key`
+      )
     }
 
-    if (type === 'Moment' && (!propertyMetadata || (propertyMetadata && propertyMetadata.typeInfo && !propertyMetadata.typeInfo.isCustom))) {
+    if (
+      type === 'Moment' &&
+      (!propertyMetadata || (propertyMetadata && propertyMetadata.typeInfo && !propertyMetadata.typeInfo.isCustom))
+    ) {
       // TODO there is gonna be a problem when we have to map back from db and we have no property metadata, we could introduce some regex matching, do we want that?
     }
 
@@ -147,14 +158,14 @@ export class Mapper {
   }
 
   static fromDb<T>(attributeMap: AttributeMap<T>, modelClass?: ModelConstructor<T>): T {
-    let model: T = <T>{}
+    const model: T = <T>{}
 
-    let propertyNames: (keyof T)[] = <(keyof T)[]>Object.getOwnPropertyNames(attributeMap)
+    const propertyNames: Array<keyof T> = <Array<keyof T>>Object.getOwnPropertyNames(attributeMap)
     propertyNames.forEach(propertyKey => {
       /*
        * 1) get the value of the property
        */
-      let attributeValue: AttributeValue = attributeMap[propertyKey]
+      const attributeValue: AttributeValue = attributeMap[propertyKey]
 
       /*
        * 2) decide how to map the property depending on type or value
@@ -203,7 +214,9 @@ export class Mapper {
 
   static fromDbOne<T>(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): T {
     const explicitType: AttributeModelType | null =
-      propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom ? propertyMetadata.typeInfo.type : null
+      propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
+        ? propertyMetadata.typeInfo.type
+        : null
     const type: AttributeModelType = explicitType || Util.typeOfFromDb(attributeValue)
 
     console.log(`mapFromDbOne for type ${type}`)
