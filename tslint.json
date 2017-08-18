@@ -1,10 +1,10 @@
 {
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier"
+  ],
   "rules": {
     "no-angle-bracket-type-assertion": false,
-    "max-line-length": [
-      true,
-      170
-    ],
     "interface-name": [
       true,
       "never-prefix"
@@ -25,13 +25,23 @@
       true,
       "no-public"
     ],
+    "prefer-conditional-expression": false,
+    "member-ordering": [
+      true,
+      "static-before-instance",
+      "variables-before-functions"
+    ],
+    "no-object-literal-type-assertion": false,
     "triple-equals": [
       true,
       "allow-null-check"
+    ],
+    "no-empty": false,
+    "no-string-literal": false,
+    "no-switch-case-fall-through": true,
+    "no-inferrable-types": [
+      true,
+      "ignore-params"
     ]
-  },
-  "extends": [
-    "tslint:recommended",
-    "tslint-config-prettier"
-  ]
+  }
 }
