@@ -32,6 +32,7 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "prettier:all": "prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5 '+(src|test|e2e)/**/*.ts'",
+    "precommit": "yarn run lint -- --fix && lint-staged"
   },
   "lint-staged": {
     "*.ts": [
@@ -78,6 +79,7 @@
     "@types/lodash": "^4.14.73",
     "@types/node": "^8.0.19",
     "@types/uuid": "^3.4.0",
+    "@types/winston": "^2.3.4",
     "colors": "^1.1.2",
     "commitizen": "^2.9.6",
     "coveralls": "^2.13.1",
@@ -112,6 +114,7 @@
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "reflect-metadata": "^0.1.10",
-    "uuid": "^3.1.0"
+    "uuid": "^3.1.0",
+    "winston": "^2.3.1"
   }
 }

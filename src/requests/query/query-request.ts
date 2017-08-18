@@ -1,7 +1,7 @@
 import { QueryInput } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
 import { Observable } from 'rxjs/Observable'
-import { Metadata, MetadataHelper } from '../../decorator/metadata'
+import { Metadata } from '../../decorator/metadata'
 import { SecondaryIndex } from '../../decorator/model.decorator'
 import { DynamoRx } from '../../dynamo/dynamo-rx'
 import { ModelConstructor } from '../../model/model-constructor'

@@ -23,6 +23,7 @@ _ (underscore)
 . (dot)
  */
 export function Model<T>(opts: ModelData = {}): ClassDecorator {
+  // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
     // Make sure everything is valid
     const classType = getMetadataType(constructor)
@@ -51,13 +52,13 @@ export function Model<T>(opts: ModelData = {}): ClassDecorator {
         : []
 
     const finalOpts = {
-        clazz: constructor,
-        clazzName: type.name,
-        tableName: kebabCase(type.name),
-        properties,
-        transientProperties,
-        indexes,
-      ...opts
+      clazz: constructor,
+      clazzName: type.name,
+      tableName: kebabCase(type.name),
+      properties,
+      transientProperties,
+      indexes,
+      ...opts,
     }
     // indexes,
 

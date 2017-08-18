@@ -1,7 +1,8 @@
 import moment from 'moment'
 import { Employee } from '../../test/models/employee.model'
 import { Moment } from '../decorator/moment.type'
-import { NullType, UndefinedType } from './attribute-model-type.type'
+import { NullType } from './null.type'
+import { UndefinedType } from './undefined.type'
 import { Util } from './util'
 
 xdescribe('Util', () => {
@@ -178,8 +179,9 @@ xdescribe('Util', () => {
     })
 
     it('undefined', () => {
-      let bla: undefined
-      expect(Util.typeOf(bla)).toBe(UndefinedType)
+      // tslint:disable-next-line:prefer-const
+      let undfn: undefined
+      expect(Util.typeOf(undfn)).toBe(UndefinedType)
     })
 
     // object with type casting to custom

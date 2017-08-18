@@ -2,7 +2,6 @@ import { AttributeModelType } from '../mapper/attribute-model-type.type'
 import { Util } from '../mapper/util'
 import { ModelConstructor } from '../model/model-constructor'
 import { getMetadataType } from './decorators'
-import { MetadataHelper } from './metadata'
 import { TypeInfo } from './property-metadata.model'
 import { AttributeModelTypes, initOrUpdateProperty, KEY_PROPERTY } from './property.decorator'
 

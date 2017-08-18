@@ -1,7 +1,7 @@
 import { AttributeMap, BatchGetItemInput, DeleteItemInput } from 'aws-sdk/clients/dynamodb'
 import * as Debug from 'debug'
 import { Observable } from 'rxjs/Observable'
-import { MetadataHelper } from '../decorator/metadata'
+import { MetadataHelper } from '../decorator/metadata-helper'
 import { Mapper } from '../mapper/mapper'
 import { ModelConstructor } from '../model/model-constructor'
 import { QueryRequest } from '../requests/query/query-request'
@@ -20,8 +20,10 @@ export class DynamoStore<T> {
   }
 
   put(item: T, ifNotExists?: boolean): Observable<void> {
-    const params: any = {...this.createBaseParams(), 
-      Item: Mapper.toDb(item, this.modelClazz)}
+    const params: any = {
+      ...this.createBaseParams(),
+      Item: Mapper.toDb(item, this.modelClazz),
+    }
 
     // FIXME add ifNotExists condition
     return this.dynamoRx.putItem(params).map(() => {

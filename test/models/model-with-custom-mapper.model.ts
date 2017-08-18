@@ -1,3 +1,4 @@
+// tslint:disable:max-classes-per-file
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { Mapper } from '../../src/decorator/mapper.decorator'
 import { Model } from '../../src/decorator/model.decorator'

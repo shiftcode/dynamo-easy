@@ -1,3 +1,4 @@
+// tslint:disable:max-classes-per-file
 import { TypedArray } from '../../src/decorator/array.decorator'
 import { Model } from '../../src/decorator/model.decorator'
 import { Property } from '../../src/decorator/property.decorator'

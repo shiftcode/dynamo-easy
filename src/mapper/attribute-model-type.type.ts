@@ -1,14 +1,12 @@
 import { Binary } from '../decorator/binary.type'
 import { Moment } from '../decorator/moment.type'
-
-export class NullType {}
-
-export class UndefinedType {}
+import { NullType } from './null.type'
+import { UndefinedType } from './undefined.type'
 
 export type AttributeModelType =
-  | String
-  | Number
-  | Boolean
+  | string
+  | number
+  | boolean
   | Binary
   | Date
   | Moment
@@ -17,7 +15,7 @@ export type AttributeModelType =
   | any[]
   | NullType
   | UndefinedType
-  | Object
+  | object
 
 // export type AttributeModelTypeName =
 //   | 'String'

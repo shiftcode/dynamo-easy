@@ -3,8 +3,10 @@ import { isNumber, isString } from 'lodash'
 import moment from 'moment'
 import { Binary } from '../decorator/binary.type'
 import { Moment } from '../decorator/moment.type'
-import { AttributeModelType, NullType, UndefinedType } from './attribute-model-type.type'
+import { AttributeModelType } from './attribute-model-type.type'
 import { AttributeCollectionType, AttributeType } from './attribute-type.type'
+import { NullType } from './null.type'
+import { UndefinedType } from './undefined.type'
 
 export type TypesByConvention = 'date'
 
@@ -203,8 +205,11 @@ export class Util {
 
       types.forEach(type => {
         if (data !== undefined && data.constructor) {
-          if (Util.isType(data, type)) return true
-          if (Util.typeName(data.constructor) === type) return true
+          if (Util.isType(data, type)) {
+            return true
+          } else if (Util.typeName(data.constructor) === type) {
+            return true
+          }
         }
       })
     }
@@ -216,7 +221,10 @@ export class Util {
    */
   static isType(obj, type): boolean {
     // handle cross-"frame" objects
-    if (typeof type === 'function') type = Util.typeName(type)
+    if (typeof type === 'function') {
+      type = Util.typeName(type)
+    }
+
     return Object.prototype.toString.call(obj) === '[object ' + type + ']'
   }
 

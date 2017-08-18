@@ -1,5 +1,4 @@
 import { ExpressionAttributeValueMap, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
-import * as _ from 'lodash'
 import { isEmpty, isString } from 'lodash'
 import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Request } from '../request.model'
@@ -19,7 +18,7 @@ export class ConditionBuilder {
     const f = (operator: ConditionOperator) => {
       return (/* values */): T => {
         const copy = Array.prototype.slice.call(arguments)
-        const existingValueKeys = _.keys(request.params.ExpressionAttributeValues)
+        const existingValueKeys = Object.keys(request.params.ExpressionAttributeValues)
         const args = [keyName, propetyMetadata, operator, existingValueKeys].concat(copy)
         const cond = Expressions.buildFilterExpression.apply(null, args)
         ParamUtil.addFilterCondition(cond, request.params)
@@ -53,7 +52,7 @@ export class ConditionBuilder {
     const f = (operator: ConditionOperator) => {
       return (/* values */): T => {
         const copy = Array.prototype.slice.call(arguments)
-        const existingValueKeys = _.keys(request.params.ExpressionAttributeValues)
+        const existingValueKeys = Object.keys(request.params.ExpressionAttributeValues)
         const args = [keyName, propetyMetadata, operator, existingValueKeys].concat(copy)
         const cond = Expressions.buildFilterExpression.apply(null, args)
         ParamUtil.addKeyCondition(cond, request.params)
@@ -81,7 +80,7 @@ export class ConditionBuilder {
     const f = (operator: ConditionOperator) => {
       return (/* values */): Condition => {
         const copy = Array.prototype.slice.call(arguments)
-        const existingValueKeys = expressionAttributeValues ? _.keys(expressionAttributeValues) : []
+        const existingValueKeys = expressionAttributeValues ? Object.keys(expressionAttributeValues) : []
         const args = [keyName, propertyMetadata, operator, existingValueKeys].concat(copy)
         const cond = Expressions.buildFilterExpression.apply(null, args)
         return cond

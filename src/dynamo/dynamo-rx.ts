@@ -1,21 +1,5 @@
 import * as AWS from 'aws-sdk'
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import {
-  BatchGetItemInput,
-  BatchGetItemOutput,
-  BatchWriteItemInput,
-  BatchWriteItemOutput,
-  DeleteItemInput,
-  DeleteItemOutput,
-  PutItemInput,
-  PutItemOutput,
-  QueryInput,
-  QueryOutput,
-  ScanInput,
-  ScanOutput,
-  UpdateItemInput,
-  UpdateItemOutput,
-} from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
 
 /**
@@ -29,7 +13,7 @@ export class DynamoRx {
     // this.logger = new Logger(() => LogLevel.DEBUG, 'DynamoDbService');
 
     // create the actual dynamo db client
-    this.dynamoDb = new AWS.DynamoDB()
+    this.dynamoDb = new DynamoDB()
   }
 
   updateAwsConfigCredentials(newConfig: AWS.Config): void {
@@ -39,31 +23,31 @@ export class DynamoRx {
   /*
    * make all the dynamo requests return an observable
    */
-  putItem(params: PutItemInput): Observable<PutItemOutput> {
+  putItem(params: DynamoDB.PutItemInput): Observable<DynamoDB.PutItemOutput> {
     return Observable.fromPromise(this.dynamoDb.putItem(params).promise())
   }
 
-  updateItem(params: UpdateItemInput): Observable<UpdateItemOutput> {
+  updateItem(params: DynamoDB.UpdateItemInput): Observable<DynamoDB.UpdateItemOutput> {
     return Observable.fromPromise(this.dynamoDb.updateItem(params).promise())
   }
 
-  deleteItem(params: DeleteItemInput): Observable<DeleteItemOutput> {
+  deleteItem(params: DynamoDB.DeleteItemInput): Observable<DynamoDB.DeleteItemOutput> {
     return Observable.fromPromise(this.dynamoDb.deleteItem(params).promise())
   }
 
-  batchWriteItem(params: BatchWriteItemInput): Observable<BatchWriteItemOutput> {
+  batchWriteItem(params: DynamoDB.BatchWriteItemInput): Observable<DynamoDB.BatchWriteItemOutput> {
     return Observable.fromPromise(this.dynamoDb.batchWriteItem(params).promise())
   }
 
-  batchGetItems(params: BatchGetItemInput): Observable<BatchGetItemOutput> {
+  batchGetItems(params: DynamoDB.BatchGetItemInput): Observable<DynamoDB.BatchGetItemOutput> {
     return Observable.fromPromise(this.dynamoDb.batchGetItem(params).promise())
   }
 
-  scan(params: ScanInput): Observable<ScanOutput> {
+  scan(params: DynamoDB.ScanInput): Observable<DynamoDB.ScanOutput> {
     return Observable.fromPromise(this.dynamoDb.scan(params).promise())
   }
 
-  query(params: QueryInput): Observable<QueryOutput> {
+  query(params: DynamoDB.QueryInput): Observable<DynamoDB.QueryOutput> {
     if (!params.KeyConditionExpression) {
       throw new Error('key condition expression must be defined')
     }

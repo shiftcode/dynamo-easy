@@ -11,19 +11,7 @@ import { TypedSet } from '../../src/decorator/typed-set.decorator'
 import { NestedModel } from '../../src/sample.model'
 import { Employee } from './employee.model'
 
-// @Model()
-// export class Award {
-//
-//   @Property({name: 'nameOfAward'})
-//   name: string;
-//   year: number;
-//
-//   constructor(name, year){
-//     this.name = name;
-//     this.year = year;
-//   }
-//
-// }
+// tslint:disable:max-classes-per-file
 @Model()
 export class Gift {
   description: string

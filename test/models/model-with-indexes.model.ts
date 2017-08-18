@@ -1,3 +1,4 @@
+// tslint:disable:max-classes-per-file
 import moment from 'moment'
 import { GSIPartitionKey } from '../../src/decorator/gsi-partition-key.decorator'
 import { GSISortKey } from '../../src/decorator/gsi-sort-key.decorator'
@@ -8,7 +9,6 @@ import { Property } from '../../src/decorator/property.decorator'
 import { SortKey } from '../../src/decorator/sort-key.decorator'
 
 export const INDEX_ACTIVE = 'active-index'
-
 @Model()
 export class ModelWithGSI {
   @PartitionKey() id: string
@@ -18,6 +18,7 @@ export class ModelWithGSI {
   @GSIPartitionKey(INDEX_ACTIVE) active: boolean
 }
 
+@Model()
 export class ModelWithLSI {
   @PartitionKey() id: string
 

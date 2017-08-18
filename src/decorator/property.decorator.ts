@@ -10,7 +10,7 @@ import { PropertyMetadata, TypeInfo } from './property-metadata.model'
 
 export const KEY_PROPERTY = 'sc-reflect:property'
 
-export type AttributeModelTypes = String | Number | Boolean | Date | Moment | Set<any> | any[]
+export type AttributeModelTypes = string | number | boolean | Date | Moment | Set<any> | any[]
 
 export interface IndexData {
   name: string
@@ -134,10 +134,10 @@ function createNewProperty(
   // console.log(`#### propertyKey: ${propertyKey} / typeInfo: ${JSON.stringify(typeInfo)}`);
 
   propertyOptions = {
-      name: propertyKey,
-      nameDb: propertyKey,
-      typeInfo,
-    ...propertyOptions
+    name: propertyKey,
+    nameDb: propertyKey,
+    typeInfo,
+    ...propertyOptions,
   }
 
   return <PropertyMetadata<any>>propertyOptions
