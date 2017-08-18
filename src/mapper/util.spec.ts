@@ -4,7 +4,7 @@ import { Util } from './util'
 import { Moment } from '../decorator/moment.type'
 import { NullType, UndefinedType } from './attribute-model-type.type'
 
-describe('Util', () => {
+xdescribe('Util', () => {
   describe('matches convention', () => {
     it('date', () => {
       ;['date', 'createdAt', 'lastUpdatedDate', 'myDateAndMore'].forEach(propertyName => {

@@ -14,7 +14,7 @@ import { TypeInfo } from './property-metadata.model'
 // TODO TypedSet naming is somewhat misleading, because it does not require a type, it is always typed thats true
 // FIXME is there any improvement if we add generics to SortedSet<T> is it even possible?
 export function TypedSet(modelClass?: ModelConstructor<any>): PropertyDecorator {
-  return function(target: any, propertyKey: string) {
+  return (target: any, propertyKey: string) => {
     const typeInfo: Partial<TypeInfo<Set<any>>> = <Partial<TypeInfo<Set<any>>>>{
       type: Set,
       typeName: 'Set',

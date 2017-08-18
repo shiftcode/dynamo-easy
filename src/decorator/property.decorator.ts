@@ -1,7 +1,10 @@
-import { TypesByConvention, Util } from '../mapper/util'
+import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { Moment } from '../decorator/moment.type'
+import { AttributeModelType } from '../mapper/attribute-model-type.type'
+import { TypesByConvention, Util } from '../mapper/util'
 import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
 import { getMetadataType } from './decorators'
+import { IndexType } from './index-type.enum'
 import { PropertyData } from './property-data.model'
 import { PropertyMetadata, TypeInfo } from './property-metadata.model'
 
@@ -9,8 +12,13 @@ export const KEY_PROPERTY = 'sc-reflect:property'
 
 export type AttributeModelTypes = String | Number | Boolean | Date | Moment | Set<any> | Array<any>
 
+export interface IndexData {
+  name: string
+  keyType: KeyType
+}
+
 export function Property(opts: Partial<PropertyData> = {}): PropertyDecorator {
-  return function(target: any, propertyKey: string) {
+  return (target: any, propertyKey: string) => {
     const propertyOptions: Partial<PropertyMetadata<any>> = {
       name: propertyKey,
       nameDb: opts.name || propertyKey,
@@ -20,18 +28,52 @@ export function Property(opts: Partial<PropertyData> = {}): PropertyDecorator {
   }
 }
 
+export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, target: any, propertyKey: string): void {
+  const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
+  const existingProperty: PropertyMetadata<any> = properties.find(property => property.name === propertyKey)
+
+  let propertyMetadata: Partial<PropertyMetadata<any>>
+  switch (indexType) {
+    case IndexType.GSI:
+      propertyMetadata = initOrUpdateGSI(existingProperty && existingProperty.keyForGSI ? existingProperty.keyForGSI : {}, indexData)
+      break
+    case IndexType.LSI:
+      propertyMetadata = initOrUpdateLSI(existingProperty && existingProperty.sortKeyForLSI ? existingProperty.sortKeyForLSI : [], indexData)
+      break
+  }
+
+  initOrUpdateProperty(propertyMetadata, target, propertyKey)
+}
+
+function initOrUpdateGSI(indexes: { [key: string]: KeyType }, indexData: IndexData): Partial<PropertyMetadata<any>> {
+  if (indexes[indexData.name]) {
+    throw new Error('the property with name is already registered as key for index - one property can only define one key per index')
+  } else {
+    indexes[indexData.name] = indexData.keyType
+  }
+
+  return { keyForGSI: indexes }
+}
+
+function initOrUpdateLSI(indexes: string[], indexData: IndexData): Partial<PropertyMetadata<any>> {
+  indexes.push(indexData.name)
+  return { sortKeyForLSI: indexes }
+}
+
 export function initOrUpdateProperty(propertyMetadata: Partial<PropertyMetadata<any>> = {}, target: any, propertyKey: string): void {
   // Update the attribute array
 
-  const properties: PropertyMetadata<any>[] = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
-  let existingProperty: PropertyMetadata<any> = properties.find(property => property.name === propertyKey)
+  const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
+  const existingProperty: PropertyMetadata<any> = properties.find(property => property.name === propertyKey)
 
   if (existingProperty) {
     // merge property options
+    // console.log('merge into existing property', existingProperty, propertyMetadata);
     Object.assign<PropertyMetadata<any>, Partial<PropertyMetadata<any>>>(existingProperty, propertyMetadata)
   } else {
     // add new options
-    let newProperty: PropertyMetadata<any> = createNewProperty(propertyMetadata, target, propertyKey)
+    const newProperty: PropertyMetadata<any> = createNewProperty(propertyMetadata, target, propertyKey)
+    // console.log('new property', newProperty);
     properties.push(newProperty)
   }
 
@@ -39,7 +81,7 @@ export function initOrUpdateProperty(propertyMetadata: Partial<PropertyMetadata<
 }
 
 function createNewProperty(propertyOptions: Partial<PropertyMetadata<any>> = {}, target: any, propertyKey: string): PropertyMetadata<any> {
-  let propertyType: AttributeModelTypes = getMetadataType(target, propertyKey)
+  let propertyType: AttributeModelType = getMetadataType(target, propertyKey)
   let customType = isCustomType(propertyType)
 
   // FIXME model metadata is not accessible here, need to know the model data for metadatintorspection
@@ -53,8 +95,7 @@ function createNewProperty(propertyOptions: Partial<PropertyMetadata<any>> = {},
         case 'date':
           switch (ScDynamoObjectMapper.config.dateType) {
             case 'default':
-              // FIXME fix typing
-              propertyType = <any>Date
+              propertyType = Date
               break
             case 'moment':
               propertyType = Moment
@@ -67,21 +108,21 @@ function createNewProperty(propertyOptions: Partial<PropertyMetadata<any>> = {},
     }
   }
 
-  let propertyDescriptor: PropertyDescriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey)
+  const propertyDescriptor: PropertyDescriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey)
 
   const typeInfo: Partial<TypeInfo<any>> = <Partial<TypeInfo<any>>>{
     type: propertyType,
     isCustom: customType,
   }
 
-  console.log(`#### propertyKey: ${propertyKey} / typeInfo: ${JSON.stringify(typeInfo)}`)
+  // console.log(`#### propertyKey: ${propertyKey} / typeInfo: ${JSON.stringify(typeInfo)}`);
 
   propertyOptions = Object.assign<any, Partial<PropertyMetadata<any>>, Partial<PropertyMetadata<any>>>(
     {},
     {
       name: propertyKey,
       nameDb: propertyKey,
-      typeInfo: typeInfo,
+      typeInfo,
     },
     propertyOptions
   )

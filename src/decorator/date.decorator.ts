@@ -1,11 +1,11 @@
-import { TypeInfo } from './property-metadata.model'
 import { Moment } from '../decorator/moment.type'
-import { initOrUpdateProperty } from './property.decorator'
-import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
 import { Util } from '../mapper/util'
+import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
+import { TypeInfo } from './property-metadata.model'
+import { initOrUpdateProperty } from './property.decorator'
 
 export function Date(): PropertyDecorator {
-  return function(target: any, propertyKey: string) {
+  return (target: any, propertyKey: string) => {
     // check the global config to decide which dat type we should use
     let dateType
     switch (ScDynamoObjectMapper.config.dateType) {
@@ -23,6 +23,6 @@ export function Date(): PropertyDecorator {
       isCustom: true,
     }
 
-    initOrUpdateProperty({ typeInfo: typeInfo }, target, propertyKey)
+    initOrUpdateProperty({ typeInfo }, target, propertyKey)
   }
 }

@@ -91,7 +91,7 @@ export class DynamoStore<T> {
   }
 
   private createBaseParams(): { TableName: string } {
-    let params: { TableName: string } = {
+    const params: { TableName: string } = {
       TableName: this.tableName,
     }
 

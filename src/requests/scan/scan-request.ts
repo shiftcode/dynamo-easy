@@ -1,45 +1,26 @@
+import { ScanInput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
+import { DynamoRx } from '../../dynamo/dynamo-rx'
 import { Request } from '../request.model'
 import { Response } from '../response.model'
-import { DynamoRx } from '../../dynamo/dynamo-rx'
+import { ConditionBuilder } from '../utils/condition-builder'
+import { ConditionFunction } from '../utils/condition-function'
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/scan.js
-export class ScanRequest<T> extends Request<T> {
+export class ScanRequest<T> extends Request<T, ScanInput> {
   constructor(dynamoRx: DynamoRx, modelClazz: { new (): T }) {
     super(dynamoRx, modelClazz)
   }
 
-  limit(limit: number = Request.DEFAULT_LIMIT): Request<T> {
-    if (limit === Request.INFINITE_LIMIT) {
-      delete this.params.Limit
-    } else {
-      this.params.Limit = limit
-    }
-
-    return this
+  where(keyName: keyof T): ConditionFunction<ScanRequest<T>> {
+    return ConditionBuilder.addCondition<ScanRequest<T>>(keyName, this, this.metaData.forProperty(keyName))
   }
-
-  // index(indexName: string): Request<T> {
-  //   let indexes: IModelAttributeIndex[] = Metadata.getIndexes(this.modelClazz);
-  //
-  //   // FIXME implement
-  //   if (indexes[indexName]) {
-  //     this.params.IndexName = indexName;
-  //   } else {
-  //     throw new Error(`there is no index with name <${indexName}> defined on the schema`);
-  //   }
-  //   return this;
-  // }
-
-  // where(keyName: string): ConditionFunction<ScanRequest<T>> {
-  //   return ConditionBuilder.addCondition<ScanRequest<T>>(keyName, this);
-  // }
 
   execNoMap(): Observable<Response<T>> {
     delete this.params.Select
 
     return this.dynamoRx.scan(this.params).map(queryResponse => {
-      let response: Response<T> = {}
+      const response: Response<T> = {}
       Object.assign(response, queryResponse)
       response.Items = queryResponse.Items.map(item => this.mapFromDb(<any>item))
 
@@ -60,7 +41,7 @@ export class ScanRequest<T> extends Request<T> {
   }
 
   execCount(): Observable<number> {
-    let params = { ...this.params }
+    const params = { ...this.params }
     params.Select = 'COUNT'
 
     return this.dynamoRx.scan(params).map(response => response.Count)

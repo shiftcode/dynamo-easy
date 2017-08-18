@@ -14,7 +14,7 @@ import { AttributeModelType } from '../mapper/attribute-model-type.type'
  */
 // FIXME is there any improvement if we add generics to SortedSet<T> is it even possible?
 export function SortedSet(modelClass?: ModelConstructor<any>): PropertyDecorator {
-  return function(target: any, propertyKey: string) {
+  return (target: any, propertyKey: string) => {
     const typeInfo: Partial<TypeInfo<Set<any>>> = <Partial<TypeInfo<Set<any>>>>{
       type: Set,
       typeName: 'Set',
@@ -25,6 +25,6 @@ export function SortedSet(modelClass?: ModelConstructor<any>): PropertyDecorator
       typeInfo.genericTypes = [modelClass]
     }
 
-    initOrUpdateProperty({ isSortedCollection: true, typeInfo: typeInfo }, target, propertyKey)
+    initOrUpdateProperty({ isSortedCollection: true, typeInfo }, target, propertyKey)
   }
 }
