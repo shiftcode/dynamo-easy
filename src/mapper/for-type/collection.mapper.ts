@@ -1,4 +1,4 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { hasGenericType, PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Mapper } from '../mapper'
 import { Util } from '../util'
@@ -31,7 +31,9 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
         propertyMetadata.typeInfo.genericTypes &&
         propertyMetadata.typeInfo.genericTypes.length
       ) {
-        arr = attributeValue.L.map(item => Mapper.fromDb(item.M, propertyMetadata.typeInfo!.genericTypes![0]))
+        arr = attributeValue.L.map(item =>
+          Mapper.fromDb(<AttributeMap>item.M, propertyMetadata.typeInfo!.genericTypes![0])
+        )
       } else {
         arr = attributeValue.L.map(value => Mapper.fromDbOne(value))
       }

@@ -1,8 +1,7 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
 // FIXME make this dependency optional
 import * as UUID from 'uuid'
 import * as winston from 'winston'
-import { AttributeMap } from '../../attribute-map.type'
 import { Binary } from '../decorator/binary.type'
 import { Metadata } from '../decorator/metadata'
 import { MetadataHelper } from '../decorator/metadata-helper'
@@ -29,8 +28,8 @@ import { Util } from './util'
 export class Mapper {
   static mapperForType: Map<AttributeModelType, MapperForType<any>> = new Map()
 
-  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): AttributeMap<T> {
-    const mapped: AttributeMap<T> = <AttributeMap<T>>{}
+  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): AttributeMap {
+    const mapped: AttributeMap = <AttributeMap>{}
 
     if (modelConstructor) {
       const metadata: Metadata<T> = MetadataHelper.get(modelConstructor)
@@ -163,7 +162,7 @@ export class Mapper {
     }
   }
 
-  static fromDb<T>(attributeMap: AttributeMap<T>, modelClass?: ModelConstructor<T>): T {
+  static fromDb<T>(attributeMap: AttributeMap, modelClass?: ModelConstructor<T>): T {
     const model: T = <T>{}
 
     Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {

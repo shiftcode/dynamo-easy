@@ -12,7 +12,7 @@ const DYNAMO_RX_MOCK = {
   },
 }
 
-describe('query request', () => {
+xdescribe('query request', () => {
   describe('defines correct params', () => {
     let request: QueryRequest<ComplexModel>
 

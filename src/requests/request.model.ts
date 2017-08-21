@@ -1,6 +1,5 @@
-import { Key, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
+import { AttributeMap, Key, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
-import { AttributeMap } from '../../attribute-map.type'
 import { Metadata } from '../decorator/metadata'
 import { MetadataHelper } from '../decorator/metadata-helper'
 import { SecondaryIndex } from '../decorator/model.decorator'
@@ -63,7 +62,7 @@ export abstract class Request<T, P extends QueryInput | ScanInput> {
     return this
   }
 
-  mapFromDb(attributeMap: AttributeMap<T>): T {
+  mapFromDb(attributeMap: AttributeMap): T {
     return Mapper.fromDb(attributeMap, this.modelClazz)
   }
 
