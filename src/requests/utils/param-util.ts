@@ -4,7 +4,7 @@ import {
   QueryInput,
   ScanInput,
 } from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash'
+import { isEmpty, isString } from 'lodash-es'
 import { Condition } from './condition.model'
 
 export class ParamUtil {

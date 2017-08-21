@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { isNumber, isString } from 'lodash'
+import { isNumber, isString } from 'lodash-es'
 import moment from 'moment'
 import { Binary } from '../decorator/binary.type'
 import { Moment } from '../decorator/moment.type'

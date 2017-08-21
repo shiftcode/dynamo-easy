@@ -1,5 +1,5 @@
 import { AttributeMap } from 'aws-sdk/clients/dynamodb'
-import * as _ from 'lodash'
+import { isDate } from 'lodash-es'
 import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
 import { ConditionOperator } from './condition-operator.type'
@@ -18,14 +18,10 @@ export class Expressions {
     'size',
   ]
 
-  static regexMap = <{ [key: string]: RegExp }>_.reduce(
-    Expressions.actionWords,
-    (result: { [key: string]: RegExp }, actionWord) => {
-      result[actionWord] = new RegExp(actionWord + '\\s*(.+?)\\s*(SET|ADD|REMOVE|DELETE|$)')
-      return result
-    },
-    {}
-  )
+  static regexMap = Expressions.actionWords.reduce((result: { [key: string]: RegExp }, actionWord) => {
+    result[actionWord] = new RegExp(actionWord + '\\s*(.+?)\\s*(SET|ADD|REMOVE|DELETE|$)')
+    return result
+  }, {})
 
   // explanation http://stackoverflow.com/questions/3428618/regex-to-find-commas-that-arent-inside-and
   static splitOperandsRegex = new RegExp(/\s*(?![^(]*\)),\s*/)
@@ -41,7 +37,7 @@ export class Expressions {
   }
 
   static formatAttributeValue(val: any): any {
-    if (_.isDate(val)) {
+    if (isDate(val)) {
       return val.toISOString()
     }
 
@@ -49,10 +45,15 @@ export class Expressions {
   }
 
   static isFunctionOperator(operator: ConditionOperator): boolean {
-    return _.includes(
-      ['attribute_exists', 'attribute_not_exists', 'attribute_type', 'begins_with', 'contains', 'NOT contains', 'size'],
-      operator
-    )
+    return [
+      'attribute_exists',
+      'attribute_not_exists',
+      'attribute_type',
+      'begins_with',
+      'contains',
+      'NOT contains',
+      'size',
+    ].includes(operator)
   }
 
   static uniqAttributeValueName(key: string, existingValueNames?: string[]): string {
@@ -60,7 +61,7 @@ export class Expressions {
     let idx = 1
 
     if (existingValueNames && existingValueNames.length) {
-      while (_.includes(existingValueNames, potentialName)) {
+      while (existingValueNames.includes(potentialName)) {
         idx++
         potentialName = `:${key}_${idx}`
       }

@@ -1,5 +1,4 @@
 import { QueryInput } from 'aws-sdk/clients/dynamodb'
-import * as _ from 'lodash'
 import { Observable } from 'rxjs/Observable'
 import { Metadata } from '../../decorator/metadata'
 import { SecondaryIndex } from '../../decorator/model.decorator'
@@ -83,7 +82,7 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
   }
 
   execCount(): Observable<number> {
-    const params = _.clone(this.params)
+    const params = { ...this.params }
     params.Select = 'COUNT'
 
     return this.dynamoRx.query(params).map(response => response.Count!)

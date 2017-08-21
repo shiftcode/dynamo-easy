@@ -1,4 +1,4 @@
-import { kebabCase } from 'lodash'
+import { kebabCase } from 'lodash-es'
 // FIXME should be optional dependency
 import { getMetadataType } from './decorators'
 import { ModelData, ModelMetadata } from './model-metadata.model'

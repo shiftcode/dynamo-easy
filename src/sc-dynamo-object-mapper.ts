@@ -1,5 +1,5 @@
 // Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
+// import 'core-js/fn/array.includes'
 // ...
 //
 import 'rxjs/add/observable/fromPromise'
@@ -8,11 +8,12 @@ import 'rxjs/add/observable/of'
 import 'rxjs/add/operator/map'
 //
 import { INDEX_ACTIVE_CREATED_AT, ModelWithGSI } from '../test/models/model-with-indexes.model'
-import { DynamoRx } from './dynamo/dynamo-rx'
-import { QueryRequest } from './requests/query/query-request'
 
 // 'default' means we use js Date object or momentjs implementation for 'momentjs'
 export type DateTypes = 'default' | 'moment'
+export * from './decorator'
+export * from './dynamo'
+export * from './mapper'
 
 export class ScDynamoObjectMapper {
   // FIXME make this configurable

@@ -1,6 +1,6 @@
 // tslint:disable:max-classes-per-file
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { Mapper } from '../../src/decorator/mapper.decorator'
+import { CustomMapper } from '../../src/decorator/custom-mapper.decorator'
 import { Model } from '../../src/decorator/model.decorator'
 import { PartitionKey } from '../../src/decorator/partition-key.decorator'
 import { PropertyMetadata } from '../../src/decorator/property-metadata.model'
@@ -38,7 +38,7 @@ export class IdMapper implements MapperForType<Id> {
 
 @Model()
 export class ModelWithCustomMapperModel {
-  @Mapper(IdMapper)
+  @CustomMapper(IdMapper)
   @PartitionKey()
   id: Id
 }
