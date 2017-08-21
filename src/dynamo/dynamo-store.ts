@@ -1,5 +1,4 @@
 import { AttributeMap, BatchGetItemInput, DeleteItemInput } from 'aws-sdk/clients/dynamodb'
-import * as Debug from 'debug'
 import { Observable } from 'rxjs/Observable'
 import { MetadataHelper } from '../decorator/metadata-helper'
 import { Mapper } from '../mapper/mapper'
@@ -9,12 +8,11 @@ import { ScanRequest } from '../requests/scan/scan-request'
 import { DynamoRx } from './dynamo-rx'
 
 export class DynamoStore<T> {
-  private readonly debug: Debug.IDebugger = Debug('dynamo-store')
   private readonly dynamoRx: DynamoRx
   private readonly tableName: string
   private readonly mapper: Mapper
 
-  constructor(logger: Logger, private modelClazz: ModelConstructor<T>) {
+  constructor(private modelClazz: ModelConstructor<T>) {
     this.dynamoRx = new DynamoRx()
     this.tableName = MetadataHelper.get(this.modelClazz).modelOptions.tableName
   }
@@ -87,7 +85,6 @@ export class DynamoStore<T> {
   }
 
   makeRequest<Z>(operation: string, params?: { [key: string]: any }): Observable<Z> {
-    this.debug('makeRequest')
     return this.dynamoRx.makeRequest(operation, params)
   }
 

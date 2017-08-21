@@ -1,20 +1,24 @@
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
+
 const pkg = require('./package.json')
 const camelCase = require('lodash.camelcase')
 
 const libraryName = 'sc-dynamo-object-mapper'
 
 export default {
-  entry: `compiled/src/${libraryName}.js`,
-  targets: [
-	  { dest: pkg.main, moduleName: camelCase(libraryName), format: 'umd' },
-	  { dest: pkg.module, format: 'es' }
+  input: `compiled/src/${libraryName}.js`,
+  output: [
+	  { file: pkg.main, format: 'umd' ,name: camelCase(libraryName)},
+	  { file: pkg.module, format: 'es' }
   ],
-  sourceMap: true,
+  sourcemap: true,
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
-  external: [],
+  external: [
+    'moment',
+    'rxjs'
+  ],
   plugins: [
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),

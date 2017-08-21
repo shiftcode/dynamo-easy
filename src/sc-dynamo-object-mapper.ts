@@ -6,6 +6,7 @@ import 'rxjs/add/observable/fromPromise'
 import 'rxjs/add/observable/of'
 //
 import 'rxjs/add/operator/map'
+//
 import { INDEX_ACTIVE_CREATED_AT, ModelWithGSI } from '../test/models/model-with-indexes.model'
 import { DynamoRx } from './dynamo/dynamo-rx'
 import { QueryRequest } from './requests/query/query-request'
