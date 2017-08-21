@@ -30,7 +30,7 @@ export function Property(opts: Partial<PropertyData> = {}): PropertyDecorator {
 
 export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, target: any, propertyKey: string): void {
   const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
-  const existingProperty: PropertyMetadata<any> = properties.find(property => property.name === propertyKey)
+  const existingProperty = properties.find(property => property.name === propertyKey)
 
   let propertyMetadata: Partial<PropertyMetadata<any>>
   switch (indexType) {
@@ -46,6 +46,8 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
         indexData
       )
       break
+    default:
+      throw new Error(`unsupported index type ${indexType}`)
   }
 
   initOrUpdateProperty(propertyMetadata, target, propertyKey)
@@ -76,7 +78,7 @@ export function initOrUpdateProperty(
   // Update the attribute array
 
   const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
-  const existingProperty: PropertyMetadata<any> = properties.find(property => property.name === propertyKey)
+  const existingProperty = properties.find(property => property.name === propertyKey)
 
   if (existingProperty) {
     // merge property options
@@ -102,7 +104,7 @@ function createNewProperty(
 
   // FIXME model metadata is not accessible here, need to know the model data for metadatintorspection
   // let modelMetadata: ModelMetadata = Reflect.getMetadata(KEY_MODEL, target.constructor);
-  const typeByConvention: TypesByConvention = Util.typeByConvention(propertyKey)
+  const typeByConvention = Util.typeByConvention(propertyKey)
   if (typeByConvention) {
     customType = true
 
@@ -126,7 +128,7 @@ function createNewProperty(
 
   const propertyDescriptor: PropertyDescriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey)
 
-  const typeInfo: Partial<TypeInfo<any>> = <Partial<TypeInfo<any>>>{
+  const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
     type: propertyType,
     isCustom: customType,
   }

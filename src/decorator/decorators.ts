@@ -9,6 +9,10 @@ export const getMetadataType = makeMetadataGetter(KEY_TYPE)
 
 export function makeMetadataGetter(metadataKey: string): (target: any, targetKey?: string) => any {
   return (target: any, targetKey?: string) => {
-    return Reflect.getMetadata(metadataKey, target, targetKey)
+    if (targetKey) {
+      return Reflect.getMetadata(metadataKey, target, targetKey)
+    } else {
+      return Reflect.getMetadata(metadataKey, target)
+    }
   }
 }

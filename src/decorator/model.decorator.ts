@@ -22,7 +22,7 @@ _ (underscore)
 - (dash)
 . (dot)
  */
-export function Model<T>(opts: ModelData = {}): ClassDecorator {
+export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
     // Make sure everything is valid
@@ -37,7 +37,7 @@ export function Model<T>(opts: ModelData = {}): ClassDecorator {
     const partitionKeys = properties
       ? properties.filter(property => property.key && property.key.type === 'HASH')
       : null
-    const partitionKeyName: string = partitionKeys && partitionKeys.length ? partitionKeys[0].nameDb : undefined
+    const partitionKeyName: string | null = partitionKeys && partitionKeys.length ? partitionKeys[0].nameDb : null
 
     /*
      * get the local and global secondary indexes
@@ -81,7 +81,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
             gsi = <SecondaryIndex>{}
           }
 
-          switch (property.keyForGSI[indexName]) {
+          switch (property.keyForGSI![indexName]) {
             case 'HASH':
               if (gsi.partitionKey) {
                 throw new Error(
@@ -114,7 +114,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
 
 // TODO VALIDATION only 5 gsi are allowed per table
 function getLocalSecondaryIndexes(
-  basePartitionKey: string,
+  basePartitionKey: string | null,
   properties: Array<PropertyMetadata<any>>
 ): Map<string, SecondaryIndex> | null {
   if (properties && properties.length) {
@@ -123,7 +123,7 @@ function getLocalSecondaryIndexes(
       .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex> => {
         let lsi: SecondaryIndex
 
-        property.sortKeyForLSI.forEach(indexName => {
+        property.sortKeyForLSI!.forEach(indexName => {
           if (map.has(indexName)) {
             throw new Error(
               `only one sort key can be defined for the same local secondary index, ${property.nameDb} is already defined as sort key for index ${indexName}`

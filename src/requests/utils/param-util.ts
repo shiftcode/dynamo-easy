@@ -1,11 +1,22 @@
-import { QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
+import {
+  ExpressionAttributeNameMap,
+  ExpressionAttributeValueMap,
+  QueryInput,
+  ScanInput,
+} from 'aws-sdk/clients/dynamodb'
 import { isEmpty, isString } from 'lodash'
 import { Condition } from './condition.model'
 
 export class ParamUtil {
   static addFilterCondition<T>(condition: Condition, params: QueryInput | ScanInput) {
-    const expressionAttributeNames = {...condition.attributeNames, ...params.ExpressionAttributeNames}
-    const expressionAttributeValues = {...condition.attributeMap, ...params.ExpressionAttributeValues}
+    const expressionAttributeNames = <ExpressionAttributeNameMap>{
+      ...condition.attributeNames,
+      ...params.ExpressionAttributeNames,
+    }
+    const expressionAttributeValues = <ExpressionAttributeValueMap>{
+      ...condition.attributeMap,
+      ...params.ExpressionAttributeValues,
+    }
 
     if (!isEmpty(expressionAttributeNames)) {
       params.ExpressionAttributeNames = expressionAttributeNames
@@ -23,8 +34,14 @@ export class ParamUtil {
   }
 
   static addKeyCondition<T>(condition: Condition, params: QueryInput) {
-    const expressionAttributeNames = {...condition.attributeNames, ...params.ExpressionAttributeNames}
-    const expressionAttributeValues = {...condition.attributeMap, ...params.ExpressionAttributeValues}
+    const expressionAttributeNames = <ExpressionAttributeNameMap>{
+      ...condition.attributeNames,
+      ...params.ExpressionAttributeNames,
+    }
+    const expressionAttributeValues = <ExpressionAttributeValueMap>{
+      ...condition.attributeMap,
+      ...params.ExpressionAttributeValues,
+    }
 
     if (!isEmpty(expressionAttributeNames)) {
       params.ExpressionAttributeNames = expressionAttributeNames

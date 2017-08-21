@@ -118,12 +118,16 @@ export class Expressions {
         // } else {
         // }
         // } else {
-        switch (propertyMetadata.typeInfo.type) {
-          case Array:
-          case Set:
-            break
-          default:
-            throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)
+        if (propertyMetadata.typeInfo) {
+          switch (propertyMetadata.typeInfo.type) {
+            case Array:
+            case Set:
+              break
+            default:
+              throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)
+          }
+        } else {
+          throw new Error('no type info defined')
         }
       } else {
         v1 = Mapper.toDbOne(v1, propertyMetadata)

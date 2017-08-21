@@ -1,7 +1,5 @@
-import { ObjectType } from 'aws-sdk/clients/clouddirectory'
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 // FIXME make this dependency optional
-import moment from 'moment'
 import * as UUID from 'uuid'
 import * as winston from 'winston'
 import { AttributeMap } from '../../attribute-map.type'
@@ -11,13 +9,11 @@ import { MetadataHelper } from '../decorator/metadata-helper'
 import { Moment } from '../decorator/moment.type'
 import { PropertyMetadata } from '../decorator/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
-import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
 import { AttributeModelType } from './attribute-model-type.type'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
 import { DateMapper } from './for-type/date.mapper'
-import { MapMapper } from './for-type/map.mapper'
 import { MomentMapper } from './for-type/moment.mapper'
 import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
@@ -44,7 +40,7 @@ export class Mapper {
        */
       if (metadata) {
         metadata.getKeysWithUUID().forEach(propertyMetadata => {
-          if (item[propertyMetadata.name]) {
+          if (Reflect.get(<any>item, propertyMetadata.name)) {
             throw Error(
               `property where a UUID decorator is present can not have any other value ${JSON.stringify(
                 propertyMetadata
@@ -52,7 +48,7 @@ export class Mapper {
             )
           }
 
-          item[propertyMetadata.name] = UUID.v1()
+          Reflect.set(<any>item, propertyMetadata.name, UUID.v1())
         })
       }
     }
@@ -75,9 +71,9 @@ export class Mapper {
       /*
        * 2) decide how to map the property depending on type or value
        */
-      let attributeValue: AttributeValue
+      let attributeValue: AttributeValue | undefined
 
-      let propertyMetadata: PropertyMetadata<any>
+      let propertyMetadata: PropertyMetadata<any> | null | undefined
       if (modelConstructor) {
         propertyMetadata = MetadataHelper.forProperty(modelConstructor, propertyKey)
       }
@@ -121,7 +117,7 @@ export class Mapper {
   static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): AttributeValue {
     const explicitType: AttributeModelType | null =
       propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
-        ? propertyMetadata.typeInfo.type
+        ? propertyMetadata.typeInfo.type!
         : null
     const type: AttributeModelType = explicitType || Util.typeOf(propertyValue)
 
@@ -150,36 +146,42 @@ export class Mapper {
 
     if (propertyMetadata && propertyMetadata.mapper) {
       // custom mapper
-      return new propertyMetadata.mapper().toDb(propertyValue, explicitType ? propertyMetadata : null)
+      if (explicitType) {
+        return new propertyMetadata.mapper().toDb(propertyValue, propertyMetadata)
+      } else {
+        return new propertyMetadata.mapper().toDb(propertyValue)
+      }
     } else {
       // mapper by type
-      return Mapper.forType(type).toDb(propertyValue, explicitType ? propertyMetadata : null)
+      if (explicitType) {
+        return Mapper.forType(type).toDb(propertyValue, propertyMetadata)
+      } else {
+        return Mapper.forType(type).toDb(propertyValue)
+      }
     }
   }
 
   static fromDb<T>(attributeMap: AttributeMap<T>, modelClass?: ModelConstructor<T>): T {
     const model: T = <T>{}
 
-    const propertyNames: Array<keyof T> = <Array<keyof T>>Object.getOwnPropertyNames(attributeMap)
-    propertyNames.forEach(propertyKey => {
+    Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {
       /*
        * 1) get the value of the property
        */
-      const attributeValue: AttributeValue = attributeMap[propertyKey]
+      const attributeValue: AttributeValue = attributeMap[attributeName]
 
       /*
        * 2) decide how to map the property depending on type or value
        */
       let modelValue: any
-      let propertyMetadata: PropertyMetadata<any>
+      let propertyMetadata: PropertyMetadata<any> | null | undefined
       if (modelClass) {
-        propertyMetadata = MetadataHelper.forProperty(modelClass, propertyKey)
+        propertyMetadata = MetadataHelper.forProperty(modelClass, attributeName)
       }
 
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
           // skip transient property
-          // TODO replace with logger
           winston.info('transient property -> skip')
         } else {
           /*
@@ -205,7 +207,7 @@ export class Mapper {
         // }
       }
 
-      model[propertyMetadata ? propertyMetadata.name : propertyKey] = modelValue
+      Reflect.set(<any>model, propertyMetadata ? propertyMetadata.name : attributeName, modelValue)
       // throw new Error('don\'t know how to map without model class');
     })
 
@@ -215,28 +217,18 @@ export class Mapper {
   static fromDbOne<T>(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): T {
     const explicitType: AttributeModelType | null =
       propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
-        ? propertyMetadata.typeInfo.type
+        ? propertyMetadata.typeInfo.type!
         : null
     const type: AttributeModelType = explicitType || Util.typeOfFromDb(attributeValue)
 
     winston.debug(`mapFromDbOne for type ${type}`)
-    return Mapper.forType(type).fromDb(attributeValue, explicitType ? propertyMetadata : null)
-  }
 
-  // static mapperForConvention<T>(typeFromConvention: 'date'): MapperForType<Date | moment.Moment> {
-  //   switch (typeFromConvention) {
-  //     case 'date':
-  //       switch (ScDynamoObjectMapper.config.dateType) {
-  //         case 'default':
-  //           return this.forType(Date);
-  //         case 'moment':
-  //           return this.forType(Moment);
-  //       }
-  //       break;
-  //     default:
-  //       throw new Error(`there is no mapping defined for type ${typeFromConvention} which was resolved from property name convention`);
-  //   }
-  // }
+    if (explicitType) {
+      return Mapper.forType(type).fromDb(attributeValue, propertyMetadata)
+    } else {
+      return Mapper.forType(type).fromDb(attributeValue)
+    }
+  }
 
   static forType(type: AttributeModelType): MapperForType<any> {
     if (!Mapper.mapperForType.has(type)) {
@@ -260,8 +252,8 @@ export class Mapper {
         case Map:
           // Maps support complex types as keys, we only support String & Number as Keys, otherwise a .toString() method should be implemented,
           // so we now how to save a  key
-          mapperForType = new MapMapper()
-          break
+          // mapperForType = new MapMapper()
+          throw new Error('Map is not supported to be mapped for now')
         case Array:
           mapperForType = new CollectionMapper()
           break
@@ -284,6 +276,6 @@ export class Mapper {
       this.mapperForType.set(type, mapperForType)
     }
 
-    return this.mapperForType.get(type)
+    return this.mapperForType.get(type)!
   }
 }

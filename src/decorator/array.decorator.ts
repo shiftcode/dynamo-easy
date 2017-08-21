@@ -17,7 +17,7 @@ import { AttributeModelTypes, initOrUpdateProperty, KEY_PROPERTY } from './prope
  */
 export function TypedArray<T>(modelClass?: ModelConstructor<T>): PropertyDecorator {
   return (target: any, propertyKey: string) => {
-    const typeInfo: Partial<TypeInfo<T>> = <Partial<TypeInfo<T>>>{
+    const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
       type: <any>Array,
       isCustom: true,
     }

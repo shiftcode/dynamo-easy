@@ -19,7 +19,7 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
     let partitionKey: string
     if (this.params.IndexName) {
-      const index: SecondaryIndex = this.metaData.getIndex(this.params.IndexName)
+      const index = this.metaData.getIndex(this.params.IndexName)
       if (index) {
         partitionKey = index.partitionKey
         if (!partitionKey) {
@@ -78,26 +78,26 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
     const params = _.clone(this.params)
     params.Select = 'COUNT'
 
-    return this.dynamoRx.query(params).map(response => response.Count)
+    return this.dynamoRx.query(params).map(response => response.Count!)
   }
 
   execNoMap(): Observable<Response<T>> {
     return this.dynamoRx.query(this.params).map(queryResponse => {
       const response: Response<T> = {}
       Object.assign(response, queryResponse)
-      response.Items = queryResponse.Items.map(item => this.mapFromDb(<any>item))
+      response.Items = queryResponse.Items!.map(item => this.mapFromDb(<any>item))
 
       return response
     })
   }
 
   exec(): Observable<T[]> {
-    return this.dynamoRx.query(this.params).map(response => response.Items.map(item => this.mapFromDb(<any>item)))
+    return this.dynamoRx.query(this.params).map(response => response.Items!.map(item => this.mapFromDb(<any>item)))
   }
 
   execSingle(): Observable<T> {
     this.limit(1)
 
-    return this.dynamoRx.query(this.params).map(response => this.mapFromDb(<any>response.Items[0]))
+    return this.dynamoRx.query(this.params).map(response => this.mapFromDb(<any>response.Items![0]))
   }
 }

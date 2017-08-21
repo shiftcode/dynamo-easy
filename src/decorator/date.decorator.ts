@@ -17,7 +17,7 @@ export function Date(): PropertyDecorator {
         break
     }
 
-    const typeInfo: Partial<TypeInfo<Moment | Date>> = <Partial<TypeInfo<Moment | Date>>>{
+    const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
       type: dateType,
       typeName: Util.typeName(dateType),
       isCustom: true,

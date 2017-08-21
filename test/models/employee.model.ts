@@ -8,11 +8,11 @@ export class Employee {
 
   age: number
 
-  createdAt: moment.Moment
+  createdAt: moment.Moment | null
 
   @SortedSet() sortedSet: Set<string>
 
-  constructor(name: string, age: number, createdAt: moment.Moment, sortedListValues: any[]) {
+  constructor(name: string, age: number, createdAt: moment.Moment | null, sortedListValues: any[] | null) {
     this.name = name
     this.age = age
     this.createdAt = createdAt

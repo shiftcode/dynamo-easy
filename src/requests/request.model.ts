@@ -53,9 +53,8 @@ export abstract class Request<T, P extends QueryInput | ScanInput> {
   }
 
   index(indexName: string): Request<T, P> {
-    const index: SecondaryIndex = this.metaData.getIndex(indexName)
+    const index = this.metaData.getIndex(indexName)
 
-    // FIXME implement
     if (index) {
       this.params.IndexName = indexName
     } else {

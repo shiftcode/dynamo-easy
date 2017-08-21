@@ -1,18 +1,21 @@
-import { Metadata, MetadataHelper } from '../src/decorator/metadata'
+import { Metadata } from '../src/decorator/metadata'
+import { MetadataHelper } from '../src/decorator/metadata-helper'
 import { ModelMetadata } from '../src/decorator/model-metadata.model'
 import { Moment } from '../src/decorator/moment.type'
 import { PropertyMetadata } from '../src/decorator/property-metadata.model'
-import { ComplexModel, NestedObject } from './models/complex.model'
+import { ComplexModel } from './models/complex.model'
 import { CustomTableNameModel } from './models/custom-table-name.model'
 import { ModelWithDateMoment } from './models/model-with-date-moment.model'
 import {
   DifferentModel,
+  INDEX_ACTIVE,
   INDEX_ACTIVE_CREATED_AT,
   INDEX_COUNT,
   ModelWithABunchOfIndexes,
   ModelWithGSI,
   ModelWithWrongIndexes,
 } from './models/model-with-indexes.model'
+import { NestedObject } from './models/nested-object.model'
 import { SimpleModel } from './models/simple.model'
 
 describe('Decorators should add correct metadata', () => {
@@ -20,7 +23,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<SimpleModel>
 
     beforeEach(() => {
-      modelOptions = MetadataHelper.get(SimpleModel).modelOptions
+      modelOptions = MetadataHelper.forModel(SimpleModel)
     })
 
     it('with default table name', () => {
@@ -39,7 +42,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<CustomTableNameModel>
 
     beforeEach(() => {
-      modelOptions = MetadataHelper.get(CustomTableNameModel).modelOptions
+      modelOptions = MetadataHelper.forModel(CustomTableNameModel)
     })
 
     it('with custom table name', () => {
@@ -54,7 +57,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<ModelWithDateMoment>
 
     beforeEach(() => {
-      modelOptions = MetadataHelper.get(ModelWithDateMoment).modelOptions
+      modelOptions = MetadataHelper.forModel(ModelWithDateMoment)
     })
 
     it('id', () => {
@@ -284,11 +287,11 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('should add indexes on model', () => {
-        expect(metadata.modelOptions.globalSecondaryIndexes).toBeDefined()
-        expect(metadata.modelOptions.globalSecondaryIndexes.size).toBe(1)
-        expect(metadata.modelOptions.globalSecondaryIndexes.get('active-index')).toBeDefined()
-        expect(metadata.modelOptions.globalSecondaryIndexes.get('active-index').partitionKey).toBe('active')
-        expect(metadata.modelOptions.globalSecondaryIndexes.get('active-index').sortKey).toBeUndefined()
+        expect(metadata.modelOptions.indexes).toBeDefined()
+        expect(metadata.modelOptions.indexes.size).toBe(1)
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)).toBeDefined()
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE).partitionKey).toBe('active')
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE).sortKey).toBeUndefined()
       })
 
       it('should define the index on property metadata', () => {
@@ -296,8 +299,8 @@ describe('Decorators should add correct metadata', () => {
         expect(propMeta).toBeDefined()
         expect(propMeta.keyForGSI).toBeDefined()
         expect(Object.keys(propMeta.keyForGSI).length).toBe(1)
-        expect(propMeta.keyForGSI['active-index']).toBeDefined()
-        expect(propMeta.keyForGSI['active-index']).toBe('HASH')
+        expect(propMeta.keyForGSI[INDEX_ACTIVE]).toBeDefined()
+        expect(propMeta.keyForGSI[INDEX_ACTIVE]).toBe('HASH')
       })
     })
 
@@ -309,11 +312,11 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('should add indexes on model', () => {
-        expect(metadata.modelOptions.globalSecondaryIndexes).toBeDefined()
-        expect(metadata.modelOptions.globalSecondaryIndexes.size).toBe(1)
-        expect(metadata.modelOptions.globalSecondaryIndexes.get('active-index')).toBeDefined()
-        expect(metadata.modelOptions.globalSecondaryIndexes.get('active-index').partitionKey).toBe('active')
-        expect(metadata.modelOptions.globalSecondaryIndexes.get('active-index').sortKey).toBe('createdAt')
+        expect(metadata.modelOptions.indexes).toBeDefined()
+        expect(metadata.modelOptions.indexes.size).toBe(1)
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)).toBeDefined()
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE).partitionKey).toBe('active')
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE).sortKey).toBe('createdAt')
       })
 
       it('should define the index on property metadata', () => {
@@ -321,8 +324,8 @@ describe('Decorators should add correct metadata', () => {
         expect(propMeta).toBeDefined()
         expect(propMeta.keyForGSI).toBeDefined()
         expect(Object.keys(propMeta.keyForGSI).length).toBe(1)
-        expect(propMeta.keyForGSI['active-index']).toBeDefined()
-        expect(propMeta.keyForGSI['active-index']).toBe('HASH')
+        expect(propMeta.keyForGSI[INDEX_ACTIVE]).toBeDefined()
+        expect(propMeta.keyForGSI[INDEX_ACTIVE]).toBe('HASH')
       })
 
       it('should define the index on property metadata', () => {
@@ -330,8 +333,8 @@ describe('Decorators should add correct metadata', () => {
         expect(propMeta).toBeDefined()
         expect(propMeta.keyForGSI).toBeDefined()
         expect(Object.keys(propMeta.keyForGSI).length).toBe(1)
-        expect(propMeta.keyForGSI['active-index']).toBeDefined()
-        expect(propMeta.keyForGSI['active-index']).toBe('RANGE')
+        expect(propMeta.keyForGSI[INDEX_ACTIVE]).toBeDefined()
+        expect(propMeta.keyForGSI[INDEX_ACTIVE]).toBe('RANGE')
       })
     })
 
@@ -352,15 +355,15 @@ describe('Decorators should add correct metadata', () => {
         // metadata.getGlobalIndex(INDEX_ACTIVE_CREATED_AT)
         // metadata.getLocalIndex(INDEX_ACTIVE_CREATED_AT)
 
-        expect(metadata.modelOptions.globalSecondaryIndexes).toBeDefined()
-        expect(metadata.modelOptions.globalSecondaryIndexes.size).toBe(1)
+        expect(metadata.modelOptions.indexes).toBeDefined()
+        expect(metadata.modelOptions.indexes.size).toBe(2)
 
-        const gsiActive = metadata.getGlobalIndex(INDEX_ACTIVE_CREATED_AT)
+        const gsiActive = metadata.getIndex(INDEX_ACTIVE_CREATED_AT)
         expect(gsiActive).toBeDefined()
         expect(gsiActive.partitionKey).toBe('active')
         expect(gsiActive.sortKey).toBe('createdAt')
 
-        const lsiCount = metadata.getLocalIndex(INDEX_COUNT)
+        const lsiCount = metadata.getIndex(INDEX_COUNT)
         expect(lsiCount).toBeDefined()
         expect(lsiCount.partitionKey).toBe('myId')
         expect(lsiCount.sortKey).toBe('count')

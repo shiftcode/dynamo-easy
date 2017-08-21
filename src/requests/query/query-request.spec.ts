@@ -16,7 +16,7 @@ xdescribe('query request', () => {
   describe('defines correct params', () => {
     let request: QueryRequest<ComplexModel>
     beforeEach(() => {
-      request = new QueryRequest(null, ComplexModel)
+      request = new QueryRequest(<any>null, ComplexModel)
     })
     it('defaults should be defined', () => {
       expect(request.params.TableName).toBe('complex_model')
@@ -37,7 +37,7 @@ xdescribe('query request', () => {
     let request: QueryRequest<ComplexModel>
 
     beforeEach(() => {
-      request = new QueryRequest(null, ComplexModel)
+      request = new QueryRequest(<any>null, ComplexModel)
       querySpy = spyOn(dynamoRx, 'query').and.callThrough()
     })
 

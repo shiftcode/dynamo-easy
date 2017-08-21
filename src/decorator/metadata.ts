@@ -10,33 +10,46 @@ export class Metadata<T> {
     this.modelOptions = Reflect.getMetadata(KEY_MODEL, modelClass)
   }
 
-  forProperty<K extends keyof T>(propertyKey: K): PropertyMetadata<T[K]> | undefined {
-    let options: PropertyMetadata<T[K]> | undefined
+  forProperty(propertyKey: keyof T | string): PropertyMetadata<T> | undefined {
+    let options: PropertyMetadata<T> | undefined
 
     if (this.modelOptions.properties) {
-      options = this.modelOptions.properties.find(property => property.name === propertyKey)
+      options = this.modelOptions.properties.find(
+        property => property.name === propertyKey || property.nameDb === propertyKey
+      )
     }
 
     return options
   }
 
   getKeysWithUUID(): Array<PropertyMetadata<any>> {
-    return this.filterBy(p => p.key && p.key.uuid, [])
+    return this.filterBy(p => !!(p.key && p.key.uuid), [])
   }
 
-  getPartitionKey(): string | null {
-    const property = this.filterByFirst(p => p.key && p.key.type === 'HASH')
-    return property ? property.nameDb : null
+  /**
+   *
+   * @returns {string}
+   * @throws Throws an error if no partition key was defined for the current model
+   */
+  getPartitionKey(): string {
+    const property = this.filterByFirst(p => !!(p.key && p.key.type === 'HASH'))
+
+    if (property) {
+      return property.nameDb
+    } else {
+      throw new Error('could not find any partition key')
+    }
   }
 
   getSortKey(): string | null {
-    const property = this.filterByFirst(p => p.key && p.key.type === 'RANGE')
+    const property = this.filterByFirst(p => !!(p.key && p.key.type === 'RANGE'))
     return property ? property.nameDb : null
   }
 
   getIndex(indexName: string): SecondaryIndex | null {
     if (this.modelOptions.indexes) {
-      return this.modelOptions.indexes.get(indexName)
+      const index = this.modelOptions.indexes.get(indexName)
+      return index ? index : null
     }
 
     return null
@@ -44,7 +57,7 @@ export class Metadata<T> {
 
   private filterBy<R>(
     predicate: (property: PropertyMetadata<any>) => boolean,
-    defaultValue: R = null
+    defaultValue: R
   ): Array<PropertyMetadata<any>> | R {
     if (this.modelOptions && this.modelOptions.properties) {
       const properties = this.modelOptions.properties.filter(predicate)
@@ -57,7 +70,7 @@ export class Metadata<T> {
   }
 
   private filterByFirst(predicate: (property: PropertyMetadata<any>) => boolean): PropertyMetadata<any> | null {
-    const properties = this.filterBy<null>(predicate)
+    const properties = this.filterBy(predicate, null)
     return properties && properties.length ? properties[0] : null
   }
 }

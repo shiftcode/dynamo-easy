@@ -22,7 +22,7 @@ export class ScanRequest<T> extends Request<T, ScanInput> {
     return this.dynamoRx.scan(this.params).map(queryResponse => {
       const response: Response<T> = {}
       Object.assign(response, queryResponse)
-      response.Items = queryResponse.Items.map(item => this.mapFromDb(<any>item))
+      response.Items = queryResponse.Items!.map(item => this.mapFromDb(<any>item))
 
       return response
     })
@@ -31,19 +31,19 @@ export class ScanRequest<T> extends Request<T, ScanInput> {
   exec(): Observable<T[]> {
     delete this.params.Select
 
-    return this.dynamoRx.scan(this.params).map(response => response.Items.map(item => this.mapFromDb(<any>item)))
+    return this.dynamoRx.scan(this.params).map(response => response.Items!.map(item => this.mapFromDb(<any>item)))
   }
 
   execSingle(): Observable<T | null> {
     delete this.params.Select
 
-    return this.dynamoRx.scan(this.params).map(response => this.mapFromDb(<any>response.Items[0]))
+    return this.dynamoRx.scan(this.params).map(response => this.mapFromDb(<any>response.Items![0]))
   }
 
   execCount(): Observable<number> {
     const params = { ...this.params }
     params.Select = 'COUNT'
 
-    return this.dynamoRx.scan(params).map(response => response.Count)
+    return this.dynamoRx.scan(params).map(response => response.Count!)
   }
 }

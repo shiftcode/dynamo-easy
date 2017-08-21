@@ -13,10 +13,16 @@ export class MetadataHelper {
     return Reflect.getMetadata(KEY_MODEL, modelClass)
   }
 
-  static forProperty<T, K extends keyof T>(
+  /**
+   *
+   * @param {ModelConstructor<T>} modelClass
+   * @param {keyof T} propertyKey Either the name of the property or the name of the
+   * @returns {PropertyMetadata<T>}
+   */
+  static forProperty<T>(
     modelClass: ModelConstructor<T>,
-    propertyKey: K
-  ): PropertyMetadata<T[K]> | null {
+    propertyKey: keyof T | string
+  ): PropertyMetadata<T> | null | undefined {
     if (modelClass) {
       const modelMetadata: ModelMetadata<T> = Reflect.getMetadata(KEY_MODEL, modelClass)
 
@@ -28,9 +34,11 @@ export class MetadataHelper {
         )
       }
 
-      let options: PropertyMetadata<T[K]> | undefined
+      let options: PropertyMetadata<T> | undefined
       if (modelMetadata.properties) {
-        options = modelMetadata.properties.find(property => property.name === propertyKey)
+        options = modelMetadata.properties.find(
+          property => property.name === propertyKey || property.nameDb === propertyKey
+        )
       }
 
       return options

@@ -1,6 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { hasGenericType, PropertyMetadata } from '../../decorator/property-metadata.model'
-import { AttributeCollectionType } from '../attribute-type.type'
 import { Mapper } from '../mapper'
 import { Util } from '../util'
 import { MapperForType } from './base.mapper'
@@ -8,7 +7,7 @@ import { MapperForType } from './base.mapper'
 export class CollectionMapper implements MapperForType<any[] | Set<any>> {
   // TODO add some validation rules based on propertyMetadata and returned value from db for sorted as example (SS -> sorted -> throw error)
   fromDb(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): any[] | Set<any> {
-    const explicitType = propertyMetadata ? propertyMetadata.typeInfo.type : null
+    const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
     if (attributeValue.SS) {
       const arr: string[] = attributeValue.SS
       return explicitType && explicitType === Array ? arr : new Set(arr)
@@ -32,22 +31,24 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
         propertyMetadata.typeInfo.genericTypes &&
         propertyMetadata.typeInfo.genericTypes.length
       ) {
-        arr = attributeValue.L.map(item => Mapper.fromDb(item.M, propertyMetadata.typeInfo.genericTypes[0]))
+        arr = attributeValue.L.map(item => Mapper.fromDb(item.M, propertyMetadata.typeInfo!.genericTypes![0]))
       } else {
         arr = attributeValue.L.map(value => Mapper.fromDbOne(value))
       }
 
       return explicitType && explicitType === Set ? new Set(arr) : arr
     }
+
+    throw new Error('No Collection Data (SS | NS | BS | L) was found in attribute data')
   }
 
   toDb(propertyValue: any[] | Set<any>, propertyMetadata?: PropertyMetadata<any>): AttributeValue {
     if (Array.isArray(propertyValue) || Util.isSet(propertyValue)) {
       const attributeValue: AttributeValue = {}
 
-      let collectionType: AttributeCollectionType
+      let collectionType
       if (propertyMetadata) {
-        const explicitType = propertyMetadata.typeInfo.type
+        const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
         switch (explicitType) {
           case Array:
             collectionType = 'L'
@@ -74,28 +75,28 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
         propertyValue = Array.from(propertyValue)
       }
 
-      let propertyValueMapped
       switch (collectionType) {
         case 'SS':
-          propertyValueMapped = propertyValue
+          attributeValue.SS = propertyValue
           break
         case 'NS':
-          propertyValueMapped = (<number[]>propertyValue).map(num => num.toString())
+          attributeValue.NS = (<number[]>propertyValue).map(num => num.toString())
           break
         case 'BS':
-          propertyValueMapped = propertyValue
+          attributeValue.BS = propertyValue
           break
         case 'L':
           if (hasGenericType(propertyMetadata)) {
-            propertyValueMapped = (<any[]>propertyValue).map(value => ({
-              M: Mapper.toDb(value, propertyMetadata.typeInfo.genericTypes[0]),
+            attributeValue.L = (<any[]>propertyValue).map(value => ({
+              M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericTypes![0]),
             }))
           } else {
-            propertyValueMapped = (<any[]>propertyValue).map(value => Mapper.toDbOne(value))
+            attributeValue.L = (<any[]>propertyValue).map(value => Mapper.toDbOne(value))
           }
           break
+        default:
+          throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
       }
-      attributeValue[collectionType] = propertyValueMapped
       return attributeValue
     } else {
       throw new Error(`given value is not an array ${propertyValue}`)

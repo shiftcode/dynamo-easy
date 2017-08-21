@@ -15,7 +15,7 @@ import { initOrUpdateProperty } from './property.decorator'
 // FIXME is there any improvement if we add generics to SortedSet<T> is it even possible?
 export function SortedSet(modelClass?: ModelConstructor<any>): PropertyDecorator {
   return (target: any, propertyKey: string) => {
-    const typeInfo: Partial<TypeInfo<Set<any>>> = <Partial<TypeInfo<Set<any>>>>{
+    const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
       type: Set,
       typeName: 'Set',
       isCustom: true,

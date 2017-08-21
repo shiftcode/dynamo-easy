@@ -19,7 +19,7 @@ export class Util {
   static DATE_TIME_ISO8601 = /^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$/
 
   // TODO should we handle duplicates, switch from set to list?
-  static detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType | null {
+  static detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType {
     if (Array.isArray(collection)) {
       if (collection.every(isString)) {
         return 'SS'
@@ -49,14 +49,14 @@ export class Util {
           return 'L'
       }
     } else {
-      return null
+      throw new Error('given collection was no array or Set -> type could not be detected')
     }
   }
 
   static typeByConvention(propertyKey: string): TypesByConvention | undefined {
-    let type: TypesByConvention
+    let type: TypesByConvention | undefined
     Object.keys(Util.REGEX_CONVENTIONS).forEach(key => {
-      if (Util.REGEX_CONVENTIONS[key].test(propertyKey)) {
+      if (Util.REGEX_CONVENTIONS[<TypesByConvention>key].test(propertyKey)) {
         type = <TypesByConvention>key
       }
     })
@@ -104,6 +104,8 @@ export class Util {
         return 'M'
       }
     }
+
+    throw new Error(`the type for value ${value} could not be detected`)
   }
 
   /**
@@ -143,18 +145,20 @@ export class Util {
         }
       }
     }
+
+    throw new Error(`typeof data ${data} could not be detected`)
   }
 
   /*
    * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
    * should we work with string match
    */
-  static typeOfFromDb(attributeValue: AttributeValue): AttributeModelType | null {
+  static typeOfFromDb(attributeValue?: AttributeValue): AttributeModelType {
     if (attributeValue) {
       const dynamoType: AttributeType = <AttributeType>Object.keys(attributeValue)[0]
       switch (dynamoType) {
         case 'S':
-          if (Util.DATE_TIME_ISO8601.test(attributeValue.S)) {
+          if (Util.DATE_TIME_ISO8601.test(attributeValue.S!)) {
             return Moment
           } else {
             return String
@@ -178,10 +182,10 @@ export class Util {
       }
     }
 
-    return null
+    throw new Error(`could not resolve the dynamo db type for attribute value ${attributeValue}`)
   }
 
-  static isBinary(data): boolean {
+  static isBinary(data: any): boolean {
     if (Util.isNode()) {
       // FIXME should add || data instanceof Stream
       return Buffer.isBuffer(data)
@@ -219,7 +223,7 @@ export class Util {
   /*
    * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/util.js
    */
-  static isType(obj, type): boolean {
+  static isType(obj: any, type: any): boolean {
     // handle cross-"frame" objects
     if (typeof type === 'function') {
       type = Util.typeName(type)
@@ -257,5 +261,7 @@ export class Util {
         return 'Undefined'
       }
     }
+
+    throw new Error(`was not able to resolve type name for type ${type}`)
   }
 }

@@ -3,8 +3,8 @@ import moment from 'moment'
 import { MapperForType } from '../mapper/for-type/base.mapper'
 import { ModelConstructor } from '../model/model-constructor'
 
-export interface TypeInfo<T> {
-  type: ModelConstructor<T>
+export interface TypeInfo {
+  type: ModelConstructor<any>
   // typeName: AttributeModelTypeName;
   // TODO define what custom means
   // true if we use a non native type for dynamo document client
@@ -24,16 +24,16 @@ export interface PropertyMetadata<T> {
   key?: Key
 
   // name of the property on js side
-  name: string
+  name: keyof T
 
   // name of the dynamodb attribute, same as key by default
-  nameDb?: string
+  nameDb: string
 
   /*
    * the type will re resolved using compile time information leveraging the reflect api, due to some limitations we
    * cannot differ between Object, Set, Map so we need an additional @Type decorator
    */
-  typeInfo?: Partial<TypeInfo<T>>
+  typeInfo?: Partial<TypeInfo>
 
   /*
    * defines which dynamodb type should be used for storing collection data, only L(ist) preserves order (compared to Set types)
@@ -52,7 +52,7 @@ export interface PropertyMetadata<T> {
   transient?: boolean
 }
 
-export function hasGenericType(propertyMetadata: PropertyMetadata<any>): boolean {
+export function hasGenericType(propertyMetadata?: PropertyMetadata<any>): boolean {
   return !!(
     propertyMetadata &&
     propertyMetadata.typeInfo &&
