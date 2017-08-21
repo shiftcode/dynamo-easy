@@ -8,6 +8,8 @@ import { ModelConstructor } from '../../model/model-constructor'
 import { Request } from '../request.model'
 import { Response } from '../response.model'
 import { ConditionBuilder } from '../utils/condition-builder'
+import { ConditionFunction } from '../utils/condition-function'
+import { RangeKeyConditionFunction } from '../utils/range-key-condition-function'
 
 // inspired by https://github.com/ryanfitz/vogels/blob/master/lib/query.js
 export class QueryRequest<T> extends Request<T, QueryInput> {
@@ -15,7 +17,6 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
     super(dynamoRx, modelClazz)
   }
 
-  // FIXME implement
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
     let partitionKey: string
     if (this.params.IndexName) {
@@ -43,26 +44,33 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
    * used to define some condition for the range key, use the secondary index to query based on a custom index
    * @returns {ConditionFunction<T>}
    */
-  // FIXME implmenet
-  // whereSortKey(): RangeKeyConditionFunction<QueryRequest<T>> {
-  //   let sortKey: string;
-  //   if (this.params.IndexName) {
-  //     sortKey = this.schema.indexes[this.params.IndexName].sortKey;
-  //   } else {
-  //     sortKey = this.schema.sortKey;
-  //   }
-  //
-  //   if (!sortKey) {
-  //     throw new Error('There was no sort key defined for current schema');
-  //   }
-  //
-  //   return ConditionBuilder.addKeyCondition(sortKey, this);
-  // }
+  whereSortKey(): RangeKeyConditionFunction<QueryRequest<T>> {
+    let sortKey: string | null
+    if (this.params.IndexName) {
+      const index = this.metaData.getIndex(this.params.IndexName)
+      if (index) {
+        if (index.sortKey) {
+          sortKey = index.sortKey
+        } else {
+          throw new Error(`there is no sort key defined for index <${this.params.IndexName}>`)
+        }
+      } else {
+        throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
+      }
+    } else {
+      sortKey = this.metaData.getSortKey()
+    }
 
-  // FIXME implement
-  // where(keyName: string): ConditionFunction<QueryRequest<T>> {
-  //   return ConditionBuilder.addCondition(keyName, this);
-  // }
+    if (!sortKey) {
+      throw new Error('There was no sort key defined for current schema')
+    }
+
+    return ConditionBuilder.addKeyCondition(sortKey, this)
+  }
+
+  where(keyName: string): ConditionFunction<QueryRequest<T>> {
+    return ConditionBuilder.addCondition(keyName, this)
+  }
 
   ascending(): QueryRequest<T> {
     this.params.ScanIndexForward = true

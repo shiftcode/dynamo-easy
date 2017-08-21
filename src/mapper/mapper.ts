@@ -133,7 +133,9 @@ export class Mapper {
       type !== Binary
     ) {
       throw new Error(
-        `make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key`
+        `make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key, value = ${JSON.stringify(
+          propertyValue
+        )}`
       )
     }
 

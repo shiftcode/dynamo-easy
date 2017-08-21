@@ -1,7 +1,6 @@
-import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { AttributeMap } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
 import { PropertyMetadata } from '../../decorator/property-metadata.model'
-import { AttributeModelType } from '../../mapper/attribute-model-type.type'
 import { Mapper } from '../../mapper/mapper'
 import { ConditionOperator } from './condition-operator.type'
 import { Condition } from './condition.model'
@@ -56,13 +55,15 @@ export class Expressions {
     )
   }
 
-  static uniqAttributeValueName(key: string, existingValueNames: string[]): string {
-    let potentialName = ':' + key
+  static uniqAttributeValueName(key: string, existingValueNames?: string[]): string {
+    let potentialName = `:${key}`
     let idx = 1
 
-    while (_.includes(existingValueNames, potentialName)) {
-      idx++
-      potentialName = ':' + key + '_' + idx
+    if (existingValueNames && existingValueNames.length) {
+      while (_.includes(existingValueNames, potentialName)) {
+        idx++
+        potentialName = `:${key}_${idx}`
+      }
     }
 
     return potentialName
@@ -70,55 +71,54 @@ export class Expressions {
 
   static buildFilterExpression(
     keyName: string,
-    propertyMetadata: PropertyMetadata<any>,
     operator: ConditionOperator,
-    existingValueNames: string[],
-    value1: any,
-    value2?: any
+    values: any[],
+    existingValueNames?: string[],
+    propertyMetadata?: PropertyMetadata<any>
   ): Condition {
-    // IN filter expression is unlike all the others where val1 is an array of values
-    if (operator === 'IN') {
-      return Expressions.buildInFilterExpression(keyName, existingValueNames, value1)
-    }
+    Expressions.validateValues(operator, values)
 
-    let v1 = Expressions.formatAttributeValue(value1)
-    let v2 = Expressions.formatAttributeValue(value2)
-
-    const path: string = '#' + keyName
+    const path = `#${keyName}`
+    let value1: any = values[0]
     const v1ValueName = Expressions.uniqAttributeValueName(keyName, existingValueNames)
-    const v2ValueName = Expressions.uniqAttributeValueName(keyName, [v1ValueName].concat(existingValueNames))
 
-    let statement = ''
-
-    if (Expressions.isFunctionOperator(operator)) {
-      if (!_.isNull(v1) && !_.isUndefined(v1)) {
-        statement = operator + '(' + path + ', ' + v1ValueName + ')'
-      } else {
-        statement = operator + '(' + path + ')'
-      }
+    let statement
+    if (operator === 'IN') {
+      // IN filter expression is unlike all the others where val1 is an array of values
+      return Expressions.buildInFilterExpression(keyName, value1, existingValueNames)
     } else if (operator === 'BETWEEN') {
+      const value2: any | undefined = values[0]
+      const v2 = Expressions.formatAttributeValue(value2)
+      const v2ValueName = Expressions.uniqAttributeValueName(keyName, [v1ValueName].concat(existingValueNames || []))
+
       statement = path + ' BETWEEN ' + v1ValueName + ' AND ' + v2ValueName
+    } else if (Expressions.isFunctionOperator(operator)) {
+      if (value1 !== null && value1 !== undefined) {
+        statement = `${operator} (${path}, ${v1ValueName})`
+      } else {
+        statement = `${operator} (${path})`
+      }
     } else {
       statement = [path, operator, v1ValueName].join(' ')
     }
 
     const attributeMap: AttributeMap = {}
 
-    if (!_.isNull(v1) && !_.isUndefined(v1)) {
+    if (value1 !== null && value1 !== undefined) {
       if (operator === 'contains') {
         // FIXME review concept for this, soooo hacky right now and only supporting dedicated cases
         // if (attributeType instanceof List) {
         // TODO support more types
         // if ((<List<any>>attributeType).listType === 'uniform') {
         //   if ((<List<any>>attributeType).listArguments.type === 'string') {
-        //     v1 = { S: v1.toString() };
+        //     value1 = { S: value1.toString() };
         //   } else {
         //     throw new Error(`contains expression is not supported for lists with type «uniform» and model type ${(<List<any>>attributeType).listArguments.type}`);
         //   }
         // } else {
         // }
         // } else {
-        if (propertyMetadata.typeInfo) {
+        if (propertyMetadata && propertyMetadata.typeInfo) {
           switch (propertyMetadata.typeInfo.type) {
             case Array:
             case Set:
@@ -130,16 +130,16 @@ export class Expressions {
           throw new Error('no type info defined')
         }
       } else {
-        v1 = Mapper.toDbOne(v1, propertyMetadata)
+        value1 = Mapper.toDbOne(value1, propertyMetadata)
       }
 
-      attributeMap[v1ValueName] = v1
+      attributeMap[v1ValueName] = value1
     }
 
-    if (!_.isNull(v2) && !_.isUndefined(v2)) {
-      v2 = Mapper.toDbOne(v2, propertyMetadata)
-      attributeMap[v2ValueName] = v2
-    }
+    // if (!_.isNull(v2) && !_.isUndefined(v2)) {
+    //   v2 = Mapper.toDbOne(v2, propertyMetadata)
+    //   attributeMap[v2ValueName] = v2
+    // }
 
     const attributeNames: { [key: string]: string } = {}
     attributeNames[path] = keyName
@@ -151,27 +151,47 @@ export class Expressions {
     }
   }
 
-  static buildInFilterExpression(key: string, existingValueNames: string[], values: string[]): Condition {
-    const path = '#' + key
+  static buildInFilterExpression(key: string, values: string[], existingValueNames?: string[]): Condition {
+    const path = `#${key}`
 
     const attributeNames: { [key: string]: string } = {}
     attributeNames[path] = key
 
-    const attributeMap: AttributeMap = <{ [key: string]: AttributeValue }>_.reduce(
-      values,
-      (result: { [key: string]: string }, val) => {
-        const existing = _.keys(result).concat(existingValueNames)
-        const p = Expressions.uniqAttributeValueName(key, existing)
-        result[p] = Expressions.formatAttributeValue(val)
-        return result
-      },
-      {}
-    )
+    const attributeMap = values.reduce((result: AttributeMap, val) => {
+      const existing = Object.keys(result).concat(existingValueNames || [])
+      const p = Expressions.uniqAttributeValueName(key, existing)
+      result[p] = Expressions.formatAttributeValue(val)
+      return result
+    }, {})
 
     return {
       attributeNames,
       attributeMap,
-      statement: path + ' IN (' + _.keys(attributeMap) + ')',
+      statement: `${path} IN (${Object.keys(attributeMap)})`,
+    }
+  }
+
+  // TODO implement more checks
+  private static validateValues(operator: ConditionOperator, values?: any[]) {
+    if (values && Array.isArray(values)) {
+      switch (values.length) {
+        case 0:
+          throw new Error(
+            `there is no operator defined where no value is needed, check your code to provide some values for operator ${operator}`
+          )
+        case 1:
+          if (operator === 'BETWEEN') {
+            throw new Error('the operator BETWEEN needs two values, just got one')
+          }
+          break
+        case 2:
+          if (operator === '<' || operator === '>') {
+            throw new Error(`the operator ${operator} needs one value, got two`)
+          }
+          break
+      }
+    } else {
+      throw new Error('values must be of type Array')
     }
   }
 }

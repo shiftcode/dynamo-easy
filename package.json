@@ -1,6 +1,6 @@
 {
   "name": "sc-dynamo-object-mapper",
-  "version": "0.0.0",
+  "version": "0.0.0-development",
   "description": "",
   "keywords": [],
   "main": "dist/sc-dynamo-object-mapper.umd.js",
@@ -12,7 +12,7 @@
   "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/shiftcode/sc-dynamo-object-mapper"
   },
   "license": "MIT",
   "engines": {
@@ -32,7 +32,9 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "prettier:all": "prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5 '+(src|test|e2e)/**/*.ts'",
-    "precommit": "yarn run lint -- --fix && lint-staged"
+    "precommit": "yarn run lint -- --fix && lint-staged",
+    "prepush": "npm run test:prod && npm run build",
+    "commitmsg": "validate-commit-msg"
   },
   "lint-staged": {
     "*.ts": [
@@ -97,7 +99,7 @@
     "rollup-plugin-commonjs": "^8.1.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "semantic-release": "^7.0.1",
+    "semantic-release": "^7.0.2",
     "ts-jest": "^20.0.10",
     "ts-node": "^3.0.6",
     "tsc-watch": "^1.0.8",
@@ -115,5 +117,8 @@
     "reflect-metadata": "^0.1.10",
     "uuid": "^3.1.0",
     "winston": "^2.3.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }

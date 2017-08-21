@@ -1,5 +1,4 @@
-import { ExpressionAttributeValueMap, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash'
+import { ExpressionAttributeValueMap } from 'aws-sdk/clients/dynamodb'
 import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Request } from '../request.model'
 import { ConditionFunction, ConditionFunctionA } from './condition-function'
@@ -16,12 +15,14 @@ export class ConditionBuilder {
     propetyMetadata?: PropertyMetadata<any>
   ): ConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
-      return (/* values */): T => {
-        const copy = Array.prototype.slice.call(arguments)
-        const existingValueKeys = Object.keys(request.params.ExpressionAttributeValues)
-        const args = [keyName, propetyMetadata, operator, existingValueKeys].concat(copy)
-        const cond = Expressions.buildFilterExpression.apply(null, args)
-        ParamUtil.addFilterCondition(cond, request.params)
+      return (...values: any[]): T => {
+        const conditionChain = ConditionBuilder.build(
+          keyName,
+          propetyMetadata,
+          request.params.ExpressionAttributeValues
+        )
+        const condition: Condition = (<any>conditionChain)[operator](values)
+        ParamUtil.addFilterCondition(condition, request.params)
         return request
       }
     }
@@ -50,12 +51,14 @@ export class ConditionBuilder {
     propetyMetadata?: PropertyMetadata<any>
   ): RangeKeyConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
-      return (/* values */): T => {
-        const copy = Array.prototype.slice.call(arguments)
-        const existingValueKeys = Object.keys(request.params.ExpressionAttributeValues)
-        const args = [keyName, propetyMetadata, operator, existingValueKeys].concat(copy)
-        const cond = Expressions.buildFilterExpression.apply(null, args)
-        ParamUtil.addKeyCondition(cond, request.params)
+      return (...values: any[]): T => {
+        const conditionChain = ConditionBuilder.build(
+          keyName,
+          propetyMetadata,
+          request.params.ExpressionAttributeValues
+        )
+        const condition: Condition = (<any>conditionChain)[operator](values)
+        ParamUtil.addKeyCondition(condition, request.params)
         return request
       }
     }
@@ -74,16 +77,14 @@ export class ConditionBuilder {
 
   static build<T>(
     keyName: string,
-    propertyMetadata: PropertyMetadata<any>,
+    propertyMetadata?: PropertyMetadata<any>,
     expressionAttributeValues?: ExpressionAttributeValueMap
   ): ConditionFunctionA {
     const f = (operator: ConditionOperator) => {
-      return (/* values */): Condition => {
-        const copy = Array.prototype.slice.call(arguments)
+      return (...values: any[]): Condition => {
+        const copy = [...values]
         const existingValueKeys = expressionAttributeValues ? Object.keys(expressionAttributeValues) : []
-        const args = [keyName, propertyMetadata, operator, existingValueKeys].concat(copy)
-        const cond = Expressions.buildFilterExpression.apply(null, args)
-        return cond
+        return Expressions.buildFilterExpression(keyName, operator, values, existingValueKeys, propertyMetadata)
       }
     }
 
