@@ -17,7 +17,8 @@
     "declarationDir": "dist/types",
     "outDir": "compiled",
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowJs": true
   },
   "include": [
     "src"

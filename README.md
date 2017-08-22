@@ -11,6 +11,12 @@ A starter project that makes creating a TypeScript library extremely easy.
 
 ## Object Mapper
 
+#### Notes
+
+##### lodash with rollup and jest
+We ended up using lodash-es to get it to work with rollup, there is some additional configuration required for jest [Tree Shake](https://medium.com/@martin_hotell/tree-shake-lodash-with-webpack-jest-and-typescript-2734fa13b5cd)
+we used the configuration linked (allowJs in tsconfig, and transform & transformIgnorePattern in jest config -> see package.json)
+
 #### Decorators
 Decorators are used to add some metadata to our model classes required by the mapper for some special cases.
 
