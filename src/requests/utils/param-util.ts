@@ -4,12 +4,12 @@ import {
   QueryInput,
   ScanInput,
 } from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash-es'
+import * as _ from 'lodash'
 import { Condition } from './condition.model'
 
 export class ParamUtil {
   static addFilterCondition<T>(condition: Condition, params: QueryInput | ScanInput) {
-    if (isString(params.FilterExpression)) {
+    if (_.isString(params.FilterExpression)) {
       params.FilterExpression = params.FilterExpression + ' AND (' + condition.statement + ')'
     } else {
       params.FilterExpression = '(' + condition.statement + ')'
@@ -34,16 +34,16 @@ export class ParamUtil {
       ...params.ExpressionAttributeValues,
     }
 
-    if (!isEmpty(expressionAttributeNames)) {
+    if (!_.isEmpty(expressionAttributeNames)) {
       params.ExpressionAttributeNames = expressionAttributeNames
     }
 
-    if (!isEmpty(expressionAttributeValues)) {
+    if (!_.isEmpty(expressionAttributeValues)) {
       params.ExpressionAttributeValues = expressionAttributeValues
     }
 
     const expression = Reflect.get(params, expressionType)
-    if (isString(expression)) {
+    if (_.isString(expression)) {
       ;(<any>params)[expressionType] = (<any>params).KeyConditionExpression + ' AND (' + condition.statement + ')'
     } else {
       ;(<any>params)[expressionType] = '(' + condition.statement + ')'

@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { isNumber, isString } from 'lodash-es'
+import * as _ from 'lodash'
 import moment from 'moment'
 import { Binary } from '../decorator/binary.type'
 import { Moment } from '../decorator/moment.type'
@@ -21,11 +21,11 @@ export class Util {
   // TODO should we handle duplicates, switch from set to list?
   static detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType {
     if (Array.isArray(collection)) {
-      if (collection.every(isString)) {
+      if (collection.every(_.isString)) {
         return 'SS'
       }
 
-      if (collection.every(isNumber)) {
+      if (collection.every(_.isNumber)) {
         return 'NS'
       }
 
@@ -80,11 +80,11 @@ export class Util {
     if (Util.isCollection(value)) {
       return Util.detectCollectionType(value)
     } else {
-      if (isString(value)) {
+      if (_.isString(value)) {
         return 'S'
       }
 
-      if (isNumber(value)) {
+      if (_.isNumber(value)) {
         return 'N'
       }
 

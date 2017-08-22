@@ -1,5 +1,5 @@
 import { AttributeMap } from 'aws-sdk/clients/dynamodb'
-import { isDate } from 'lodash-es'
+import * as _ from 'lodash'
 import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
 import { ConditionOperator } from './condition-operator.type'
@@ -37,7 +37,7 @@ export class Expressions {
   }
 
   static formatAttributeValue(val: any): any {
-    if (isDate(val)) {
+    if (_.isDate(val)) {
       return val.toISOString()
     }
 
