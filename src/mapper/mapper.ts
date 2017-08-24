@@ -1,25 +1,24 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-// FIXME make this dependency optional
-import * as UUID from 'uuid'
-import * as winston from 'winston'
+// import v1 from 'uuid'
 import { Binary } from '../decorator/binary.type'
+import { BlaType } from '../decorator/bla.type'
 import { Metadata } from '../decorator/metadata'
 import { MetadataHelper } from '../decorator/metadata-helper'
-import { Moment } from '../decorator/moment.type'
 import { PropertyMetadata } from '../decorator/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
 import { AttributeModelType } from './attribute-model-type.type'
 import { MapperForType } from './for-type/base.mapper'
+import { BlaMapper } from './for-type/bla.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
 import { DateMapper } from './for-type/date.mapper'
-import { MomentMapper } from './for-type/moment.mapper'
 import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
 import { StringMapper } from './for-type/string.mapper'
 import { NullType } from './null.type'
 import { Util } from './util'
+// import debug from 'debug';
 
 /**
  * For the base convertion we use the DynamoDB converter.
@@ -27,6 +26,8 @@ import { Util } from './util'
  */
 export class Mapper {
   static mapperForType: Map<AttributeModelType, MapperForType<any>> = new Map()
+
+  // static logger = debug('Mapper');
 
   static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): AttributeMap {
     const mapped: AttributeMap = <AttributeMap>{}
@@ -47,7 +48,7 @@ export class Mapper {
             )
           }
 
-          Reflect.set(<any>item, propertyMetadata.name, UUID.v1())
+          Reflect.set(<any>item, propertyMetadata.name, Util.uuidv4())
         })
       }
     }
@@ -80,7 +81,7 @@ export class Mapper {
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
           // skip transient property
-          winston.info('transient property -> skip')
+          // Mapper.logger.log('transient property -> skip')
         } else {
           /*
            * 3a) property metadata is defined
@@ -183,7 +184,7 @@ export class Mapper {
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
           // skip transient property
-          winston.info('transient property -> skip')
+          // Mapper.logger.log('transient property -> skip')
         } else {
           /*
            * 3a) property metadata is defined
@@ -222,7 +223,7 @@ export class Mapper {
         : null
     const type: AttributeModelType = explicitType || Util.typeOfFromDb(attributeValue)
 
-    winston.debug(`mapFromDbOne for type ${type}`)
+    // Mapper.logger.log(`mapFromDbOne for type ${type}`)
 
     if (explicitType) {
       return Mapper.forType(type).fromDb(attributeValue, propertyMetadata)
@@ -244,8 +245,8 @@ export class Mapper {
         case Boolean:
           mapperForType = new BooleanMapper()
           break
-        case Moment:
-          mapperForType = new MomentMapper()
+        case BlaType:
+          mapperForType = new BlaMapper()
           break
         case Date:
           mapperForType = new DateMapper()

@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { Employee } from '../../test/models/employee.model'
-import { Moment } from '../decorator/moment.type'
+import { BlaType } from '../decorator/bla.type'
 import { NullType } from './null.type'
 import { UndefinedType } from './undefined.type'
 import { Util } from './util'
@@ -110,7 +110,7 @@ xdescribe('Util', () => {
     })
 
     it('Moment', () => {
-      expect(Util.typeName(Moment)).toBe('Moment')
+      expect(Util.typeName(BlaType)).toBe('Moment')
     })
 
     it('Date', () => {
@@ -155,7 +155,7 @@ xdescribe('Util', () => {
 
     it('moment', () => {
       const m: moment.Moment = moment()
-      expect(Util.typeOf(m)).toBe(Moment)
+      expect(Util.typeOf(m)).toBe(BlaType)
     })
 
     it('array', () => {
@@ -209,7 +209,7 @@ xdescribe('Util', () => {
 
     it('moment', () => {
       const m: moment.Moment = moment()
-      expect(Util.typeOfFromDb({ S: m.clone().utc().format() })).toBe(Moment)
+      expect(Util.typeOfFromDb({ S: m.clone().utc().format() })).toBe(BlaType)
     })
 
     it('array', () => {

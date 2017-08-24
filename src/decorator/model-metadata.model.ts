@@ -1,9 +1,5 @@
-import { SecondaryIndex } from './model.decorator'
 import { PropertyMetadata } from './property-metadata.model'
-
-export interface ModelData {
-  tableName?: string
-}
+import { SecondaryIndex } from './secondary-index'
 
 /**
  * Options provided to model

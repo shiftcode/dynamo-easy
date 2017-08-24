@@ -1,16 +1,13 @@
 import * as _ from 'lodash'
 // FIXME should be optional dependency
 import { getMetadataType } from './decorators'
-import { ModelData, ModelMetadata } from './model-metadata.model'
+import { ModelData } from './model-data.model'
+import { ModelMetadata } from './model-metadata.model'
 import { PropertyMetadata } from './property-metadata.model'
 import { KEY_PROPERTY } from './property.decorator'
+import { SecondaryIndex } from './secondary-index'
 
 export const KEY_MODEL = 'sc-reflect:model'
-
-export interface SecondaryIndex {
-  partitionKey: string
-  sortKey?: string
-}
 
 /*
  * FIXME add validation for tableName

@@ -1,6 +1,7 @@
 // decorators
+export * from './secondary-index'
 export * from './model.decorator'
-export * from './array.decorator'
+export * from './typed-array.decorator'
 export * from './date.decorator'
 export * from './custom-mapper.decorator'
 export * from './partition-key.decorator'
@@ -17,7 +18,7 @@ export * from './transient.decorator'
 export * from './model-metadata.model'
 export * from './property-data.model'
 export * from './property-metadata.model'
-export * from './moment.type'
+export * from './bla.type'
 export * from './binary.type'
 export * from './index-type.enum'
 // util & helpers

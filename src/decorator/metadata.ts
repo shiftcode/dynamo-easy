@@ -1,7 +1,8 @@
 import { ModelConstructor } from '../model/model-constructor'
 import { ModelMetadata } from './model-metadata.model'
-import { KEY_MODEL, SecondaryIndex } from './model.decorator'
+import { KEY_MODEL } from './model.decorator'
 import { PropertyMetadata } from './property-metadata.model'
+import { SecondaryIndex } from './secondary-index'
 
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata<T>

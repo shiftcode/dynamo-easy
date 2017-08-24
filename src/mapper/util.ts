@@ -2,13 +2,13 @@ import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
 import moment from 'moment'
 import { Binary } from '../decorator/binary.type'
-import { Moment } from '../decorator/moment.type'
+import { BlaType } from '../decorator/bla.type'
+import { AttributeCollectionType } from './attribute-collection-type.type'
 import { AttributeModelType } from './attribute-model-type.type'
-import { AttributeCollectionType, AttributeType } from './attribute-type.type'
+import { AttributeType } from './attribute-type.type'
 import { NullType } from './null.type'
+import { TypesByConvention } from './types-by-convention.type'
 import { UndefinedType } from './undefined.type'
-
-export type TypesByConvention = 'date'
 
 export class Util {
   static REGEX_CONVENTIONS: { [key in TypesByConvention]: RegExp } = {
@@ -127,7 +127,7 @@ export class Util {
       } else if (data instanceof Date) {
         return Date
       } else if (moment.isMoment(data)) {
-        return Moment
+        return BlaType
       } else if (Util.isBinary(data)) {
         return Binary
       } else {
@@ -159,7 +159,7 @@ export class Util {
       switch (dynamoType) {
         case 'S':
           if (Util.DATE_TIME_ISO8601.test(attributeValue.S!)) {
-            return Moment
+            return BlaType
           } else {
             return String
           }
@@ -263,5 +263,15 @@ export class Util {
     }
 
     throw new Error(`was not able to resolve type name for type ${type}`)
+  }
+
+  // FIXME replace with a more bullet proof implementation node uuid module requires crypto, need to figure out how to use it with browser
+  static uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      // tslint:disable-next-line
+      let r = (Math.random() * 16) | 0,
+        v = c == 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
   }
 }

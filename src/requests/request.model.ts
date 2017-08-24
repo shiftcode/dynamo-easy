@@ -2,7 +2,6 @@ import { AttributeMap, Key, QueryInput, ScanInput } from 'aws-sdk/clients/dynamo
 import { Observable } from 'rxjs/Observable'
 import { Metadata } from '../decorator/metadata'
 import { MetadataHelper } from '../decorator/metadata-helper'
-import { SecondaryIndex } from '../decorator/model.decorator'
 import { DynamoRx } from '../dynamo/dynamo-rx'
 import { Mapper } from '../mapper/mapper'
 import { ModelConstructor } from '../model/model-constructor'

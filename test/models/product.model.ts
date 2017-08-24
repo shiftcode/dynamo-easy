@@ -1,8 +1,8 @@
 // tslint:disable:max-classes-per-file
-import { TypedArray } from '../../src/decorator/array.decorator'
 import { Model } from '../../src/decorator/model.decorator'
 import { Property } from '../../src/decorator/property.decorator'
 import { SortedSet } from '../../src/decorator/sorted-set.decorator'
+import { TypedArray } from '../../src/decorator/typed-array.decorator'
 import { NestedComplexModel } from './nested-complex.model'
 
 @Model()
