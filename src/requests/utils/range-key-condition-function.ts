@@ -10,8 +10,12 @@
  *      (You cannot use this function with a sort key that is of formType Number.) Note that the function name begins_with is case-sensitive.
  */
 import { Request } from '../request.model'
+import { OperatorAlias } from './condition-operator.type'
 
 export interface RangeKeyConditionFunction<R extends Request<any, any>> {
+  // TODO narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
+  // [key in OperatorAlias]: (...value: any[]) => R;
+  [key: string]: (...value: any[]) => R
   equals: (value: any) => R
   eq: (value: any) => R
   lte: (value: any) => R

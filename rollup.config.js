@@ -2,7 +2,6 @@ import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import sourceMaps from 'rollup-plugin-sourcemaps'
 import json from 'rollup-plugin-json'
-// import globals from'rollup-plugin-node-globals'
 import builtins from 'rollup-plugin-node-builtins'
 
 const pkg = require('./package.json')
@@ -19,10 +18,10 @@ export default {
   sourcemap: true,
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: function (id) {
-    return /lodash|moment|aws|rxjs/.test(id)
+    return /^(lodash|moment|aws-sdk|rxjs)/.test(id)
   },
   globals: function (id) {
-    console.log('global' + id);
+    console.log('global ' + id);
     return false
   },
   plugins: [

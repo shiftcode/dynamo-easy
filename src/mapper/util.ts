@@ -1,8 +1,8 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
-import moment from 'moment'
+import moment from 'moment-es6'
 import { Binary } from '../decorator/binary.type'
-import { BlaType } from '../decorator/bla.type'
+import { MomentType } from '../decorator/moment.type'
 import { AttributeCollectionType } from './attribute-collection-type.type'
 import { AttributeModelType } from './attribute-model-type.type'
 import { AttributeType } from './attribute-type.type'
@@ -127,7 +127,7 @@ export class Util {
       } else if (data instanceof Date) {
         return Date
       } else if (moment.isMoment(data)) {
-        return BlaType
+        return MomentType
       } else if (Util.isBinary(data)) {
         return Binary
       } else {
@@ -159,7 +159,7 @@ export class Util {
       switch (dynamoType) {
         case 'S':
           if (Util.DATE_TIME_ISO8601.test(attributeValue.S!)) {
-            return BlaType
+            return MomentType
           } else {
             return String
           }
@@ -268,7 +268,7 @@ export class Util {
   // FIXME replace with a more bullet proof implementation node uuid module requires crypto, need to figure out how to use it with browser
   static uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-      // tslint:disable-next-line
+      // tslint:disable
       let r = (Math.random() * 16) | 0,
         v = c == 'x' ? r : (r & 0x3) | 0x8
       return v.toString(16)

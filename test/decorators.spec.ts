@@ -1,8 +1,8 @@
 import { Metadata } from '../src/decorator/metadata'
 import { MetadataHelper } from '../src/decorator/metadata-helper'
 import { ModelMetadata } from '../src/decorator/model-metadata.model'
+import { MomentType } from '../src/decorator/moment.type'
 import { PropertyMetadata } from '../src/decorator/property-metadata.model'
-import { BlaType } from './decorator/bla.type'
 import { ComplexModel } from './models/complex.model'
 import { CustomTableNameModel } from './models/custom-table-name.model'
 import { ModelWithDateMoment } from './models/model-with-date-moment.model'
@@ -85,7 +85,7 @@ describe('Decorators should add correct metadata', () => {
       expect(prop.transient).toBeFalsy()
       expect(prop.typeInfo).toBeDefined()
       expect(prop.typeInfo.isCustom).toBeTruthy()
-      expect(prop.typeInfo.type).toBe(BlaType)
+      expect(prop.typeInfo.type).toBe(MomentType)
     })
 
     it('lastUpdated', () => {
@@ -97,7 +97,7 @@ describe('Decorators should add correct metadata', () => {
       expect(prop.transient).toBeFalsy()
       expect(prop.typeInfo).toBeDefined()
       expect(prop.typeInfo.isCustom).toBeTruthy()
-      expect(prop.typeInfo.type).toBe(BlaType)
+      expect(prop.typeInfo.type).toBe(MomentType)
     })
   })
 
@@ -150,7 +150,7 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
         expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(BlaType)
+        expect(prop.typeInfo.type).toBe(MomentType)
       })
 
       it('lastUpdated', () => {
@@ -162,7 +162,7 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
         expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(BlaType)
+        expect(prop.typeInfo.type).toBe(MomentType)
       })
 
       it('active', () => {

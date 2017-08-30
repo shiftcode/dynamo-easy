@@ -3,13 +3,24 @@ import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Request } from '../request.model'
 import { ConditionFunction } from './condition-function'
 import { ConditionFunctionA } from './condition-function-a'
-import { ConditionOperator } from './condition-operator.type'
+import { aliasForOperator, CONDITION_OPERATOR_ALIAS, ConditionOperator, OperatorAlias } from './condition-operator.type'
 import { Condition } from './condition.model'
 import { Expressions } from './expressions'
 import { ParamUtil } from './param-util'
 import { RangeKeyConditionFunction } from './range-key-condition-function'
 
+/**
+ * Provides an api to build conditions
+ */
 export class ConditionBuilder {
+  /**
+   * Adds a condition to the given query.
+   *
+   * @param {string} keyName
+   * @param {T} request
+   * @param {PropertyMetadata<any>} propetyMetadata
+   * @returns {ConditionFunction<T extends Request<any, any>>}
+   */
   static addCondition<T extends Request<any, any>>(
     keyName: string,
     request: T,
@@ -22,58 +33,41 @@ export class ConditionBuilder {
           propetyMetadata,
           request.params.ExpressionAttributeValues
         )
-        const condition: Condition = (<any>conditionChain)[operator](values)
-        ParamUtil.addFilterCondition(condition, request.params)
-        return request
+
+        if (Reflect.has(conditionChain, operator)) {
+          const condition: Condition = (<any>conditionChain)[operator](values)
+          ParamUtil.addFilterExpression(condition, request.params)
+          return request
+        } else {
+          throw new Error(`there is no operator function available on condition chaing for operator ${operator}`)
+        }
       }
     }
 
-    return {
-      equals: f('='),
-      eq: f('='),
-      ne: f('<>'),
-      lte: f('<='),
-      lt: f('<'),
-      gte: f('>='),
-      gt: f('>'),
-      null: f('attribute_not_exists'),
-      notNull: f('attribute_exists'),
-      contains: f('contains'),
-      notContains: f('NOT contains'),
-      in: f('IN'),
-      beginsWith: f('begins_with'),
-      between: f('BETWEEN'),
-    }
+    return ConditionBuilder.createConditionFunctions<ConditionFunction<T>>(f)
   }
 
   static addKeyCondition<T extends Request<any, any>>(
     keyName: string,
     request: T,
-    propetyMetadata?: PropertyMetadata<any>
+    propertyMetadata?: PropertyMetadata<any>
   ): RangeKeyConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
         const conditionChain = ConditionBuilder.build(
           keyName,
-          propetyMetadata,
+          propertyMetadata,
           request.params.ExpressionAttributeValues
         )
-        const condition: Condition = (<any>conditionChain)[operator](values)
-        ParamUtil.addKeyCondition(condition, request.params)
+        const alias = aliasForOperator(operator)
+        const condition: Condition = (<any>conditionChain)[alias](...values)
+        ParamUtil.addKeyConditionExpression(condition, request.params)
         return request
       }
     }
 
-    return {
-      equals: f('='),
-      eq: f('='),
-      lte: f('<='),
-      lt: f('<'),
-      gte: f('>='),
-      gt: f('>'),
-      beginsWith: f('begins_with'),
-      between: f('BETWEEN'),
-    }
+    // only a subset of available operators are supported for range keys
+    return ConditionBuilder.createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
   }
 
   static build<T>(
@@ -89,21 +83,33 @@ export class ConditionBuilder {
       }
     }
 
-    return {
-      equals: f('='),
-      eq: f('='),
-      ne: f('<>'),
-      lte: f('<='),
-      lt: f('<'),
-      gte: f('>='),
-      gt: f('>'),
-      null: f('attribute_not_exists'),
-      notNull: f('attribute_exists'),
-      contains: f('contains'),
-      notContains: f('NOT contains'),
-      in: f('IN'),
-      beginsWith: f('begins_with'),
-      between: f('BETWEEN'),
-    }
+    return ConditionBuilder.createConditionFunctions<ConditionFunctionA>(f)
+  }
+
+  /**
+   * Creates an object which contains callable functions for all aliases defined in CONDITION_OPERATOR_ALIAS or if operators parameter is defined,
+   * for all the values included in operators
+   *
+   * @param {(operator: ConditionOperator) => any} impl
+   * @param {ConditionOperator} operators
+   * @returns {T}
+   */
+  private static createConditionFunctions<T>(
+    impl: (operator: ConditionOperator) => any,
+    ...operators: ConditionOperator[]
+  ): T {
+    const includedAlias: ConditionOperator[] =
+      operators && operators.length ? operators : <ConditionOperator[]>Object.keys(CONDITION_OPERATOR_ALIAS)
+
+    return <T>includedAlias.reduce((result: T, operator: ConditionOperator) => {
+      const alias: OperatorAlias | OperatorAlias[] = CONDITION_OPERATOR_ALIAS[operator]
+      if (Array.isArray(alias)) {
+        alias.forEach(a => Reflect.set(<any>result, a, impl(operator)))
+      } else {
+        Reflect.set(<any>result, alias, impl(operator))
+      }
+
+      return result
+    }, <T>{})
   }
 }

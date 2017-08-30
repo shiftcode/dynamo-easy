@@ -1,17 +1,17 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
 // import v1 from 'uuid'
 import { Binary } from '../decorator/binary.type'
-import { BlaType } from '../decorator/bla.type'
 import { Metadata } from '../decorator/metadata'
 import { MetadataHelper } from '../decorator/metadata-helper'
+import { MomentType } from '../decorator/moment.type'
 import { PropertyMetadata } from '../decorator/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
 import { AttributeModelType } from './attribute-model-type.type'
 import { MapperForType } from './for-type/base.mapper'
-import { BlaMapper } from './for-type/bla.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
 import { DateMapper } from './for-type/date.mapper'
+import { MomentMapper } from './for-type/moment.mapper'
 import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
@@ -245,8 +245,8 @@ export class Mapper {
         case Boolean:
           mapperForType = new BooleanMapper()
           break
-        case BlaType:
-          mapperForType = new BlaMapper()
+        case MomentType:
+          mapperForType = new MomentMapper()
           break
         case Date:
           mapperForType = new DateMapper()

@@ -1,3 +1,4 @@
+import { AttributeType } from '../../mapper/attribute-type.type'
 import { Request } from '../request.model'
 import { Condition } from './condition.model'
 
@@ -13,6 +14,7 @@ export interface ConditionFunction<T extends Request<any, any>> {
   notNull: () => T
   contains: (value: any) => T
   notContains: (value: any) => T
+  type: (value: AttributeType) => T
   in: (value: any[]) => T
   beginsWith: (value: any) => T
   between: (value1: any, value2: any) => T

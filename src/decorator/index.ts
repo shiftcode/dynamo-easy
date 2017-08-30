@@ -18,7 +18,7 @@ export * from './transient.decorator'
 export * from './model-metadata.model'
 export * from './property-data.model'
 export * from './property-metadata.model'
-export * from './bla.type'
+export * from './moment.type'
 export * from './binary.type'
 export * from './index-type.enum'
 // util & helpers

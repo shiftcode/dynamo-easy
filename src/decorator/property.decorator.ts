@@ -2,15 +2,15 @@ import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { AttributeModelType } from '../mapper/attribute-model-type.type'
 import { Util } from '../mapper/util'
 import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
-import { BlaType } from './bla.type'
 import { getMetadataType } from './decorators'
 import { IndexType } from './index-type.enum'
+import { MomentType } from './moment.type'
 import { PropertyData } from './property-data.model'
 import { PropertyMetadata, TypeInfo } from './property-metadata.model'
 
 export const KEY_PROPERTY = 'sc-reflect:property'
 
-export type AttributeModelTypes = string | number | boolean | Date | BlaType | Set<any> | any[]
+export type AttributeModelTypes = string | number | boolean | Date | MomentType | Set<any> | any[]
 
 export interface IndexData {
   name: string
@@ -116,7 +116,7 @@ function createNewProperty(
               propertyType = Date
               break
             case 'moment':
-              propertyType = BlaType
+              propertyType = MomentType
               break
             default:
               throw new Error(`Unsupported date type on model metadata <${ScDynamoObjectMapper.config.dateType}>`)

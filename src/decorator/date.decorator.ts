@@ -1,6 +1,6 @@
 import { Util } from '../mapper/util'
 import { ScDynamoObjectMapper } from '../sc-dynamo-object-mapper'
-import { BlaType } from './bla.type'
+import { MomentType } from './moment.type'
 import { TypeInfo } from './property-metadata.model'
 import { initOrUpdateProperty } from './property.decorator'
 
@@ -13,7 +13,7 @@ export function Date(): PropertyDecorator {
         dateType = Date
         break
       case 'moment':
-        dateType = BlaType
+        dateType = MomentType
         break
     }
 

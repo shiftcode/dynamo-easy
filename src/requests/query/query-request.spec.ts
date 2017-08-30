@@ -1,13 +1,13 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
-import * as winston from 'winston'
 import { ComplexModel } from '../../../test/models/complex.model'
 import { DynamoRx } from '../../dynamo/dynamo-rx'
 import { QueryRequest } from './query-request'
 
-const DYNAMO_RX_MOCK = {
+export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
   query(params: QueryInput): Observable<QueryOutput> {
-    winston.debug('params', params)
+    // TODO bring back log statement
+    // debug.log('params', params)
     return Observable.of({})
   },
 }

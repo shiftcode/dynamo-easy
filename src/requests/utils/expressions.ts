@@ -1,7 +1,9 @@
 import { AttributeMap } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
+import { Binary } from '../../decorator/binary.type'
 import { PropertyMetadata } from '../../decorator/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
+import { Util } from '../../mapper/util'
 import { ConditionOperator } from './condition-operator.type'
 import { Condition } from './condition.model'
 
@@ -83,16 +85,17 @@ export class Expressions {
     let value1: any = values[0]
     const v1ValueName = Expressions.uniqAttributeValueName(keyName, existingValueNames)
 
+    const attributeMap: AttributeMap = {}
     let statement
+
+    /*
+     * build the statement
+     */
     if (operator === 'IN') {
       // IN filter expression is unlike all the others where val1 is an array of values
       return Expressions.buildInFilterExpression(keyName, value1, existingValueNames)
     } else if (operator === 'BETWEEN') {
-      const value2: any | undefined = values[0]
-      const v2 = Expressions.formatAttributeValue(value2)
-      const v2ValueName = Expressions.uniqAttributeValueName(keyName, [v1ValueName].concat(existingValueNames || []))
-
-      statement = path + ' BETWEEN ' + v1ValueName + ' AND ' + v2ValueName
+      return Expressions.buildBetweenFilterExpression(keyName, v1ValueName, value1, values[1], existingValueNames)
     } else if (Expressions.isFunctionOperator(operator)) {
       if (value1 !== null && value1 !== undefined) {
         statement = `${operator} (${path}, ${v1ValueName})`
@@ -103,32 +106,37 @@ export class Expressions {
       statement = [path, operator, v1ValueName].join(' ')
     }
 
-    const attributeMap: AttributeMap = {}
-
     if (value1 !== null && value1 !== undefined) {
       if (operator === 'contains') {
-        // FIXME review concept for this, soooo hacky right now and only supporting dedicated cases
-        // if (attributeType instanceof List) {
-        // TODO support more types
-        // if ((<List<any>>attributeType).listType === 'uniform') {
-        //   if ((<List<any>>attributeType).listArguments.type === 'string') {
-        //     value1 = { S: value1.toString() };
-        //   } else {
-        //     throw new Error(`contains expression is not supported for lists with type «uniform» and model type ${(<List<any>>attributeType).listArguments.type}`);
-        //   }
-        // } else {
-        // }
-        // } else {
+        // TODO should we support other types than String, Number, Binary (can we search a boolean set for example with boolean as string?)
         if (propertyMetadata && propertyMetadata.typeInfo) {
           switch (propertyMetadata.typeInfo.type) {
             case Array:
             case Set:
+              if (
+                propertyMetadata.typeInfo.genericTypes &&
+                propertyMetadata.typeInfo.genericTypes[0] !== String &&
+                propertyMetadata.typeInfo.genericTypes[0] !== Number &&
+                propertyMetadata.typeInfo.genericTypes[0] !== Binary
+              ) {
+                value1 = { S: value1.toString() }
+              } else {
+                throw new Error(
+                  'either generic type info is not defined or the generic type is not one of String, Number, Binary'
+                )
+              }
               break
             default:
               throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)
           }
         } else {
-          throw new Error('no type info defined')
+          // no explicit type defined -> try to detect the type from value
+          const type = Util.typeOf(value1)
+          if (type === String || type === Number || type === Binary) {
+            value1 = { S: value1.toString() }
+          } else {
+            throw new Error(`contains expression is not supported for type ${type}`)
+          }
         }
       } else {
         value1 = Mapper.toDbOne(value1, propertyMetadata)
@@ -152,7 +160,7 @@ export class Expressions {
     }
   }
 
-  static buildInFilterExpression(key: string, values: string[], existingValueNames?: string[]): Condition {
+  private static buildInFilterExpression(key: string, values: string[], existingValueNames?: string[]): Condition {
     const path = `#${key}`
 
     const attributeNames: { [key: string]: string } = {}
@@ -172,18 +180,58 @@ export class Expressions {
     }
   }
 
+  private static buildBetweenFilterExpression(
+    key: string,
+    v1ValueName: string,
+    value1: any,
+    value2: any,
+    existingValueNames?: string[]
+  ): Condition {
+    const path = `#${key}`
+    const attributeNames: { [key: string]: string } = {}
+    attributeNames[path] = key
+    // FIXME is it really an AttributeMap or just plain values with no wrapping?
+    const attributeMap: AttributeMap = {}
+    const v1 = Expressions.formatAttributeValue(value1)
+    const v2 = Expressions.formatAttributeValue(value2)
+
+    const v2ValueName = Expressions.uniqAttributeValueName(key, [v1ValueName].concat(existingValueNames || []))
+
+    const statement = `${path} BETWEEN ${v1ValueName} AND ${v2ValueName}`
+    attributeMap[v1ValueName] = v1
+    attributeMap[v2ValueName] = v2
+
+    return {
+      attributeNames,
+      attributeMap,
+      statement,
+    }
+  }
+
   // TODO implement more checks
   private static validateValues(operator: ConditionOperator, values?: any[]) {
     if (values && Array.isArray(values)) {
       switch (values.length) {
         case 0:
-          throw new Error(
-            `there is no operator defined where no value is needed, check your code to provide some values for operator ${operator}`
-          )
+          if (operator !== 'attribute_exists' && operator !== 'attribute_not_exists' && operator !== 'size') {
+            throw new Error(
+              `there is no operator defined where no value is needed, check your code to provide some values for operator ${operator}`
+            )
+          }
+          break
         case 1:
           if (operator === 'BETWEEN') {
             throw new Error('the operator BETWEEN needs two values, just got one')
           }
+
+          // operand must be a String for operator contains
+          if (operator === 'contains') {
+            const type = Util.typeOf(values[0])
+            // if (type !== String || type !== Number || type !== Binary) {
+            //   throw new Error(`the operator contains only supports String, Number, Binary got ${type}`)
+            // }
+          }
+
           break
         case 2:
           if (operator === '<' || operator === '>') {

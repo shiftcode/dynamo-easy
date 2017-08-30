@@ -1,5 +1,5 @@
 import { Binary } from '../decorator/binary.type'
-import { BlaType } from '../decorator/bla.type'
+import { MomentType } from '../decorator/moment.type'
 import { NullType } from './null.type'
 import { UndefinedType } from './undefined.type'
 
@@ -9,7 +9,7 @@ export type AttributeModelType =
   | boolean
   | Binary
   | Date
-  | BlaType
+  | MomentType
   | Set<any>
   | Map<any, any>
   | any[]

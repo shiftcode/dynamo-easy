@@ -1,11 +1,11 @@
-import moment from 'moment'
+import * as moment from 'moment'
 import { Employee } from '../../test/models/employee.model'
-import { BlaType } from '../decorator/bla.type'
+import { MomentType } from '../decorator/moment.type'
 import { NullType } from './null.type'
 import { UndefinedType } from './undefined.type'
 import { Util } from './util'
 
-xdescribe('Util', () => {
+describe('Util', () => {
   describe('matches convention', () => {
     it('date', () => {
       ;['date', 'createdAt', 'lastUpdatedDate', 'myDateAndMore'].forEach(propertyName => {
@@ -110,7 +110,7 @@ xdescribe('Util', () => {
     })
 
     it('Moment', () => {
-      expect(Util.typeName(BlaType)).toBe('Moment')
+      expect(Util.typeName(MomentType)).toBe('MomentType')
     })
 
     it('Date', () => {
@@ -122,10 +122,18 @@ xdescribe('Util', () => {
     })
 
     it('Null', () => {
-      expect(Util.typeName(null)).toBe('Null')
+      expect(Util.typeName(NullType)).toBe('NullType')
     })
 
     it('Null', () => {
+      expect(Util.typeName(null)).toBe('Null')
+    })
+
+    it('UndefinedType', () => {
+      expect(Util.typeName(UndefinedType)).toBe('UndefinedType')
+    })
+
+    it('Undefined', () => {
       expect(Util.typeName(undefined)).toBe('Undefined')
     })
   })
@@ -155,7 +163,7 @@ xdescribe('Util', () => {
 
     it('moment', () => {
       const m: moment.Moment = moment()
-      expect(Util.typeOf(m)).toBe(BlaType)
+      expect(Util.typeOf(m)).toBe(MomentType)
     })
 
     it('array', () => {
@@ -209,7 +217,7 @@ xdescribe('Util', () => {
 
     it('moment', () => {
       const m: moment.Moment = moment()
-      expect(Util.typeOfFromDb({ S: m.clone().utc().format() })).toBe(BlaType)
+      expect(Util.typeOfFromDb({ S: m.clone().utc().format() })).toBe(MomentType)
     })
 
     it('array', () => {
@@ -229,7 +237,9 @@ xdescribe('Util', () => {
     })
 
     it('undefined', () => {
-      expect(Util.typeOfFromDb(undefined)).toBe(null)
+      expect(() => {
+        Util.typeOfFromDb(undefined)
+      }).toThrowError()
     })
   })
 })

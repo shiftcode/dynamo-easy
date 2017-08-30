@@ -1,5 +1,5 @@
-import moment from 'moment'
-import { AttributeMap } from '../../attribute-map.type'
+import { AttributeMap } from 'aws-sdk/clients/dynamodb'
+import moment from 'moment-es6'
 import { Organization } from '../models/organization.model'
 
 export const organization1CreatedAt: moment.Moment = moment('2017-05-15', 'YYYY-MM-DD')
@@ -7,7 +7,7 @@ export const organization1LastUpdated: moment.Moment = moment('2017-07-25', 'YYY
 export const organization1Employee1CreatedAt: moment.Moment = moment('2015-02-15', 'YYYY-MM-DD')
 export const organization1Employee2CreatedAt: moment.Moment = moment('2015-07-03', 'YYYY-MM-DD')
 
-export const organizationFromDb: AttributeMap<Organization> = <any>{
+export const organizationFromDb: AttributeMap = <any>{
   id: { S: 'myId' },
   createdAtDate: {
     S: organization1CreatedAt.clone().utc().format(moment.defaultFormat),

@@ -8,7 +8,7 @@ import * as _ from 'lodash'
 import { Condition } from './condition.model'
 
 export class ParamUtil {
-  static addFilterCondition<T>(condition: Condition, params: QueryInput | ScanInput) {
+  static addFilterExpression<T>(condition: Condition, params: QueryInput | ScanInput): void {
     if (_.isString(params.FilterExpression)) {
       params.FilterExpression = params.FilterExpression + ' AND (' + condition.statement + ')'
     } else {
@@ -16,11 +16,11 @@ export class ParamUtil {
     }
   }
 
-  static addKeyCondition<T>(condition: Condition, params: QueryInput) {
-    this.addCondition('KeyConditionExpression', condition, params)
+  static addKeyConditionExpression<T>(condition: Condition, params: QueryInput): void {
+    this.addExpression('KeyConditionExpression', condition, params)
   }
 
-  static addCondition(
+  static addExpression(
     expressionType: 'KeyConditionExpression' | 'FilterExpression',
     condition: Condition,
     params: QueryInput | ScanInput
@@ -29,6 +29,7 @@ export class ParamUtil {
       ...condition.attributeNames,
       ...params.ExpressionAttributeNames,
     }
+
     const expressionAttributeValues = <ExpressionAttributeValueMap>{
       ...condition.attributeMap,
       ...params.ExpressionAttributeValues,

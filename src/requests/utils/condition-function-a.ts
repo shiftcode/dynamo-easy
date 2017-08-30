@@ -1,3 +1,4 @@
+import { AttributeType } from '../../mapper/attribute-type.type'
 import { Condition } from './condition.model'
 
 export interface ConditionFunctionA {
@@ -12,7 +13,9 @@ export interface ConditionFunctionA {
   notNull: () => Condition
   contains: (value: any) => Condition
   notContains: (value: any) => Condition
+  type: (value: AttributeType) => Condition
   in: (value: any[]) => Condition
   beginsWith: (value: any) => Condition
   between: (value1: any, value2: any) => Condition
+  size: () => Condition
 }

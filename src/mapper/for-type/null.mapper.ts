@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment'
+import moment from 'moment-es6'
 import { MapperForType } from './base.mapper'
 
 export class NullMapper implements MapperForType<null> {
