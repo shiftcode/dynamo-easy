@@ -1,6 +1,6 @@
 import moment from 'moment'
-import { Model } from '../../src/decorator/model.decorator'
-import { SortedSet } from '../../src/decorator/sorted-set.decorator'
+import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
+import { Model } from '../../src/decorator/impl/model/model.decorator'
 
 @Model()
 export class Employee {

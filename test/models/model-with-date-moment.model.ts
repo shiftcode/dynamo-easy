@@ -1,8 +1,8 @@
 import moment from 'moment'
-import { Date } from '../../src/decorator/date.decorator'
-import { Model } from '../../src/decorator/model.decorator'
-import { PartitionKey } from '../../src/decorator/partition-key.decorator'
-import { SortKey } from '../../src/decorator/sort-key.decorator'
+import { Date } from '../../src/decorator/impl/date/date.decorator'
+import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
+import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
+import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Moment } from '../../src/moment.type'
 
 @Model()

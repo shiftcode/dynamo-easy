@@ -1,8 +1,8 @@
 import * as moment from 'moment'
 import { Employee } from '../../test/models/employee.model'
-import { MomentType } from '../decorator/moment.type'
-import { NullType } from './null.type'
-import { UndefinedType } from './undefined.type'
+import { MomentType } from '../decorator/impl/date/moment.type'
+import { NullType } from './type/null.type'
+import { UndefinedType } from './type/undefined.type'
 import { Util } from './util'
 
 describe('Util', () => {
@@ -217,7 +217,14 @@ describe('Util', () => {
 
     it('moment', () => {
       const m: moment.Moment = moment()
-      expect(Util.typeOfFromDb({ S: m.clone().utc().format() })).toBe(MomentType)
+      expect(
+        Util.typeOfFromDb({
+          S: m
+            .clone()
+            .utc()
+            .format(),
+        })
+      ).toBe(MomentType)
     })
 
     it('array', () => {

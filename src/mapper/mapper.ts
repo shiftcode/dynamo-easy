@@ -1,12 +1,9 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-// import v1 from 'uuid'
-import { Binary } from '../decorator/binary.type'
-import { Metadata } from '../decorator/metadata'
-import { MetadataHelper } from '../decorator/metadata-helper'
-import { MomentType } from '../decorator/moment.type'
-import { PropertyMetadata } from '../decorator/property-metadata.model'
+import { MomentType } from '../decorator/impl/date/moment.type'
+import { Metadata } from '../decorator/metadata/metadata'
+import { MetadataHelper } from '../decorator/metadata/metadata-helper'
+import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
-import { AttributeModelType } from './attribute-model-type.type'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
@@ -16,7 +13,10 @@ import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
 import { StringMapper } from './for-type/string.mapper'
-import { NullType } from './null.type'
+import { AttributeModelType } from './type/attribute-model.type'
+// import v1 from 'uuid'
+import { Binary } from './type/binary.type'
+import { NullType } from './type/null.type'
 import { Util } from './util'
 // import debug from 'debug';
 
@@ -53,7 +53,7 @@ export class Mapper {
       }
     }
 
-    const propertyNames: Array<keyof T> = (<Array<keyof T>>Object.getOwnPropertyNames(item)) || []
+    const propertyNames: Array<keyof T> = <Array<keyof T>>Object.getOwnPropertyNames(item) || []
     propertyNames.forEach(propertyKey => {
       /*
        * 1) get the value of the property

@@ -1,5 +1,5 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { hasGenericType, PropertyMetadata } from '../../decorator/property-metadata.model'
+import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../mapper'
 import { Util } from '../util'
 import { MapperForType } from './base.mapper'

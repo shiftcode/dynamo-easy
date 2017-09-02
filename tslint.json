@@ -5,6 +5,7 @@
   ],
   "rules": {
     "no-angle-bracket-type-assertion": false,
+    "no-submodule-imports": false,
     "interface-name": [
       true,
       "never-prefix"

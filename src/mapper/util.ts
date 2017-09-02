@@ -1,14 +1,14 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
 import moment from 'moment-es6'
-import { Binary } from '../decorator/binary.type'
-import { MomentType } from '../decorator/moment.type'
-import { AttributeCollectionType } from './attribute-collection-type.type'
-import { AttributeModelType } from './attribute-model-type.type'
-import { AttributeType } from './attribute-type.type'
-import { NullType } from './null.type'
-import { TypesByConvention } from './types-by-convention.type'
-import { UndefinedType } from './undefined.type'
+import { MomentType } from '../decorator/impl/date/moment.type'
+import { AttributeCollectionType } from './type/attribute-collection.type'
+import { AttributeModelType } from './type/attribute-model.type'
+import { AttributeType } from './type/attribute.type'
+import { Binary } from './type/binary.type'
+import { NullType } from './type/null.type'
+import { TypesByConvention } from './type/types-by-convention.type'
+import { UndefinedType } from './type/undefined.type'
 
 export class Util {
   static REGEX_CONVENTIONS: { [key in TypesByConvention]: RegExp } = {

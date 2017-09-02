@@ -7,9 +7,10 @@ import {
   StringSetAttributeValue,
 } from 'aws-sdk/clients/dynamodb'
 import moment from 'moment-es6'
+// TODO should this be imported in sc-dynamo-object-mapper.ts file?
 import 'moment/locale/de-ch'
-import { MomentType } from '../src/decorator/moment.type'
-import { PropertyMetadata } from '../src/decorator/property-metadata.model'
+import { MomentType } from '../src/decorator/impl/date/moment.type'
+import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
 import { Mapper } from '../src/mapper/mapper'
 import {
   organization1CreatedAt,
@@ -61,7 +62,12 @@ describe('Mapper', () => {
         const attrValue: AttributeValue = Mapper.toDbOne(m)
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('S')
-        expect(attrValue.S).toBe(m.clone().utc().format())
+        expect(attrValue.S).toBe(
+          m
+            .clone()
+            .utc()
+            .format()
+        )
       })
 
       it('array -> SS (homogen, no duplicates)', () => {
@@ -192,7 +198,12 @@ describe('Mapper', () => {
         // createdAt
         expect(attrValue.M['createdAt']).toBeDefined()
         expect(keyOf(attrValue.M['createdAt'])).toBe('S')
-        expect(attrValue.M['createdAt'].S).toBe(cr.clone().utc().format())
+        expect(attrValue.M['createdAt'].S).toBe(
+          cr
+            .clone()
+            .utc()
+            .format()
+        )
       })
 
       it('object (Employee created using constructor)', () => {
@@ -214,7 +225,12 @@ describe('Mapper', () => {
         // createdAt
         expect(attrValue.M['createdAt']).toBeDefined()
         expect(keyOf(attrValue.M['createdAt'])).toBe('S')
-        expect(attrValue.M['createdAt'].S).toBe(cr.clone().utc().format())
+        expect(attrValue.M['createdAt'].S).toBe(
+          cr
+            .clone()
+            .utc()
+            .format()
+        )
       })
     })
 
@@ -231,7 +247,12 @@ describe('Mapper', () => {
       })
 
       it('S -> Moment from convention', () => {
-        const attrValue = { S: date.clone().utc().format() }
+        const attrValue = {
+          S: date
+            .clone()
+            .utc()
+            .format(),
+        }
         const momentOb = Mapper.fromDbOne<moment.Moment>(attrValue)
         expect(moment.isMoment(momentOb)).toBeTruthy()
         expect(momentOb.isValid()).toBeTruthy()
@@ -242,7 +263,12 @@ describe('Mapper', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
           typeInfo: { type: MomentType, typeName: 'Moment', isCustom: true },
         }
-        const attrValue = { S: date.clone().utc().format() }
+        const attrValue = {
+          S: date
+            .clone()
+            .utc()
+            .format(),
+        }
         const momentOb = Mapper.fromDbOne<moment.Moment>(attrValue, <any>propertyMetadata)
         expect(moment.isMoment(momentOb)).toBeTruthy()
         expect(momentOb.isValid()).toBeTruthy()
@@ -343,10 +369,16 @@ describe('Mapper', () => {
             active: { BOOL: true },
             siblings: { SS: ['hans', 'andi', 'dora'] },
             createdAt: {
-              S: createdAt.clone().utc().format(moment.defaultFormat),
+              S: createdAt
+                .clone()
+                .utc()
+                .format(moment.defaultFormat),
             },
             lastUpdatedDate: {
-              S: createdAt.clone().utc().format(moment.defaultFormat),
+              S: createdAt
+                .clone()
+                .utc()
+                .format(moment.defaultFormat),
             },
           },
         }
@@ -437,13 +469,23 @@ describe('Mapper', () => {
           it('createdAtDate', () => {
             expect(organizationAttrMap.createdAtDate).toBeDefined()
             expect(organizationAttrMap.createdAtDate.S).toBeDefined()
-            expect(organizationAttrMap.createdAtDate.S).toBe(createdAt.clone().utc().format())
+            expect(organizationAttrMap.createdAtDate.S).toBe(
+              createdAt
+                .clone()
+                .utc()
+                .format()
+            )
           })
 
           it('lastUpdated', () => {
             expect(organizationAttrMap.lastUpdated).toBeDefined()
             expect(organizationAttrMap.lastUpdated.S).toBeDefined()
-            expect(organizationAttrMap.lastUpdated.S).toBe(lastUpdated.clone().utc().format())
+            expect(organizationAttrMap.lastUpdated.S).toBe(
+              lastUpdated
+                .clone()
+                .utc()
+                .format()
+            )
           })
 
           it('active', () => {
@@ -503,7 +545,12 @@ describe('Mapper', () => {
             expect(employee1['age'].N).toBe('50')
             expect(employee1['createdAt']).toBeDefined()
             expect(employee1['createdAt'].S).toBeDefined()
-            expect(employee1['createdAt'].S).toBe(createdAtDateEmployee1.clone().utc().format())
+            expect(employee1['createdAt'].S).toBe(
+              createdAtDateEmployee1
+                .clone()
+                .utc()
+                .format()
+            )
 
             // test employee2
             const employee2: MapAttributeValue = employeesL[1].M
@@ -515,7 +562,12 @@ describe('Mapper', () => {
             expect(employee2['age'].N).toBe('27')
             expect(employee2['createdAt']).toBeDefined()
             expect(employee2['createdAt'].S).toBeDefined()
-            expect(employee2['createdAt'].S).toBe(createdAtDateEmployee2.clone().utc().format())
+            expect(employee2['createdAt'].S).toBe(
+              createdAtDateEmployee2
+                .clone()
+                .utc()
+                .format()
+            )
           })
 
           it('cities', () => {
@@ -541,7 +593,12 @@ describe('Mapper', () => {
             const birthday1: MapAttributeValue = birthdays[0]['M']
             expect(birthday1['date']).toBeDefined()
             expect(keyOf(birthday1['date'])).toBe('S')
-            expect(birthday1['date']['S']).toBe(birthday1Date.clone().utc().format())
+            expect(birthday1['date']['S']).toBe(
+              birthday1Date
+                .clone()
+                .utc()
+                .format()
+            )
 
             expect(birthday1['presents']).toBeDefined()
             expect(keyOf(birthday1['presents'])).toBe('L')
@@ -564,7 +621,12 @@ describe('Mapper', () => {
             const birthday2: MapAttributeValue = birthdays[1]['M']
             expect(birthday2['date']).toBeDefined()
             expect(keyOf(birthday2['date'])).toBe('S')
-            expect(birthday2['date']['S']).toBe(birthday2Date.clone().utc().format())
+            expect(birthday2['date']['S']).toBe(
+              birthday2Date
+                .clone()
+                .utc()
+                .format()
+            )
 
             expect(birthday2['presents']).toBeDefined()
             expect(keyOf(birthday2['presents'])).toBe('L')
@@ -650,7 +712,7 @@ describe('Mapper', () => {
       })
 
       describe('model with complex property values (decorators)', () => {
-        let toDb: AttributeMap<Product>
+        let toDb: AttributeMap
 
         beforeEach(() => {
           toDb = Mapper.toDb(new Product(), Product)

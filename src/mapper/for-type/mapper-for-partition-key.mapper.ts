@@ -1,5 +1,5 @@
 import { BinaryAttributeValue, NumberAttributeValue, StringAttributeValue } from 'aws-sdk/clients/dynamodb'
-import { PropertyMetadata } from '../../decorator/property-metadata.model'
+import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 
 export type PartitionKeyAttributeType = StringAttributeValue | NumberAttributeValue | BinaryAttributeValue
 

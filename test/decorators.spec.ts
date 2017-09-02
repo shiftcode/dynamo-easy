@@ -1,8 +1,8 @@
-import { Metadata } from '../src/decorator/metadata'
-import { MetadataHelper } from '../src/decorator/metadata-helper'
-import { ModelMetadata } from '../src/decorator/model-metadata.model'
-import { MomentType } from '../src/decorator/moment.type'
-import { PropertyMetadata } from '../src/decorator/property-metadata.model'
+import { MomentType } from '../src/decorator/impl/date/moment.type'
+import { Metadata } from '../src/decorator/metadata/metadata'
+import { MetadataHelper } from '../src/decorator/metadata/metadata-helper'
+import { ModelMetadata } from '../src/decorator/metadata/model-metadata.model'
+import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
 import { ComplexModel } from './models/complex.model'
 import { CustomTableNameModel } from './models/custom-table-name.model'
 import { ModelWithDateMoment } from './models/model-with-date-moment.model'
@@ -18,6 +18,7 @@ import {
 import { NestedObject } from './models/nested-object.model'
 import { SimpleModel } from './models/simple.model'
 
+// TODO add tests for error cases which should thrw (multiple indexes for example)
 describe('Decorators should add correct metadata', () => {
   describe('for simple model', () => {
     let modelOptions: ModelMetadata<SimpleModel>
@@ -367,20 +368,6 @@ describe('Decorators should add correct metadata', () => {
         expect(lsiCount).toBeDefined()
         expect(lsiCount.partitionKey).toBe('myId')
         expect(lsiCount.sortKey).toBe('count')
-      })
-    })
-
-    xdescribe('index (multiple range keys for same index)', () => {
-      // let metadata: Metadata<ModelWithWrongIndexes>;
-      //
-      // beforeEach(() => {
-      //   metadata = MetadataHelper.get(ModelWithWrongIndexes);
-      // });
-
-      it('should throw error', () => {
-        expect(() => {
-          MetadataHelper.forModel(ModelWithWrongIndexes)
-        }).toThrowError()
       })
     })
   })
