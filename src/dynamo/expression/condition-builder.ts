@@ -1,9 +1,10 @@
 import { ExpressionAttributeValueMap } from 'aws-sdk/clients/dynamodb'
+import { Metadata } from '../../decorator/metadata/metadata'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Util } from '../../mapper/util'
 import { ModelConstructor } from '../../model/model-constructor'
-import { Request } from '../request/request.model'
+import { BaseRequest } from '../request/base.request'
 import { Expressions } from './expressions'
 import { ParamUtil } from './param-util'
 import { ConditionFunction } from './type/condition-function'
@@ -16,7 +17,8 @@ import { RangeKeyConditionFunction } from './type/range-key-condition-function.t
 import { RequestConditionFunction } from './type/request-condition-function'
 
 /**
- * Provides an api to build conditions
+ * Provides an api to build condition expressions
+ * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
  */
 export class ConditionBuilder {
   /**
@@ -27,18 +29,14 @@ export class ConditionBuilder {
    * @param {PropertyMetadata<any>} propetyMetadata
    * @returns {RequestConditionFunction<T extends Request<any, any>>}
    */
-  static addCondition<T extends Request<any, any>>(
+  static addCondition<T extends BaseRequest<any, any>>(
     keyName: string,
     request: T,
-    propetyMetadata?: PropertyMetadata<any>
+    metadata?: Metadata<any>
   ): RequestConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
-        const conditionChain = ConditionBuilder.where(
-          keyName,
-          propetyMetadata,
-          request.params.ExpressionAttributeValues
-        )
+        const conditionChain = ConditionBuilder.where(keyName, metadata, request.params.ExpressionAttributeValues)
 
         const alias = aliasForOperator(operator)
         if (Reflect.has(conditionChain, alias)) {
@@ -54,18 +52,14 @@ export class ConditionBuilder {
     return ConditionBuilder.createConditionFunctions<RequestConditionFunction<T>>(f)
   }
 
-  static addRangeKeyCondition<T extends Request<any, any>>(
+  static addRangeKeyCondition<T extends BaseRequest<any, any>>(
     keyName: string,
     request: T,
-    propertyMetadata?: PropertyMetadata<any>
+    metadata?: Metadata<any>
   ): RequestRangeKeyConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
-        const conditionChain = ConditionBuilder.where(
-          keyName,
-          propertyMetadata,
-          request.params.ExpressionAttributeValues
-        )
+        const conditionChain = ConditionBuilder.where(keyName, metadata, request.params.ExpressionAttributeValues)
         const alias = aliasForOperator(operator)
         if (Reflect.has(conditionChain, alias)) {
           const condition: Condition = (<any>conditionChain)[alias](...values)
@@ -81,40 +75,39 @@ export class ConditionBuilder {
     return ConditionBuilder.createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
   }
 
-  static addPartitionKeyCondition<T extends Request<any, any>>(
+  static addPartitionKeyCondition<T extends BaseRequest<any, any>>(
     keyName: string,
     keyValue: any,
     request: T,
-    propertyMetadata?: PropertyMetadata<any>
+    metadata?: Metadata<any>
   ): T {
-    return ConditionBuilder.addRangeKeyCondition(keyName, request, propertyMetadata).equals(keyValue)
+    return ConditionBuilder.addRangeKeyCondition(keyName, request, metadata).equals(keyValue)
   }
 
   static where<T>(
     keyName: string,
-    propertyMetadata?: PropertyMetadata<any>,
+    metadata?: Metadata<any>,
     expressionAttributeValues?: ExpressionAttributeValueMap
   ): ConditionFunction {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): Condition => {
         const copy = [...values]
         const existingValueKeys = expressionAttributeValues ? Object.keys(expressionAttributeValues) : []
-        return Expressions.buildFilterExpression(keyName, operator, values, existingValueKeys, propertyMetadata)
+        return Expressions.buildFilterExpression(keyName, operator, values, existingValueKeys, metadata)
       }
     }
 
-    // TODO move out of call is always the same, static member
     return ConditionBuilder.createConditionFunctions<ConditionFunction>(f)
   }
 
   static whereRangeKey(
     keyName: string,
-    propertyMetadata?: PropertyMetadata<any>,
+    metadata?: Metadata<any>,
     expressionAttributeValues?: ExpressionAttributeValueMap
   ): RangeKeyConditionFunction {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): Condition => {
-        const conditionChain = ConditionBuilder.where(keyName, propertyMetadata, expressionAttributeValues)
+        const conditionChain = ConditionBuilder.where(keyName, metadata, expressionAttributeValues)
         const alias = aliasForOperator(operator)
         const condition: Condition = (<any>conditionChain)[alias](...values)
         return condition
@@ -128,7 +121,7 @@ export class ConditionBuilder {
   static wherePartitionKey(
     value: string | ModelConstructor<any>,
     keyValue: any,
-    propertyMetadata?: PropertyMetadata<any>,
+    metadata?: Metadata<any>,
     expressionAttributeValues?: ExpressionAttributeValueMap
   ): Condition {
     let keyName: string
@@ -138,21 +131,23 @@ export class ConditionBuilder {
       keyName = MetadataHelper.get(<ModelConstructor<any>>value).getPartitionKey()
     }
 
-    return ConditionBuilder.where(keyName, propertyMetadata, expressionAttributeValues).equals(keyValue)
+    return ConditionBuilder.where(keyName, metadata, expressionAttributeValues).equals(keyValue)
   }
 
   /**
    * Creates an object which contains callable functions for all aliases defined in CONDITION_OPERATOR_ALIAS or if operators parameter is defined,
    * for all the values included in operators
    *
-   * @param {(operator: ConditionOperator) => any} impl
+   * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
+   * for the condition. when executed the implementation defines what todo with the condition, just return it for example or add the condition to the request
+   * parameters as another example
+   *
    * @param {ConditionOperator} operators
    * @returns {T}
+   *
+   * TODO make private
    */
-  private static createConditionFunctions<T>(
-    impl: (operator: ConditionOperator) => any,
-    ...operators: ConditionOperator[]
-  ): T {
+  static createConditionFunctions<T>(impl: (operator: ConditionOperator) => any, ...operators: ConditionOperator[]): T {
     const includedAlias: ConditionOperator[] =
       operators && operators.length ? operators : <ConditionOperator[]>Object.keys(OPERATOR_TO_ALIAS_MAP)
 

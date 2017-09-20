@@ -9,6 +9,18 @@
 
 A starter project that makes creating a TypeScript library extremely easy.
 
+## DynamoDB Request abstraction
+
+We provide an abstraction on top of the aws-sdk to execute requests.  The fluent api should be self-explanatory always with the ability to access the underlaying
+plain request params to be very flexible. (If new api parameters are not implemented by the library yet, we can still use it).
+
+### Primary Key
+
+To be clear about the used naming for keys, here is how we use it (same as in the official aws documentation):
+
+DynamoDb has two key types **Partition Key** (hashkey - dynamodb internally uses a hash function to evenly distribute data items across partitions) and **Sort Key** (rangekey)
+The primary key can either be simple (only a partition key) or composite (combination of partition and sort key)
+
 ## Object Mapper
 
 #### Notes

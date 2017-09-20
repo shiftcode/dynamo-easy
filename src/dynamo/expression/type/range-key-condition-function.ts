@@ -9,9 +9,9 @@
  *      begins_with ( sortKeyName, :sortkeyval ) - true if the sort key value begins with a particular operand.
  *      (You cannot use this function with a sort key that is of formType Number.) Note that the function name begins_with is case-sensitive.
  */
-import { Request } from '../../request/request.model'
+import { BaseRequest } from '../../request/base.request'
 
-export interface RequestRangeKeyConditionFunction<R extends Request<any, any>> {
+export interface RequestRangeKeyConditionFunction<R extends BaseRequest<any, any>> {
   // TODO narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
   // [key in OperatorAlias]: (...value: any[]) => R;
   [key: string]: (...value: any[]) => R

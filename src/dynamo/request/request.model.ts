@@ -5,33 +5,24 @@ import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
-import { Response } from './response.model'
+import { BaseRequest } from './base.request'
+import { QueryRequest } from './query/query.request'
+import { QueryResponse } from './query/query.response'
+import { ScanRequest } from './scan/scan.request'
+import { ScanResponse } from './scan/scan.response'
 
-export abstract class Request<T, P extends QueryInput | ScanInput> {
+export abstract class Request<
+  T,
+  R extends QueryRequest<T> | ScanRequest<T>,
+  I extends QueryInput | ScanInput,
+  Z extends QueryResponse<T> | ScanResponse<T>
+> extends BaseRequest<T, I> {
   static DEFAULT_LIMIT = 10
   static INFINITE_LIMIT = -1
 
-  readonly dynamoRx: DynamoRx
-  readonly params: P
-  readonly modelClazz: ModelConstructor<T>
-
-  private _metadata: Metadata<T>
-
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
-    this.dynamoRx = dynamoRx
-    this.modelClazz = modelClazz
-    this.params = <P>{
-      TableName: MetadataHelper.forModel(modelClazz).tableName,
-    }
+    super(dynamoRx, modelClazz)
     this.limit(Request.DEFAULT_LIMIT)
-  }
-
-  get metaData(): Metadata<T> {
-    if (!this._metadata) {
-      this._metadata = MetadataHelper.get(this.modelClazz)
-    }
-
-    return this._metadata
   }
 
   /**
@@ -40,7 +31,7 @@ export abstract class Request<T, P extends QueryInput | ScanInput> {
    * startKey will be removed from params
    * @returns {Request}
    */
-  exclusiveStartKey(key: Key | null): Request<T, P> {
+  exclusiveStartKey(key: Key | null): Request<T, R, I, Z> {
     if (key) {
       this.params.ExclusiveStartKey = key
     } else {
@@ -50,7 +41,7 @@ export abstract class Request<T, P extends QueryInput | ScanInput> {
     return this
   }
 
-  index(indexName: string): Request<T, P> {
+  index(indexName: string): Request<T, R, I, Z> {
     const index = this.metaData.getIndex(indexName)
 
     if (index) {
@@ -61,14 +52,7 @@ export abstract class Request<T, P extends QueryInput | ScanInput> {
     return this
   }
 
-  mapFromDb(attributeMap: AttributeMap): T {
-    return Mapper.fromDb(attributeMap, this.modelClazz)
-  }
-
-  // TODO resolve remove old dynamo implementation
-  // abstract where(keyName: string): ConditionFunction<Request<T>>;
-
-  limit(limit: number): Request<T, P> {
+  limit(limit: number): Request<T, R, I, Z> {
     if (limit === Request.INFINITE_LIMIT) {
       delete this.params.Limit
     } else {
@@ -82,7 +66,7 @@ export abstract class Request<T, P extends QueryInput | ScanInput> {
     return this
   }
 
-  abstract execFullResponse(): Observable<Response<T>>
+  abstract execFullResponse(): Observable<Z>
 
   abstract exec(): Observable<T[]>
 

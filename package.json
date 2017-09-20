@@ -1,6 +1,6 @@
 {
   "name": "sc-dynamo-object-mapper",
-  "version": "0.0.24",
+  "version": "0.0.28",
   "description": "",
   "keywords": [],
   "main": "dist/sc-dynamo-object-mapper.umd.js",

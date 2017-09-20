@@ -27,6 +27,10 @@ export class DynamoRx {
     return Observable.fromPromise(this.dynamoDb.putItem(params).promise())
   }
 
+  getItem(params: DynamoDB.GetItemInput): Observable<DynamoDB.GetItemOutput> {
+    return Observable.fromPromise(this.dynamoDb.getItem(params).promise())
+  }
+
   updateItem(params: DynamoDB.UpdateItemInput): Observable<DynamoDB.UpdateItemOutput> {
     return Observable.fromPromise(this.dynamoDb.updateItem(params).promise())
   }

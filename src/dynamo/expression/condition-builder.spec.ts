@@ -1,9 +1,9 @@
 import { has } from 'lodash'
 import moment from 'moment-es6'
 import { Organization } from '../../../test/models/organization.model'
-import { QueryRequest } from '../request/query/query-request'
-import { DYNAMO_RX_MOCK } from '../request/query/query-request.spec'
-import { ScanRequest } from '../request/scan/scan-request'
+import { QueryRequest } from '../request/query/query.request'
+import { DYNAMO_RX_MOCK } from '../request/query/query.request.spec'
+import { ScanRequest } from '../request/scan/scan.request'
 import { ConditionBuilder } from './condition-builder'
 
 describe('condition builder', () => {
@@ -16,9 +16,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#id')
       expect(condition.attributeNames['#id']).toBe('id')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':id')
-      expect(condition.attributeMap[':id']).toEqual({ S: 'equalsValue' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':id')
+      expect(condition.attributeValues[':id']).toEqual({ S: 'equalsValue' })
     })
 
     it('not equals', () => {
@@ -29,9 +29,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#id')
       expect(condition.attributeNames['#id']).toBe('id')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':id')
-      expect(condition.attributeMap[':id']).toEqual({ S: 'notEqualsValue' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':id')
+      expect(condition.attributeValues[':id']).toEqual({ S: 'notEqualsValue' })
     })
 
     it('greater than', () => {
@@ -42,9 +42,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#count')
       expect(condition.attributeNames['#count']).toBe('count')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':count')
-      expect(condition.attributeMap[':count']).toEqual({ N: '5' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':count')
+      expect(condition.attributeValues[':count']).toEqual({ N: '5' })
     })
 
     it('greater than, equal', () => {
@@ -55,9 +55,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#count')
       expect(condition.attributeNames['#count']).toBe('count')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':count')
-      expect(condition.attributeMap[':count']).toEqual({ N: '10' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':count')
+      expect(condition.attributeValues[':count']).toEqual({ N: '10' })
     })
 
     it('lower than', () => {
@@ -68,9 +68,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#count')
       expect(condition.attributeNames['#count']).toBe('count')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':count')
-      expect(condition.attributeMap[':count']).toEqual({ N: '100' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':count')
+      expect(condition.attributeValues[':count']).toEqual({ N: '100' })
     })
 
     it('lower than, equal', () => {
@@ -81,9 +81,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#count')
       expect(condition.attributeNames['#count']).toBe('count')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':count')
-      expect(condition.attributeMap[':count']).toEqual({ N: '100' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':count')
+      expect(condition.attributeValues[':count']).toEqual({ N: '100' })
     })
 
     it('attribute exists', () => {
@@ -94,8 +94,8 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#attr')
       expect(condition.attributeNames['#attr']).toBe('attr')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap).length).toBe(0)
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues).length).toBe(0)
     })
 
     it('attribute not exists', () => {
@@ -106,8 +106,8 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#attr')
       expect(condition.attributeNames['#attr']).toBe('attr')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap).length).toBe(0)
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues).length).toBe(0)
     })
 
     it('attribute type', () => {
@@ -118,9 +118,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#attr')
       expect(condition.attributeNames['#attr']).toBe('attr')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':attr')
-      expect(condition.attributeMap[':attr']).toEqual({ S: 'S' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':attr')
+      expect(condition.attributeValues[':attr']).toEqual({ S: 'S' })
     })
 
     it('begins with', () => {
@@ -131,9 +131,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#textProp')
       expect(condition.attributeNames['#textProp']).toBe('textProp')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':textProp')
-      expect(condition.attributeMap[':textProp']).toEqual({ S: 'te' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':textProp')
+      expect(condition.attributeValues[':textProp']).toEqual({ S: 'te' })
     })
 
     it('contains', () => {
@@ -144,9 +144,9 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#myCollection')
       expect(condition.attributeNames['#myCollection']).toBe('myCollection')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':myCollection')
-      expect(condition.attributeMap[':myCollection']).toEqual({ S: '2' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':myCollection')
+      expect(condition.attributeValues[':myCollection']).toEqual({ S: '2' })
     })
 
     it('in', () => {
@@ -158,11 +158,11 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#myCollection')
       expect(condition.attributeNames['#myCollection']).toBe('myCollection')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap)[0]).toBe(':myCollection')
-      expect(condition.attributeMap[':myCollection']).toEqual('myCollection')
-      expect(Object.keys(condition.attributeMap)[1]).toBe(':myCollection_2')
-      expect(condition.attributeMap[':myCollection_2']).toEqual('myOtherValue')
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues)[0]).toBe(':myCollection')
+      expect(condition.attributeValues[':myCollection']).toEqual('myCollection')
+      expect(Object.keys(condition.attributeValues)[1]).toBe(':myCollection_2')
+      expect(condition.attributeValues[':myCollection_2']).toEqual('myOtherValue')
     })
 
     it('between (numbers)', () => {
@@ -174,12 +174,12 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#counter')
       expect(condition.attributeNames['#counter']).toBe('counter')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap).length).toBe(2)
-      expect(has(condition.attributeMap, ':counter')).toBeTruthy()
-      expect(condition.attributeMap[':counter']).toEqual({ N: '2' })
-      expect(has(condition.attributeMap, ':counter_2')).toBeTruthy()
-      expect(condition.attributeMap[':counter_2']).toEqual({ N: '5' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues).length).toBe(2)
+      expect(has(condition.attributeValues, ':counter')).toBeTruthy()
+      expect(condition.attributeValues[':counter']).toEqual({ N: '2' })
+      expect(has(condition.attributeValues, ':counter_2')).toBeTruthy()
+      expect(condition.attributeValues[':counter_2']).toEqual({ N: '5' })
     })
   })
 
@@ -193,10 +193,10 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#id')
       expect(condition.attributeNames['#id']).toBe('id')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap).length).toBe(1)
-      expect(has(condition.attributeMap, ':id')).toBeTruthy()
-      expect(condition.attributeMap[':id']).toEqual({ S: 'idValue' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues).length).toBe(1)
+      expect(has(condition.attributeValues, ':id')).toBeTruthy()
+      expect(condition.attributeValues[':id']).toEqual({ S: 'idValue' })
     })
 
     it('range key', () => {
@@ -209,10 +209,10 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#count')
       expect(condition.attributeNames['#count']).toBe('count')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap).length).toBe(1)
-      expect(has(condition.attributeMap, ':count')).toBeTruthy()
-      expect(condition.attributeMap[':count']).toEqual({ N: '25' })
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues).length).toBe(1)
+      expect(has(condition.attributeValues, ':count')).toBeTruthy()
+      expect(condition.attributeValues[':count']).toEqual({ N: '25' })
     })
 
     it('range key (between moment dates)', () => {
@@ -227,17 +227,17 @@ describe('condition builder', () => {
       expect(Object.keys(condition.attributeNames)[0]).toBe('#creationDate')
       expect(condition.attributeNames['#creationDate']).toBe('creationDate')
 
-      expect(condition.attributeMap).toBeDefined()
-      expect(Object.keys(condition.attributeMap).length).toBe(2)
-      expect(has(condition.attributeMap, ':creationDate')).toBeTruthy()
-      expect(condition.attributeMap[':creationDate']).toEqual({
+      expect(condition.attributeValues).toBeDefined()
+      expect(Object.keys(condition.attributeValues).length).toBe(2)
+      expect(has(condition.attributeValues, ':creationDate')).toBeTruthy()
+      expect(condition.attributeValues[':creationDate']).toEqual({
         S: date1
           .clone()
           .utc()
           .format(),
       })
-      expect(has(condition.attributeMap, ':creationDate_2')).toBeTruthy()
-      expect(condition.attributeMap[':creationDate_2']).toEqual({
+      expect(has(condition.attributeValues, ':creationDate_2')).toBeTruthy()
+      expect(condition.attributeValues[':creationDate_2']).toEqual({
         S: date2
           .clone()
           .utc()
@@ -252,7 +252,7 @@ describe('condition builder', () => {
       ConditionBuilder.addRangeKeyCondition('count', queryRequest).equals(25)
 
       const params = queryRequest.params
-      expect(params.KeyConditionExpression).toBe('(#count = :count)')
+      expect(params.KeyConditionExpression).toBe('#count = :count')
       expect(params.ExpressionAttributeNames).toEqual({ '#count': 'count' })
       expect(params.ExpressionAttributeValues).toEqual({ ':count': { N: '25' } })
     })
@@ -265,7 +265,7 @@ describe('condition builder', () => {
       scanRequest.where('createdAtDate').between(start, end)
 
       const params = scanRequest.params
-      expect(params.FilterExpression).toBe('(#createdAtDate BETWEEN :createdAtDate AND :createdAtDate_2)')
+      expect(params.FilterExpression).toBe('#createdAtDate BETWEEN :createdAtDate AND :createdAtDate_2')
       expect(params.ExpressionAttributeNames).toBeDefined()
       expect(Object.keys(params.ExpressionAttributeNames).length).toBe(1)
       expect(params.ExpressionAttributeNames).toEqual({ '#createdAtDate': 'createdAtDate' })
@@ -286,16 +286,5 @@ describe('condition builder', () => {
           .format(),
       })
     })
-  })
-
-  describe('complex conditions', () => {
-    // CondChain.and(
-    //   ConditionBuilder.build('id').beginsWith('bla')
-    // )
-    //
-    // QB.not(
-    //   QB.where('id').equals('idValue'),
-    //   QB.where('bla').contains('ha')
-    // )
   })
 })

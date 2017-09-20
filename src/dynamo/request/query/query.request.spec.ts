@@ -1,8 +1,10 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
+import * as moment from 'moment'
 import { Observable } from 'rxjs/Observable'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { DynamoRx } from '../../dynamo-rx'
-import { QueryRequest } from './query-request'
+import { property } from '../../expression/logical-operator/property'
+import { QueryRequest } from './query.request'
 
 export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
   query(params: QueryInput): Observable<QueryOutput> {
@@ -12,7 +14,7 @@ export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
   },
 }
 
-xdescribe('query request', () => {
+describe('query request', () => {
   describe('defines correct params', () => {
     let request: QueryRequest<ComplexModel>
 
@@ -41,6 +43,32 @@ xdescribe('query request', () => {
     })
   })
 
+  describe('filter expression', () => {
+    it('simple', () => {
+      const request = new QueryRequest(<any>null, ComplexModel)
+
+      request.whereProperty('active').eq(true)
+      expect(request.params.FilterExpression).toBe('#active = :active')
+
+      expect(request.params.ExpressionAttributeNames).toBeDefined()
+      expect(Object.keys(request.params.ExpressionAttributeNames).length).toBe(1)
+      expect(request.params.ExpressionAttributeNames['#active']).toBe('isActive')
+
+      expect(request.params.ExpressionAttributeValues).toBeDefined()
+      expect(Object.keys(request.params.ExpressionAttributeValues).length).toBe(1)
+      expect(request.params.ExpressionAttributeValues[':active']).toEqual({ BOOL: true })
+    })
+
+    it('complex', () => {
+      const request = new QueryRequest(<any>null, ComplexModel)
+
+      request.where(property<ComplexModel>('active').eq(true), property('creationDate').lt(moment()))
+
+      const params = request.params
+      expect(params.FilterExpression).toBe('(#active = :active AND #creationDate < :creationDate)')
+    })
+  })
+
   describe('calls endpoint with correct params', () => {
     const dynamoRx: DynamoRx = DYNAMO_RX_MOCK as DynamoRx
     let querySpy
@@ -50,12 +78,6 @@ xdescribe('query request', () => {
     beforeEach(() => {
       request = new QueryRequest(<any>null, ComplexModel)
       querySpy = spyOn(dynamoRx, 'query').and.callThrough()
-    })
-
-    it('partition key', () => {
-      request.wherePartitionKey('partitionKeyValue')
-      expect(request.params).toBeDefined()
-      expect(request.params.KeyConditionExpression).toBe('bla')
     })
   })
 })

@@ -1,8 +1,8 @@
 import { AttributeType } from '../../../mapper/type/attribute.type'
-import { Request } from '../../request/request.model'
+import { BaseRequest } from '../../request/base.request'
 import { Condition } from './condition.type'
 
-export interface RequestConditionFunction<T extends Request<any, any>> {
+export interface RequestConditionFunction<T extends BaseRequest<any, any>> {
   equals: (value: any) => T
   eq: (value: any) => T
   ne: (value: any) => T

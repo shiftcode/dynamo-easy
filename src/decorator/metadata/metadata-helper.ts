@@ -10,7 +10,12 @@ export class MetadataHelper {
   }
 
   static forModel<T>(modelClass: ModelConstructor<T>): ModelMetadata<T> {
-    return Reflect.getMetadata(KEY_MODEL, modelClass)
+    const modelMetadata = Reflect.getMetadata(KEY_MODEL, modelClass)
+    if (!modelMetadata) {
+      throw new Error(`make sure the @Model decorator is present on the model ${modelClass.name}`)
+    }
+
+    return modelMetadata
   }
 
   /**

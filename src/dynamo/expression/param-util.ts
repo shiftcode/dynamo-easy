@@ -12,12 +12,16 @@ export class ParamUtil {
     this.addExpression('FilterExpression', condition, params)
   }
 
+  static addConditionExpression<T>(condition: Condition, params: QueryInput | ScanInput): void {
+    this.addExpression('ConditionExpression', condition, params)
+  }
+
   static addKeyConditionExpression<T>(condition: Condition, params: QueryInput): void {
     this.addExpression('KeyConditionExpression', condition, params)
   }
 
   private static addExpression(
-    expressionType: 'KeyConditionExpression' | 'FilterExpression',
+    expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression',
     condition: Condition,
     params: QueryInput | ScanInput
   ) {
@@ -27,7 +31,7 @@ export class ParamUtil {
     }
 
     const expressionAttributeValues = <ExpressionAttributeValueMap>{
-      ...condition.attributeMap,
+      ...condition.attributeValues,
       ...params.ExpressionAttributeValues,
     }
 
@@ -41,9 +45,11 @@ export class ParamUtil {
 
     const expression = Reflect.get(params, expressionType)
     if (_.isString(expression)) {
-      ;(<any>params)[expressionType] = (<any>params).KeyConditionExpression + ' AND (' + condition.statement + ')'
-    } else {
-      ;(<any>params)[expressionType] = '(' + condition.statement + ')'
+      throw new Error(
+        'please use the logical operators and / or / not to define complex expressions instead of just adding it the an existing condition'
+      )
     }
+
+    ;(<any>params)[expressionType] = condition.statement
   }
 }

@@ -1,15 +1,19 @@
 import { QueryInput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
+import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { ConditionBuilder } from '../../expression/condition-builder'
+import { and } from '../../expression/logical-operator/and'
+import { ConditionDefFn } from '../../expression/logical-operator/property'
+import { ParamUtil } from '../../expression/param-util'
+import { Condition } from '../../expression/type/condition.type'
 import { RequestRangeKeyConditionFunction } from '../../expression/type/range-key-condition-function'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { Request } from '../request.model'
-import { Response } from '../response.model'
+import { QueryResponse } from './query.response'
 
-// inspired by https://github.com/ryanfitz/vogels/blob/master/lib/query.js
-export class QueryRequest<T> extends Request<T, QueryInput> {
+export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>> {
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
@@ -30,11 +34,9 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
       partitionKey = this.metaData.getPartitionKey()
     }
 
-    return ConditionBuilder.addRangeKeyCondition<QueryRequest<T>>(
-      partitionKey,
-      this,
-      this.metaData.forProperty(partitionKey)
-    ).equals(partitionKeyValue)
+    return ConditionBuilder.addRangeKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData).equals(
+      partitionKeyValue
+    )
   }
 
   /**
@@ -65,9 +67,43 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
     return ConditionBuilder.addRangeKeyCondition(sortKey, this)
   }
 
-  where(keyName: string): RequestConditionFunction<QueryRequest<T>> {
-    return ConditionBuilder.addCondition(keyName, this)
+  whereProperty(keyName: keyof T): RequestConditionFunction<QueryRequest<T>> {
+    return ConditionBuilder.addCondition(keyName, this, this.metaData)
   }
+
+  where(...conditionDefFns: ConditionDefFn[]): QueryRequest<T> {
+    const conditions: Condition[] = conditionDefFns.map((conditionDefFn: ConditionDefFn) => {
+      return conditionDefFn(undefined, this.metaData)
+    })
+
+    const condition = and(...conditions)
+    ParamUtil.addFilterExpression(condition, this.params)
+    return this
+  }
+
+  /**
+   * multiple conditions will be combined using the AND operator by default
+   * @param {Condition[]} conditions
+   * @returns {QueryRequest<T>}
+   */
+  // implementation with overload won't work perfectly with ide support, so we add two different methods
+  // where(keyName: keyof T): RequestConditionFunction<QueryRequest<T>>
+  // where(...conditionDefFns: ConditionDefFn[]): QueryRequest<T>
+  //
+  // // (keyof T)[] | ConditionDefFn[]
+  // where(...args: any[]): RequestConditionFunction<QueryRequest<T>> | QueryRequest<T> {
+  //   if (args.length === 1 && typeof args[0] === 'string') {
+  //
+  //   } else {
+  //     const conditions: Condition[] = args.map((conditionDefFn: ConditionDefFn) => {
+  //       return conditionDefFn(undefined, this.metaData)
+  //     })
+  //
+  //     const condition = and(...conditions)
+  //     ParamUtil.addFilterExpression(condition, this.params)
+  //     return this
+  //   }
+  // }
 
   ascending(): QueryRequest<T> {
     this.params.ScanIndexForward = true
@@ -86,18 +122,19 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
     return this.dynamoRx.query(params).map(response => response.Count!)
   }
 
-  execFullResponse(): Observable<Response<T>> {
+  execFullResponse(): Observable<QueryResponse<T>> {
     return this.dynamoRx.query(this.params).map(queryResponse => {
-      const response: Response<T> = {}
-      Object.assign(response, queryResponse)
-      response.Items = queryResponse.Items!.map(item => this.mapFromDb(<any>item))
+      const response: QueryResponse<T> = <any>{ ...queryResponse }
+      response.Items = queryResponse.Items!.map(item => Mapper.fromDb(item, this.modelClazz))
 
       return response
     })
   }
 
   exec(): Observable<T[]> {
-    return this.dynamoRx.query(this.params).map(response => response.Items!.map(item => this.mapFromDb(<any>item)))
+    return this.dynamoRx
+      .query(this.params)
+      .map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz)))
   }
 
   execSingle(): Observable<T | null> {
@@ -105,7 +142,7 @@ export class QueryRequest<T> extends Request<T, QueryInput> {
 
     return this.dynamoRx.query(this.params).map(response => {
       if (response.Count) {
-        return this.mapFromDb(<any>response.Items![0])
+        return Mapper.fromDb(response.Items![0], this.modelClazz)
       } else {
         return null
       }
