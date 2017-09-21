@@ -1,10 +1,10 @@
-import { AttributeMap, GetItemInput, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
+import { AttributeMap, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
+import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs/Observable'
-import { Metadata } from '../../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
+import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 import { BaseRequest } from '../base.request'
 import { GetResponse } from './get.response'
 
@@ -14,7 +14,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
-    if ((hasSortKey && sortKey === null) || sortKey === undefined) {
+    if (hasSortKey && (sortKey === null || sortKey === undefined)) {
       throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
     }
 
@@ -47,8 +47,13 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     return this
   }
 
+  // TODO review this
   projectionExpression(...attributesToGet: string[]): GetRequest<T> {
-    this.params.ProjectionExpression = attributesToGet.join(', ')
+    const resolved = attributesToGet.map(attr => resolveAttributeNames(attr))
+    this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
+    objValues(resolved).forEach(r => {
+      this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
+    })
     return this
   }
 

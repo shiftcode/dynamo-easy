@@ -5,15 +5,13 @@ import { PropertyMetadata } from '../../decorator/metadata/property-metadata.mod
 import { Mapper } from '../../mapper/mapper'
 import { Binary } from '../../mapper/type/binary.type'
 import { Util } from '../../mapper/util'
+import { resolveAttributeNames } from './functions/attribute-names.function'
 import { isFunctionOperator } from './functions/is-function-operator.function'
 import { isNoParamFunctionOperator } from './functions/is-no-param-function-operator.function'
 import { operatorParameterArity } from './functions/operator-parameter-arity.function'
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { ConditionExpression } from './type/condition-expression.type'
 import { ConditionOperator } from './type/condition-operator.type'
-
-const NESTED_ATTR_PATH_CAPTURED_REGEX = /([a-z]+)(?:\[(\d+)])?\.?/g
-const NESTED_ATTR_PATH_REGEX = /^.+((\[(\d+)])|(\.)).*$/
 
 /**
  * TODO complete doc
@@ -58,49 +56,8 @@ export class ConditionExpressionBuilder {
      * person[0] -> #person: person
      * person.list[0].age -> #person: person, #attr: attr, #age: age
      * person.age
-     * TODO review this with fresh mind
      */
-    let namePlaceholder: string
-    const attributeNames: { [key: string]: string } = {}
-    const execResult = NESTED_ATTR_PATH_REGEX.exec(attributePath)
-    if (NESTED_ATTR_PATH_REGEX.test(attributePath)) {
-      // nested attribute with document path (map or list)
-      let re
-      const namePlaceholders: string[] = []
-      // tslint:disable-next-line:no-conditional-assignment
-      while ((re = NESTED_ATTR_PATH_CAPTURED_REGEX.exec(attributePath)) !== null) {
-        const fullMatch = re[0]
-        const pathPart = re[1]
-        const collectionIndex = re[2]
-
-        let pathPartDb
-        // get propertyMetdata of nested attribute if available
-        if (propertyMetadata) {
-          pathPartDb = propertyMetadata.nameDb
-        } else {
-          pathPartDb = pathPart
-        }
-
-        attributeNames[`#${pathPartDb}`] = pathPart
-        if (collectionIndex !== undefined) {
-          namePlaceholders.push(`#${pathPartDb}[${collectionIndex}]`)
-        } else {
-          namePlaceholders.push(`#${pathPartDb}`)
-        }
-      }
-      namePlaceholder = namePlaceholders.join('.')
-    } else {
-      // top level attribute
-      let attrPathDb
-      if (propertyMetadata) {
-        attrPathDb = propertyMetadata.nameDb
-      } else {
-        attrPathDb = attributePath
-      }
-      attributeNames[`#${attributePath}`] = attrPathDb
-      namePlaceholder = `#${attributePath}`
-    }
-
+    const resolvedAttributeNames = resolveAttributeNames(attributePath, propertyMetadata)
     const valuePlaceholder = uniqAttributeValueName(attributePath, existingValueNames)
 
     /*
@@ -121,9 +78,9 @@ export class ConditionExpressionBuilder {
 
     return buildFilterFn(
       attributePath,
-      namePlaceholder,
+      resolvedAttributeNames.placeholder,
       valuePlaceholder,
-      attributeNames,
+      resolvedAttributeNames.attributeNames,
       values,
       existingValueNames,
       propertyMetadata
