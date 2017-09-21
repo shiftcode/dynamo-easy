@@ -68,7 +68,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   whereProperty(keyName: keyof T): RequestConditionFunction<QueryRequest<T>> {
-    return RequestExpressionBuilder.addCondition(keyName, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('FilterExpression', keyName, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {

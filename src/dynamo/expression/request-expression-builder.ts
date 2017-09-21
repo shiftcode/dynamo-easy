@@ -10,10 +10,9 @@ import { ConditionExpression } from './type/condition-expression.type'
 import { OperatorAlias } from './type/condition-operator-alias.type'
 import { OPERATOR_TO_ALIAS_MAP } from './type/condition-operator-to-alias-map.const'
 import { ConditionOperator } from './type/condition-operator.type'
+import { ExpressionType } from './type/expression-type.type'
 import { RequestConditionFunction } from './type/request-condition-function'
 import { RequestSortKeyConditionFunction } from './type/sort-key-condition-function'
-
-type ExpressionType = 'ConditionExpression' | 'FilterExpression' | 'KeyConditionExpression'
 
 /**
  *
@@ -28,13 +27,14 @@ export class RequestExpressionBuilder {
    * @returns {RequestConditionFunction<T extends Request<any, any>>}
    */
   static addCondition<T extends BaseRequest<any, any>>(
+    expressionType: ExpressionType,
     keyName: string,
     request: T,
     metadata?: Metadata<any>
   ): RequestConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
-        return RequestExpressionBuilder.bla('FilterExpression', keyName, request, metadata, operator, ...values)
+        return RequestExpressionBuilder.doAddCondition(expressionType, keyName, request, metadata, operator, ...values)
       }
     }
 
@@ -48,7 +48,14 @@ export class RequestExpressionBuilder {
   ): RequestSortKeyConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
-        return RequestExpressionBuilder.bla('KeyConditionExpression', keyName, request, metadata, operator, ...values)
+        return RequestExpressionBuilder.doAddCondition(
+          'KeyConditionExpression',
+          keyName,
+          request,
+          metadata,
+          operator,
+          ...values
+        )
       }
     }
 
@@ -56,7 +63,7 @@ export class RequestExpressionBuilder {
     return RequestExpressionBuilder.createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
   }
 
-  private static bla<T extends BaseRequest<any, any>>(
+  private static doAddCondition<T extends BaseRequest<any, any>>(
     expressionType: ExpressionType,
     keyName: string,
     request: T,

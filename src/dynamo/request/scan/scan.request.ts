@@ -18,7 +18,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
   }
 
   whereProperty(keyName: keyof T): RequestConditionFunction<ScanRequest<T>> {
-    return RequestExpressionBuilder.addCondition(keyName, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('FilterExpression', keyName, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): ScanRequest<T> {

@@ -37,7 +37,7 @@ describe('request expression builder', () => {
 
     it('non key', () => {
       const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
-      RequestExpressionBuilder.addCondition('age', queryRequest).lte(45)
+      RequestExpressionBuilder.addCondition('FilterExpression', 'age', queryRequest).lte(45)
 
       const params = queryRequest.params
       expect(params.FilterExpression).toBe('#age <= :age')

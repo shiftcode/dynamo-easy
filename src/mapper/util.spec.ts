@@ -53,7 +53,7 @@ describe('Util', () => {
     })
 
     it('all falsey', () => {
-      expect(Util.isCollection('bla')).toBeFalsy()
+      expect(Util.isCollection('doAddCondition')).toBeFalsy()
       expect(Util.isCollection(5)).toBeFalsy()
       expect(Util.isCollection(null)).toBeFalsy()
       expect(Util.isCollection(true)).toBeFalsy()

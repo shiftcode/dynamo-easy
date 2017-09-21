@@ -51,9 +51,11 @@ describe('chained conditions', () => {
   it('mixed', () => {
     const condition = or(
       and(property('age').gt(10)(undefined, undefined), property('name').contains('Bla')(undefined, undefined)),
-      property('bla').beginsWith('Start')(undefined, undefined)
+      property('doAddCondition').beginsWith('Start')(undefined, undefined)
     )
 
-    expect(condition.statement).toBe('((#age > :age AND contains (#name, :name)) OR begins_with (#bla, :bla))')
+    expect(condition.statement).toBe(
+      '((#age > :age AND contains (#name, :name)) OR begins_with (#doAddCondition, :doAddCondition))'
+    )
   })
 })
