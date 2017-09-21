@@ -36,6 +36,10 @@ export class ConditionExpressionBuilder {
     existingValueNames: string[] | undefined,
     metadata: Metadata<any> | undefined
   ): ConditionExpression {
+    // TODO investigate is there a use case for undefined desired to be a value
+    // get rid of undefined values
+    values = values.filter(value => value !== undefined)
+
     // check if provided values are valid for given operator
     ConditionExpressionBuilder.validateValues(operator, values)
 

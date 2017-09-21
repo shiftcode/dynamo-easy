@@ -21,11 +21,11 @@ export class Util {
   // TODO should we handle duplicates, switch from set to list?
   static detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType {
     if (Array.isArray(collection)) {
-      if (collection.every(_.isString)) {
+      if (collection.every(isString)) {
         return 'SS'
       }
 
-      if (collection.every(_.isNumber)) {
+      if (collection.every(isNumber)) {
         return 'NS'
       }
 

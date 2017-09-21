@@ -5,10 +5,6 @@ import { Model } from '../../decorator/impl/model/model.decorator'
 import { Property } from '../../decorator/impl/property/property.decorator'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
-import { and } from './logical-operator/and.function'
-import { not } from './logical-operator/not.function'
-import { or } from './logical-operator/or.function'
-import { property } from './logical-operator/property.function'
 
 @Model()
 class MyModel {
@@ -333,6 +329,34 @@ describe('expressions', () => {
           .utc()
           .format(),
       })
+    })
+
+    it('should throw error for wrong value arity', () => {
+      expect(() => {
+        const condition = ConditionExpressionBuilder.buildFilterExpression(
+          'age',
+          'attribute_type',
+          [],
+          undefined,
+          undefined
+        )
+      }).toThrowError(
+        'expected 1 values for operator attribute_type, this is not the right amount of method parameters for this operator'
+      )
+    })
+
+    it('should throw error for wrong value arity', () => {
+      expect(() => {
+        const condition = ConditionExpressionBuilder.buildFilterExpression(
+          'age',
+          'attribute_type',
+          [undefined],
+          undefined,
+          undefined
+        )
+      }).toThrowError(
+        'expected 1 values for operator attribute_type, this is not the right amount of method parameters for this operator'
+      )
     })
   })
 })
