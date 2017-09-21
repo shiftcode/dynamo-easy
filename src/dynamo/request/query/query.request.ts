@@ -40,7 +40,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   /**
-   * used to define some condition for the range key, use the secondary index to query based on a custom index
+   * used to define some condition for the sort key, use the secondary index to query based on a custom index
    * @returns {RequestConditionFunction<T>}
    */
   whereSortKey(): RequestSortKeyConditionFunction<QueryRequest<T>> {

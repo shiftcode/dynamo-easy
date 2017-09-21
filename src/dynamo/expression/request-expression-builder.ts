@@ -59,7 +59,7 @@ export class RequestExpressionBuilder {
       }
     }
 
-    // only a subset of available operators are supported for range keys
+    // only a subset of available operators are supported for sort keys
     return RequestExpressionBuilder.createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
   }
 
