@@ -258,7 +258,9 @@ describe('expressions', () => {
       )
       expect(condition.statement).toBe('#myCollection IN (:myCollection)')
       expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
-      expect(condition.attributeValues).toEqual({ ':myCollection': { L: ['myCollection', 'myOtherValue'] } })
+      expect(condition.attributeValues).toEqual({
+        ':myCollection': { L: [{ S: 'myCollection' }, { S: 'myOtherValue' }] },
+      })
     })
 
     it('between (numbers)', () => {

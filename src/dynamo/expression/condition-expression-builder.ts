@@ -106,8 +106,7 @@ export class ConditionExpressionBuilder {
     valuePlaceholder: string
   ): ConditionExpression {
     const mappedValues = (<any[]>values[0]).map(value => {
-      const mapped = Mapper.toDbOne(value, propertyMetadata)
-      return objValues(<any>mapped)[0]
+      return Mapper.toDbOne(value, propertyMetadata)
     })
 
     const attributeValues: AttributeMap = {}
