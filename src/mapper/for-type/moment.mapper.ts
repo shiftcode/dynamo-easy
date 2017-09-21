@@ -16,7 +16,12 @@ export class MomentMapper implements MapperForType<moment.Moment> {
     if (moment.isMoment(value)) {
       if (value.isValid()) {
         // always store in utc, default format is ISO_8601
-        return { S: value.clone().utc().format() }
+        return {
+          S: value
+            .clone()
+            .utc()
+            .format(),
+        }
       } else {
         throw new Error(`cannot map property value ${value}, because it is not a valid moment date`)
       }

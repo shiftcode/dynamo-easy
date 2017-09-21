@@ -23,30 +23,43 @@ export class Metadata<T> {
     return options
   }
 
+  /**
+   *
+   * @returns {Array<PropertyMetadata<any>>} Returns all the properties property the @PartitionKeyUUID decorator is present, returns an empty array by default
+   */
   getKeysWithUUID(): Array<PropertyMetadata<any>> {
     return this.filterBy(p => !!(p.key && p.key.uuid), [])
   }
 
   /**
    * TODO implement more complete solution to support indexes
-   * @returns {string}
+   * @returns {string} Returns the name of partition key (not the db name if it differs from property name)
    * @throws Throws an error if no partition key was defined for the current model
    */
-  getPartitionKey(): string {
+  getPartitionKey(): keyof T {
     const property = this.filterByFirst(p => !!(p.key && p.key.type === 'HASH'))
 
     if (property) {
-      return property.nameDb
+      return property.name
     } else {
       throw new Error('could not find any partition key')
     }
   }
 
-  getSortKey(): string | null {
+  /**
+   *
+   * TODO implement more complete solution to support indexes
+   * @returns {keyof T} Returns the name of sort key (not the db name if it differs from property name) or null if none was defined
+   */
+  getSortKey(): keyof T | null {
     const property = this.filterByFirst(p => !!(p.key && p.key.type === 'RANGE'))
-    return property ? property.nameDb : null
+    return property ? property.name : null
   }
 
+  /**
+   * @param {string} indexName
+   * @returns {SecondaryIndex} Returns the index if one with given name exists, null otherwise
+   */
   getIndex(indexName: string): SecondaryIndex | null {
     if (this.modelOptions.indexes) {
       const index = this.modelOptions.indexes.get(indexName)
@@ -70,7 +83,7 @@ export class Metadata<T> {
     return defaultValue
   }
 
-  private filterByFirst(predicate: (property: PropertyMetadata<any>) => boolean): PropertyMetadata<any> | null {
+  private filterByFirst(predicate: (property: PropertyMetadata<T>) => boolean): PropertyMetadata<T> | null {
     const properties = this.filterBy(predicate, null)
     return properties && properties.length ? properties[0] : null
   }

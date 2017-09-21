@@ -12,10 +12,11 @@ import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
-import { ConditionBuilder } from '../../expression/condition-builder'
-import { and } from '../../expression/logical-operator/and'
+import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
-import { Condition } from '../../expression/type/condition.type'
+import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
+import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
+import { ConditionExpression } from '../../expression/type/condition-expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { BaseRequest } from '../base.request'
 import { Request } from '../request.model'
@@ -49,24 +50,20 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     this.params.Key = keyAttributeMap
   }
 
-  where(keyName: keyof T): RequestConditionFunction<UpdateRequest<T>>
+  whereProperty(keyName: keyof T): RequestConditionFunction<UpdateRequest<T>> {
+    return RequestExpressionBuilder.addCondition(keyName, this, this.metaData)
+  }
 
-  /**
-   * multiple conditions will be combined using the AND operator by default
-   * @param {Condition[]} conditions
-   * @returns {QueryRequest<T>}
-   */
-  where(conditions: Condition[]): UpdateRequest<T>
+  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {
+    const conditions: ConditionExpression[] = conditionDefFns.map(
+      (conditionDefFn: ConditionExpressionDefinitionFunction) => {
+        return conditionDefFn(undefined, this.metaData)
+      }
+    )
 
-  where(args: any): any {
-    if (Array.isArray(args)) {
-      const condition = and(...args)
-      ParamUtil.addConditionExpression(condition, this.params)
-      return this
-    } else {
-      const keyName = args
-      return ConditionBuilder.addCondition(keyName, this)
-    }
+    const condition = and(...conditions)
+    ParamUtil.addExpression('FilterExpression', condition, this.params)
+    return this
   }
 
   // TODO implement http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#DDB-UpdateItem-request-UpdateExpression

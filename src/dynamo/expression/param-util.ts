@@ -5,24 +5,12 @@ import {
   ScanInput,
 } from 'aws-sdk/clients/dynamodb'
 import * as _ from 'lodash'
-import { Condition } from './type/condition.type'
+import { ConditionExpression } from './type/condition-expression.type'
 
 export class ParamUtil {
-  static addFilterExpression<T>(condition: Condition, params: QueryInput | ScanInput): void {
-    this.addExpression('FilterExpression', condition, params)
-  }
-
-  static addConditionExpression<T>(condition: Condition, params: QueryInput | ScanInput): void {
-    this.addExpression('ConditionExpression', condition, params)
-  }
-
-  static addKeyConditionExpression<T>(condition: Condition, params: QueryInput): void {
-    this.addExpression('KeyConditionExpression', condition, params)
-  }
-
-  private static addExpression(
+  static addExpression(
     expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression',
-    condition: Condition,
+    condition: ConditionExpression,
     params: QueryInput | ScanInput
   ) {
     const expressionAttributeNames = <ExpressionAttributeNameMap>{

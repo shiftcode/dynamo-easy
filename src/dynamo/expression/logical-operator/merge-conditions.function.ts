@@ -1,9 +1,10 @@
 import { mapKeys } from 'lodash'
-import { Expressions } from '../expressions'
-import { Condition } from '../type/condition.type'
+import { ConditionExpressionBuilder } from '../condition-expression-builder'
+import { uniqAttributeValueName } from '../functions/unique-attribute-value-name.function'
+import { ConditionExpression } from '../type/condition-expression.type'
 
-export function mergeConditions(operator: 'AND' | 'OR', conditions: Condition[]): Condition {
-  const mergedCondition: Condition = {
+export function mergeConditions(operator: 'AND' | 'OR', conditions: ConditionExpression[]): ConditionExpression {
+  const mergedCondition: ConditionExpression = {
     statement: '',
     attributeNames: {},
     attributeValues: {},
@@ -16,10 +17,7 @@ export function mergeConditions(operator: 'AND' | 'OR', conditions: Condition[])
 
     // we need to make sure the value variable name is unique
     const attributeValues = mapKeys(condition.attributeValues, (value, key) => {
-      const unique = Expressions.uniqAttributeValueName(
-        key.replace(':', ''),
-        Object.keys(mergedCondition.attributeValues)
-      )
+      const unique = uniqAttributeValueName(key.replace(':', ''), Object.keys(mergedCondition.attributeValues))
       if (key !== unique) {
         condition.statement = condition.statement.replace(key, unique)
       }

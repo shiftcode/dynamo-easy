@@ -10,10 +10,16 @@ export const organization1Employee2CreatedAt: moment.Moment = moment('2015-07-03
 export const organizationFromDb: AttributeMap = <any>{
   id: { S: 'myId' },
   createdAtDate: {
-    S: organization1CreatedAt.clone().utc().format(moment.defaultFormat),
+    S: organization1CreatedAt
+      .clone()
+      .utc()
+      .format(moment.defaultFormat),
   },
   lastUpdated: {
-    S: organization1LastUpdated.clone().utc().format(moment.defaultFormat),
+    S: organization1LastUpdated
+      .clone()
+      .utc()
+      .format(moment.defaultFormat),
   },
   active: { BOOL: true },
   count: { N: '52' },
@@ -24,7 +30,10 @@ export const organizationFromDb: AttributeMap = <any>{
           name: { S: 'max' },
           age: { N: '50' },
           createdAt: {
-            S: organization1Employee1CreatedAt.clone().utc().format(moment.defaultFormat),
+            S: organization1Employee1CreatedAt
+              .clone()
+              .utc()
+              .format(moment.defaultFormat),
           },
           sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },
@@ -34,7 +43,10 @@ export const organizationFromDb: AttributeMap = <any>{
           name: { S: 'anna' },
           age: { N: '27' },
           createdAt: {
-            S: organization1Employee2CreatedAt.clone().utc().format(moment.defaultFormat),
+            S: organization1Employee2CreatedAt
+              .clone()
+              .utc()
+              .format(moment.defaultFormat),
           },
           sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },

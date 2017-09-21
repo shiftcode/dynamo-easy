@@ -31,44 +31,9 @@
  *    TODO size will be always chained if a condition, think about concept
  */
 
-import { OperatorAlias } from './operator-alias.type'
-import { OPERATOR_TO_ALIAS_MAP } from './operator-to-alias-map'
+import { ComparatorOperator } from './comparator-operator.type'
+import { OperatorAlias } from './condition-operator-alias.type'
+import { OPERATOR_TO_ALIAS_MAP } from './condition-operator-to-alias-map.const'
+import { FunctionOperator } from './function-operator.type'
 
-export type ConditionOperator =
-  | '='
-  | '<>'
-  | '<='
-  | '<'
-  | '>='
-  | '>'
-  | 'attribute_exists'
-  | 'attribute_not_exists'
-  | 'attribute_type'
-  | 'begins_with'
-  | 'contains'
-  | 'IN'
-  | 'BETWEEN'
-
-export function operatorForAlias(alias: OperatorAlias): ConditionOperator | undefined {
-  let operator: ConditionOperator | undefined
-  Object.keys(OPERATOR_TO_ALIAS_MAP).forEach((key: ConditionOperator) => {
-    const a: string | string[] = OPERATOR_TO_ALIAS_MAP[key]
-    if (Array.isArray(alias)) {
-      if (a.includes(alias)) {
-        operator = key
-      }
-    } else {
-      if (a === alias) {
-        operator = key
-      }
-    }
-  })
-
-  return operator
-}
-
-export function aliasForOperator(operator: ConditionOperator): OperatorAlias {
-  return Array.isArray(OPERATOR_TO_ALIAS_MAP[operator])
-    ? <OperatorAlias>OPERATOR_TO_ALIAS_MAP[operator][0]
-    : <OperatorAlias>OPERATOR_TO_ALIAS_MAP[operator]
-}
+export type ConditionOperator = FunctionOperator | ComparatorOperator

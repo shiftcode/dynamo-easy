@@ -11,7 +11,7 @@
  */
 import { BaseRequest } from '../../request/base.request'
 
-export interface RequestRangeKeyConditionFunction<R extends BaseRequest<any, any>> {
+export interface RequestSortKeyConditionFunction<R extends BaseRequest<any, any>> {
   // TODO narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
   // [key in OperatorAlias]: (...value: any[]) => R;
   [key: string]: (...value: any[]) => R

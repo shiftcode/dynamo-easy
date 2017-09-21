@@ -3,7 +3,7 @@ import * as moment from 'moment'
 import { Observable } from 'rxjs/Observable'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { DynamoRx } from '../../dynamo-rx'
-import { property } from '../../expression/logical-operator/property'
+import { property } from '../../expression/logical-operator/property.function'
 import { QueryRequest } from './query.request'
 
 export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{

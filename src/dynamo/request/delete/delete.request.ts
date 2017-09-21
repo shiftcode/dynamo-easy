@@ -11,10 +11,11 @@ import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
-import { ConditionBuilder } from '../../expression/condition-builder'
-import { and } from '../../expression/logical-operator/and'
+import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
-import { Condition } from '../../expression/type/condition.type'
+import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
+import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
+import { ConditionExpression } from '../../expression/type/condition-expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { BaseRequest } from '../base.request'
 
@@ -47,24 +48,20 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
     this.params.Key = keyAttributeMap
   }
 
-  where(keyName: keyof T): RequestConditionFunction<DeleteRequest<T>>
+  whereProperty(keyName: keyof T): RequestConditionFunction<DeleteRequest<T>> {
+    return RequestExpressionBuilder.addCondition(keyName, this, this.metaData)
+  }
 
-  /**
-   * multiple conditions will be combined using the AND operator by default
-   * @param {Condition[]} conditions
-   * @returns {QueryRequest<T>}
-   */
-  where(conditions: Condition[]): DeleteRequest<T>
+  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): DeleteRequest<T> {
+    const conditions: ConditionExpression[] = conditionDefFns.map(
+      (conditionDefFn: ConditionExpressionDefinitionFunction) => {
+        return conditionDefFn(undefined, this.metaData)
+      }
+    )
 
-  where(args: any): any {
-    if (Array.isArray(args)) {
-      const condition = and(...args)
-      ParamUtil.addConditionExpression(condition, this.params)
-      return this
-    } else {
-      const keyName = args
-      return ConditionBuilder.addCondition(keyName, this)
-    }
+    const condition = and(...conditions)
+    ParamUtil.addExpression('ConditionExpression', condition, this.params)
+    return this
   }
 
   returnConsumedCapacity(level: ReturnConsumedCapacity): DeleteRequest<T> {

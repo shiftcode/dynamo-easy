@@ -1,5 +1,5 @@
+import { OperatorAlias } from './condition-operator-alias.type'
 import { ConditionOperator } from './condition-operator.type'
-import { OperatorAlias } from './operator-alias.type'
 
 export const OPERATOR_TO_ALIAS_MAP: { [key in ConditionOperator]: OperatorAlias | OperatorAlias[] } = {
   '=': ['equals', 'eq'],

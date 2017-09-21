@@ -348,7 +348,7 @@ describe('Decorators should add correct metadata', () => {
 
       it('should add indexes on model', () => {
         expect(metadata.getPartitionKey()).toBeDefined()
-        expect(metadata.getPartitionKey()).toBe('myId')
+        expect(metadata.getPartitionKey()).toBe('id')
 
         expect(metadata.getSortKey()).toBeDefined()
         expect(metadata.getSortKey()).toBe('createdAt')

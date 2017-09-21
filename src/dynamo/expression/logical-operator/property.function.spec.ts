@@ -1,40 +1,13 @@
-import { ComplexModel } from '../../../test/models/complex.model'
-import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
-import { Model } from '../../decorator/impl/model/model.decorator'
-import { Property } from '../../decorator/impl/property/property.decorator'
-import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
-import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
-import { ModelConstructor } from '../../model/model-constructor'
-import { and } from './logical-operator/and'
-import { not } from './logical-operator/not'
-import { or } from './logical-operator/or'
-import { property } from './logical-operator/property'
+import { PartitionKey } from '../../../decorator/impl/key/partition-key.decorator'
+import { Model } from '../../../decorator/impl/model/model.decorator'
+import { Property } from '../../../decorator/impl/property/property.decorator'
+import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
+import { and } from './and.function'
+import { not } from './not.function'
+import { or } from './or.function'
+import { property } from './property.function'
 
-@Model()
-class MyModel {
-  @PartitionKey() id: string
-
-  @Property({ name: 'propDb' })
-  prop: number
-}
-
-describe('expressions', () => {
-  it('use property metadata', () => {
-    const condition = property<MyModel>('prop').gt(10)(undefined, MetadataHelper.get(MyModel))
-    expect(condition.statement).toBe('#prop > :prop')
-
-    expect(condition.attributeNames['#prop']).toBeDefined()
-    expect(condition.attributeNames['#prop']).toBe('propDb')
-
-    expect(condition.attributeValues[':prop']).toBeDefined()
-    expect(condition.attributeValues[':prop']).toEqual({ N: '10' })
-  })
-
-  it('simple', () => {
-    const condition = property('age').gt(10)(undefined, undefined)
-    expect(condition.statement).toBe('#age > :age')
-  })
-
+describe('chained conditions', () => {
   it('not', () => {
     const condition = not(property('name').contains('Bla')(undefined, undefined))
     expect(condition.statement).toBe('NOT contains (#name, :name)')
