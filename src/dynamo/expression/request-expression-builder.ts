@@ -21,20 +21,27 @@ export class RequestExpressionBuilder {
   /**
    * Adds a condition to the given query.
    *
-   * @param {string} keyName
+   * @param {string} attributePath
    * @param {T} request
    * @param {PropertyMetadata<any>} propetyMetadata
    * @returns {RequestConditionFunction<T extends Request<any, any>>}
    */
   static addCondition<T extends BaseRequest<any, any>>(
     expressionType: ExpressionType,
-    keyName: string,
+    attributePath: string,
     request: T,
     metadata?: Metadata<any>
   ): RequestConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
-        return RequestExpressionBuilder.doAddCondition(expressionType, keyName, request, metadata, operator, ...values)
+        return RequestExpressionBuilder.doAddCondition(
+          expressionType,
+          attributePath,
+          request,
+          metadata,
+          operator,
+          ...values
+        )
       }
     }
 
@@ -65,7 +72,7 @@ export class RequestExpressionBuilder {
 
   private static doAddCondition<T extends BaseRequest<any, any>>(
     expressionType: ExpressionType,
-    keyName: string,
+    attributePath: string,
     request: T,
     metadata: Metadata<any> | undefined,
     operator: ConditionOperator,
@@ -76,7 +83,7 @@ export class RequestExpressionBuilder {
       ? Object.keys(request.params.ExpressionAttributeValues)
       : []
     const condition = ConditionExpressionBuilder.buildFilterExpression(
-      keyName,
+      attributePath,
       operator,
       values,
       existingValueKeys,
@@ -96,14 +103,14 @@ export class RequestExpressionBuilder {
     return RequestExpressionBuilder.addSortKeyCondition(keyName, request, metadata).equals(keyValue)
   }
 
-  static propertyDefinitionFunction<T>(keyName: keyof T): ConditionExpressionDefinitionChain {
+  static propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): ConditionExpressionDefinitionFunction => {
         const copy = [...values]
         const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, ConditionExpression>(
           ConditionExpressionBuilder.buildFilterExpression
         )
-        return curried(keyName, operator, values)
+        return curried(attributePath, operator, values)
       }
     }
 

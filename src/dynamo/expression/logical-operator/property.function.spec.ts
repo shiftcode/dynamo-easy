@@ -5,18 +5,18 @@ import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { and } from './and.function'
 import { not } from './not.function'
 import { or } from './or.function'
-import { property } from './property.function'
+import { attribute } from './property.function'
 
 describe('chained conditions', () => {
   it('not', () => {
-    const condition = not(property('name').contains('Bla')(undefined, undefined))
+    const condition = not(attribute('name').contains('Bla')(undefined, undefined))
     expect(condition.statement).toBe('NOT contains (#name, :name)')
   })
 
   it('and & not', () => {
     const condition = and(
-      not(property('name').contains('z')(undefined, undefined)),
-      property('name').beginsWith('Sta')(undefined, undefined)
+      not(attribute('name').contains('z')(undefined, undefined)),
+      attribute('name').beginsWith('Sta')(undefined, undefined)
     )
 
     expect(condition.attributeNames).toBeDefined()
@@ -32,8 +32,8 @@ describe('chained conditions', () => {
 
   it('or', () => {
     const condition = or(
-      property('age').gt(10)(undefined, undefined),
-      property('name').contains('Bla')(undefined, undefined)
+      attribute('age').gt(10)(undefined, undefined),
+      attribute('name').contains('Bla')(undefined, undefined)
     )
 
     expect(condition.statement).toBe('(#age > :age OR contains (#name, :name))')
@@ -41,8 +41,8 @@ describe('chained conditions', () => {
 
   it('and', () => {
     const condition = and(
-      property('age').gt(10)(undefined, undefined),
-      property('name').contains('Bla')(undefined, undefined)
+      attribute('age').gt(10)(undefined, undefined),
+      attribute('name').contains('Bla')(undefined, undefined)
     )
 
     expect(condition.statement).toBe('(#age > :age AND contains (#name, :name))')
@@ -50,8 +50,8 @@ describe('chained conditions', () => {
 
   it('mixed', () => {
     const condition = or(
-      and(property('age').gt(10)(undefined, undefined), property('name').contains('Bla')(undefined, undefined)),
-      property('doAddCondition').beginsWith('Start')(undefined, undefined)
+      and(attribute('age').gt(10)(undefined, undefined), attribute('name').contains('Bla')(undefined, undefined)),
+      attribute('doAddCondition').beginsWith('Start')(undefined, undefined)
     )
 
     expect(condition.statement).toBe(

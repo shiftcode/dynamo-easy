@@ -3,7 +3,7 @@ import moment from 'moment-es6'
 import { Observable } from 'rxjs/Observable'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { DynamoRx } from '../../dynamo-rx'
-import { property } from '../../expression/logical-operator/property.function'
+import { attribute } from '../../expression/logical-operator/property.function'
 import { QueryRequest } from './query.request'
 
 export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
@@ -47,7 +47,7 @@ describe('query request', () => {
     it('simple', () => {
       const request = new QueryRequest(<any>null, ComplexModel)
 
-      request.whereProperty('active').eq(true)
+      request.whereAttribute('active').eq(true)
       expect(request.params.FilterExpression).toBe('#active = :active')
 
       expect(request.params.ExpressionAttributeNames).toBeDefined()
@@ -62,7 +62,7 @@ describe('query request', () => {
     it('complex', () => {
       const request = new QueryRequest(<any>null, ComplexModel)
 
-      request.where(property<ComplexModel>('active').eq(true), property('creationDate').lt(moment()))
+      request.where(attribute<ComplexModel>('active').eq(true), attribute('creationDate').lt(moment()))
 
       const params = request.params
       expect(params.FilterExpression).toBe('(#active = :active AND #creationDate < :creationDate)')

@@ -67,8 +67,8 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return RequestExpressionBuilder.addSortKeyCondition(sortKey, this)
   }
 
-  whereProperty(keyName: keyof T): RequestConditionFunction<QueryRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', keyName, this, this.metaData)
+  whereAttribute(attributePath: keyof T): RequestConditionFunction<QueryRequest<T>> {
+    return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {
@@ -87,6 +87,8 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
    * multiple conditions will be combined using the AND operator by default
    * @param {ConditionExpression[]} conditions
    * @returns {QueryRequest<T>}
+   *
+   * TODO remove after investigation
    */
   // implementation with overload won't work perfectly with ide support, so we add two different methods
   // property(keyName: keyof T): RequestConditionFunction<QueryRequest<T>>

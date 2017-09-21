@@ -15,6 +15,8 @@ class MyModel {
 
   @Property({ name: 'propDb' })
   prop: number
+
+  list: any[]
 }
 
 describe('expressions', () => {
@@ -258,8 +260,12 @@ describe('expressions', () => {
       )
       expect(condition.statement).toBe('#myCollection IN (:myCollection)')
       expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
+      // TODO review not sure if the attribute should be L(ist) or S(et) or if both are supported, they both executed successfuly against dynamodb when testing but with wrong result
+      // expect(condition.attributeValues).toEqual({
+      //   ':myCollection': { L: [{ S: 'myCollection' }, { S: 'myOtherValue' }] },
+      // })
       expect(condition.attributeValues).toEqual({
-        ':myCollection': { L: [{ S: 'myCollection' }, { S: 'myOtherValue' }] },
+        ':myCollection': { SS: ['myCollection', 'myOtherValue'] },
       })
     })
 
@@ -364,6 +370,41 @@ describe('expressions', () => {
       }).toThrowError(
         'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
       )
+    })
+  })
+
+  describe('operator nested attributes', () => {
+    it('list path', () => {
+      // property('age').gt(10)
+      const condition = ConditionExpressionBuilder.buildFilterExpression('list[0]', '>', [10], undefined, undefined)
+
+      expect(condition.statement).toBe('#list[0] > :list_at_0')
+      expect(condition.attributeNames).toEqual({ '#list': 'list' })
+      expect(condition.attributeValues).toEqual({ ':list_at_0': { N: '10' } })
+    })
+
+    it('document (map) path', () => {
+      // property('age').gt(10)
+      const condition = ConditionExpressionBuilder.buildFilterExpression('person.age', '>', [10], undefined, undefined)
+
+      expect(condition.statement).toBe('#person.#age > :person.age')
+      expect(condition.attributeNames).toEqual({ '#person': 'person', '#age': 'age' })
+      expect(condition.attributeValues).toEqual({ ':person.age': { N: '10' } })
+    })
+
+    it('combined path', () => {
+      // property('age').gt(10)
+      const condition = ConditionExpressionBuilder.buildFilterExpression(
+        'person.birthdays[5].year',
+        '=',
+        [2016],
+        undefined,
+        undefined
+      )
+
+      expect(condition.statement).toBe('#person.#birthdays[5].#year = :person.birthdays_at_5.year')
+      expect(condition.attributeNames).toEqual({ '#person': 'person', '#birthdays': 'birthdays', '#year': 'year' })
+      expect(condition.attributeValues).toEqual({ ':person.birthdays_at_5.year': { N: '2016' } })
     })
   })
 })

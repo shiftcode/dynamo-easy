@@ -32,7 +32,7 @@ export class PutRequest<T> extends BaseRequest<T, any> {
    */
   ifNotExists(): PutRequest<T> {
     // FIXME should we check for sort key too?
-    this.whereProperty(this.metaData.getPartitionKey()).null()
+    this.whereAttribute(this.metaData.getPartitionKey()).null()
     return this
   }
 
@@ -55,8 +55,8 @@ export class PutRequest<T> extends BaseRequest<T, any> {
     return this
   }
 
-  whereProperty(keyName: keyof T): RequestConditionFunction<PutRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', keyName, this, this.metaData)
+  whereAttribute(attributePath: keyof T): RequestConditionFunction<PutRequest<T>> {
+    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): PutRequest<T> {

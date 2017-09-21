@@ -50,8 +50,8 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     this.params.Key = keyAttributeMap
   }
 
-  whereProperty(keyName: keyof T): RequestConditionFunction<UpdateRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', keyName, this, this.metaData)
+  whereAttribute(attributePath: keyof T): RequestConditionFunction<UpdateRequest<T>> {
+    return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {

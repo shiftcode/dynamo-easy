@@ -48,8 +48,8 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
     this.params.Key = keyAttributeMap
   }
 
-  whereProperty(keyName: keyof T): RequestConditionFunction<DeleteRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', keyName, this, this.metaData)
+  whereAttribute(attributePath: keyof T): RequestConditionFunction<DeleteRequest<T>> {
+    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): DeleteRequest<T> {

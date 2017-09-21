@@ -12,6 +12,9 @@ import { uniqAttributeValueName } from './functions/unique-attribute-value-name.
 import { ConditionExpression } from './type/condition-expression.type'
 import { ConditionOperator } from './type/condition-operator.type'
 
+const NESTED_ATTR_PATH_CAPTURED_REGEX = /([a-z]+)(?:\[(\d+)])?\.?/g
+const NESTED_ATTR_PATH_REGEX = /^.+((\[(\d+)])|(\.)).*$/
+
 /**
  * TODO complete doc
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
@@ -21,15 +24,15 @@ export class ConditionExpressionBuilder {
    * Will create a condition which can be added to a request using the param object.
    * It will create the expression statement and the attribute names and values.
    *
-   * @param {string} keyName
+   * @param {string} attributePath
    * @param {ConditionOperator} operator
    * @param {any[]} values Depending on the operator the amount of values differs
-   * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current keyName
+   * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
    * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
    * @returns {ConditionExpression}
    */
   static buildFilterExpression(
-    keyName: string,
+    attributePath: string,
     operator: ConditionOperator,
     values: any[],
     existingValueNames: string[] | undefined,
@@ -45,25 +48,60 @@ export class ConditionExpressionBuilder {
     // load property metadat if model metadata was provided
     let propertyMetadata: PropertyMetadata<any> | undefined
     if (metadata) {
-      propertyMetadata = metadata.forProperty(keyName)
+      propertyMetadata = metadata.forProperty(attributePath)
     }
 
     /*
-     * resolve placeholder and valuePlaceholder names (same as keyName if it not already exists)
+     * resolve placeholder and valuePlaceholder names (same as attributePath if it not already exists)
      * myProp -> #myProp for name placeholder and :myProp for value placeholder
+     *
+     * person[0] -> #person: person
+     * person.list[0].age -> #person: person, #attr: attr, #age: age
+     * person.age
+     * TODO review this with fresh mind
      */
-    const namePlaceholder = `#${keyName}`
-    const valuePlaceholder = uniqAttributeValueName(keyName, existingValueNames)
-
+    let namePlaceholder: string
     const attributeNames: { [key: string]: string } = {}
-    let finalKeyName: string
-    if (propertyMetadata) {
-      finalKeyName = propertyMetadata.nameDb
+    const execResult = NESTED_ATTR_PATH_REGEX.exec(attributePath)
+    if (NESTED_ATTR_PATH_REGEX.test(attributePath)) {
+      // nested attribute with document path (map or list)
+      let re
+      const namePlaceholders: string[] = []
+      // tslint:disable-next-line:no-conditional-assignment
+      while ((re = NESTED_ATTR_PATH_CAPTURED_REGEX.exec(attributePath)) !== null) {
+        const fullMatch = re[0]
+        const pathPart = re[1]
+        const collectionIndex = re[2]
+
+        let pathPartDb
+        // get propertyMetdata of nested attribute if available
+        if (propertyMetadata) {
+          pathPartDb = propertyMetadata.nameDb
+        } else {
+          pathPartDb = pathPart
+        }
+
+        attributeNames[`#${pathPartDb}`] = pathPart
+        if (collectionIndex !== undefined) {
+          namePlaceholders.push(`#${pathPartDb}[${collectionIndex}]`)
+        } else {
+          namePlaceholders.push(`#${pathPartDb}`)
+        }
+      }
+      namePlaceholder = namePlaceholders.join('.')
     } else {
-      finalKeyName = keyName
+      // top level attribute
+      let attrPathDb
+      if (propertyMetadata) {
+        attrPathDb = propertyMetadata.nameDb
+      } else {
+        attrPathDb = attributePath
+      }
+      attributeNames[`#${attributePath}`] = attrPathDb
+      namePlaceholder = `#${attributePath}`
     }
 
-    attributeNames[namePlaceholder] = finalKeyName
+    const valuePlaceholder = uniqAttributeValueName(attributePath, existingValueNames)
 
     /*
      * build the statement
@@ -71,57 +109,49 @@ export class ConditionExpressionBuilder {
     let buildFilterFn: any
     switch (operator) {
       case 'IN':
-        // return ConditionExpressionBuilder.buildInConditionExpression(keyName, value1, existingValueNames, propertyMetadata)
         buildFilterFn = curryRight(ConditionExpressionBuilder.buildInConditionExpression)
-        buildFilterFn = buildFilterFn(valuePlaceholder)
         break
       case 'BETWEEN':
         buildFilterFn = curryRight(ConditionExpressionBuilder.buildBetweenConditionExpression)
-        buildFilterFn = buildFilterFn(valuePlaceholder)
         break
       default:
         buildFilterFn = curryRight(ConditionExpressionBuilder.buildDefaultConditionExpression)
-        buildFilterFn = buildFilterFn(operator, valuePlaceholder)
+        buildFilterFn = buildFilterFn(operator)
     }
 
-    return buildFilterFn(keyName, namePlaceholder, attributeNames, values, existingValueNames, propertyMetadata)
+    return buildFilterFn(
+      attributePath,
+      namePlaceholder,
+      valuePlaceholder,
+      attributeNames,
+      values,
+      existingValueNames,
+      propertyMetadata
+    )
   }
 
   /**
    * IN expression is unlike all the others property the operand is an array of unwrapped values (not attribute values)
    *
-   * @param {string} keyName
+   * @param {string} attributePath
    * @param {string[]} values
    * @param {string[]} existingValueNames
    * @param {PropertyMetadata<any>} propertyMetadata
    * @returns {ConditionExpression}
    */
   private static buildInConditionExpression(
-    keyName: string,
+    attributePath: string,
     namePlaceholder: string,
+    valuePlaceholder: string,
     attributeNames: { [key: string]: string },
     values: any[],
     existingValueNames: string[] | undefined,
-    propertyMetadata: PropertyMetadata<any> | undefined,
-    valuePlaceholder: string
+    propertyMetadata: PropertyMetadata<any> | undefined
   ): ConditionExpression {
-    const mappedValues = (<any[]>values[0]).map(value => {
-      return Mapper.toDbOne(value, propertyMetadata)
-    })
+    const mappedValues = Mapper.toDbOne(values[0], propertyMetadata)
 
     const attributeValues: AttributeMap = {}
-    attributeValues[valuePlaceholder] = { L: <any>mappedValues }
-
-    // (<any[]>values[0]).reduce(
-    //   (result, value) => {
-    //     const existing = Object.keys(result).concat(existingValueNames || [])
-    //     const valuePlaceholder = uniqAttributeValueName(keyName, existing)
-    //     const attributeValue = Mapper.toDbOne(value, propertyMetadata)
-    //     result[valuePlaceholder] = <any>attributeValue[<AttributeType>Object.keys(attributeValue)[0]]
-    //     return result
-    //   },
-    //   <AttributeMap>{}
-    // )
+    attributeValues[valuePlaceholder] = <any>mappedValues
 
     return {
       statement: `${namePlaceholder} IN (${Object.keys(attributeValues)})`,
@@ -131,19 +161,19 @@ export class ConditionExpressionBuilder {
   }
 
   private static buildBetweenConditionExpression(
-    keyName: string,
+    attributePath: string,
     namePlaceholder: string,
+    valuePlaceholder: string,
     attributeNames: { [key: string]: string },
     values: string[],
     existingValueNames: string[] | undefined,
-    propertyMetadata: PropertyMetadata<any> | undefined,
-    valuePlaceholder: string
+    propertyMetadata: PropertyMetadata<any> | undefined
   ): ConditionExpression {
     const attributeValues: AttributeMap = {}
     const mappedValue1 = Mapper.toDbOne(values[0], propertyMetadata)
     const mappedValue2 = Mapper.toDbOne(values[1], propertyMetadata)
 
-    const value2Placeholder = uniqAttributeValueName(keyName, [valuePlaceholder].concat(existingValueNames || []))
+    const value2Placeholder = uniqAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
     const statement = `${namePlaceholder} BETWEEN ${valuePlaceholder} AND ${value2Placeholder}`
     attributeValues[valuePlaceholder] = mappedValue1
@@ -157,14 +187,14 @@ export class ConditionExpressionBuilder {
   }
 
   private static buildDefaultConditionExpression(
-    keyName: string,
+    attributePath: string,
     namePlaceholder: string,
+    valuePlaceholder: string,
     attributeNames: { [key: string]: string },
     values: any[],
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined,
-    operator: ConditionOperator,
-    valuePlaceholder: string
+    operator: ConditionOperator
   ): ConditionExpression {
     let statement: string
     let hasValue = true

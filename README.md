@@ -21,6 +21,31 @@ To be clear about the used naming for keys, here is how we use it (same as in th
 DynamoDb has two key types **Partition Key** (hashkey - dynamodb internally uses a hash function to evenly distribute data items across partitions) and **Sort Key** (rangekey)
 The primary key can either be simple (only a partition key) or composite (combination of partition and sort key)
 
+## Condition Expression Builder
+
+#### Expression Attribute Names
+By default we create a substitution placeholder for all the attributes, just to not implement a blacklist with reserved words in the context of aws dynamodb.
+
+attributename: age
+
+attributeExpressionNames: {'#age': 'age'}
+attributeExpressionValues: {':age': {N: '10'}}
+expression: '#age = :age' 
+
+this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
+attributeName: person.age
+
+attributeExpressionNames: {'#person':'person', '#age': 'age'}
+attributeExpressionValues: {':age': {N: '10'}}
+expression: '#person.#age = :age'
+
+we can't use #personAge: 'person.age' because if the dot is part of an attribute name it is not treated as metacharacter compared to when using directly in expression, so
+the above solution needs to be used
+
+these are the accessor rules for nested attribute types
+[n]—for list elements
+. (dot)—for map elements
+
 ## Object Mapper
 
 #### Notes

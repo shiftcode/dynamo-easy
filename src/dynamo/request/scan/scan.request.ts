@@ -17,8 +17,8 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     super(dynamoRx, modelClazz)
   }
 
-  whereProperty(keyName: keyof T): RequestConditionFunction<ScanRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', keyName, this, this.metaData)
+  whereAttribute(attributePath: keyof T): RequestConditionFunction<ScanRequest<T>> {
+    return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): ScanRequest<T> {

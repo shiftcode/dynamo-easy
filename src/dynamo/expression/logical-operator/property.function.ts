@@ -21,9 +21,9 @@ import { ConditionOperator } from '../type/condition-operator.type'
  *
  * maybe we wanna provide another property function where0 or similar with a fixed a
  */
-export function property<T>(keyName: keyof T): ConditionExpressionDefinitionChain
-export function property(keyName: string): ConditionExpressionDefinitionChain
+export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
+export function attribute(attributePath: string): ConditionExpressionDefinitionChain
 
-export function property<T>(keyName: keyof T): ConditionExpressionDefinitionChain {
-  return RequestExpressionBuilder.propertyDefinitionFunction<T>(keyName)
+export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain {
+  return RequestExpressionBuilder.propertyDefinitionFunction<T>(attributePath)
 }
