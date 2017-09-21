@@ -1,5 +1,5 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
-import * as moment from 'moment'
+import moment from 'moment-es6'
 import { Observable } from 'rxjs/Observable'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { DynamoRx } from '../../dynamo-rx'

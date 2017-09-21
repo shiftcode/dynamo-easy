@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import { kebabCase } from 'lodash'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 // FIXME should be optional dependency
@@ -51,7 +51,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
     const finalOpts = {
       clazz: constructor,
       clazzName: type.name,
-      tableName: _.kebabCase(type.name),
+      tableName: kebabCase(type.name),
       properties,
       transientProperties,
       indexes,

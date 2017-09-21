@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import moment from 'moment-es6'
 import { Employee } from '../../test/models/employee.model'
 import { MomentType } from '../decorator/impl/date/moment.type'
 import { NullType } from './type/null.type'

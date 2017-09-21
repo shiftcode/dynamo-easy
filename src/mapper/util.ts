@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import * as _ from 'lodash'
+import { isNumber, isString } from 'lodash'
 import moment from 'moment-es6'
 import { MomentType } from '../decorator/impl/date/moment.type'
 import { AttributeCollectionType } from './type/attribute-collection.type'
@@ -80,11 +80,11 @@ export class Util {
     if (Util.isCollection(value)) {
       return Util.detectCollectionType(value)
     } else {
-      if (_.isString(value)) {
+      if (isString(value)) {
         return 'S'
       }
 
-      if (_.isNumber(value)) {
+      if (isNumber(value)) {
         return 'N'
       }
 

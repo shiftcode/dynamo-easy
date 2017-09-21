@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import moment from 'moment-es6'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { SimpleWithIdModel } from '../../../../test/models/simple-with-id.model'
 import { DeleteRequest } from './delete.request'

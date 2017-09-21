@@ -4,7 +4,7 @@ import {
   QueryInput,
   ScanInput,
 } from 'aws-sdk/clients/dynamodb'
-import * as _ from 'lodash'
+import { isEmpty, isString } from 'lodash'
 import { ConditionExpression } from './type/condition-expression.type'
 
 export class ParamUtil {
@@ -23,16 +23,16 @@ export class ParamUtil {
       ...params.ExpressionAttributeValues,
     }
 
-    if (!_.isEmpty(expressionAttributeNames)) {
+    if (!isEmpty(expressionAttributeNames)) {
       params.ExpressionAttributeNames = expressionAttributeNames
     }
 
-    if (!_.isEmpty(expressionAttributeValues)) {
+    if (!isEmpty(expressionAttributeValues)) {
       params.ExpressionAttributeValues = expressionAttributeValues
     }
 
     const expression = Reflect.get(params, expressionType)
-    if (_.isString(expression)) {
+    if (isString(expression)) {
       throw new Error(
         'please use the logical operators and / or / not to define complex expressions instead of just adding it the an existing condition'
       )

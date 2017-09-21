@@ -1,6 +1,10 @@
 //
 // Reflect Metadata
 //
+//
+// MomentJs locales
+//
+import 'moment/locale/de-ch'
 import 'reflect-metadata'
 //
 // RxJs

@@ -7,8 +7,6 @@ import {
   StringSetAttributeValue,
 } from 'aws-sdk/clients/dynamodb'
 import moment from 'moment-es6'
-// TODO should this be imported in sc-dynamo-object-mapper.ts file?
-import 'moment/locale/de-ch'
 import { MomentType } from '../src/decorator/impl/date/moment.type'
 import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
 import { Mapper } from '../src/mapper/mapper'
