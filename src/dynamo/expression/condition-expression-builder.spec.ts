@@ -387,9 +387,9 @@ describe('expressions', () => {
       // property('age').gt(10)
       const condition = ConditionExpressionBuilder.buildFilterExpression('person.age', '>', [10], undefined, undefined)
 
-      expect(condition.statement).toBe('#person.#age > :person.age')
+      expect(condition.statement).toBe('#person.#age > :person__age')
       expect(condition.attributeNames).toEqual({ '#person': 'person', '#age': 'age' })
-      expect(condition.attributeValues).toEqual({ ':person.age': { N: '10' } })
+      expect(condition.attributeValues).toEqual({ ':person__age': { N: '10' } })
     })
 
     it('combined path', () => {
@@ -402,9 +402,9 @@ describe('expressions', () => {
         undefined
       )
 
-      expect(condition.statement).toBe('#person.#birthdays[5].#year = :person.birthdays_at_5.year')
+      expect(condition.statement).toBe('#person.#birthdays[5].#year = :person__birthdays_at_5__year')
       expect(condition.attributeNames).toEqual({ '#person': 'person', '#birthdays': 'birthdays', '#year': 'year' })
-      expect(condition.attributeValues).toEqual({ ':person.birthdays_at_5.year': { N: '2016' } })
+      expect(condition.attributeValues).toEqual({ ':person__birthdays_at_5__year': { N: '2016' } })
     })
   })
 })

@@ -28,6 +28,11 @@ export abstract class BaseRequest<
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     this.dynamoRx = dynamoRx
+
+    if (modelClazz === null || modelClazz === undefined) {
+      throw new Error("please provide the model clazz for the request, won't work otherwise")
+    }
+
     this.modelClazz = modelClazz
     this.params = <I>{
       TableName: MetadataHelper.forModel(modelClazz).tableName,
