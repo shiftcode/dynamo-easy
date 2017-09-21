@@ -256,18 +256,9 @@ describe('expressions', () => {
         undefined,
         undefined
       )
-      expect(condition.statement).toBe('#myCollection IN (:myCollection,:myCollection_2)')
-
-      expect(condition.attributeNames).toBeDefined()
-      expect(Object.keys(condition.attributeNames).length).toBe(1)
-      expect(Object.keys(condition.attributeNames)[0]).toBe('#myCollection')
-      expect(condition.attributeNames['#myCollection']).toBe('myCollection')
-
-      expect(condition.attributeValues).toBeDefined()
-      expect(Object.keys(condition.attributeValues)[0]).toBe(':myCollection')
-      expect(condition.attributeValues[':myCollection']).toEqual('myCollection')
-      expect(Object.keys(condition.attributeValues)[1]).toBe(':myCollection_2')
-      expect(condition.attributeValues[':myCollection_2']).toEqual('myOtherValue')
+      expect(condition.statement).toBe('#myCollection IN (:myCollection)')
+      expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
+      expect(condition.attributeValues).toEqual({ ':myCollection': { L: ['myCollection', 'myOtherValue'] } })
     })
 
     it('between (numbers)', () => {
@@ -341,7 +332,7 @@ describe('expressions', () => {
           undefined
         )
       }).toThrowError(
-        'expected 1 values for operator attribute_type, this is not the right amount of method parameters for this operator'
+        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
       )
     })
 
@@ -355,7 +346,21 @@ describe('expressions', () => {
           undefined
         )
       }).toThrowError(
-        'expected 1 values for operator attribute_type, this is not the right amount of method parameters for this operator'
+        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
+      )
+    })
+
+    it('should throw error for wrong value type', () => {
+      expect(() => {
+        const condition = ConditionExpressionBuilder.buildFilterExpression(
+          'age',
+          'IN',
+          ['myValue', 'mySecondValue'],
+          undefined,
+          undefined
+        )
+      }).toThrowError(
+        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
       )
     })
   })

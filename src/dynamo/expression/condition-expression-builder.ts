@@ -1,9 +1,8 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { curryRight } from 'lodash'
+import { curryRight, values as objValues } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
-import { AttributeType } from '../../mapper/type/attribute.type'
 import { Binary } from '../../mapper/type/binary.type'
 import { Util } from '../../mapper/util'
 import { isFunctionOperator } from './functions/is-function-operator.function'
@@ -74,6 +73,7 @@ export class ConditionExpressionBuilder {
       case 'IN':
         // return ConditionExpressionBuilder.buildInConditionExpression(keyName, value1, existingValueNames, propertyMetadata)
         buildFilterFn = curryRight(ConditionExpressionBuilder.buildInConditionExpression)
+        buildFilterFn = buildFilterFn(valuePlaceholder)
         break
       case 'BETWEEN':
         buildFilterFn = curryRight(ConditionExpressionBuilder.buildBetweenConditionExpression)
@@ -102,18 +102,27 @@ export class ConditionExpressionBuilder {
     attributeNames: { [key: string]: string },
     values: any[],
     existingValueNames: string[] | undefined,
-    propertyMetadata: PropertyMetadata<any> | undefined
+    propertyMetadata: PropertyMetadata<any> | undefined,
+    valuePlaceholder: string
   ): ConditionExpression {
-    const attributeValues = (<any[]>values[0]).reduce(
-      (result, value) => {
-        const existing = Object.keys(result).concat(existingValueNames || [])
-        const valuePlaceholder = uniqAttributeValueName(keyName, existing)
-        const attributeValue = Mapper.toDbOne(value, propertyMetadata)
-        result[valuePlaceholder] = <any>attributeValue[<AttributeType>Object.keys(attributeValue)[0]]
-        return result
-      },
-      <AttributeMap>{}
-    )
+    const mappedValues = (<any[]>values[0]).map(value => {
+      const mapped = Mapper.toDbOne(value, propertyMetadata)
+      return objValues(<any>mapped)[0]
+    })
+
+    const attributeValues: AttributeMap = {}
+    attributeValues[valuePlaceholder] = { L: <any>mappedValues }
+
+    // (<any[]>values[0]).reduce(
+    //   (result, value) => {
+    //     const existing = Object.keys(result).concat(existingValueNames || [])
+    //     const valuePlaceholder = uniqAttributeValueName(keyName, existing)
+    //     const attributeValue = Mapper.toDbOne(value, propertyMetadata)
+    //     result[valuePlaceholder] = <any>attributeValue[<AttributeType>Object.keys(attributeValue)[0]]
+    //     return result
+    //   },
+    //   <AttributeMap>{}
+    // )
 
     return {
       statement: `${namePlaceholder} IN (${Object.keys(attributeValues)})`,
@@ -131,7 +140,6 @@ export class ConditionExpressionBuilder {
     propertyMetadata: PropertyMetadata<any> | undefined,
     valuePlaceholder: string
   ): ConditionExpression {
-    // FIXME is it really an AttributeMap or just plain values with no wrapping?
     const attributeValues: AttributeMap = {}
     const mappedValue1 = Mapper.toDbOne(values[0], propertyMetadata)
     const mappedValue2 = Mapper.toDbOne(values[1], propertyMetadata)
@@ -194,6 +202,9 @@ export class ConditionExpressionBuilder {
   }
 
   /**
+   * TODO if propertyMetadata is available we could add some type check for example with operator IN the given values should all have the same type like the attribute
+   * which should be checked
+   *
    * Every operator requires a predefined arity of parameters, this method checks for the correct arity and throws an Error
    * if not correct
    *
@@ -207,9 +218,16 @@ export class ConditionExpressionBuilder {
       // check for correct amount of values
       const parameterArity = operatorParameterArity(operator)
       if (values.length !== parameterArity) {
-        throw new Error(
-          `expected ${parameterArity} values for operator ${operator}, this is not the right amount of method parameters for this operator`
-        )
+        switch (operator) {
+          case 'IN':
+            throw new Error(
+              `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)`
+            )
+          default:
+            throw new Error(
+              `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`
+            )
+        }
       }
 
       // some additional operator dependent validation
