@@ -130,9 +130,12 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   exec(): Observable<T[]> {
-    return this.dynamoRx
-      .query(this.params)
-      .map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz)))
+    return (
+      this.dynamoRx
+        .query(this.params)
+        // TODO check if Items is always defined
+        .map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz)))
+    )
   }
 
   execSingle(): Observable<T | null> {

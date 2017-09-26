@@ -9,10 +9,12 @@ import { RequestExpressionBuilder } from '../../expression/request-expression-bu
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
 import { ConditionExpression } from '../../expression/type/condition-expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
+import { Pageable } from '../../paged/pageable'
 import { Request } from '../request.model'
 import { ScanResponse } from './scan.response'
 
-export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanResponse<T>> {
+export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanResponse<T>>
+  implements Pageable<T, ScanRequest<T>, ScanResponse<T>> {
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
