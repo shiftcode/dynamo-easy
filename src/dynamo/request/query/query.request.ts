@@ -72,13 +72,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {
-    const conditions: ConditionExpression[] = conditionDefFns.map(
-      (conditionDefFn: ConditionExpressionDefinitionFunction) => {
-        return conditionDefFn(undefined, this.metaData)
-      }
-    )
-
-    const condition = and(...conditions)
+    const condition = and(...conditionDefFns)(undefined, this.metaData)
     ParamUtil.addExpression('FilterExpression', condition, this.params)
     return this
   }
