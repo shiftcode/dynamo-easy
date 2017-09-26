@@ -60,13 +60,7 @@ export class PutRequest<T> extends BaseRequest<T, any> {
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): PutRequest<T> {
-    const conditions: ConditionExpression[] = conditionDefFns.map(
-      (conditionDefFn: ConditionExpressionDefinitionFunction) => {
-        return conditionDefFn(undefined, this.metaData)
-      }
-    )
-
-    const condition = and(...conditions)
+    const condition = and(...conditionDefFns)(undefined, this.metaData)
     ParamUtil.addExpression('ConditionExpression', condition, this.params)
     return this
   }

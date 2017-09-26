@@ -22,13 +22,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): ScanRequest<T> {
-    const conditions: ConditionExpression[] = conditionDefFns.map(
-      (conditionDefFn: ConditionExpressionDefinitionFunction) => {
-        return conditionDefFn(undefined, this.metaData)
-      }
-    )
-
-    const condition = and(...conditions)
+    const condition = and(...conditionDefFns)(undefined, this.metaData)
     ParamUtil.addExpression('FilterExpression', condition, this.params)
     return this
   }

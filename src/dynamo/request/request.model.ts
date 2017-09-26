@@ -31,17 +31,17 @@ export abstract class Request<
    * startKey will be removed from params
    * @returns {Request}
    */
-  exclusiveStartKey(key: Key | null): Request<T, R, I, Z> {
+  exclusiveStartKey(key: Key | null): R {
     if (key) {
       this.params.ExclusiveStartKey = key
     } else {
       delete this.params.ExclusiveStartKey
     }
 
-    return this
+    return <any>this
   }
 
-  index(indexName: string): Request<T, R, I, Z> {
+  index(indexName: string): R {
     const index = this.metaData.getIndex(indexName)
 
     if (index) {
@@ -49,10 +49,10 @@ export abstract class Request<
     } else {
       throw new Error(`there is no index with name <${indexName}> defined for model ${this.modelClazz.name}`)
     }
-    return this
+    return <any>this
   }
 
-  limit(limit: number): Request<T, R, I, Z> {
+  limit(limit: number): R {
     if (limit === Request.INFINITE_LIMIT) {
       delete this.params.Limit
     } else {
@@ -63,7 +63,7 @@ export abstract class Request<
       }
     }
 
-    return this
+    return <any>this
   }
 
   abstract execFullResponse(): Observable<Z>
