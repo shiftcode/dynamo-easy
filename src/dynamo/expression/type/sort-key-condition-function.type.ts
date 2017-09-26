@@ -1,7 +1,7 @@
 import { ConditionExpression } from './condition-expression.type'
 
 export interface SortKeyConditionFunction {
-  // TODO narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
+  // LOW TODO narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
   // [key in OperatorAlias]: (...value: any[]) => R;
   [key: string]: (...value: any[]) => ConditionExpression
   equals: (value: any) => ConditionExpression

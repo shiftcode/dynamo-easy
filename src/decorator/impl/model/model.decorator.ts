@@ -41,7 +41,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
      */
     const globalSecondaryIndexes: any = getGlobalSecondaryIndexes(properties) || []
     const localSecondaryIndexes: any = getLocalSecondaryIndexes(partitionKeyName, properties) || []
-    const indexes: Map<string, SecondaryIndex> = new Map([...globalSecondaryIndexes, ...localSecondaryIndexes])
+    const indexes: Map<string, SecondaryIndex<any>> = new Map([...globalSecondaryIndexes, ...localSecondaryIndexes])
 
     const transientProperties: string[] =
       properties && properties.length
@@ -57,7 +57,6 @@ export function Model(opts: ModelData = {}): ClassDecorator {
       indexes,
       ...opts,
     }
-    // indexes,
 
     // console.log(`Decorating: ${finalOpts.clazzName}`, finalOpts);
     Reflect.defineMetadata(KEY_MODEL, finalOpts, constructor)
@@ -65,17 +64,17 @@ export function Model(opts: ModelData = {}): ClassDecorator {
 }
 
 // TODO VALIDATION only 5 gsi are allowed per table
-function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Map<string, SecondaryIndex> | null {
+function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
     return properties
       .filter(property => property.keyForGSI && Object.keys(property.keyForGSI).length)
-      .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex> => {
-        let gsi: SecondaryIndex
+      .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex<any>> => {
+        let gsi: SecondaryIndex<any>
         Object.keys(property.keyForGSI!).forEach(indexName => {
           if (map.has(indexName)) {
             gsi = map.get(indexName)
           } else {
-            gsi = <SecondaryIndex>{}
+            gsi = <SecondaryIndex<any>>{}
           }
 
           switch (property.keyForGSI![indexName]) {
@@ -99,7 +98,16 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
               break
           }
 
-          map.set(indexName, gsi)
+          if (map.has(indexName)) {
+            map.set(indexName, gsi)
+          } else {
+            if (map.size < 5) {
+              map.set(indexName, gsi)
+            } else {
+              // a maximum of 5 global secondary indexes can be defined per table
+              throw new Error('make sure to define no more than 5 global secondary indexes per model')
+            }
+          }
         })
 
         return map
@@ -109,16 +117,15 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
   }
 }
 
-// TODO VALIDATION only 5 gsi are allowed per table
 function getLocalSecondaryIndexes(
   basePartitionKey: string | null,
   properties: Array<PropertyMetadata<any>>
-): Map<string, SecondaryIndex> | null {
+): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
     return properties
       .filter(property => property.sortKeyForLSI && property.sortKeyForLSI.length)
-      .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex> => {
-        let lsi: SecondaryIndex
+      .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex<any>> => {
+        let lsi: SecondaryIndex<any>
 
         property.sortKeyForLSI!.forEach(indexName => {
           if (map.has(indexName)) {

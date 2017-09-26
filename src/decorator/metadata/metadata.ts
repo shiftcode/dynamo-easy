@@ -32,35 +32,70 @@ export class Metadata<T> {
   }
 
   /**
-   * TODO implement more complete solution to support indexes
+   * @param {string} indexName
    * @returns {string} Returns the name of partition key (not the db name if it differs from property name)
    * @throws Throws an error if no partition key was defined for the current model
+   * @throws Throws an error if an indexName was delivered but no index was found for given name
    */
-  getPartitionKey(): keyof T {
-    const property = this.filterByFirst(p => !!(p.key && p.key.type === 'HASH'))
-
-    if (property) {
-      return property.name
+  getPartitionKey(indexName?: string): keyof T {
+    if (indexName) {
+      const index = this.getIndex(indexName)
+      if (index) {
+        return index.partitionKey
+      } else {
+        throw new Error(`there is no index defined for name ${indexName}`)
+      }
     } else {
-      throw new Error('could not find any partition key')
+      const property = this.filterByFirst(p => !!(p.key && p.key.type === 'HASH'))
+
+      if (property) {
+        return property.name
+      } else {
+        throw new Error('could not find any partition key')
+      }
+    }
+  }
+
+  /**
+   * @param {string} indexName
+   * @returns {keyof T} Returns the name of sort key (not the db name if it differs from property name) or null if none was defined
+   * @throws Throws an error if an indexName was delivered but no index was found for given name or the found index has no sort key defined
+   */
+  getSortKey(indexName?: string): keyof T | null {
+    if (indexName) {
+      const index = this.getIndex(indexName)
+      if (index) {
+        if (index.sortKey) {
+          return index.sortKey
+        } else {
+          throw new Error(`there is no sort key defined for index ${indexName}`)
+        }
+      } else {
+        throw new Error(`there is no index defined for name ${indexName}`)
+      }
+    } else {
+      const property = this.filterByFirst(p => !!(p.key && p.key.type === 'RANGE'))
+      return property ? property.name : null
     }
   }
 
   /**
    *
-   * TODO implement more complete solution to support indexes
-   * @returns {keyof T} Returns the name of sort key (not the db name if it differs from property name) or null if none was defined
+   * @returns {SecondaryIndex[]} Returns all the secondary indexes if exists or an empty array if none is defined
    */
-  getSortKey(): keyof T | null {
-    const property = this.filterByFirst(p => !!(p.key && p.key.type === 'RANGE'))
-    return property ? property.name : null
+  getIndexes(): Array<SecondaryIndex<T>> {
+    if (this.modelOptions.indexes && this.modelOptions.indexes.size) {
+      return Array.from(this.modelOptions.indexes.values())
+    } else {
+      return []
+    }
   }
 
   /**
    * @param {string} indexName
    * @returns {SecondaryIndex} Returns the index if one with given name exists, null otherwise
    */
-  getIndex(indexName: string): SecondaryIndex | null {
+  getIndex(indexName: string): SecondaryIndex<T> | null {
     if (this.modelOptions.indexes) {
       const index = this.modelOptions.indexes.get(indexName)
       return index ? index : null

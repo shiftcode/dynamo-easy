@@ -33,11 +33,12 @@ export class ParamUtil {
 
     const expression = Reflect.get(params, expressionType)
     if (isString(expression)) {
-      throw new Error(
-        'please use the logical operators and / or / not to define complex expressions instead of just adding it the an existing condition'
-      )
+      ;(<any>params)[expressionType] = `${expression} AND ${condition.statement}`
+      // throw new Error(
+      //   'please use the logical operators and / or / not to define complex expressions instead of just adding it the an existing condition'
+      // )
+    } else {
+      ;(<any>params)[expressionType] = condition.statement
     }
-
-    ;(<any>params)[expressionType] = condition.statement
   }
 }

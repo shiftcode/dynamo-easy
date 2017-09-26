@@ -1,4 +1,4 @@
-export interface SecondaryIndex {
-  partitionKey: string
-  sortKey?: string
+export interface SecondaryIndex<T> {
+  partitionKey: keyof T
+  sortKey?: keyof T
 }

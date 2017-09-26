@@ -2,6 +2,7 @@ import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import moment from 'moment-es6'
 import { Observable } from 'rxjs/Observable'
 import { ComplexModel } from '../../../../test/models/complex.model'
+import { INDEX_ACTIVE_CREATED_AT, ModelWithABunchOfIndexes } from '../../../../test/models/model-with-indexes.model'
 import { DynamoRx } from '../../dynamo-rx'
 import { attribute } from '../../expression/logical-operator/attribute.function'
 import { QueryRequest } from './query.request'
@@ -40,6 +41,34 @@ describe('query request', () => {
       request.limit(5)
       expect(request.params).toBeDefined()
       expect(request.params.Limit).toBe(5)
+    })
+  })
+
+  describe('indexes', () => {
+    it('simple', () => {
+      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes)
+
+      const now = moment()
+
+      request
+        .index(INDEX_ACTIVE_CREATED_AT)
+        .wherePartitionKey(true)
+        .whereSortKey()
+        .lt(now)
+
+      expect(request.params.IndexName).toBe(INDEX_ACTIVE_CREATED_AT)
+
+      expect(request.params.KeyConditionExpression).toBe('#active = :active AND #createdAt < :createdAt')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#active': 'active', '#createdAt': 'createdAt' })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':active': { BOOL: true },
+        ':createdAt': {
+          S: now
+            .clone()
+            .utc()
+            .format(),
+        },
+      })
     })
   })
 

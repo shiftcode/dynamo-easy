@@ -13,5 +13,5 @@ export interface ModelMetadata<T> {
   transientProperties?: string[]
 
   // local and global secondary indexes maps the name to the index definition (partition and optional sort key depending on index type)
-  indexes?: Map<string, SecondaryIndex>
+  indexes?: Map<string, SecondaryIndex<T>>
 }
