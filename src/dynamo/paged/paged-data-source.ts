@@ -8,6 +8,7 @@ import { BaseRequest } from '../request/base.request'
 import { QueryRequest } from '../request/query/query.request'
 import { QueryResponse } from '../request/query/query.response'
 import { Request } from '../request/request.model'
+import { ScanRequest } from '../request/scan/scan.request'
 import { ScanResponse } from '../request/scan/scan.response'
 import { Pageable } from './pageable'
 
@@ -18,7 +19,11 @@ export interface PagedRequestMeta {
 }
 
 // FIXME support more than just a query request
-export class PagedDataSource<T, R extends QueryRequest<T>, O extends QueryResponse<T> | ScanResponse<T>> {
+export class PagedDataSource<
+  T,
+  R extends QueryRequest<T> | ScanRequest<T>,
+  O extends QueryResponse<T> | ScanResponse<T>
+> {
   loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject(false)
   nextSubject: Subject<void> = new Subject<void>()
   metaSubject: BehaviorSubject<PagedRequestMeta> = new BehaviorSubject({ current: 0, total: 0, hasMore: false })

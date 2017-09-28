@@ -29,7 +29,6 @@ export * from './decorator'
 export * from './dynamo'
 export * from './mapper'
 export * from './model'
-export * from './dynamo/request'
 
 /*
  * TODO add fluent api for updates

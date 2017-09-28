@@ -88,7 +88,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
               gsi.partitionKey = property.nameDb
               break
             case 'RANGE':
-              if (gsi.partitionKey) {
+              if (gsi.sortKey) {
                 throw new Error(
                   `there is already a sort key defined for global secondary index ${indexName} (property name: ${property.nameDb})`
                 )
