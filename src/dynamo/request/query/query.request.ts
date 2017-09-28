@@ -14,8 +14,8 @@ import { Request } from '../request.model'
 import { QueryResponse } from './query.response'
 
 export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>> {
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
-    super(dynamoRx, modelClazz)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
+    super(dynamoRx, modelClazz, tableName)
   }
 
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {

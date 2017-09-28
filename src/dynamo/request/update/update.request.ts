@@ -22,8 +22,14 @@ import { BaseRequest } from '../base.request'
 import { Request } from '../request.model'
 
 export class UpdateRequest<T> extends BaseRequest<T, any> {
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
-    super(dynamoRx, modelClazz)
+  constructor(
+    dynamoRx: DynamoRx,
+    modelClazz: ModelConstructor<T>,
+    tableName: string,
+    partitionKey: any,
+    sortKey?: any
+  ) {
+    super(dynamoRx, modelClazz, tableName)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 

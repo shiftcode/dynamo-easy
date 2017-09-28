@@ -1,17 +1,9 @@
-import {
-  AttributeMap,
-  GetItemInput,
-  PutItemInput,
-  PutItemOutput,
-  ReturnConsumedCapacity,
-  ReturnItemCollectionMetrics,
-} from 'aws-sdk/clients/dynamodb'
+import { PutItemOutput, ReturnConsumedCapacity, ReturnItemCollectionMetrics } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
-import { Metadata } from '../../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
+import { TableNameResolver } from '../../dynamo-store'
 import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
@@ -21,8 +13,8 @@ import { RequestConditionFunction } from '../../expression/type/request-conditio
 import { BaseRequest } from '../base.request'
 
 export class PutRequest<T> extends BaseRequest<T, any> {
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, item: T) {
-    super(dynamoRx, modelClazz)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, item: T) {
+    super(dynamoRx, modelClazz, tableName)
     this.params.Item = Mapper.toDb(item, this.modelClazz)
   }
 
@@ -30,9 +22,13 @@ export class PutRequest<T> extends BaseRequest<T, any> {
    * Adds a condition expression to the request, which makes sure the item will only be saved if the id does not exist
    * @returns {PutRequest<T>}
    */
-  ifNotExists(): PutRequest<T> {
+  ifNotExists(predicate?: boolean): PutRequest<T> {
     // FIXME should we check for sort key too?
-    this.whereAttribute(this.metaData.getPartitionKey()).null()
+    // FIXME add test for predicate
+    if (predicate === undefined || (predicate !== undefined && predicate === true)) {
+      this.whereAttribute(this.metaData.getPartitionKey()).null()
+    }
+
     return this
   }
 

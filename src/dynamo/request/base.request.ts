@@ -14,6 +14,7 @@ import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
+import { DEFAULT_TABLE_NAME_RESOLVER, TableNameResolver } from '../dynamo-store'
 import { PutRequest } from './put/put.request'
 
 export abstract class BaseRequest<
@@ -26,7 +27,7 @@ export abstract class BaseRequest<
 
   private _metadata: Metadata<T>
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     this.dynamoRx = dynamoRx
 
     if (modelClazz === null || modelClazz === undefined) {
@@ -35,7 +36,7 @@ export abstract class BaseRequest<
 
     this.modelClazz = modelClazz
     this.params = <I>{
-      TableName: MetadataHelper.forModel(modelClazz).tableName,
+      TableName: tableName,
     }
   }
 

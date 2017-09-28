@@ -1,6 +1,7 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import moment from 'moment-es6'
 import { Observable } from 'rxjs/Observable'
+import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { INDEX_ACTIVE_CREATED_AT, ModelWithABunchOfIndexes } from '../../../../test/models/model-with-indexes.model'
 import { DynamoRx } from '../../dynamo-rx'
@@ -20,7 +21,7 @@ describe('query request', () => {
     let request: QueryRequest<ComplexModel>
 
     beforeEach(() => {
-      request = new QueryRequest(<any>null, ComplexModel)
+      request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
     })
 
     it('defaults should be defined', () => {

@@ -1,3 +1,3 @@
 import { PutRequest } from './put.request'
 
-describe('put request', () => {})
+xdescribe('put request', () => {})

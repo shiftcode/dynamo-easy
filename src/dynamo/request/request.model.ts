@@ -20,8 +20,8 @@ export abstract class Request<
   static DEFAULT_LIMIT = 10
   static INFINITE_LIMIT = -1
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
-    super(dynamoRx, modelClazz)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
+    super(dynamoRx, modelClazz, tableName)
     this.limit(Request.DEFAULT_LIMIT)
   }
 
@@ -56,10 +56,10 @@ export abstract class Request<
     if (limit === Request.INFINITE_LIMIT) {
       delete this.params.Limit
     } else {
-      if (limit !== null && limit !== undefined) {
+      if (limit !== null && limit !== undefined && limit > 0) {
         this.params.Limit = limit
       } else {
-        throw new Error('limit must be a valid number')
+        throw new Error('limit must be a valid positive number')
       }
     }
 

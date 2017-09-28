@@ -20,8 +20,14 @@ import { RequestConditionFunction } from '../../expression/type/request-conditio
 import { BaseRequest } from '../base.request'
 
 export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
-    super(dynamoRx, modelClazz)
+  constructor(
+    dynamoRx: DynamoRx,
+    modelClazz: ModelConstructor<T>,
+    tableName: string,
+    partitionKey: any,
+    sortKey?: any
+  ) {
+    super(dynamoRx, modelClazz, tableName)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
