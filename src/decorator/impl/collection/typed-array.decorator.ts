@@ -9,10 +9,6 @@ import { AttributeModelTypes, initOrUpdateProperty, KEY_PROPERTY } from '../prop
  * Makes sure the property will be marshalled to a L(ist) type. The modelClass is required if the array items
  * have some property decorators, so we can retrieve this information using the model class.
  *
- * @param {ModelConstructor<any>} modelClass
- * @returns {PropertyDecorator}
- * @constructor
- *
  * FIXME rename (collision with es.Array)
  */
 export function TypedArray<T>(modelClass?: ModelConstructor<T>): PropertyDecorator {

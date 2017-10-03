@@ -6,10 +6,6 @@ import { initOrUpdateProperty } from '../property/property.decorator'
 /**
  * Makes sure the property will be marshalled to a S(et) type. The modelClass is required for additional type saftey
  * or if the items have a complex type
- *
- * @param {ModelConstructor<any>} modelClass
- * @returns {PropertyDecorator}
- * @constructor
  */
 // TODO TypedSet naming is somewhat misleading, because it does not require a type, it is always typed thats true
 // FIXME is there any improvement if we add generics to SortedSet<T> is it even possible?

@@ -6,8 +6,6 @@ import {
   ReturnItemCollectionMetrics,
 } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs/Observable'
-import { Metadata } from '../../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -38,17 +36,23 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
     const keyAttributeMap: AttributeMap = {}
 
     // partition key
-    keyAttributeMap[this.metaData.getPartitionKey()] = Mapper.toDbOne(
-      partitionKey,
-      this.metaData.forProperty(this.metaData.getPartitionKey())
-    )
+    const partitionKeyValue = Mapper.toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
+
+    if (partitionKeyValue === null) {
+      throw new Error('please provide an acutal value for partition key, got null')
+    }
+
+    keyAttributeMap[this.metaData.getPartitionKey()] = partitionKeyValue
 
     // sort key
     if (hasSortKey) {
-      keyAttributeMap[this.metaData.getSortKey()!] = Mapper.toDbOne(
-        sortKey!,
-        this.metaData.forProperty(this.metaData.getSortKey()!)
-      )
+      const sortKeyValue = Mapper.toDbOne(sortKey!, this.metaData.forProperty(this.metaData.getSortKey()!))
+
+      if (sortKeyValue === null) {
+        throw new Error('please provide an actual value for sort key, got null')
+      }
+
+      keyAttributeMap[this.metaData.getSortKey()!] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap

@@ -3,8 +3,9 @@ import { Observable } from 'rxjs/Observable'
 import { MetadataHelper } from '../decorator/metadata/metadata-helper'
 import { Mapper } from '../mapper/mapper'
 import { ModelConstructor } from '../model/model-constructor'
-import { DEFAULT_SESSION_VALIDITY_ENSURERE } from './default-session-validity-ensurer.const'
+import { DEFAULT_SESSION_VALIDITY_ENSURER } from './default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
+import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoRx } from './dynamo-rx'
 import { DeleteRequest } from './request/delete/delete.request'
 import { GetRequest } from './request/get/get.request'
@@ -24,7 +25,7 @@ export class DynamoStore<T> {
   constructor(
     private modelClazz: ModelConstructor<T>,
     tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURERE
+    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
   ) {
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
     this.tableName = tableNameResolver(MetadataHelper.get(this.modelClazz).modelOptions.tableName)
@@ -58,7 +59,7 @@ export class DynamoStore<T> {
     return new QueryRequest(this.dynamoRx, this.modelClazz, this.tableName)
   }
 
-  makeRequest<Z>(operation: string, params?: { [key: string]: any }): Observable<Z> {
+  makeRequest<Z>(operation: DynamoApiOperations, params?: { [key: string]: any }): Observable<Z> {
     return this.dynamoRx.makeRequest(operation, params)
   }
 
@@ -68,9 +69,6 @@ export class DynamoStore<T> {
    */
   /**
    * executes a dynamoDB.batchGetItem for multiple keys or a operation
-   *
-   * @param {any[]} keys
-   * @returns {Observable<T[]>}
    */
   byKeys(keys: any[]): Observable<T[]> {
     return this.findByMultipleKeys(keys)
@@ -87,7 +85,12 @@ export class DynamoStore<T> {
     keys.forEach(id => {
       // TODO add support for secondary index
       const idOb: DynamoDB.AttributeMap = {}
-      idOb[MetadataHelper.get(this.modelClazz).getPartitionKey()] = Mapper.toDbOne(id)
+      const value = Mapper.toDbOne(id)
+      if (value === null) {
+        throw Error('please provide an actual value for partition key')
+      }
+
+      idOb[MetadataHelper.get(this.modelClazz).getPartitionKey()] = value
       attributeMaps.push(idOb)
     })
 

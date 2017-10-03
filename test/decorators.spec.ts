@@ -3,9 +3,12 @@ import { Metadata } from '../src/decorator/metadata/metadata'
 import { MetadataHelper } from '../src/decorator/metadata/metadata-helper'
 import { ModelMetadata } from '../src/decorator/metadata/model-metadata.model'
 import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
+import { EnumType } from '../src/mapper/type/enum.type'
 import { ComplexModel } from './models/complex.model'
 import { CustomTableNameModel } from './models/custom-table-name.model'
 import { ModelWithDateMoment } from './models/model-with-date-moment.model'
+import { ModelWithEnumDeclared } from './models/model-with-enum-declared.model'
+import { ModelWithEnum } from './models/model-with-enum.model'
 import {
   DifferentModel,
   INDEX_ACTIVE,
@@ -17,6 +20,7 @@ import {
 } from './models/model-with-indexes.model'
 import { NestedObject } from './models/nested-object.model'
 import { SimpleModel } from './models/simple.model'
+import { Type } from './models/types.enum'
 
 // TODO add tests for error cases which should thrw (multiple indexes for example)
 describe('Decorators should add correct metadata', () => {
@@ -369,6 +373,34 @@ describe('Decorators should add correct metadata', () => {
         expect(lsiCount.partitionKey).toBe('myId')
         expect(lsiCount.sortKey).toBe('count')
       })
+    })
+  })
+
+  describe('enum (no Enum decorator)', () => {
+    let metadata: Metadata<ModelWithEnum>
+
+    beforeEach(() => {
+      metadata = MetadataHelper.get(ModelWithEnum)
+    })
+
+    it('should add enum type to property', () => {
+      const enumPropertyMetadata = metadata.forProperty('type')
+      expect(enumPropertyMetadata.typeInfo).toBeDefined()
+      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Object, isCustom: true })
+    })
+  })
+
+  describe('enum', () => {
+    let metadata: Metadata<ModelWithEnumDeclared>
+
+    beforeEach(() => {
+      metadata = MetadataHelper.get(ModelWithEnumDeclared)
+    })
+
+    it('should add enum type to property', () => {
+      const enumPropertyMetadata = metadata.forProperty('type')
+      expect(enumPropertyMetadata.typeInfo).toBeDefined()
+      expect(enumPropertyMetadata.typeInfo).toEqual({ type: EnumType, isCustom: true })
     })
   })
 })

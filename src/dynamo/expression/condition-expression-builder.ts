@@ -1,5 +1,5 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { curryRight, values as objValues } from 'lodash'
+import { curryRight } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
@@ -130,6 +130,10 @@ export class ConditionExpressionBuilder {
     const mappedValue1 = Mapper.toDbOne(values[0], propertyMetadata)
     const mappedValue2 = Mapper.toDbOne(values[1], propertyMetadata)
 
+    if (mappedValue1 === null || mappedValue2 === null) {
+      throw new Error('make sure to provide an actual value for te BETWEEN operator')
+    }
+
     const value2Placeholder = uniqAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
     const statement = `${namePlaceholder} BETWEEN ${valuePlaceholder} AND ${value2Placeholder}`
@@ -168,7 +172,7 @@ export class ConditionExpressionBuilder {
 
     const attributeValues: AttributeMap = {}
     if (hasValue) {
-      let value: AttributeValue
+      let value: AttributeValue | null
       switch (operator) {
         case 'contains':
           value = ConditionExpressionBuilder.validateValueForContains(values[0], propertyMetadata)
@@ -177,7 +181,9 @@ export class ConditionExpressionBuilder {
           value = Mapper.toDbOne(values[0], propertyMetadata)
       }
 
-      attributeValues[valuePlaceholder] = value
+      if (value) {
+        attributeValues[valuePlaceholder] = value
+      }
     }
 
     return {
@@ -253,6 +259,11 @@ export class ConditionExpressionBuilder {
               'either generic type info is not defined or the generic type is not one of String, Number, Binary'
             )
           }
+          break
+        case String:
+        case Number:
+        case Binary:
+          finalValue = { S: value.toString() }
           break
         default:
           throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)

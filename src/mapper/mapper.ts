@@ -8,6 +8,7 @@ import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
 import { DateMapper } from './for-type/date.mapper'
+import { EnumMapper } from './for-type/enum.mapper'
 import { MomentMapper } from './for-type/moment.mapper'
 import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
@@ -16,13 +17,14 @@ import { StringMapper } from './for-type/string.mapper'
 import { AttributeModelType } from './type/attribute-model.type'
 // import v1 from 'uuid'
 import { Binary } from './type/binary.type'
+import { EnumType } from './type/enum.type'
 import { NullType } from './type/null.type'
 import { Util } from './util'
+
 // import debug from 'debug';
 
 /**
- * For the base convertion we use the DynamoDB converter.
- * We have some special requirements for which we add our own logic.
+ *
  */
 export class Mapper {
   static mapperForType: Map<AttributeModelType, MapperForType<any>> = new Map()
@@ -40,15 +42,9 @@ export class Mapper {
        */
       if (metadata) {
         metadata.getKeysWithUUID().forEach(propertyMetadata => {
-          if (Reflect.get(<any>item, propertyMetadata.name)) {
-            throw Error(
-              `property where a UUID decorator is present can not have any other value ${JSON.stringify(
-                propertyMetadata
-              )}`
-            )
+          if (!Reflect.get(<any>item, propertyMetadata.name)) {
+            Reflect.set(<any>item, propertyMetadata.name, Util.uuidv4())
           }
-
-          Reflect.set(<any>item, propertyMetadata.name, Util.uuidv4())
         })
       }
     }
@@ -71,7 +67,7 @@ export class Mapper {
       /*
        * 2) decide how to map the property depending on type or value
        */
-      let attributeValue: AttributeValue | undefined
+      let attributeValue: AttributeValue | undefined | null
 
       let propertyMetadata: PropertyMetadata<any> | null | undefined
       if (modelConstructor) {
@@ -106,7 +102,11 @@ export class Mapper {
         // }
       }
 
-      if (attributeValue) {
+      if (attributeValue === undefined) {
+        // no-op transient field, just ignore it
+      } else if (attributeValue === null) {
+        // empty values (string, set, list) will be ignored too
+      } else {
         mapped[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
       }
     })
@@ -114,7 +114,7 @@ export class Mapper {
     return mapped
   }
 
-  static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): AttributeValue {
+  static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): AttributeValue | null {
     const explicitType: AttributeModelType | null =
       propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
         ? propertyMetadata.typeInfo.type!
@@ -149,6 +149,7 @@ export class Mapper {
     if (propertyMetadata && propertyMetadata.mapper) {
       // custom mapper
       if (explicitType) {
+        // TODO what about customMapper.fromDb
         return new propertyMetadata.mapper().toDb(propertyValue, propertyMetadata)
       } else {
         return new propertyMetadata.mapper().toDb(propertyValue)
@@ -250,6 +251,9 @@ export class Mapper {
           break
         case Date:
           mapperForType = new DateMapper()
+          break
+        case EnumType:
+          mapperForType = new EnumMapper()
           break
         case Map:
           // Maps support complex types as keys, we only support String & Number as Keys, otherwise a .toString() method should be implemented,

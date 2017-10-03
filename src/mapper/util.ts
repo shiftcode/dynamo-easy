@@ -10,6 +10,23 @@ import { NullType } from './type/null.type'
 import { TypesByConvention } from './type/types-by-convention.type'
 import { UndefinedType } from './type/undefined.type'
 
+const BUFFER_TYPES = [
+  'Buffer',
+  'File',
+  'Blob',
+  'ArrayBuffer',
+  'DataView',
+  'Int8Array',
+  'Uint8Array',
+  'Uint8ClampedArray',
+  'Int16Array',
+  'Uint16Array',
+  'Int32Array',
+  'Uint32Array',
+  'Float32Array',
+  'Float64Array',
+]
+
 export class Util {
   static REGEX_CONVENTIONS: { [key in TypesByConvention]: RegExp } = {
     date: /^(?:date|[\w]+(?:Date|At)(?:[A-Z]{1}[\w]+)?)$/,
@@ -190,24 +207,7 @@ export class Util {
       // FIXME should add || data instanceof Stream
       return Buffer.isBuffer(data)
     } else {
-      const types = [
-        'Buffer',
-        'File',
-        'Blob',
-        'ArrayBuffer',
-        'DataView',
-        'Int8Array',
-        'Uint8Array',
-        'Uint8ClampedArray',
-        'Int16Array',
-        'Uint16Array',
-        'Int32Array',
-        'Uint32Array',
-        'Float32Array',
-        'Float64Array',
-      ]
-
-      types.forEach(type => {
+      BUFFER_TYPES.forEach(type => {
         if (data !== undefined && data.constructor) {
           if (Util.isType(data, type)) {
             return true
@@ -218,6 +218,10 @@ export class Util {
       })
     }
     return false
+  }
+
+  static isBufferType(type: any): boolean {
+    return BUFFER_TYPES.includes(type)
   }
 
   /*

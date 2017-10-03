@@ -5,7 +5,6 @@ import { isNoParamFunctionOperator } from './is-no-param-function-operator.funct
  * Every expression condition operator has a predefined arity (amount) of function paramers, this method
  * returns this value
  *
- * @param {ConditionOperator} operator
  * @returns {number} The amount of required method parameters when calling an operator function
  */
 export function operatorParameterArity(operator: ConditionOperator): number {

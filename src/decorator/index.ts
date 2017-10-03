@@ -26,6 +26,8 @@ export * from './impl/model/model.decorator'
 export * from './impl/property/property.decorator'
 // transient
 export * from './impl/transient/transient.decorator'
+// enum
+export * from './impl/enum/enum.decorator'
 //
 // metadata
 //

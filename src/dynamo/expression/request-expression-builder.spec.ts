@@ -6,6 +6,7 @@ import {
 } from 'aws-sdk/clients/dynamodb'
 import { has } from 'lodash'
 import moment from 'moment-es6'
+import { getTableName } from '../../../test/helper/get-table-name.function'
 import { Organization } from '../../../test/models/organization.model'
 import { BaseRequest } from '../request/base.request'
 import { QueryRequest } from '../request/query/query.request'
@@ -16,7 +17,7 @@ import { RequestExpressionBuilder } from './request-expression-builder'
 describe('request expression builder', () => {
   describe('adds condition expression to request', () => {
     it('partition key', () => {
-      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
+      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
       RequestExpressionBuilder.addPartitionKeyCondition('id', 'idValue', queryRequest)
 
       const params = queryRequest.params
@@ -26,7 +27,7 @@ describe('request expression builder', () => {
     })
 
     it('sort key', () => {
-      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
+      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
       RequestExpressionBuilder.addSortKeyCondition('count', queryRequest).equals(25)
 
       const params = queryRequest.params
@@ -36,7 +37,7 @@ describe('request expression builder', () => {
     })
 
     it('non key', () => {
-      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
+      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
       RequestExpressionBuilder.addCondition('FilterExpression', 'age', queryRequest).lte(45)
 
       const params = queryRequest.params

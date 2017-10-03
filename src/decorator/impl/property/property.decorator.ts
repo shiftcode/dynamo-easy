@@ -55,9 +55,10 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
 
 function initOrUpdateGSI(indexes: { [key: string]: KeyType }, indexData: IndexData): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
-    throw new Error(
-      'the property with name is already registered as key for index - one property can only define one key per index'
-    )
+    // TODO when we throw an error we have a problem where multiple different classes extend one base class, this will be executed by multiple times
+    // throw new Error(
+    //   'the property with name is already registered as key for index - one property can only define one key per index'
+    // )
   } else {
     indexes[indexData.name] = indexData.keyType
   }

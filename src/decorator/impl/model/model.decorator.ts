@@ -51,7 +51,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
     const finalOpts = {
       clazz: constructor,
       clazzName: type.name,
-      tableName: kebabCase(type.name),
+      tableName: `${kebabCase(type.name)}s`,
       properties,
       transientProperties,
       indexes,

@@ -4,6 +4,7 @@ import { Mapper } from '../mapper'
 import { Util } from '../util'
 import { MapperForType } from './base.mapper'
 
+// TODO add doc
 export class CollectionMapper implements MapperForType<any[] | Set<any>> {
   // TODO add some validation rules based on propertyMetadata and returned value from db for sorted as example (SS -> sorted -> throw error)
   fromDb(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): any[] | Set<any> {
@@ -44,7 +45,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
     throw new Error('No Collection Data (SS | NS | BS | L) was found in attribute data')
   }
 
-  toDb(propertyValue: any[] | Set<any>, propertyMetadata?: PropertyMetadata<any>): AttributeValue {
+  toDb(propertyValue: any[] | Set<any>, propertyMetadata?: PropertyMetadata<any>): AttributeValue | null {
     if (Array.isArray(propertyValue) || Util.isSet(propertyValue)) {
       const attributeValue: AttributeValue = {}
 
@@ -60,8 +61,32 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
               // only the L(ist) type preserves order
               collectionType = 'L'
             } else {
-              // auto detect based on set item values
-              collectionType = Util.detectCollectionType(propertyValue)
+              if ((<Set<any>>propertyValue).size === 0) {
+                // if the type is Set defined by propertyMetadata and the value is empty return null type, empty set is not allowed
+                return { NULL: true }
+              } else {
+                if (hasGenericType(propertyMetadata)) {
+                  // generic type of Set is defined, so decide based on the generic type which db set type should be used
+                  if (Util.isBufferType(propertyMetadata.typeInfo!.genericTypes![0])) {
+                    collectionType = 'BS'
+                  } else {
+                    switch (propertyMetadata.typeInfo!.genericTypes![0]) {
+                      case String:
+                        collectionType = 'SS'
+                        break
+                      case Number:
+                        collectionType = 'NS'
+                        break
+                      default:
+                        // fallback to list if the type is not one of String or Number
+                        collectionType = 'L'
+                    }
+                  }
+                } else {
+                  // auto detect based on set item values
+                  collectionType = Util.detectCollectionType(propertyValue)
+                }
+              }
             }
             break
           default:
@@ -77,29 +102,37 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
         propertyValue = Array.from(propertyValue)
       }
 
-      switch (collectionType) {
-        case 'SS':
-          attributeValue.SS = propertyValue
-          break
-        case 'NS':
-          attributeValue.NS = (<number[]>propertyValue).map(num => num.toString())
-          break
-        case 'BS':
-          attributeValue.BS = propertyValue
-          break
-        case 'L':
-          if (hasGenericType(propertyMetadata)) {
-            attributeValue.L = (<any[]>propertyValue).map(value => ({
-              M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericTypes![0]),
-            }))
-          } else {
-            attributeValue.L = (<any[]>propertyValue).map(value => Mapper.toDbOne(value))
-          }
-          break
-        default:
-          throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
+      // empty value is not allowed for Set and List (TODO check if true for lists)
+      if (propertyValue.length === 0) {
+        return null
+      } else {
+        switch (collectionType) {
+          case 'SS':
+            attributeValue.SS = propertyValue
+            break
+          case 'NS':
+            attributeValue.NS = propertyValue.map(num => num.toString())
+            break
+          case 'BS':
+            attributeValue.BS = propertyValue
+            break
+          case 'L':
+            if (hasGenericType(propertyMetadata)) {
+              attributeValue.L = (<any[]>propertyValue).map(value => ({
+                M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericTypes![0]),
+              }))
+            } else {
+              attributeValue.L = <AttributeValue[]>(<any[]>propertyValue)
+                .map(value => Mapper.toDbOne(value))
+                .filter(value => value !== null)
+            }
+            break
+          default:
+            throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
+        }
+
+        return attributeValue
       }
-      return attributeValue
     } else {
       throw new Error(`given value is not an array ${propertyValue}`)
     }

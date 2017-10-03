@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
-import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
+import { TypedSet, TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
@@ -99,6 +99,8 @@ export class Organization {
 
   // set with complex type -> sorted -> L(ist)
   @SortedSet(OrganizationEvent) events: Set<OrganizationEvent>
+
+  @TypedSet() emptySet: Set<string> = new Set()
 
   // TODO add map? year to benefit description
   // benefits: Map<number, string>

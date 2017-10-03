@@ -1,13 +1,126 @@
-# TypeScript library starter
+# sc-dynamodb
 
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
-[![Travis](https://img.shields.io/travis/alexjoverm/typescript-library-starter.svg)](https://travis-ci.org/alexjoverm/typescript-library-starter)
-[![Coveralls](https://img.shields.io/coveralls/alexjoverm/typescript-library-starter.svg)](https://coveralls.io/github/alexjoverm/typescript-library-starter)
-[![Dev Dependencies](https://david-dm.org/alexjoverm/typescript-library-starter/dev-status.svg)](https://david-dm.org/alexjoverm/typescript-library-starter?type=dev)
-[![Donate](https://img.shields.io/badge/donate-paypal-blue.svg)](https://paypal.me/AJoverMorales)
+[![Travis](https://img.shields.io/travis/michaelwittwer/dynamo-easy.svg)](https://travis-ci.org/michaelwittwer/dynamo-easy)
+[![Coveralls](https://img.shields.io/coveralls/michaelwittwer/dynamo-easy.svg)](https://coveralls.io/github/michaelwittwer/dynamo-easy)
+[![Dev Dependencies](https://david-dm.org/michaelwittwer/dynamo-easy/dev-status.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 
-A starter project that makes creating a TypeScript library extremely easy.
+sc stands for [https://www.shiftcode.ch](shiftcode) that's the company which supports this project.
+
+## Purpose
+
+The official Amazon Dynamo SDK for javascript has a pretty low level api, where some deeper knowledge about all the possible options is required.
+There is also the Dynamo-Document client which also supports the mapping of Javascript objects to DynamoDb attributes, but not at the depth we need.
+This Library provides an easy to use descriptive chainable api to execute dynamoDb requests. This library also takes care of the mapping of Typescript
+Models into DnymoDb attribute values. From simple types like String, Number, Boolean, Binary to more complex types like custom classes, momentJs Dates.
+
+# What this library does not provide
+API to setup tables (we use cloudformation on our side for infrastructur setup, so this was not a need for us)
+
+
+# Thanks goes out to
+[https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) For the awesome project which helps to scaffold, develop and build a typescript library project
+[https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the chainable api
+[http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Thats where the base idea on how to implement the model decorators came came from 
+ 
+
+# Get Started
+
+Usage it with Angular (>4) checkout our angular-service. [TODO](TODO)
+
+Basic Example:
+```
+@Model()
+class Person{
+  @PartitionKeyUUID() 
+  id: string
+  
+  name: string
+}
+
+const dynamoStore = new DynamoStore(Person)
+
+// add a new item
+dynamoStore.put({name: 'peter'})
+  .exec().subscribe(()=>{
+    console.log('peter was saved')
+  })
+
+// search for all persons which start with the character 'p'
+dynamoStore.query()
+  .where('name').startsWith('p')
+  .exec()
+  .subscribe((persons: Person[])=>{
+    console.log('got persons')
+  })
+  
+  
+// returns all persons
+dynamoStore.scan()
+  .exec()
+  .subscribe((persons: Person[]) => {
+    console.log('all persons')
+  })
+
+```
+
+# Authentication
+
+# Customization
+
+## Table Names
+
+## Session Validity Ensurer
+
+# Request API
+
+The request api has support for the following operations:
+
+- Put
+- Get
+- Update
+- Delete
+- Scan
+- Query
+- MakeRequest (generic low level method for special scenarios)
+
+For most of the api there is probably no explanation required, here are some topics we think
+need some more info.
+
+There is always the possibility to access the Params object directly to add values which are not covered with our api.
+
+### Expressions ([http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html](Official Doc))
+
+When working with expressions there is an important point to remember, an expression looks like (Scan Filter Expression):
+
+```
+{
+  FilterExpression: '#name = :name'
+  ExpressionAttributeNames: {'#name': 'name'}
+  ExpressionAttributeValues: {':name': {S: 'peter'}}
+}
+```
+
+The usage of ExpressionAttributeNames is not required, but due to the fact that there are a lot of keywords which could not be used in an expression (blacklist)[http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html],
+we replace the attribute names always with a variable (starting with the '#' sign)
+
+## Put
+
+## Scan
+
+## Query
+
+## Delete
+
+## Update
+
+## Pagination 
+
+
+# Decorators
+
+# Fluent API 
 
 ## DynamoDB Request abstraction
 
@@ -33,26 +146,31 @@ attributeExpressionValues: {':age': {N: '10'}}
 expression: '#age = :age' 
 
 this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
-attributeName: person.age
+nested attribute: person.age
 
 attributeExpressionNames: {'#person':'person', '#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
 expression: '#person.#age = :age'
 
-we can't use #personAge: 'person.age' because if the dot is part of an attribute name it is not treated as metacharacter compared to when using directly in expression, so
+we can't use #personAge: 'person.age' because if the dot is part of an attribute name it is not treated as a metacharacter compared to when using directly in expression, so
 the above solution needs to be used
 
 these are the accessor rules for nested attribute types
-[n]—for list elements
-. (dot)—for map elements
+- [n]—for list elements
+- . (dot)—for map elements
 
 ## Object Mapper
 
-#### Notes
+#### Enum
+Typescript enums are stored as N(umber) type in DynamoDb, use the @Enum decorator to mark an enum
 
-##### lodash with rollup and jest
-We ended up using lodash-es to get it to work with rollup, there is some additional configuration required for jest [Tree Shake](https://medium.com/@martin_hotell/tree-shake-lodash-with-webpack-jest-and-typescript-2734fa13b5cd)
-we used the configuration linked (allowJs in tsconfig, and transform & transformIgnorePattern in jest config -> see package.json)
+#### Null Values
+Think about an attribute of type string where the value is an empty string, this is not a valid attributeValue to be persisted. There are two solutions for this problem.
+1. Don't send the attribute to the backend
+2. Use the NULL type to express the empty string
+
+The default for now is to skip properties with empty values depending on type (empty string / empty set, etc)
+
 
 #### Decorators
 Decorators are used to add some metadata to our model classes required by the mapper for some special cases.
@@ -85,7 +203,7 @@ Generic information is never available due to some serialization limitations at 
 
 ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get(design:type), so we need some extra info.
 
-**** Collections *****
+##### Collections
 
 #Array
 Javascript Arrays with a a items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
@@ -96,7 +214,11 @@ es6 Set types will be marshalled to dynamoDb set type if the type of the set is 
 marshalled to an dynamoDB List.  
 
 When one of the following decorators is added, the value is marshalled to a List type.
-@SortedSet(), @Set(complexType?)
+@SortedSet(), @TypedSet(complexType?)
+
+##Model
+Here is the rule how a table name is built `${kebabCase(modelName)}s` so for a model called Product the table will be named products, this is a default implementation.
+To Provide your own logic you can implement a TableNameResolver function and give it to the DynamoStore class when implementing a new instance.
 
 
 **Custom TableName**
@@ -155,44 +277,13 @@ Mapper Strategy:
       YES                 NO
       
       custom mapping      document client can map
+
 -> From DB
 
 
-## Open Tasks
-Null Values?
-How does DynamoDb treat empty lists, sets or emtpy strings?
+## Contribution
 
-## Node Project Template
-
-
-### Usage
-
-```bash
-git clone https://github.com/alexjoverm/typescript-library-starter.git YOURFOLDERNAME
-cd YOURFOLDERNAME
-
-# Run npm install and write your library name when asked. That's all!
-npm install
-```
-
-**Start coding!** `package.json` and entry files are already set up for you, so don't worry about linking to your main file, typings, etc. Just keep those files with the same names.
-
-### Features
-
- - Zero-setup. After running `npm install` things will be setup for you :wink:
- - **[RollupJS](https://rollupjs.org/)** for multiple optimized bundles following the [standard convention](http://2ality.com/2017/04/setting-up-multi-platform-packages.html) and [Tree-shaking](https://alexjoverm.github.io/2017/03/06/Tree-shaking-with-Webpack-2-TypeScript-and-Babel/).
- - Tests, coverage and interactive watch mode using **[Jest](http://facebook.github.io/jest/)**
- - **[Prettier](https://github.com/prettier/prettier)** and **[TSLint](https://palantir.github.io/tslint/)** for code formatting and consistency.
- - **Docs automatic generation and deployment** to `gh-pages`, using **[TypeDoc](http://typedoc.org/)**
- - Automatic types `(*.d.ts)` file generation
- - **[Travis](https://travis-ci.org)** integration and **[Coveralls](https://coveralls.io/)** report
- - (Optional) **Automatic releases and changelog**, using [Semantic release](https://github.com/semantic-release/semantic-release), [Commitizen](https://github.com/commitizen/cz-cli), [Conventional changelog](https://github.com/conventional-changelog/conventional-changelog) and [Husky](https://github.com/typicode/husky) (for the git hooks)
-
-### Excluding peerDependencies
-
-On library development, one might want to set some peer dependencies, and thus remove those from the final bundle. You can see in [Rollup docs](https://rollupjs.org/#peer-dependencies) how to do that.
-
-The good news is here is setup for you, you only must include the dependency name in `external` property within `rollup.config.js`. For example, if you wanna exclude `lodash`, just write there `external: ['lodash']`.
+## Development
 
 ### NPM scripts
 
@@ -206,32 +297,13 @@ The good news is here is setup for you, you only must include the dependency nam
 
 ### Automatic releases
 
-If you'd like to have automatic releases with Semantic Versioning, follow these simple steps.
+We use automatic releases with Semantic Versioning, follow these simple steps.
 
-_**Prerequisites**: you need to create/login accounts and add your project to:_
- - npm
- - Travis
- - Coveralls
-
-Run the following command to prepare hooks and stuff:
-
-```bash
-npm run semantic-release-prepare
-```
-
-Follow the console instructions to install semantic release run it (answer NO to "Generate travis.yml").
-
-_Note: make sure you've setup `repository.url` in your `package.json` file_
-
-```bash
-npm install -g semantic-release-cli
 semantic-release setup
-# IMPORTANT!! Answer NO to "Generate travis.yml" question. Is already prepared for you :P
-```
 
 From now on, you'll need to use `npm run commit`, which is a convenient way to create conventional commits.
 
-Automatic releases are possible thanks to [semantic release](https://github.com/semantic-release/semantic-release), which publishes your code automatically on github and npm, plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
+Automatic releases are possible thanks to [semantic release](https://github.com/semantic-release/semantic-release), which publishes our code automatically on github and npm, plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
 
 ### Git Hooks
 
@@ -243,41 +315,13 @@ By default, there are 2 disabled git hooks. They're set up when you run the `npm
 
 This makes more sense in combination with [automatic releases](#automatic-releases)
 
-### FAQ
-
-#### `Array.prototype.from`, `Promise`, `Map`... is undefined?
-
-TypeScript or Babel only provides down-emits on syntactical features (`class`, `let`, `async/away`...), but not on functional features (`Array.prototype.find`, `Set`, `Promise`...), . For that, you need Polyfills, such as [`core-js`](https://github.com/zloirock/core-js) or [`babel-polyfill`](https://babeljs.io/docs/usage/polyfill/) (which extends `core-js`).
-
-For a library, `core-js` plays very nicely, since you can import just the polyfills you need:
-
-```javascript
-import "core-js/fn/array/find"
-import "core-js/fn/string/includes"
-import "core-js/fn/promise"
-...
-```
-
-#### What is `npm install` doing the first time runned?
-
-It runs the script `tools/init` which sets up everything for you. In short, it:
- - Configures RollupJS for the build, which creates the bundles.
- - Configures `package.json` (typings file, main file, etc)
- - Renames main src and test files
-
-#### What if I don't want git-hooks, automatic releases or semantic-release?
-
-Then you may want to:
- - Remove `commitmsg`, `postinstall` scripts from `package.json`. That will not use those git hooks to make sure you make a conventional commit
- - Remove `npm run semantic-release` from `.travis.yml`
-
 #### What if I don't want to use coveralls or report my coverage?
 
 Remove `npm run report-coverage` from `.travis.yml`
 
 ## Credits
 
-Made with :heart: by [@alexjoverm](https://twitter.com/alexjoverm) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
+Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 | [<img src="https://avatars.githubusercontent.com/u/6052309?v=3" width="100px;"/><br /><sub>Ciro</sub>](https://www.linkedin.com/in/ciro-ivan-agulló-guarinos-42109376)<br />[💻](https://github.com/alexjoverm/typescript-library-starter/commits?author=k1r0s "Code") [🔧](#tool-k1r0s "Tools") | [<img src="https://avatars.githubusercontent.com/u/947523?v=3" width="100px;"/><br /><sub>Marius Schulz</sub>](https://blog.mariusschulz.com)<br />[📖](https://github.com/alexjoverm/typescript-library-starter/commits?author=mariusschulz "Documentation") | [<img src="https://avatars.githubusercontent.com/u/4152819?v=3" width="100px;"/><br /><sub>Alexander Odell</sub>](https://github.com/alextrastero)<br />[📖](https://github.com/alexjoverm/typescript-library-starter/commits?author=alextrastero "Documentation") | [<img src="https://avatars1.githubusercontent.com/u/8728882?v=3" width="100px;"/><br /><sub>Ryan Ham</sub>](https://github.com/superamadeus)<br />[💻](https://github.com/alexjoverm/typescript-library-starter/commits?author=superamadeus "Code") | [<img src="https://avatars1.githubusercontent.com/u/8458838?v=3" width="100px;"/><br /><sub>Chi</sub>](https://consiiii.me)<br />[💻](https://github.com/alexjoverm/typescript-library-starter/commits?author=ChinW "Code") [🔧](#tool-ChinW "Tools") [📖](https://github.com/alexjoverm/typescript-library-starter/commits?author=ChinW "Documentation") | [<img src="https://avatars2.githubusercontent.com/u/2856501?v=3" width="100px;"/><br /><sub>Matt Mazzola</sub>](https://github.com/mattmazzola)<br />[💻](https://github.com/alexjoverm/typescript-library-starter/commits?author=mattmazzola "Code") [🔧](#tool-mattmazzola "Tools") | [<img src="https://avatars0.githubusercontent.com/u/2664047?v=3" width="100px;"/><br /><sub>Sergii Lischuk</sub>](http://leefrost.github.io)<br />[💻](https://github.com/alexjoverm/typescript-library-starter/commits?author=Leefrost "Code") |

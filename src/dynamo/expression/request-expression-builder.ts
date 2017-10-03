@@ -20,11 +20,6 @@ import { RequestSortKeyConditionFunction } from './type/sort-key-condition-funct
 export class RequestExpressionBuilder {
   /**
    * Adds a condition to the given query.
-   *
-   * @param {string} attributePath
-   * @param {T} request
-   * @param {PropertyMetadata<any>} propetyMetadata
-   * @returns {RequestConditionFunction<T extends Request<any, any>>}
    */
   static addCondition<T extends BaseRequest<any, any>>(
     expressionType: ExpressionType,
@@ -85,7 +80,7 @@ export class RequestExpressionBuilder {
     const condition = ConditionExpressionBuilder.buildFilterExpression(
       attributePath,
       operator,
-      values,
+      copy,
       existingValueKeys,
       metadata
     )
@@ -110,7 +105,7 @@ export class RequestExpressionBuilder {
         const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, ConditionExpression>(
           ConditionExpressionBuilder.buildFilterExpression
         )
-        return curried(attributePath, operator, values)
+        return curried(attributePath, operator, copy)
       }
     }
 
@@ -124,9 +119,6 @@ export class RequestExpressionBuilder {
    * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
    * for the condition. when executed the implementation defines what todo with the condition, just return it for example or add the condition to the request
    * parameters as another example
-   *
-   * @param {ConditionOperator} operators
-   * @returns {T}
    */
   private static createConditionFunctions<T>(
     impl: (operator: ConditionOperator) => any,

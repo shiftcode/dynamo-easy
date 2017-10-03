@@ -14,7 +14,6 @@ import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
-import { DEFAULT_TABLE_NAME_RESOLVER, TableNameResolver } from '../dynamo-store'
 import { PutRequest } from './put/put.request'
 
 export abstract class BaseRequest<
