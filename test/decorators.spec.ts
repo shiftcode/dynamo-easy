@@ -33,7 +33,7 @@ describe('Decorators should add correct metadata', () => {
 
     it('with default table name', () => {
       expect(modelOptions).toBeDefined()
-      expect(modelOptions.tableName).toBe('simple-model')
+      expect(modelOptions.tableName).toBe('simple-models')
       expect(modelOptions.clazz).toBe(SimpleModel)
       expect(modelOptions.clazzName).toBe('SimpleModel')
     })
