@@ -7,7 +7,7 @@ import builtins from 'rollup-plugin-node-builtins'
 const pkg = require('./package.json')
 const camelCase = require('lodash.camelcase')
 
-const libraryName = 'sc-dynamo-object-mapper'
+const libraryName = 'dynamo-easy'
 
 export default {
   input: `compiled/${libraryName}.js`,

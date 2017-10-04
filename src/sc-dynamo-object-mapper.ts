@@ -30,11 +30,7 @@ export * from './dynamo'
 export * from './mapper'
 export * from './model'
 
-/*
- * TODO add fluent api for updates
- * TODO add query builder for more complex queries QB.AND(QB.NOT(condition1), QB.OR(condition1, condition2...))
- */
-export class ScDynamoObjectMapper {
+export class DynamoEasy {
   // FIXME make this configurable
   static config: { dateType: DateTypes } = { dateType: 'moment' }
 

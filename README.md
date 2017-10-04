@@ -1,4 +1,4 @@
-# sc-dynamodb
+# Dynamo-Easy
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
 
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
@@ -7,7 +7,7 @@
 [![Coveralls](https://img.shields.io/coveralls/michaelwittwer/dynamo-easy.svg)](https://coveralls.io/github/michaelwittwer/dynamo-easy)
 [![Dev Dependencies](https://david-dm.org/michaelwittwer/dynamo-easy/dev-status.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 
-sc stands for [https://www.shiftcode.ch](shiftcode) that's the company which supports this project.
+Built with :heart: by the crew from [https://www.shiftcode.ch](shiftcode).
 
 ## Purpose
 
@@ -63,8 +63,7 @@ dynamoStore.scan()
 Decorators define how on object should be mapped to dynamodb also defining indexes and properties which are used as partition keys
 Use the class <MetadataHelper> to read the informations defined by decorators.
 
-See []() for a the full documentation.
-
+See []() for the full documentation.
 
 -----
 
@@ -324,7 +323,7 @@ This makes more sense in combination with [automatic releases](#automatic-releas
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/sc-dynamo-object-mapper/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/sc-dynamo-object-mapper/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/sc-dynamo-object-mapper/commits?author=michaelwittwer "Tests") |
+| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") |
 | :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 

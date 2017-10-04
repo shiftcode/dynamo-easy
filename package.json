@@ -1,18 +1,18 @@
 {
-  "name": "sc-dynamo-object-mapper",
-  "version": "0.0.65",
+  "name": "dynamo-easy",
+  "version": "0.0.1-alpha.1",
   "description": "",
-  "keywords": [],
-  "main": "dist/sc-dynamo-object-mapper.umd.js",
-  "module": "dist/sc-dynamo-object-mapper.es5.js",
-  "typings": "dist/types/sc-dynamo-object-mapper.d.ts",
+  "keywords": ['aws','dynamo','dynamodb','api','mapper','orm','typescript', 'typescript-decorator','fluent-api'],
+  "main": "dist/dynamo-easy.umd.js",
+  "module": "dist/dynamo-easy.es5.js",
+  "typings": "dist/types/dynamo-easy.d.ts",
   "files": [
     "dist"
   ],
   "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shiftcode/sc-dynamo-object-mapper"
+    "url": "https://github.com/shiftcode/dynamo-easy"
   },
   "license": "MIT",
   "engines": {

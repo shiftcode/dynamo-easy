@@ -1,7 +1,7 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { AttributeModelType } from '../../../mapper/type/attribute-model.type'
 import { Util } from '../../../mapper/util'
-import { ScDynamoObjectMapper } from '../../../sc-dynamo-object-mapper'
+import { DynamoEasy } from '../../../sc-dynamo-object-mapper'
 import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
 import { getMetadataType } from '../../util'
 import { MomentType } from '../date/moment.type'
@@ -109,10 +109,10 @@ function createNewProperty(
   if (typeByConvention) {
     customType = true
 
-    if (ScDynamoObjectMapper.config) {
+    if (DynamoEasy.config) {
       switch (typeByConvention) {
         case 'date':
-          switch (ScDynamoObjectMapper.config.dateType) {
+          switch (DynamoEasy.config.dateType) {
             case 'default':
               propertyType = Date
               break
@@ -120,7 +120,7 @@ function createNewProperty(
               propertyType = MomentType
               break
             default:
-              throw new Error(`Unsupported date type on model metadata <${ScDynamoObjectMapper.config.dateType}>`)
+              throw new Error(`Unsupported date type on model metadata <${DynamoEasy.config.dateType}>`)
           }
           break
       }
