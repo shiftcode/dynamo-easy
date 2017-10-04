@@ -248,10 +248,10 @@ export class ConditionExpressionBuilder {
         case Array:
         case Set:
           if (
-            propertyMetadata.typeInfo.genericTypes &&
-            propertyMetadata.typeInfo.genericTypes[0] !== String &&
-            propertyMetadata.typeInfo.genericTypes[0] !== Number &&
-            propertyMetadata.typeInfo.genericTypes[0] !== Binary
+            propertyMetadata.typeInfo.genericType &&
+            propertyMetadata.typeInfo.genericType !== String &&
+            propertyMetadata.typeInfo.genericType !== Number &&
+            propertyMetadata.typeInfo.genericType !== Binary
           ) {
             finalValue = { S: value.toString() }
           } else {

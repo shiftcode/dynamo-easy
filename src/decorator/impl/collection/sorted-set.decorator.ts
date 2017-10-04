@@ -15,7 +15,7 @@ export function SortedSet(modelClass?: ModelConstructor<any>): PropertyDecorator
     }
 
     if (modelClass) {
-      typeInfo.genericTypes = [modelClass]
+      typeInfo.genericType = modelClass
     }
 
     initOrUpdateProperty({ isSortedCollection: true, typeInfo }, target, propertyKey)

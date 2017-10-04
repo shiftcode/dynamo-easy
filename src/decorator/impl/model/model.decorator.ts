@@ -63,7 +63,6 @@ export function Model(opts: ModelData = {}): ClassDecorator {
   }
 }
 
-// TODO VALIDATION only 5 gsi are allowed per table
 function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
     return properties

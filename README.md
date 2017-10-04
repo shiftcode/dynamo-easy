@@ -14,7 +14,7 @@ The official Amazon Dynamo SDK for javascript has a pretty low level api, where 
 This Library provides an easy to use, descriptive, chainable api to execute dynamoDb requests. It also provides decorators to define how a type should be mapped
 to dynamodb. Supporting simple types like String, Number, Boolean, Binary to more complex types like custom classes, momentJs dates.
 
-Checkout the full api documentation [TODO add link](here).
+Checkout the full api documentation [https://shiftcode.github.io/dynamo-easy/](here).
 
 # What this library does not provide
 API to setup tables (we use cloudformation on our side for infrastructur setup, so this was not a need for us)
@@ -62,7 +62,7 @@ dynamoStore.scan()
 Decorators define how on object should be mapped to dynamodb also defining indexes and properties which are used as partition keys
 Use the class <MetadataHelper> to read the informations defined by decorators.
 
-See []() for the full documentation.
+Checkout the full [https://shiftcode.github.io/dynamo-easy/](documentation).
 
 -----
 
