@@ -151,7 +151,6 @@ export class PagedDataSource<
       .execFullResponse()
       .do(response => {
         console.debug(response)
-        // TODO maybe we should support undefined in request.exclusiveStartKey() expression
         this.lastKey = response.LastEvaluatedKey === undefined ? null : response.LastEvaluatedKey
       })
       .map(response => response.Items || [])

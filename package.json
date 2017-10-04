@@ -2,7 +2,17 @@
   "name": "dynamo-easy",
   "version": "0.0.1-alpha.1",
   "description": "",
-  "keywords": ["aws","dynamo","dynamodb","api","mapper","orm","typescript", "typescript-decorator","fluent-api"],
+  "keywords": [
+    "aws",
+    "dynamo",
+    "dynamodb",
+    "api",
+    "mapper",
+    "orm",
+    "typescript",
+    "typescript-decorator",
+    "fluent-api"
+  ],
   "main": "dist/dynamo-easy.umd.js",
   "module": "dist/dynamo-easy.es5.js",
   "typings": "dist/types/dynamo-easy.d.ts",

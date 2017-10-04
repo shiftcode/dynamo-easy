@@ -59,7 +59,6 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     return this
   }
 
-  // TODO review this
   projectionExpression(...attributesToGet: string[]): GetRequest<T> {
     const resolved = attributesToGet.map(attr => resolveAttributeNames(attr))
     this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')

@@ -4,6 +4,7 @@
 //
 // MomentJs locales
 //
+// FIXME we should import other locals (should we just import all locales for now?)
 import 'moment/locale/de-ch'
 import 'reflect-metadata'
 //
@@ -19,20 +20,24 @@ import 'rxjs/add/operator/map'
 import 'rxjs/add/operator/publishReplay'
 import 'rxjs/add/operator/share'
 import 'rxjs/add/operator/switchMap'
+import { Config } from './config'
 
 //
 // Export public api of the library
 //
-// 'default' means we use js Date object or momentjs implementation for 'momentjs'
-export type DateTypes = 'default' | 'moment'
 export * from './decorator'
 export * from './dynamo'
 export * from './mapper'
 export * from './model'
+export * from './date-types.type'
+export * from './config'
 
 export class DynamoEasy {
-  // FIXME make this configurable
-  static config: { dateType: DateTypes } = { dateType: 'moment' }
+  static config: Config = { dateType: 'moment', debug: true }
+
+  static updateConfig(config: Config): void {
+    Object.assign(DynamoEasy.config, config)
+  }
 
   constructor() {}
 }

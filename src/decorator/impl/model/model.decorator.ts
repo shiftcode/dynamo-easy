@@ -1,3 +1,4 @@
+import * as Debug from 'debug'
 import { kebabCase } from 'lodash'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
@@ -8,6 +9,8 @@ import { KEY_PROPERTY } from '../property/property.decorator'
 import { ModelData } from './model-data.model'
 
 export const KEY_MODEL = 'sc-reflect:model'
+
+const debug = Debug('Model')
 
 /*
  * FIXME add validation for tableName
@@ -22,6 +25,7 @@ _ (underscore)
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
+    debug.log('defining metadata for thing')
     // Make sure everything is valid
     const classType = getMetadataType(constructor)
     const type = constructor as any
@@ -57,6 +61,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
       indexes,
       ...opts,
     }
+    debug.log('here are the final opts', finalOpts)
 
     // console.log(`Decorating: ${finalOpts.clazzName}`, finalOpts);
     Reflect.defineMetadata(KEY_MODEL, finalOpts, constructor)
