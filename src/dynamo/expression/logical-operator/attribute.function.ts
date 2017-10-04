@@ -11,16 +11,6 @@ import { ConditionExpressionDefinitionFunction } from '../type/condition-express
 import { ConditionExpression } from '../type/condition-expression.type'
 import { ConditionOperator } from '../type/condition-operator.type'
 
-/*
- * TODO review this comment
- *
- * because we curry the ConditionExpressionBuilder.buildFilterExpression function we cannot support optional parameters, because
- * the curry function needs to know when all arguments are provided to actually execute the function.
- *
- * for convenienve we could add another property fn like where0 which could accept no arguments for existingValueNames and metadata
- *
- * maybe we wanna provide another property function where0 or similar with a fixed a
- */
 export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
 export function attribute(attributePath: string): ConditionExpressionDefinitionChain
 
