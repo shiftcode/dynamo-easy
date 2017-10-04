@@ -25,7 +25,7 @@ _ (underscore)
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
-    debug.log('defining metadata for thing')
+    debug('defining metadata for thing')
     // Make sure everything is valid
     const classType = getMetadataType(constructor)
     const type = constructor as any
@@ -61,7 +61,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
       indexes,
       ...opts,
     }
-    debug.log('here are the final opts', finalOpts)
+    debug('here are the final opts', finalOpts)
 
     // console.log(`Decorating: ${finalOpts.clazzName}`, finalOpts);
     Reflect.defineMetadata(KEY_MODEL, finalOpts, constructor)
