@@ -206,7 +206,6 @@ describe('Decorators should add correct metadata', () => {
       //   expect(prop.typeInfo).toBeDefined()
       //   expect(prop.typeInfo.isCustom).toBeTruthy()
       //   expect(prop.typeInfo.type).toBe(Map)
-      //   expect(prop.typeInfo.typeName).toBe("Map")
       // })
 
       it('sortedSet', () => {

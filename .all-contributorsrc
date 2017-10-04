@@ -1,0 +1,22 @@
+{
+  "projectName": "sc-dynamo-object-mapper",
+  "projectOwner": "shiftcode",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "michaelwittwer",
+      "name": "Michael Wittwer",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8394182?v=4",
+      "profile": "https://www.shiftcode.ch",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    }
+  ]
+}

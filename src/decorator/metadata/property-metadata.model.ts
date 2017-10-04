@@ -5,13 +5,11 @@ import { ModelConstructor } from '../../model/model-constructor'
 
 export interface TypeInfo {
   type: ModelConstructor<any>
-  // typeName: AttributeModelTypeName;
   // TODO define what custom means
   // true if we use a non native type for dynamo document client
   isCustom?: boolean
   // FIXME should we support only one generic type for now?
   genericTypes?: Array<ModelConstructor<any>>
-  // genericNames?: AttributeModelTypeName[];
 }
 
 export interface Key {

@@ -297,7 +297,7 @@ describe('Mapper', () => {
 
       it('S -> Moment from type decoration', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: MomentType, typeName: 'Moment', isCustom: true },
+          typeInfo: { type: MomentType, isCustom: true },
         }
         const attrValue = {
           S: date
@@ -337,7 +337,7 @@ describe('Mapper', () => {
 
       it('SS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, typeName: 'Array', isCustom: true },
+          typeInfo: { type: Array, isCustom: true },
         }
         const attrValue = { SS: ['foo', 'bar'] }
         const arr = Mapper.fromDbOne<string[]>(attrValue, <any>propertyMetadata)
@@ -362,7 +362,7 @@ describe('Mapper', () => {
 
       it('NS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, typeName: 'Array', isCustom: true },
+          typeInfo: { type: Array, isCustom: true },
         }
         const attrValue = { NS: ['45', '2'] }
         const arr = Mapper.fromDbOne<number[]>(attrValue, <any>propertyMetadata)
@@ -384,7 +384,7 @@ describe('Mapper', () => {
 
       it('L -> set', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Set, typeName: 'Set', isCustom: true },
+          typeInfo: { type: Set, isCustom: true },
         }
         const attrValue = { L: [{ S: 'foo' }, { N: '45' }, { BOOL: true }] }
         const set = Mapper.fromDbOne<Set<any>>(attrValue, <any>propertyMetadata)
