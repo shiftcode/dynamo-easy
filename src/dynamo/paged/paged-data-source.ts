@@ -37,7 +37,7 @@ export class PagedDataSource<
   meta$: Observable<PagedRequestMeta>
 
   // TODO better typing
-  // TODO pagesize should be configurable
+  // TODO pagesize should be configurable via an observable input
   constructor(request$: Observable<Pageable<T, R, O>>, private pageSize: number = 50) {
     this.loading$ = this.loadingSubject.asObservable()
     this.meta$ = this.metaSubject.asObservable()

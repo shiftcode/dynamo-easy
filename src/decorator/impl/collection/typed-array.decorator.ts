@@ -14,7 +14,7 @@ export function TypedArray<T>(modelClass?: ModelConstructor<T>): PropertyDecorat
     }
 
     if (modelClass) {
-      typeInfo.genericTypes = [modelClass]
+      typeInfo.genericType = modelClass
     }
 
     initOrUpdateProperty({ typeInfo }, target, propertyKey)

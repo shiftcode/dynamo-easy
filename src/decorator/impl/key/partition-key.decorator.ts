@@ -1,7 +1,6 @@
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty, KEY_PROPERTY } from '../property/property.decorator'
 
-// TODO check for type of partition key only some scalars are allowed, there could be a custom mapper and the order of decorators cannot be guaranted
 export function PartitionKey(): PropertyDecorator {
   return (target: any, propertyKey: string) => {
     // check for existing properties marked as partition key

@@ -1,3 +1,8 @@
+import { ComparatorOperator } from './comparator-operator.type'
+import { OperatorAlias } from './condition-operator-alias.type'
+import { OPERATOR_TO_ALIAS_MAP } from './condition-operator-to-alias-map.const'
+import { FunctionOperator } from './function-operator.type'
+
 /**
  *
  * http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Syntax
@@ -27,13 +32,5 @@
  *    | begins_with (path, substr)
  *    | contains (path, operand)
  *    | size (path)
- *
- *    TODO size will be always chained if a condition, think about concept
  */
-
-import { ComparatorOperator } from './comparator-operator.type'
-import { OperatorAlias } from './condition-operator-alias.type'
-import { OPERATOR_TO_ALIAS_MAP } from './condition-operator-to-alias-map.const'
-import { FunctionOperator } from './function-operator.type'
-
 export type ConditionOperator = FunctionOperator | ComparatorOperator

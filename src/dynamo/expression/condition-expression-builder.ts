@@ -194,13 +194,9 @@ export class ConditionExpressionBuilder {
   }
 
   /**
-   * TODO if propertyMetadata is available we could add some type check for example with operator IN the given values should all have the same type like the attribute
-   * which should be checked
-   *
    * Every operator requires a predefined arity of parameters, this method checks for the correct arity and throws an Error
    * if not correct
    *
-   * @param {ConditionOperator} operator
    * @param {any[]} values The values which will be applied to the operator function implementation
    * @throws {Error} error Throws an error if the amount of values won't match the operator function parameter arity or
    * the given values is not an array
@@ -248,10 +244,10 @@ export class ConditionExpressionBuilder {
         case Array:
         case Set:
           if (
-            propertyMetadata.typeInfo.genericTypes &&
-            propertyMetadata.typeInfo.genericTypes[0] !== String &&
-            propertyMetadata.typeInfo.genericTypes[0] !== Number &&
-            propertyMetadata.typeInfo.genericTypes[0] !== Binary
+            propertyMetadata.typeInfo.genericType &&
+            propertyMetadata.typeInfo.genericType !== String &&
+            propertyMetadata.typeInfo.genericType !== Number &&
+            propertyMetadata.typeInfo.genericType !== Binary
           ) {
             finalValue = { S: value.toString() }
           } else {

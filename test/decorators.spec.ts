@@ -234,9 +234,8 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(Set)
 
-        expect(prop.typeInfo.genericTypes).toBeDefined()
-        expect(prop.typeInfo.genericTypes.length).toBe(1)
-        expect(prop.typeInfo.genericTypes[0]).toBe(NestedObject)
+        expect(prop.typeInfo.genericType).toBeDefined()
+        expect(prop.typeInfo.genericType).toBe(NestedObject)
       })
 
       it('mapWithNoType', () => {

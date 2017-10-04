@@ -26,15 +26,8 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
 
     if (attributeValue.L) {
       let arr: any[]
-      if (
-        propertyMetadata &&
-        propertyMetadata.typeInfo &&
-        propertyMetadata.typeInfo.genericTypes &&
-        propertyMetadata.typeInfo.genericTypes.length
-      ) {
-        arr = attributeValue.L.map(item =>
-          Mapper.fromDb(<AttributeMap>item.M, propertyMetadata.typeInfo!.genericTypes![0])
-        )
+      if (hasGenericType(propertyMetadata)) {
+        arr = attributeValue.L.map(item => Mapper.fromDb(<AttributeMap>item.M, propertyMetadata!.typeInfo!.genericType))
       } else {
         arr = attributeValue.L.map(value => Mapper.fromDbOne(value))
       }
@@ -67,10 +60,10 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
               } else {
                 if (hasGenericType(propertyMetadata)) {
                   // generic type of Set is defined, so decide based on the generic type which db set type should be used
-                  if (Util.isBufferType(propertyMetadata.typeInfo!.genericTypes![0])) {
+                  if (Util.isBufferType(propertyMetadata.typeInfo!.genericType)) {
                     collectionType = 'BS'
                   } else {
-                    switch (propertyMetadata.typeInfo!.genericTypes![0]) {
+                    switch (propertyMetadata.typeInfo!.genericType) {
                       case String:
                         collectionType = 'SS'
                         break
@@ -119,7 +112,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
           case 'L':
             if (hasGenericType(propertyMetadata)) {
               attributeValue.L = (<any[]>propertyValue).map(value => ({
-                M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericTypes![0]),
+                M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericType),
               }))
             } else {
               attributeValue.L = <AttributeValue[]>(<any[]>propertyValue)
