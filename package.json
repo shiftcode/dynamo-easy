@@ -124,12 +124,12 @@
   },
   "dependencies": {
     "aws-sdk": "^2.100.0",
-    "debug": "^3.0.1",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "moment-es6": "^1.0.0",
     "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.3",
+    "ts-log-debug": "^3.0.0",
     "uuid": "^3.1.0"
   }
 }
