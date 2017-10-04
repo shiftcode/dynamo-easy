@@ -1,11 +1,10 @@
 # Dynamo-Easy
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
-
-[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
+[![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy)
+[![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
-[![Travis](https://img.shields.io/travis/michaelwittwer/dynamo-easy.svg)](https://travis-ci.org/michaelwittwer/dynamo-easy)
-[![Coveralls](https://img.shields.io/coveralls/michaelwittwer/dynamo-easy.svg)](https://coveralls.io/github/michaelwittwer/dynamo-easy)
-[![Dev Dependencies](https://david-dm.org/michaelwittwer/dynamo-easy/dev-status.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
+[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors)
 
 Built with :heart: by the crew from [https://www.shiftcode.ch](shiftcode).
 
