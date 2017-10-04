@@ -1,5 +1,5 @@
+import { DynamoEasy } from '../../../dynamo-easy'
 import { Util } from '../../../mapper/util'
-import { DynamoEasy } from '../../../sc-dynamo-object-mapper'
 import { TypeInfo } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/property.decorator'
 import { MomentType } from './moment.type'
