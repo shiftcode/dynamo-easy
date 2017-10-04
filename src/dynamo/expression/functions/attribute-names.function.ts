@@ -3,7 +3,6 @@ import { PropertyMetadata } from '../../../decorator/metadata/property-metadata.
 const NESTED_ATTR_PATH_CAPTURED_REGEX = /([a-z]+)(?:\[(\d+)])?\.?/g
 const NESTED_ATTR_PATH_REGEX = /^.+((\[(\d+)])|(\.)).*$/
 
-// TODO review this with fresh mind
 export function resolveAttributeNames(
   attributePath: string,
   propertyMetadata?: PropertyMetadata<any>
