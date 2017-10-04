@@ -10,13 +10,16 @@ export class DynamoRx {
   readonly dynamoDb: DynamoDB
   readonly sessionValidityEnsurer: SessionValidityEnsurer
 
-  private readonly logger: Logger
-  constructor(sessionValidtyEnsurer: SessionValidityEnsurer) {
+  constructor(sessionValidityEnsurer: SessionValidityEnsurer, awsRegion?: string) {
     // this.logger = new Logger(() => LogLevel.DEBUG, 'DynamoDbService');
 
     // create the actual dynamo db client
-    this.dynamoDb = new DynamoDB()
-    this.sessionValidityEnsurer = sessionValidtyEnsurer
+    if (awsRegion) {
+      this.dynamoDb = new DynamoDB()
+    } else {
+      this.dynamoDb = new DynamoDB({ region: awsRegion })
+    }
+    this.sessionValidityEnsurer = sessionValidityEnsurer
   }
 
   updateAwsConfigCredentials(newConfig: AWS.Config): void {
