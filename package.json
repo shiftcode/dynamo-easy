@@ -87,6 +87,12 @@
     }
   },
   "devDependencies": {
+    "aws-sdk": "^2.100.0",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "moment-es6": "^1.0.0",
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.3",
     "@types/debug": "^0.0.30",
     "@types/jest": "^21.1.2",
     "@types/lodash": "^4.14.74",
@@ -122,13 +128,12 @@
     "typescript": "^2.5.2",
     "validate-commit-msg": "^2.14.0"
   },
-  "dependencies": {
+  "peerDependencies": {
     "aws-sdk": "^2.100.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "moment-es6": "^1.0.0",
     "reflect-metadata": "^0.1.10",
-    "rxjs": "^5.4.3",
-    "uuid": "^3.1.0"
+    "rxjs": "^5.4.3"
   }
 }
