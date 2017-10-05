@@ -14,11 +14,7 @@ export class DynamoRx {
     // this.logger = new Logger(() => LogLevel.DEBUG, 'DynamoDbService');
 
     // create the actual dynamo db client
-    if (awsRegion) {
-      this.dynamoDb = new DynamoDB()
-    } else {
-      this.dynamoDb = new DynamoDB({ region: awsRegion })
-    }
+    this.dynamoDb = new DynamoDB()
     this.sessionValidityEnsurer = sessionValidityEnsurer
   }
 

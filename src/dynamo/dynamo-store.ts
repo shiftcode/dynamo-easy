@@ -24,11 +24,10 @@ export class DynamoStore<T> {
 
   constructor(
     private modelClazz: ModelConstructor<T>,
-    awsRegion?: string,
     tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
     sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
   ) {
-    this.dynamoRx = new DynamoRx(sessionValidityEnsurer, awsRegion)
+    this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
     this.tableName = tableNameResolver(MetadataHelper.get(this.modelClazz).modelOptions.tableName)
   }
 
