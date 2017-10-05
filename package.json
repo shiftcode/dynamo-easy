@@ -130,12 +130,10 @@
     "aws-sdk": "^2.100.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "moment-es6": "^1.0.0",
-    "reflect-metadata": "^0.1.10",
     "rxjs": "^5.4.3"
   },
   "dependencies": {
     "moment-es6": "^1.0.0",
-    "reflect-metadata": "^0.1.10",
+    "reflect-metadata": "^0.1.10"
   }
 }
