@@ -1,5 +1,5 @@
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
-import { ConditionExpression } from '../type/condition-expression.type'
+import { Expression } from '../type/expression.type'
 import { mergeConditions } from './merge-conditions.function'
 
 export function and(

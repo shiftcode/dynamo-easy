@@ -3,17 +3,14 @@ import { Metadata } from '../../../decorator/metadata/metadata'
 import { ConditionExpressionBuilder } from '../condition-expression-builder'
 import { uniqAttributeValueName } from '../functions/unique-attribute-value-name.function'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
-import { ConditionExpression } from '../type/condition-expression.type'
+import { Expression } from '../type/expression.type'
 
 export function mergeConditions(
   operator: 'AND' | 'OR',
   conditionDefinitionFns: ConditionExpressionDefinitionFunction[]
 ): ConditionExpressionDefinitionFunction {
-  return (
-    expressionAttributeValues: string[] | undefined,
-    metadata: Metadata<any> | undefined
-  ): ConditionExpression => {
-    const mergedCondition: ConditionExpression = {
+  return (expressionAttributeValues: string[] | undefined, metadata: Metadata<any> | undefined): Expression => {
+    const mergedCondition: Expression = {
       statement: '',
       attributeNames: {},
       attributeValues: {},

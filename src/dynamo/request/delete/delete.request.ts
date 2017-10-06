@@ -13,7 +13,7 @@ import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { ConditionExpression } from '../../expression/type/condition-expression.type'
+import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { BaseRequest } from '../base.request'
 

@@ -1,6 +1,6 @@
 import { AttributeMap } from 'aws-sdk/clients/dynamodb'
 
-export interface ConditionExpression {
+export interface Expression {
   attributeNames: { [key: string]: string }
   attributeValues: AttributeMap
   statement: string
