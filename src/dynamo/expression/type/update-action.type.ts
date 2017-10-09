@@ -22,13 +22,3 @@ export type UpdateAction =
   | 'removeFromListAt'
   | 'add'
   | 'removeFromSet'
-
-export class UpdateActionDef {
-  actionKeyword: UpdateActionKeyword
-  action: UpdateAction
-
-  constructor(actionKeyWord: UpdateActionKeyword, action: UpdateAction) {
-    this.actionKeyword = actionKeyWord
-    this.action = action
-  }
-}

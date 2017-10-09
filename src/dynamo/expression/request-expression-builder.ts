@@ -12,7 +12,9 @@ import { ExpressionType } from './type/expression-type.type'
 import { Expression } from './type/expression.type'
 import { RequestConditionFunction } from './type/request-condition-function'
 import { RequestSortKeyConditionFunction } from './type/sort-key-condition-function'
-import { UpdateAction, UpdateActionDef } from './type/update-action.type'
+import { UpdateActionDef } from './type/update-action-def'
+import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
+import { UpdateAction } from './type/update-action.type'
 import { UpdateExpressionDefinitionChain } from './type/update-expression-definition-chain'
 import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
 import { UpdateExpression } from './type/update-expression.type'
@@ -149,12 +151,7 @@ export class RequestExpressionBuilder {
    * parameters as another example
    */
   private static createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T {
-    // FIXME add all operators
-    return <T>[
-      new UpdateActionDef('SET', 'incrementBy'),
-      new UpdateActionDef('SET', 'decrementBy'),
-      new UpdateActionDef('SET', 'set'),
-    ].reduce(
+    return <T>UPDATE_ACTION_DEFS.reduce(
       (result: T, updateActionDef: UpdateActionDef) => {
         Reflect.set(<any>result, updateActionDef.action, impl(updateActionDef))
 

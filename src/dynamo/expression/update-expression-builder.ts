@@ -1,14 +1,13 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { curryRight } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
+import { Util } from '../../mapper/util'
 import { resolveAttributeNames } from './functions/attribute-names.function'
-import { isFunctionOperator } from './functions/is-function-operator.function'
-import { isNoParamFunctionOperator } from './functions/is-no-param-function-operator.function'
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { Expression } from './type/expression.type'
-import { UpdateAction, UpdateActionDef } from './type/update-action.type'
+import { UpdateActionDef } from './type/update-action-def'
+import { UpdateAction } from './type/update-action.type'
 import { UpdateExpression } from './type/update-expression.type'
 
 export class UpdateExpressionBuilder {
@@ -32,6 +31,7 @@ export class UpdateExpressionBuilder {
   ): UpdateExpression {
     // TODO investigate is there a use case for undefined desired to be a value
     // get rid of undefined values
+    // FIXME should this not be a deep filter?
     values = values.filter(value => value !== undefined)
 
     // TODO check if provided values are valid for given operation
@@ -83,22 +83,61 @@ export class UpdateExpressionBuilder {
   ): UpdateExpression {
     let statement: string
     switch (operator.action) {
-      case 'set':
-        statement = `${namePlaceholder} = ${valuePlaceholder}`
-        break
       case 'incrementBy':
         statement = `${namePlaceholder} = ${namePlaceholder} + ${valuePlaceholder}`
         break
       case 'decrementBy':
         statement = `${namePlaceholder} = ${namePlaceholder} - ${valuePlaceholder}`
         break
+      case 'set':
+        statement = `${namePlaceholder} = ${valuePlaceholder}`
+        break
+      case 'appendToList':
+        const position = values.length > 1 ? values[values.length - 1] || 'END' : 'END'
+        switch (position) {
+          case 'END':
+            statement = `${namePlaceholder} = list_append(${namePlaceholder}, ${valuePlaceholder})`
+            break
+          case 'START':
+            statement = `${namePlaceholder} = list_append(${valuePlaceholder}, ${namePlaceholder})`
+            break
+          default:
+            throw new Error("make sure to provide either 'START' or 'END' as value for position argument")
+        }
+        break
+      case 'remove':
+        statement = `${namePlaceholder}`
+        break
+      case 'removeFromListAt':
+        const positions: number[] = values
+        statement = values.map(pos => `${namePlaceholder}[${pos}]`).join(', ')
+        break
+      case 'add':
+        // TODO add validation to make sure expressionAttributeValue to be N(umber) or S(et)
+        statement = `${namePlaceholder} ${valuePlaceholder}`
+        // TODO won't work for numbers, is always gonna be mapped to a collectio type
+        if ((values.length === 1 && Array.isArray(values[0])) || Util.isSet(values[0])) {
+          // dealing with arr | set as single argument
+        } else {
+          // dealing with vararg
+          values[0] = [...values]
+        }
+        break
+      case 'removeFromSet':
+        // TODO add validation to make sure expressionAttributeValue to be S(et)
+        statement = `${namePlaceholder} ${valuePlaceholder}`
+        if ((values.length === 1 && Array.isArray(values[0])) || Util.isSet(values[0])) {
+          // dealing with arr | set as single argument
+        } else {
+          // dealing with vararg
+          values[0] = [...values]
+        }
+        break
       default:
-        throw new Error('no implementation')
+        throw new Error(`no implementation for action ${operator.action}`)
     }
 
-    // = [namePlaceholder, operator, valuePlaceholder].join(' ')
-    // FIXME add hasValue logic
-    const hasValue = true
+    const hasValue = !UpdateExpressionBuilder.isNoValueAction(operator.action)
 
     const attributeValues: AttributeMap = {}
     if (hasValue) {
@@ -115,5 +154,13 @@ export class UpdateExpressionBuilder {
       attributeNames,
       attributeValues,
     }
+  }
+
+  private static isNoValueAction(action: UpdateAction) {
+    return (
+      action === 'remove' ||
+      // special cases: values are used in statement instaed of expressionValues
+      action === 'removeFromListAt'
+    )
   }
 }
