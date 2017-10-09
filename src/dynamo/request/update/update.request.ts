@@ -35,7 +35,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
-    if ((hasSortKey && sortKey === null) || sortKey === undefined) {
+    if (hasSortKey && (sortKey === null || sortKey === undefined)) {
       throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
     }
 
