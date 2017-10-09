@@ -22,6 +22,7 @@ import { BaseRequest } from '../base.request'
 
 export type Bla = { [key in UpdateActionKeyword]: Expression[] }
 
+// TODO add if no operations are defined, don't execute
 export class UpdateRequest<T> extends BaseRequest<T, any> {
   constructor(
     dynamoRx: DynamoRx,
