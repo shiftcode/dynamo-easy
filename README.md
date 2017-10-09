@@ -1,6 +1,6 @@
 # Dynamo-Easy
 [![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
-[![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy)
+[![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
@@ -11,7 +11,7 @@ to define some metadata for your models. You don't need to care about the mappin
 
 Checkout the full technical api documentation [here](https://shiftcode.github.io/dynamo-easy/).
 
-Built with :heart: by the crew from [shiftcode](https://www.shiftcode.ch).
+Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
 ```

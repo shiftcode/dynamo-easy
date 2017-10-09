@@ -12,7 +12,7 @@ export class DateMapper implements MapperForType<Date> {
 
   toDb(modelValue: Date): AttributeValue {
     if (modelValue && modelValue instanceof Date) {
-      return { N: modelValue.getTime().toString() }
+      return { N: `${modelValue.getTime()}` }
     } else {
       throw new Error('the given model value must be an instance of Date')
     }
