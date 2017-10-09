@@ -104,7 +104,6 @@ export class RequestExpressionBuilder {
     return RequestExpressionBuilder.addSortKeyCondition(keyName, request, metadata).equals(keyValue)
   }
 
-  // FIXME attributePath could also be a simple string for nested paths
   static updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain
   static updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
 
@@ -147,7 +146,7 @@ export class RequestExpressionBuilder {
    * for all the values included in operators
    *
    * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
-   * for the condition. when executed the implementation defines what todo with the condition, just return it for example or add the condition to the request
+   * for the condition. when executed the implementation defines what to do with the condition, just return it for example or add the condition to the request
    * parameters as another example
    */
   private static createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T {
@@ -166,7 +165,7 @@ export class RequestExpressionBuilder {
    * for all the values included in operators
    *
    * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
-   * for the condition. when executed the implementation defines what todo with the condition, just return it for example or add the condition to the request
+   * for the condition. when executed the implementation defines what to do with the condition, just return it for example or add the condition to the request
    * parameters as another example
    */
   private static createConditionFunctions<T>(

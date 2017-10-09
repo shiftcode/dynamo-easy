@@ -22,7 +22,6 @@ import { BaseRequest } from '../base.request'
 
 export type Bla = { [key in UpdateActionKeyword]: Expression[] }
 
-// TODO add if no operations are defined, don't execute
 export class UpdateRequest<T> extends BaseRequest<T, any> {
   constructor(
     dynamoRx: DynamoRx,
@@ -74,33 +73,6 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     return this
   }
 
-  /*
-   * update()
-   * //////////// SET ACTION ////////////
-   *  - add one or more attributes to an item
-   *  .set('attrPath', value)
-   *  - increment / decrement number value (incrementBy(), decrementBy())
-   *  .set('attr', value) SET Attr = Attr +- :value
-   *  - add a new list / map
-   *  .set('attrPath', collectionValue)
-   *  - add elements to a list
-   *  .set('listAttrPath', itemValue)
-   *  - add nested map attributes
-   *  .set('', )
-   * ///////////  /////////////
-   *
-   *  //
-   *  .
-   *  //
-   *  .
-   *  //
-   *  .
-   *
-   */
-
-  /**
-   *
-   */
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
     if (updateDefFns && updateDefFns.length) {
       const sortedByActionKeyWord: Bla = updateDefFns
@@ -119,11 +91,6 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
           <Bla>{}
         )
 
-      /*
-       * {
-       *  SET: [updateExpression, updateExpression]
-       * }
-       */
       const actionStatements: string[] = []
       let attributeValues: AttributeMap = {}
       let attributeNames: { [key: string]: string } = {}
@@ -177,7 +144,6 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
   }
 
   exec(): Observable<void> {
-    // TODO maybe we should map the returned Attributes to the given model type, needs some more investigation
     return this.dynamoRx.updateItem(this.params).map(response => {
       return
     })

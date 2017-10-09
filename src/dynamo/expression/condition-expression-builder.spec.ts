@@ -8,7 +8,6 @@ import { ConditionExpressionBuilder } from './condition-expression-builder'
 
 @Model()
 class MyModel {
-  // FIXME TEST if the db name is used for requests
   @Property({ name: 'myId' })
   @PartitionKey()
   id: string
@@ -260,7 +259,7 @@ describe('expressions', () => {
       )
       expect(condition.statement).toBe('#myCollection IN (:myCollection)')
       expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
-      // TODO review not sure if the attribute should be L(ist) or S(et) or if both are supported, they both executed successfuly against dynamodb when testing but with wrong result
+      // TODO review not sure if the attribute should be L(ist) or S(et) or if both are supported, they both executed successfuly against dynamodb when testing but with unexpected result
       // expect(condition.attributeValues).toEqual({
       //   ':myCollection': { L: [{ S: 'myCollection' }, { S: 'myOtherValue' }] },
       // })

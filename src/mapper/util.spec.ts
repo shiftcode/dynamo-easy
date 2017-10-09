@@ -72,12 +72,6 @@ describe('Util', () => {
       expect(Util.detectCollectionType(collection)).toBe('NS')
     })
 
-    // TODO implement binary
-    // it('set with binary values', ()=>{
-    //   const collection: Set<string> = new Set(['foo', 'bar']);
-    //   expect(Util.detectCollectionType(collection)).toBe('BS');
-    // })
-
     it('set with object values', () => {
       const collection: Set<any> = new Set([{ foo: 'foo' }, { bar: 'bar' }])
       expect(Util.detectCollectionType(collection)).toBe('L')
@@ -138,7 +132,6 @@ describe('Util', () => {
     })
   })
 
-  // TODO add binary test
   describe('typeof', () => {
     it('string', () => {
       expect(Util.typeOf('foo')).toBe(String)

@@ -23,7 +23,6 @@ export class PutRequest<T> extends BaseRequest<T, any> {
    */
   ifNotExists(predicate?: boolean): PutRequest<T> {
     // FIXME should we check for sort key too?
-    // FIXME add test for predicate
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
       this.whereAttribute(this.metaData.getPartitionKey()).null()
     }

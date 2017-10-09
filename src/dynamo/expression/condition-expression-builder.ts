@@ -14,7 +14,6 @@ import { ConditionOperator } from './type/condition-operator.type'
 import { Expression } from './type/expression.type'
 
 /**
- * TODO complete doc
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
  */
 export class ConditionExpressionBuilder {
@@ -38,6 +37,7 @@ export class ConditionExpressionBuilder {
   ): Expression {
     // TODO investigate is there a use case for undefined desired to be a value
     // get rid of undefined values
+    // TODO should this not be a deep filter?
     values = values.filter(value => value !== undefined)
 
     // check if provided values are valid for given operator
