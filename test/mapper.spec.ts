@@ -160,7 +160,7 @@ describe('Mapper', () => {
         expect(bool.BOOL).toBe(true)
       })
 
-      fit('array -> L (homogen, complex type)', () => {
+      it('array -> L (homogen, complex type)', () => {
         const now = moment()
         const attrValue: AttributeValue = Mapper.toDbOne([
           new Employee('max', 25, now, null),
@@ -193,9 +193,10 @@ describe('Mapper', () => {
       it('set', () => {
         const attrValue: AttributeValue = Mapper.toDbOne(new Set(['foo', 'bar', 25]))
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('SS')
-        expect(attrValue.SS[0]).toBe('foo')
-        expect(attrValue.SS[1]).toBe('bar')
+        expect(keyOf(attrValue)).toBe('L')
+        expect(attrValue.L[0]).toEqual({ S: 'foo' })
+        expect(attrValue.L[1]).toEqual({ S: 'bar' })
+        expect(attrValue.L[2]).toEqual({ N: '25' })
       })
 
       it('set (empty)', () => {

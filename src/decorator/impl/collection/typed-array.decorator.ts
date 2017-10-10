@@ -3,7 +3,7 @@ import { TypeInfo } from '../../metadata/property-metadata.model'
 import { AttributeModelTypes, initOrUpdateProperty, KEY_PROPERTY } from '../property/property.decorator'
 
 /**
- * Makes sure the property will be marshalled to a L(ist) type. The modelClass is required if the collection items
+ * Makes sure the property will be mapped to a L(ist) type. The modelClass is required if the collection items
  * have some property decorators, so we can retrieve this information using the model class.
  */
 export function TypedArray<T>(modelClass?: ModelConstructor<T>): PropertyDecorator {

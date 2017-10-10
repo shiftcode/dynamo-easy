@@ -6,10 +6,18 @@ export class NullMapper implements MapperForType<null> {
   constructor() {}
 
   fromDb(value: AttributeValue): null {
-    return null
+    if (value.NULL) {
+      return null
+    } else {
+      throw new Error(`there is no NULL value defiend on given attribute value ${value}`)
+    }
   }
 
   toDb(value: null): AttributeValue {
+    if (value !== null) {
+      throw new Error(`null mapper only supports null value, got ${value}`)
+    }
+
     return { NULL: true }
   }
 }

@@ -76,6 +76,16 @@ describe('Util', () => {
       const collection: Set<any> = new Set([{ foo: 'foo' }, { bar: 'bar' }])
       expect(Util.detectCollectionType(collection)).toBe('L')
     })
+
+    it('set with values of different type', () => {
+      const collection: Set<any> = new Set(['foo', 5])
+      expect(Util.detectCollectionType(collection)).toBe('L')
+    })
+
+    it('set with no values', () => {
+      const collection: Set<any> = new Set()
+      expect(Util.detectCollectionType(collection)).toBe('L')
+    })
   })
 
   describe('type name', () => {
@@ -141,9 +151,12 @@ describe('Util', () => {
       expect(Util.typeOf(253)).toBe(Number)
     })
 
+    it('number', () => {
+      expect(Util.typeOf(-521)).toBe(Number)
+    })
+
     it('number (NaN)', () => {
-      const nan = NaN
-      expect(Util.typeOf(nan)).toBe(Number)
+      expect(Util.typeOf(NaN)).toBe(Number)
     })
 
     it('boolean', () => {

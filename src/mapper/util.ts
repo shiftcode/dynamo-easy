@@ -36,34 +36,59 @@ export class Util {
   static DATE_TIME_ISO8601 = /^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$/
 
   // TODO should we handle duplicates, switch from set to list?
+  /**
+   * Detects the dynamodb type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
+   * Collections of type array where all the values are either String | Number | Binary will be mapped to the corresponding S(et)
+   * type. If the item types are heterogeneous or it is a non supported set type the returned type will be L(ist).
+   * The logic for collection fo type Set is the same.
+   *
+   * @param {any[] | Set<any>} collection
+   * @returns {AttributeCollectionType}
+   */
   static detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType {
     if (Array.isArray(collection)) {
-      if (collection.every(isString)) {
-        return 'SS'
-      }
+      if (collection.length) {
+        if (collection.every(isString)) {
+          return 'SS'
+        }
 
-      if (collection.every(isNumber)) {
-        return 'NS'
-      }
+        if (collection.every(isNumber)) {
+          return 'NS'
+        }
 
-      if (collection.every(Util.isBinary)) {
-        return 'BS'
+        if (collection.every(Util.isBinary)) {
+          return 'BS'
+        }
       }
 
       return 'L'
     } else if (Util.isSet(collection)) {
-      const firstValueType = collection.size ? collection.values().next().value : null
-      const type: AttributeType = Util.detectType(firstValueType)
+      const firstValueType: AttributeType | null = collection.size
+        ? Util.detectType(collection.values().next().value)
+        : null
+      let heterogeneous = false
 
-      switch (type) {
-        case 'S':
-          return 'SS'
-        case 'N':
-          return 'NS'
-        case 'B':
-          return 'BS'
-        default:
-          return 'L'
+      for (const item of collection) {
+        const type: AttributeType = Util.detectType(item)
+        if (type !== firstValueType) {
+          heterogeneous = true
+          break
+        }
+      }
+
+      if (heterogeneous) {
+        return 'L'
+      } else {
+        switch (firstValueType) {
+          case 'S':
+            return 'SS'
+          case 'N':
+            return 'NS'
+          case 'B':
+            return 'BS'
+          default:
+            return 'L'
+        }
       }
     } else {
       throw new Error('given collection was no array or Set -> type could not be detected')
