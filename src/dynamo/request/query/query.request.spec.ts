@@ -27,20 +27,11 @@ describe('query request', () => {
     it('defaults should be defined', () => {
       expect(request.params.TableName).toBe('complex_model')
       expect(request.params.Limit).toBe(QueryRequest.DEFAULT_LIMIT)
-      expect(request.params.IndexName).toBeUndefined()
-      expect(request.params.KeyConditions).toBeUndefined()
-      expect(request.params.KeyConditionExpression).toBeUndefined()
-      expect(request.params.ConditionalOperator).toBeUndefined()
-      expect(request.params.AttributesToGet).toBeUndefined()
-      expect(request.params.ConsistentRead).toBeUndefined()
-      expect(request.params.ExclusiveStartKey).toBeUndefined()
-      expect(request.params.ExpressionAttributeNames).toBeUndefined()
-      expect(request.params.ExpressionAttributeValues).toBeUndefined()
+      expect(Object.keys(request.params).length).toBe(2)
     })
 
     it('Limit', () => {
       request.limit(5)
-      expect(request.params).toBeDefined()
       expect(request.params.Limit).toBe(5)
     })
   })

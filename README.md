@@ -1,6 +1,7 @@
 # Dynamo-Easy
 [![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
 [![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/shiftcode/dynamo-easy/badge.svg?branch=master)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)

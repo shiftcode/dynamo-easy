@@ -47,10 +47,6 @@
     lodash "^4.17.4"
     pify "^3.0.0"
 
-"@types/core-js@^0.9.43":
-  version "0.9.43"
-  resolved "https://registry.yarnpkg.com/@types/core-js/-/core-js-0.9.43.tgz#65d646c5e8c0cd1bdee37065799f9d3d48748253"
-
 "@types/debug@^0.0.30":
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/debug/-/debug-0.0.30.tgz#dc1e40f7af3b9c815013a7860e6252f6352a84df"
