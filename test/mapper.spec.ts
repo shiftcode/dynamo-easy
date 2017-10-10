@@ -160,10 +160,11 @@ describe('Mapper', () => {
         expect(bool.BOOL).toBe(true)
       })
 
-      it('array -> L (homogen, complex type)', () => {
+      fit('array -> L (homogen, complex type)', () => {
+        const now = moment()
         const attrValue: AttributeValue = Mapper.toDbOne([
-          new Employee('max', 25, moment(), null),
-          new Employee('anna', 65, moment(), null),
+          new Employee('max', 25, now, null),
+          new Employee('anna', 65, now, null),
         ])
 
         expect(attrValue).toBeDefined()
@@ -180,7 +181,13 @@ describe('Mapper', () => {
         expect(employee1.M['age']).toBeDefined()
         expect(keyOf(employee1.M['age'])).toBe('N')
         expect(employee1.M['age']['N']).toBe('25')
-        // TODO test for moment date
+
+        expect(employee1.M['createdAt']).toEqual({
+          S: now
+            .clone()
+            .utc()
+            .format(),
+        })
       })
 
       it('set', () => {
@@ -482,7 +489,7 @@ describe('Mapper', () => {
           events.add(new OrganizationEvent('shift the web', 1520))
           organization.events = events
 
-          // TODO add map data?
+          //  TODO add map data?
           // const benefits: Map<number, string> = new Map();
           // benefits.set(2012, 'wine');
           // benefits.set(2013, 'moooney');

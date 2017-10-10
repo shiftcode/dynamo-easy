@@ -17,6 +17,9 @@ import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 import { TableNameResolver } from './table-name-resolver.type'
 
 export class DynamoStore<T> {
+  /* http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html#limits-naming-rules */
+  private static REGEX_TABLE_NAME = /^[a-zA-Z0-9_\-.]{3,255}$/
+
   private readonly dynamoRx: DynamoRx
   private readonly mapper: Mapper
 
@@ -28,7 +31,14 @@ export class DynamoStore<T> {
     sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
   ) {
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
-    this.tableName = tableNameResolver(MetadataHelper.get(this.modelClazz).modelOptions.tableName)
+    const tableName = tableNameResolver(MetadataHelper.get(this.modelClazz).modelOptions.tableName)
+    if (!DynamoStore.REGEX_TABLE_NAME.test(tableName)) {
+      throw new Error(
+        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long'
+      )
+    }
+
+    this.tableName = tableName
   }
 
   get dynamoDb(): DynamoDB {
@@ -110,12 +120,6 @@ export class DynamoStore<T> {
       }
     })
   }
-
-  // private findBySingleKey(partitionKeyValue: any): Observable<T[]> {
-  //   return this.query()
-  //     .wherePartitionKey(partitionKeyValue)
-  //     .exec()
-  // }
 
   private createBaseParams(): { TableName: string } {
     const params: { TableName: string } = {

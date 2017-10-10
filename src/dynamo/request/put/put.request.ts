@@ -7,7 +7,7 @@ import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { ConditionExpression } from '../../expression/type/condition-expression.type'
+import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { BaseRequest } from '../base.request'
 
@@ -23,7 +23,6 @@ export class PutRequest<T> extends BaseRequest<T, any> {
    */
   ifNotExists(predicate?: boolean): PutRequest<T> {
     // FIXME should we check for sort key too?
-    // FIXME add test for predicate
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
       this.whereAttribute(this.metaData.getPartitionKey()).null()
     }

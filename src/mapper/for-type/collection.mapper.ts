@@ -95,7 +95,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
         propertyValue = Array.from(propertyValue)
       }
 
-      // empty value is not allowed for Set and List (TODO check if true for lists)
+      // empty value is not allowed for S(et) (supported for L(ist))
       if (propertyValue.length === 0) {
         return null
       } else {

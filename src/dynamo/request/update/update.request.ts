@@ -2,13 +2,10 @@ import {
   AttributeMap,
   ReturnConsumedCapacity,
   ReturnItemCollectionMetrics,
-  ScanInput,
-  UpdateItemInput,
   UpdateItemOutput,
 } from 'aws-sdk/clients/dynamodb'
+import { forEach } from 'lodash'
 import { Observable } from 'rxjs/Observable'
-import { Metadata } from '../../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -16,10 +13,14 @@ import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { ConditionExpression } from '../../expression/type/condition-expression.type'
+import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
+import { UpdateActionKeyword } from '../../expression/type/update-action-keyword.type'
+import { UpdateExpressionDefinitionFunction } from '../../expression/type/update-expression-definition-function'
+import { UpdateExpression } from '../../expression/type/update-expression.type'
 import { BaseRequest } from '../base.request'
-import { Request } from '../request.model'
+
+export type Bla = { [key in UpdateActionKeyword]: Expression[] }
 
 export class UpdateRequest<T> extends BaseRequest<T, any> {
   constructor(
@@ -33,7 +34,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
-    if ((hasSortKey && sortKey === null) || sortKey === undefined) {
+    if (hasSortKey && (sortKey === null || sortKey === undefined)) {
       throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
     }
 
@@ -72,9 +73,51 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     return this
   }
 
-  // TODO implement http://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_UpdateItem.html#DDB-UpdateItem-request-UpdateExpression
-  updateExpression(expression: any): UpdateRequest<T> {
-    return this
+  operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
+    if (updateDefFns && updateDefFns.length) {
+      const sortedByActionKeyWord: Bla = updateDefFns
+        .map(updateDefFn => {
+          return updateDefFn(this.params.ExpressionAttributeValues, this.metaData)
+        })
+        .reduce(
+          (result, expr) => {
+            if (!result[expr.type]) {
+              result[expr.type] = []
+            }
+
+            result[expr.type].push(expr)
+            return result
+          },
+          <Bla>{}
+        )
+
+      const actionStatements: string[] = []
+      let attributeValues: AttributeMap = {}
+      let attributeNames: { [key: string]: string } = {}
+
+      forEach(sortedByActionKeyWord, (value: UpdateExpression[], key: UpdateActionKeyword) => {
+        const statements: string[] = []
+        if (value && value.length) {
+          value.forEach(updateExpression => {
+            statements.push(updateExpression.statement)
+            attributeValues = { ...attributeValues, ...updateExpression.attributeValues }
+            attributeNames = { ...attributeNames, ...updateExpression.attributeNames }
+          })
+          actionStatements.push(`${key} ${statements.join(', ')}`)
+        }
+      })
+
+      const expression: Expression = {
+        statement: actionStatements.join(' '),
+        attributeValues,
+        attributeNames,
+      }
+
+      ParamUtil.addUpdateExpression(expression, this.params)
+      return this
+    } else {
+      throw new Error('at least one update operation must be defined')
+    }
   }
 
   returnConsumedCapacity(level: ReturnConsumedCapacity): UpdateRequest<T> {
@@ -101,7 +144,6 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
   }
 
   exec(): Observable<void> {
-    // TODO maybe we should map the returned Attributes to the given model type, needs some more investigation
     return this.dynamoRx.updateItem(this.params).map(response => {
       return
     })

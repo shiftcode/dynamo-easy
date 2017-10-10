@@ -122,7 +122,6 @@ export class Mapper {
     const type: AttributeModelType = explicitType || Util.typeOf(propertyValue)
 
     // some basic validation
-    // TODO add check for binary type which is valid for parition key
     if (
       propertyMetadata &&
       propertyMetadata.key &&

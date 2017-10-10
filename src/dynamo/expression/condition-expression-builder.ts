@@ -10,11 +10,10 @@ import { isFunctionOperator } from './functions/is-function-operator.function'
 import { isNoParamFunctionOperator } from './functions/is-no-param-function-operator.function'
 import { operatorParameterArity } from './functions/operator-parameter-arity.function'
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
-import { ConditionExpression } from './type/condition-expression.type'
 import { ConditionOperator } from './type/condition-operator.type'
+import { Expression } from './type/expression.type'
 
 /**
- * TODO complete doc
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
  */
 export class ConditionExpressionBuilder {
@@ -27,7 +26,7 @@ export class ConditionExpressionBuilder {
    * @param {any[]} values Depending on the operator the amount of values differs
    * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
    * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
-   * @returns {ConditionExpression}
+   * @returns {Expression}
    */
   static buildFilterExpression(
     attributePath: string,
@@ -35,9 +34,10 @@ export class ConditionExpressionBuilder {
     values: any[],
     existingValueNames: string[] | undefined,
     metadata: Metadata<any> | undefined
-  ): ConditionExpression {
+  ): Expression {
     // TODO investigate is there a use case for undefined desired to be a value
     // get rid of undefined values
+    // TODO should this not be a deep filter?
     values = values.filter(value => value !== undefined)
 
     // check if provided values are valid for given operator
@@ -94,7 +94,7 @@ export class ConditionExpressionBuilder {
    * @param {string[]} values
    * @param {string[]} existingValueNames
    * @param {PropertyMetadata<any>} propertyMetadata
-   * @returns {ConditionExpression}
+   * @returns {Expression}
    */
   private static buildInConditionExpression(
     attributePath: string,
@@ -104,7 +104,7 @@ export class ConditionExpressionBuilder {
     values: any[],
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined
-  ): ConditionExpression {
+  ): Expression {
     const mappedValues = Mapper.toDbOne(values[0], propertyMetadata)
 
     const attributeValues: AttributeMap = {}
@@ -125,7 +125,7 @@ export class ConditionExpressionBuilder {
     values: string[],
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined
-  ): ConditionExpression {
+  ): Expression {
     const attributeValues: AttributeMap = {}
     const mappedValue1 = Mapper.toDbOne(values[0], propertyMetadata)
     const mappedValue2 = Mapper.toDbOne(values[1], propertyMetadata)
@@ -156,7 +156,7 @@ export class ConditionExpressionBuilder {
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined,
     operator: ConditionOperator
-  ): ConditionExpression {
+  ): Expression {
     let statement: string
     let hasValue = true
     if (isFunctionOperator(operator)) {

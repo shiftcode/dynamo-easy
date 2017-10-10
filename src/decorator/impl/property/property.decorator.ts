@@ -103,8 +103,6 @@ function createNewProperty(
   let propertyType: AttributeModelType = getMetadataType(target, propertyKey)
   let customType = isCustomType(propertyType)
 
-  // FIXME model metadata is not accessible here, need to know the model data for metadatintorspection
-  // let modelMetadata: ModelMetadata = Reflect.getMetadata(KEY_MODEL, target.constructor);
   const typeByConvention = Util.typeByConvention(propertyKey)
   if (typeByConvention) {
     customType = true
@@ -147,8 +145,7 @@ function createNewProperty(
 }
 
 /**
- * FIXME fix typing
- * FIXME make sure to implement the context dependant details of Binary (Buffer vs. Uint8Array)
+ * TODO BINARY make sure to implement the context dependant details of Binary (Buffer vs. Uint8Array)
  * @returns {boolean} true if the type cannot be mapped by dynamo document client
  */
 function isCustomType(type: AttributeModelTypes): boolean {

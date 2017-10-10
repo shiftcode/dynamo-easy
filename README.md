@@ -1,28 +1,19 @@
 # Dynamo-Easy
 [![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
-[![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy)
+[![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors)
 
-Built with :heart: by the crew from [https://www.shiftcode.ch](shiftcode).
+Abstracts away the complexity of the low level aws dynamosdk. Provides an easy to use fluent api to for requests and supports typescript decorators,
+to define some metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
 
-## Purpose
+Checkout the full technical api documentation [here](https://shiftcode.github.io/dynamo-easy/).
 
-The official Amazon Dynamo SDK for javascript has a pretty low level api, where some deeper knowledge about all the possible options is required.
-This Library provides an easy to use, descriptive, chainable api to execute dynamoDb requests. It also provides decorators to define how a type should be mapped
-to dynamodb. Supporting simple types like String, Number, Boolean, Binary to more complex types like custom classes, momentJs dates.
-
-Checkout the full api documentation [https://shiftcode.github.io/dynamo-easy/](here).
-
-# What this library does not provide
-API to setup tables (we use cloudformation on our side for infrastructur setup, so this was not a need for us)
+Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
-Usage with Angular (>4) checkout our angular-service. [TODO](TODO)
-
-Basic Example:
 ```
 @Model()
 class Person{
@@ -58,126 +49,87 @@ dynamoStore.scan()
 
 ```
 
+Want to use this library with Angular (>4) [checkout our angular-service](TODO).
+
 # Decorators
-Decorators define how on object should be mapped to dynamodb also defining indexes and properties which are used as partition keys
-Use the class <MetadataHelper> to read the informations defined by decorators.
+Decorators are used to add some metadata to our model classes, relevant to our javascript-to-dynamo mapper.
 
-Checkout the full [https://shiftcode.github.io/dynamo-easy/](documentation).
-
------
-
-To map an js object into the attribute map required by dynamodb requests, we implement our very oppinionated custom mapper.
-We use the DynamoDB Document Mapper to map all «default» types to dynamodb attribute values.
-
-There are some custom requirements for these cases:
-
-- MomentJs Dates
-- Use ES6 Map, Set types
-
-Mapper Strategy:
-
--> To DB
-1) check if we have some property metadata
-      
-      YES                                                      NO
-      
-      isCustomType                                             document client can map (check with typeof propertyValue for additional security)
-      
-      YES                 NO
-      
-      custom mapping      document client can map
-
--> From DB
-
------
-
-
-Decorators are used to add some metadata to our model classes required by the mapper for some special cases.
-
-This is an experimental feature and requires to set the
+This is an experimental feature and requires to set the following typescript compiler options:
  
 - "experimentalDecorators": true
 - "emitDecoratorMetadata": true
 
-typescript compiler options.
-
 Additionally we rely on the reflect-metadata (https://www.npmjs.com/package/reflect-metadata) library for reflection api.
 
-To get started with decorators just add a @Model() Decorator to any ts class. By default this enables the custom mapping functionality
-and will get you started to work with Dynamo DB and simple types (like String, Number, Boolean etc. but no custom classes for example)
+To get started with decorators just add a [@Model()](https://shiftcode.github.io/dynamo-easy/modules/_decorator_impl_model_model_decorator_.html) Decorator to any typescript class. 
+
+If you need to read the metadata by hand for some purpose, use the [MetadataHelper](https://shiftcode.github.io/dynamo-easy/classes/_decorator_metadata_metadata_helper_.metadatahelper.html) to read the informations.
 
 We make heavy usage of compile time informations about our models and the property types.
 Here is a list of the types that can be retrieved from compile time information for the key design:type. (The metadata will only be added if at least one decorator is
 present on a property)
 
-String
-Number
-Boolean
-Array (no generics)
-Custom Types
-
-Map / Set will be Object
+- String
+- Number
+- Boolean
+- Array (no generics)
+- Custom Types
+- ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get(design:type), so we need some extra info.
 
 Generic information is never available due to some serialization limitations at the time of writing.
 
-ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get(design:type), so we need some extra info.
+## A word on Collections (Array & Set)
 
-##### Collections
-
-#Array
+###Array
 Javascript Arrays with a a items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
 If an item of an Array has a complex type the type can be defined using the @TypedArray() Decorator.
 
-#Set
-es6 Set types will be marshalled to dynamoDb set type if the type of the set is supported, if the type is not supported it will be
+###Set
+ES6 Set types will be marshalled to dynamoDb set type if the type of the set is supported, if the type is not supported it will be
 marshalled to an dynamoDB List.  
 
 When one of the following decorators is added, the value is marshalled to a List type.
-@SortedSet(), @TypedSet(complexType?)
+@SortedSet(itemType?: ModelClazz), @TypedSet(itemType?: ModelClazz)
 
-##Model
+## Model
+
+###Custom TableName
 Here is the rule how a table name is built `${kebabCase(modelName)}s` so for a model called Product the table will be named products, this is a default implementation.
-To Provide your own logic you can implement a TableNameResolver function and give it to the DynamoStore class when implementing a new instance.
 
+There are two possibilities to change the name:
 
-**Custom TableName**
-@Model({tableName: tableName})
+- override the name using the tableName parameter @Model({tableName: tableName})
+- provide a TableNameResolver function when instantiating a DynamoStore. This method will receive the default table name 
+  (either resolved using the model name or custom value when a tableName was provided in @Model decorator)
 
+# Mapper
 
-#### Types
+## Types
 
-Simple Type (no decorators requried to work)
+We do the mapping from javascript objects to dynamodb types for you in requests and responses
+
+Simple Type (no decorators required to work)
 - String
 - Number
 - Boolean
 - Null
 - Array
-
-- Date (moment) is mapped by convention (see TODO:addLink Dates)
+- Date (we only support MomentJS)
 
 Complex Types (properties with these types need some decorators to work properly)
 - Set<simpleType | complexType>
 - Map
 - Array<complexType>
 
-##### Date #####
-Two Date types are supported. Default JS Date and moment dates.
+## Date
+Right now we only support (MomentJS)[http://momentjs.com/] Dates.
 
-The type defines how a value will be mapped. Types can be defined using decorators (for complex types) or we use one of the following methods:
-fromDB  ->  use default for DynamoDB type (see type table)
-toDB    ->  use property value to resolve the type
-
-design:type
-String, Number, Boolean, Undefined, Object
-
-unsupported
-Set, Map, Date, moment.Moment
+If you want to explicitly mark a property to be a Date use the @Date() decorator. If we find a moment value we automatically map it to a String (using ISO-8601 format).
+When coming from db we do a regex test for ISO-8601 format and map it back to a moment object.
 
 # Requests API
-
-To start making requests create an instance of [TODO add link](DynamoStore) and execute the desired operation using the provided api.
-We support all the common dynamodb operations
-See for a the [TODO add link](full documentation).
+To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
+We support all the common dynamodb operations.
 
 The request api has support for the following operations:
 
@@ -195,9 +147,9 @@ need some more info.
 There is always the possibility to access the Params object directly to add values which are not covered with our api.
 
 # Authentication
-In a real world scenario you'll have some kind of authentication to protect your dynamodb ressources. You can customize on how to authenticate when giving a custom
-SessionValidityEnsurer function to the dynamo store when creating a new instance.
-The default implementation is a no-op.
+In a real world scenario you'll have some kind of authentication to protect your dynamodb ressources. You can customize on how to authenticate when providing a custom
+SessionValidityEnsurer function to the DynamoStore when creating a new instance.
+The default implementation is a no-op function.
 
 ## Session Validity Ensurer
 Here is an example of an implementation using amazon cognito
@@ -225,64 +177,39 @@ function sessionValidityEnsurer(): Observable<>{
   }
 ```
 
-### Expressions ([http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html](Official Doc))
-
-When working with expressions there is an important point to remember, an expression looks like this (Scan Filter Expression):
-
-```
-{
-  FilterExpression: '#name = :name'
-  ExpressionAttributeNames: {'#name': 'name'}
-  ExpressionAttributeValues: {':name': {S: 'peter'}}
-}
-```
-
-The usage of ExpressionAttributeNames is not required, but due to the fact that there are a lot of keywords which could not be used in an expression (blacklist)[http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html],
-we replace the attribute names always with a variable (starting with the '#' sign)
-
-
-----
-
-
-By default we create a substitution placeholder for all the attributes, just to not implement a blacklist with reserved words in the context of aws dynamodb.
+## Expressions ([AWS Doc](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html))
+By default we create a substitution placeholder for all the attributes, just to not implement a [blacklist](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html) with reserved words in the context of aws dynamodb.
 
 attributename: age
 
+```
+expression: '#age = :age' 
 attributeExpressionNames: {'#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
-expression: '#age = :age' 
+```
 
 this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
 nested attribute: person.age
 
+```
 attributeExpressionNames: {'#person':'person', '#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
 expression: '#person.#age = :age'
+```
 
-we can't use #personAge: 'person.age' because if the dot is part of an attribute name it is not treated as a metacharacter compared to when using directly in expression, so
+we can't use #personAge as a placeholder for 'person.age' because if the dot is part of an attribute name it is not treated as a metacharacter compared to when using directly in expression, so
 the above solution needs to be used
 
 these are the accessor rules for nested attribute types
-- [n]—for list elements
-- . (dot)—for map elements
+- [n] — for list elements
+- . (dot) — for map elements
 
-### Pagination 
+## Pagination 
 TODO
 
-### Primary Key
+# Development
 
-To be clear about the used naming for keys, here is how we use it (same as in the official aws documentation):
-
-DynamoDb has two key types **Partition Key** (hashkey - dynamodb internally uses a hash function to evenly distribute data items across partitions) and **Sort Key** (rangekey)
-The primary key can either be simple (only a partition key) or composite (combination of partition and sort key)
-
-
-## Contribution
-
-## Development
-
-### NPM scripts
-
+## NPM scripts
  - `npm t`: Run test suite
  - `npm start`: Runs `npm run build` in watch mode
  - `npm run test:watch`: Run test suite in [interactive watch mode](http://facebook.github.io/jest/docs/cli.html#watch)
@@ -291,34 +218,28 @@ The primary key can either be simple (only a partition key) or composite (combin
  - `npm run lint`: Lints code
  - `npm run commit`: Commit using conventional commit style ([husky](https://github.com/typicode/husky) will tell you to use it if you haven't :wink:)
 
-### Automatic releases
+## Automatic releases
+Use the npm comand `npm run commit`, which is a convenient way to create conventional commits. Those messages are used to run [semantic releases](https://github.com/semantic-release/semantic-release),
+which publishes our code automatically on github and npm, plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
 
-We use automatic releases with Semantic Versioning, follow these simple steps.
+## Git Hooks
+We use 2 git hooks:
 
-semantic-release setup
+`precommit`
+- to format the code with Prettier :nail_care: before sending it to the git repo.
+- to check if the commit message follows a [conventional commit message](https://github.com/conventional-changelog/conventional-changelog)
 
-From now on, you'll need to use `npm run commit`, which is a convenient way to create conventional commits.
 
-Automatic releases are possible thanks to [semantic release](https://github.com/semantic-release/semantic-release), which publishes our code automatically on github and npm, plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
-
-### Git Hooks
-
-There is already set a `precommit` hook for formatting your code with Prettier :nail_care:
-
-By default, there are 2 disabled git hooks. They're set up when you run the `npm run semantic-release-prepare` script. They make sure:
- - You follow a [conventional commit message](https://github.com/conventional-changelog/conventional-changelog)
- - Your build is not gonna fail in [Travis](https://travis-ci.org) (or your CI server), since it's runned locally before `git push`
-
-This makes more sense in combination with [automatic releases](#automatic-releases)
+`prepush`
+- if the code can be built running npm run build
+- if all the tests pass
 
 ## Credits
-
 [https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) For the awesome project which helps to scaffold, develop and build a typescript library project
 [https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the chainable api
 [http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Thats where the base idea on how to implement the model decorators came came from
 
 ## Contributors
-
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->

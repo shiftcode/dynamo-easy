@@ -7,7 +7,7 @@ import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { ConditionExpression } from '../../expression/type/condition-expression.type'
+import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { RequestSortKeyConditionFunction } from '../../expression/type/sort-key-condition-function'
 import { Request } from '../request.model'
@@ -77,32 +77,6 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this
   }
 
-  /**
-   * multiple conditions will be combined using the AND operator by default
-   * @param {ConditionExpression[]} conditions
-   * @returns {QueryRequest<T>}
-   *
-   * TODO remove after investigation
-   */
-  // implementation with overload won't work perfectly with ide support, so we add two different methods
-  // property(keyName: keyof T): RequestConditionFunction<QueryRequest<T>>
-  // property(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T>
-  //
-  // // (keyof T)[] | ConditionExpressionDefinitionFunction[]
-  // property(...args: any[]): RequestConditionFunction<QueryRequest<T>> | QueryRequest<T> {
-  //   if (args.length === 1 && typeof args[0] === 'string') {
-  //
-  //   } else {
-  //     const conditions: ConditionExpression[] = args.map((conditionDefFn: ConditionExpressionDefinitionFunction) => {
-  //       return conditionDefFn(undefined, this.metaData)
-  //     })
-  //
-  //     const condition = and(...conditions)
-  //     ParamUtil.addFilterExpression(condition, this.params)
-  //     return this
-  //   }
-  // }
-
   ascending(): QueryRequest<T> {
     this.params.ScanIndexForward = true
     return this
@@ -130,12 +104,9 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   exec(): Observable<T[]> {
-    return (
-      this.dynamoRx
-        .query(this.params)
-        // TODO check if Items is always defined
-        .map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz)))
-    )
+    return this.dynamoRx
+      .query(this.params)
+      .map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz)))
   }
 
   execSingle(): Observable<T | null> {

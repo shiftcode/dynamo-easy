@@ -1,7 +1,7 @@
 {
   "name": "dynamo-easy",
   "version": "0.0.1-alpha.1",
-  "description": "",
+  "description": "Use the power of typescript to define your object mapping when using dynamodb. This library also provides a fluent api for easy interaction with dynamodb.",
   "keywords": [
     "aws",
     "dynamo",
@@ -10,7 +10,7 @@
     "mapper",
     "orm",
     "typescript",
-    "typescript-decorator",
+    "typescript-decorators",
     "fluent-api"
   ],
   "main": "dist/dynamo-easy.umd.js",
