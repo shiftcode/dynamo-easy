@@ -3,6 +3,7 @@ import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
 import { Util } from '../../mapper/util'
+import { ConditionExpressionBuilder } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { Expression } from './type/expression.type'
@@ -29,10 +30,9 @@ export class UpdateExpressionBuilder {
     existingValueNames: string[] | undefined,
     metadata: Metadata<any> | undefined
   ): UpdateExpression {
-    // TODO investigate is there a use case for undefined desired to be a value
+    // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
     // get rid of undefined values
-    // FIXME should this not be a deep filter?
-    values = values.filter(value => value !== undefined)
+    values = ConditionExpressionBuilder.deepFilter(values, value => value !== undefined)
 
     // TODO check if provided values are valid for given operation
     // ConditionExpressionBuilder.validateValues(operation, values)

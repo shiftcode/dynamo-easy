@@ -124,19 +124,6 @@ describe('Mapper', () => {
         expect(attrValue.L[1].S).toBe('bar')
       })
 
-      // TODO should we handle arrays with duplicates as list, or throw an error
-      // it('array (homogen, duplicates)', () => {
-      //   let attrValue: AttributeValue = Mapper.mapToDbOne(['foo', 'bar', 'foo']);
-      //   expect(attrValue).toBeDefined();
-      //   expect(keyOf(attrValue)).toBe('L');
-      //   expect(attrValue.L).toBeDefined();
-      //   expect(attrValue.L.length).toBe(3);
-      //   const foo: AttributeValue = attrValue.L[0];
-      //   expect(foo).toBeDefined();
-      //   expect(keyOf(foo)).toBe('S');
-      //   expect(foo.S).toBe('foo');
-      // });
-
       it('array -> L (heterogen, no duplicates)', () => {
         const attrValue: AttributeValue = Mapper.toDbOne(['foo', 56, true])
         expect(attrValue).toBeDefined()
@@ -364,10 +351,6 @@ describe('Mapper', () => {
         expect(Array.from(set)[1]).toBe(2)
       })
 
-      // TODO implement test for binary
-      // it('bs -> set', () => {
-      // });
-
       it('NS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
           typeInfo: { type: Array, isCustom: true },
@@ -489,13 +472,6 @@ describe('Mapper', () => {
           const events = new Set()
           events.add(new OrganizationEvent('shift the web', 1520))
           organization.events = events
-
-          //  TODO add map data?
-          // const benefits: Map<number, string> = new Map();
-          // benefits.set(2012, 'wine');
-          // benefits.set(2013, 'moooney');
-          // organization.benefits = benefits;
-
           organization.transient = 'the value which is marked as transient'
 
           organizationAttrMap = Mapper.toDb(organization, Organization)

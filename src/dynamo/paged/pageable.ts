@@ -8,6 +8,5 @@ export interface Pageable<T, R, O extends QueryResponse<T> | ScanResponse<T>> {
   limit(limit: number): R
   exclusiveStartKey(key: Key | null): R
   execCount(): Observable<number>
-  // TODO better typing
   execFullResponse(): Observable<O>
 }

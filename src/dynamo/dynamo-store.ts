@@ -73,53 +73,37 @@ export class DynamoStore<T> {
     return this.dynamoRx.makeRequest(operation, params)
   }
 
-  /*
-   * some methods which simplify calls which are usually often used
-   * TODO review the methods
-   */
-  /**
-   * executes a dynamoDB.batchGetItem for multiple keys or a operation
-   */
-  byKeys(keys: any[]): Observable<T[]> {
-    return this.findByMultipleKeys(keys)
-  }
-
-  findAll(): Observable<T[]> {
-    return this.scan().exec()
-  }
-
-  // TODO how does this work when we work with composite primary key
-  private findByMultipleKeys(keys: any[]): Observable<T[]> {
-    const requestItems: { [nameDb: string]: { Keys: DynamoDB.AttributeMap[] } } = {}
-    const attributeMaps: DynamoDB.AttributeMap[] = []
-    keys.forEach(id => {
-      // TODO add support for secondary index
-      const idOb: DynamoDB.AttributeMap = {}
-      const value = Mapper.toDbOne(id)
-      if (value === null) {
-        throw Error('please provide an actual value for partition key')
-      }
-
-      idOb[MetadataHelper.get(this.modelClazz).getPartitionKey()] = value
-      attributeMaps.push(idOb)
-    })
-
-    requestItems[this.tableName] = {
-      Keys: attributeMaps,
-    }
-
-    const params: DynamoDB.BatchGetItemInput = {
-      RequestItems: requestItems,
-    }
-
-    return this.dynamoRx.batchGetItems(params).map(response => {
-      if (response.Responses && Object.keys(response.Responses).length) {
-        return response.Responses[this.tableName].map(attributeMap => Mapper.fromDb(attributeMap, this.modelClazz))
-      } else {
-        return []
-      }
-    })
-  }
+  // TODO implement BatchGetItem request (think about support for secondary indexes)
+  // batchGetItems(keys: any[]): Observable<T[]> {
+  //   const requestItems: { [nameDb: string]: { Keys: DynamoDB.AttributeMap[] } } = {}
+  //   const attributeMaps: DynamoDB.AttributeMap[] = []
+  //   keys.forEach(id => {
+  //     const idOb: DynamoDB.AttributeMap = {}
+  //     const value = Mapper.toDbOne(id)
+  //     if (value === null) {
+  //       throw Error('please provide an actual value for partition key')
+  //     }
+  //
+  //     idOb[MetadataHelper.get(this.modelClazz).getPartitionKey()] = value
+  //     attributeMaps.push(idOb)
+  //   })
+  //
+  //   requestItems[this.tableName] = {
+  //     Keys: attributeMaps,
+  //   }
+  //
+  //   const params: DynamoDB.BatchGetItemInput = {
+  //     RequestItems: requestItems,
+  //   }
+  //
+  //   return this.dynamoRx.batchGetItems(params).map(response => {
+  //     if (response.Responses && Object.keys(response.Responses).length) {
+  //       return response.Responses[this.tableName].map(attributeMap => Mapper.fromDb(attributeMap, this.modelClazz))
+  //     } else {
+  //       return []
+  //     }
+  //   })
+  // }
 
   private createBaseParams(): { TableName: string } {
     const params: { TableName: string } = {

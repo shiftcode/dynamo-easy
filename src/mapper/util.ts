@@ -35,7 +35,6 @@ export class Util {
   // tslint:disable-next-line:max-line-length
   static DATE_TIME_ISO8601 = /^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$/
 
-  // TODO should we handle duplicates, switch from set to list?
   /**
    * Detects the dynamodb type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
    * Collections of type array where all the values are either String | Number | Binary will be mapped to the corresponding S(et)
@@ -117,7 +116,6 @@ export class Util {
     )
   }
 
-  // FIXME should we handle duplicates -> switch to L(ist) instead of S(et)
   static detectType(value: any): AttributeType {
     if (Util.isCollection(value)) {
       return Util.detectCollectionType(value)
@@ -229,7 +227,7 @@ export class Util {
 
   static isBinary(data: any): boolean {
     if (Util.isNode()) {
-      // FIXME should add || data instanceof Stream
+      // TODO LOW:BINARY should add || data instanceof Stream
       return Buffer.isBuffer(data)
     } else {
       BUFFER_TYPES.forEach(type => {
@@ -294,7 +292,7 @@ export class Util {
     throw new Error(`was not able to resolve type name for type ${type}`)
   }
 
-  // FIXME replace with a more bullet proof implementation node uuid module requires crypto, need to figure out how to use it with browser
+  // FIXME UUID replace with a more bullet proof implementation node uuid module requires crypto, need to figure out how to use it with browser
   static uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
       // tslint:disable

@@ -19,6 +19,23 @@ class MyModel {
 }
 
 describe('expressions', () => {
+  it('deep filter', () => {
+    const arr = [5, 'bla', undefined]
+    const obj = [
+      { street: 'street', zip: 1524 },
+      undefined,
+      [undefined, { name: undefined, age: 25 }],
+      [undefined, undefined, {}],
+      {},
+      [],
+      { blub: undefined, other: undefined },
+      new Set(arr),
+    ]
+
+    const filteredObj = ConditionExpressionBuilder.deepFilter(obj, item => item !== undefined)
+    expect(filteredObj).toEqual([{ street: 'street', zip: 1524 }, [{ age: 25 }], new Set([arr[0], arr[1]])])
+  })
+
   it('use property metadata', () => {
     const condition = ConditionExpressionBuilder.buildFilterExpression(
       'prop',

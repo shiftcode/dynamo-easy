@@ -11,14 +11,8 @@ import { Request } from '../request/request.model'
 import { ScanRequest } from '../request/scan/scan.request'
 import { ScanResponse } from '../request/scan/scan.response'
 import { Pageable } from './pageable'
+import { PagedRequestMeta } from './paged-request-meta'
 
-export interface PagedRequestMeta {
-  current: number
-  total: number
-  hasMore: boolean
-}
-
-// FIXME support more than just a query request
 export class PagedDataSource<
   T,
   R extends QueryRequest<T> | ScanRequest<T>,
@@ -36,8 +30,6 @@ export class PagedDataSource<
   lastKey: Key | null
   meta$: Observable<PagedRequestMeta>
 
-  // TODO better typing
-  // TODO pagesize should be configurable via an observable input
   constructor(request$: Observable<Pageable<T, R, O>>, private pageSize: number = 50) {
     this.loading$ = this.loadingSubject.asObservable()
     this.meta$ = this.metaSubject.asObservable()

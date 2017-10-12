@@ -1,7 +1,7 @@
 import { Expression } from './expression.type'
 
 export interface SortKeyConditionFunction {
-  // LOW TODO narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
+  // TODO LOW:TYPINGS narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
   // [key in OperatorAlias]: (...value: any[]) => R;
   [key: string]: (...value: any[]) => Expression
   equals: (value: any) => Expression

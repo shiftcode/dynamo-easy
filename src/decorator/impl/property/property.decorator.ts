@@ -55,7 +55,7 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
 
 function initOrUpdateGSI(indexes: { [key: string]: KeyType }, indexData: IndexData): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
-    // TODO when we throw an error we have a problem where multiple different classes extend one base class, this will be executed by multiple times
+    // TODO LOW:INVESTIGATE when we throw an error we have a problem where multiple different classes extend one base class, this will be executed by multiple times
     // throw new Error(
     //   'the property with name is already registered as key for index - one property can only define one key per index'
     // )
@@ -145,7 +145,7 @@ function createNewProperty(
 }
 
 /**
- * TODO BINARY make sure to implement the context dependant details of Binary (Buffer vs. Uint8Array)
+ * TODO LOW:BINARY make sure to implement the context dependant details of Binary (Buffer vs. Uint8Array)
  * @returns {boolean} true if the type cannot be mapped by dynamo document client
  */
 function isCustomType(type: AttributeModelTypes): boolean {

@@ -10,8 +10,6 @@ import { QueryRequest } from './query.request'
 
 export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
   query(params: QueryInput): Observable<QueryOutput> {
-    // TODO bring back log statement
-    // debug.log('params', params)
     return Observable.of({})
   },
 }
@@ -38,7 +36,7 @@ describe('query request', () => {
 
   describe('indexes', () => {
     it('simple', () => {
-      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes)
+      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes, getTableName(ModelWithABunchOfIndexes))
 
       const now = moment()
 
@@ -66,7 +64,7 @@ describe('query request', () => {
 
   describe('filter expression', () => {
     it('simple', () => {
-      const request = new QueryRequest(<any>null, ComplexModel)
+      const request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
 
       request.whereAttribute('active').eq(true)
       expect(request.params.FilterExpression).toBe('#active = :active')
@@ -81,7 +79,7 @@ describe('query request', () => {
     })
 
     it('complex', () => {
-      const request = new QueryRequest(<any>null, ComplexModel)
+      const request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
 
       request.where(attribute<ComplexModel>('active').eq(true), attribute('creationDate').lt(moment()))
 
@@ -97,7 +95,7 @@ describe('query request', () => {
     let request: QueryRequest<ComplexModel>
 
     beforeEach(() => {
-      request = new QueryRequest(<any>null, ComplexModel)
+      request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
       querySpy = spyOn(dynamoRx, 'query').and.callThrough()
     })
   })

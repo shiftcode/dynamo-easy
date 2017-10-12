@@ -138,17 +138,9 @@ export class Mapper {
       )
     }
 
-    if (
-      type === 'Moment' &&
-      (!propertyMetadata || (propertyMetadata && propertyMetadata.typeInfo && !propertyMetadata.typeInfo.isCustom))
-    ) {
-      // TODO there is gonna be a problem when we have to map back from db and we have no property metadata, we could introduce some regex matching, do we want that?
-    }
-
     if (propertyMetadata && propertyMetadata.mapper) {
       // custom mapper
       if (explicitType) {
-        // TODO what about customMapper.fromDb
         return new propertyMetadata.mapper().toDb(propertyValue, propertyMetadata)
       } else {
         return new propertyMetadata.mapper().toDb(propertyValue)
@@ -189,7 +181,12 @@ export class Mapper {
           /*
            * 3a) property metadata is defined
            */
-          modelValue = Mapper.fromDbOne(attributeValue, propertyMetadata)
+          if (propertyMetadata && propertyMetadata.mapper) {
+            // custom mapper
+            modelValue = new propertyMetadata.mapper().fromDb(attributeValue, propertyMetadata)
+          } else {
+            modelValue = Mapper.fromDbOne(attributeValue, propertyMetadata)
+          }
         }
       } else {
         /*
@@ -272,7 +269,7 @@ export class Mapper {
           mapperForType = new NullMapper()
           break
         case Binary:
-          // TODO add binary mapper
+          // TODO LOW:BINARY add binary mapper
           throw new Error('no mapper for binary type implemented yet')
         default:
           mapperForType = new ObjectMapper()

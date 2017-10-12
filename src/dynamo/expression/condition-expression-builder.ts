@@ -1,5 +1,5 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { curryRight } from 'lodash'
+import { curryRight, forEach, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
@@ -18,6 +18,53 @@ import { Expression } from './type/expression.type'
  */
 export class ConditionExpressionBuilder {
   /**
+   * Will walk the object tree recursively and removes all items which do not satisfy the filterFn
+   * @param obj
+   * @param {(value: any) => boolean} filterFn
+   * @returns {any}
+   */
+  static deepFilter(obj: any, filterFn: (value: any) => boolean): any | null {
+    if (Array.isArray(obj)) {
+      const returnArr: any[] = []
+      obj.forEach(i => {
+        const item = ConditionExpressionBuilder.deepFilter(i, filterFn)
+        if (item !== null) {
+          returnArr.push(item)
+        }
+      })
+
+      return returnArr.length ? returnArr : null
+    } else if (obj instanceof Set) {
+      const returnArr: any[] = []
+      Array.from(<Set<any>>obj).forEach(i => {
+        const item = ConditionExpressionBuilder.deepFilter(i, filterFn)
+        if (item !== null) {
+          returnArr.push(item)
+        }
+      })
+
+      return returnArr.length ? new Set(returnArr) : null
+    } else if (isPlainObject(obj)) {
+      const returnObj: { [key: string]: any } = {}
+
+      forEach(obj, (value: any, key: string) => {
+        const item = ConditionExpressionBuilder.deepFilter(value, filterFn)
+        if (item !== null) {
+          returnObj[key] = item
+        }
+      })
+
+      return Object.keys(returnObj).length ? returnObj : null
+    } else {
+      if (filterFn(obj)) {
+        return obj
+      } else {
+        return null
+      }
+    }
+  }
+
+  /**
    * Will create a condition which can be added to a request using the param object.
    * It will create the expression statement and the attribute names and values.
    *
@@ -35,10 +82,9 @@ export class ConditionExpressionBuilder {
     existingValueNames: string[] | undefined,
     metadata: Metadata<any> | undefined
   ): Expression {
-    // TODO investigate is there a use case for undefined desired to be a value
+    // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
     // get rid of undefined values
-    // TODO should this not be a deep filter?
-    values = values.filter(value => value !== undefined)
+    values = ConditionExpressionBuilder.deepFilter(values, value => value !== undefined)
 
     // check if provided values are valid for given operator
     ConditionExpressionBuilder.validateValues(operator, values)
@@ -202,9 +248,16 @@ export class ConditionExpressionBuilder {
    * the given values is not an array
    */
   private static validateValues(operator: ConditionOperator, values?: any[]) {
-    if (values && Array.isArray(values)) {
+    const parameterArity = operatorParameterArity(operator)
+    if (values === null || values === undefined) {
+      if (!isNoParamFunctionOperator(operator)) {
+        // the operator needs some values to work
+        throw new Error(
+          `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`
+        )
+      }
+    } else if (values && Array.isArray(values)) {
       // check for correct amount of values
-      const parameterArity = operatorParameterArity(operator)
       if (values.length !== parameterArity) {
         switch (operator) {
           case 'IN':
@@ -231,8 +284,6 @@ export class ConditionExpressionBuilder {
           }
           break
       }
-    } else {
-      throw new Error('values must be of type Array')
     }
   }
 

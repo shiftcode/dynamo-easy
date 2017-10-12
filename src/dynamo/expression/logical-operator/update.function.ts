@@ -1,9 +1,9 @@
-/**
- * Use this method when accesing a top level attribute of a model
- */
 import { RequestExpressionBuilder } from '../request-expression-builder'
 import { UpdateExpressionDefinitionChain } from '../type/update-expression-definition-chain'
 
+/**
+ * Use this method when accesing a top level attribute of a model
+ */
 export function update<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
 
 /**

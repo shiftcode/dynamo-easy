@@ -12,7 +12,7 @@
 import { BaseRequest } from '../../request/base.request'
 
 export interface RequestSortKeyConditionFunction<R extends BaseRequest<any, any>> {
-  // TODO LOW narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
+  // TODO LOW:TYPINGS narrow typing when possible -> https://github.com/Microsoft/TypeScript/issues/13573
   // [key in OperatorAlias]: (...value: any[]) => R;
   [key: string]: (...value: any[]) => R
   equals: (value: any) => R

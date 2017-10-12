@@ -1,11 +1,6 @@
 //
 // Reflect Metadata
 //
-//
-// MomentJs locales
-//
-// TODO MOMENT we should import other locals (should we just import all locales for now?)
-import 'moment/locale/de-ch'
 import 'reflect-metadata'
 //
 // RxJs

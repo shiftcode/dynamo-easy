@@ -4,9 +4,7 @@ import { Mapper } from '../mapper'
 import { Util } from '../util'
 import { MapperForType } from './base.mapper'
 
-// TODO add doc
 export class CollectionMapper implements MapperForType<any[] | Set<any>> {
-  // TODO add some validation rules based on propertyMetadata and returned value from db for sorted as example (SS -> sorted -> throw error)
   fromDb(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): any[] | Set<any> {
     const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
     if (attributeValue.SS) {

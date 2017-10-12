@@ -5,7 +5,6 @@ import { ModelConstructor } from '../../model/model-constructor'
 
 export interface TypeInfo {
   type: ModelConstructor<any>
-  // TODO define what custom means, maybe remove it
   // true if we use a non native type for dynamo document client
   isCustom?: boolean
   genericType?: ModelConstructor<any>

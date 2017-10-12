@@ -102,9 +102,6 @@ export class Organization {
 
   @TypedSet() emptySet: Set<string> = new Set()
 
-  // TODO add map? year to benefit description
-  // benefits: Map<number, string>
-
   // tslint:disable-next-line:no-empty
   constructor() {}
 }

@@ -22,7 +22,6 @@ import { NestedObject } from './models/nested-object.model'
 import { SimpleModel } from './models/simple.model'
 import { Type } from './models/types.enum'
 
-// TODO add tests for error cases which should thrw (multiple indexes for example)
 describe('Decorators should add correct metadata', () => {
   describe('for simple model', () => {
     let modelOptions: ModelMetadata<SimpleModel>
@@ -193,20 +192,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(Set)
       })
-
-      // TODO decide if we support map or not
-      // xit("myMap", () => {
-      //   const prop = getProperty(modelOptions, "myMap")
-      //   expect(prop).toBeDefined()
-      //   expect(prop.key).toBe("myMap")
-      //   expect(prop.name).toBe("myMap")
-      //   expect(prop.partitionKey).toBeFalsy()
-      //   expect(prop.sortKey).toBeFalsy()
-      //   expect(prop.transient).toBeFalsy()
-      //   expect(prop.typeInfo).toBeDefined()
-      //   expect(prop.typeInfo.isCustom).toBeTruthy()
-      //   expect(prop.typeInfo.type).toBe(Map)
-      // })
 
       it('sortedSet', () => {
         const prop = getProperty(modelOptions, 'sortedSet')
