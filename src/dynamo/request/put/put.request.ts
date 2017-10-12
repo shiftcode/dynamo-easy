@@ -4,10 +4,10 @@ import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { and } from '../../expression/logical-operator/and.function'
+import { attribute } from '../../expression/logical-operator/attribute.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { BaseRequest } from '../base.request'
 
@@ -23,8 +23,16 @@ export class PutRequest<T> extends BaseRequest<T, any> {
    */
   ifNotExists(predicate?: boolean): PutRequest<T> {
     // FIXME should we check for sort key too?
+    const conditionDefFns = []
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
-      this.whereAttribute(this.metaData.getPartitionKey()).null()
+      conditionDefFns.push(attribute<T>(this.metaData.getPartitionKey()).null())
+
+      const sortKey = this.metaData.getSortKey()
+      if (sortKey !== null) {
+        conditionDefFns.push(attribute<T>(sortKey).null())
+      }
+
+      this.where(...conditionDefFns)
     }
 
     return this

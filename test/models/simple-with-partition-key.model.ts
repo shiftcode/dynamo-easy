@@ -2,7 +2,7 @@ import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorat
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 
 @Model()
-export class SimpleWithIdModel {
+export class SimpleWithPartitionKeyModel {
   @PartitionKey() id: string
 
   age: number

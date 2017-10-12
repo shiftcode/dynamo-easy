@@ -1,18 +1,23 @@
 import { GetItemInput } from 'aws-sdk/clients/dynamodb'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { SimpleWithIdModel } from '../../../../test/models/simple-with-id.model'
+import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'
 import { GetRequest } from './get.request'
 
 describe('get requst', () => {
-  let request: GetRequest<SimpleWithIdModel>
+  let request: GetRequest<SimpleWithPartitionKeyModel>
 
   beforeEach(() => {
-    request = new GetRequest(null, SimpleWithIdModel, getTableName(SimpleWithIdModel), 'partitionKeyValue')
+    request = new GetRequest(
+      null,
+      SimpleWithPartitionKeyModel,
+      getTableName(SimpleWithPartitionKeyModel),
+      'partitionKeyValue'
+    )
   })
 
   it('default params', () => {
     const params: GetItemInput = request.params
-    expect(params.TableName).toBe('simple-with-id-models')
+    expect(params.TableName).toBe('simple-with-partition-key-models')
     expect(params.Key).toEqual({ id: { S: 'partitionKeyValue' } })
     expect(Object.keys(params).length).toBe(2)
   })
