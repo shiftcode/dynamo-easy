@@ -151,13 +151,20 @@ export class ConditionExpressionBuilder {
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined
   ): Expression {
-    const mappedValues = Mapper.toDbOne(values[0], propertyMetadata)
+    const attributeValues: AttributeMap = (<any[]>values[0])
+      .map(value => Mapper.toDbOne(value, propertyMetadata))
+      .reduce(
+        (result, mappedValue: AttributeValue, index: number) => {
+          result[`${valuePlaceholder}_${index}`] = mappedValue
+          return result
+        },
+        <AttributeMap>{}
+      )
 
-    const attributeValues: AttributeMap = {}
-    attributeValues[valuePlaceholder] = <any>mappedValues
+    const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
     return {
-      statement: `${namePlaceholder} IN (${Object.keys(attributeValues)})`,
+      statement: `${namePlaceholder} IN (${inStatement})`,
       attributeNames,
       attributeValues,
     }
@@ -283,6 +290,10 @@ export class ConditionExpressionBuilder {
             )
           }
           break
+        case 'IN':
+          if (!Array.isArray(values[0])) {
+            throw new Error('the provided value for IN operator must be an array')
+          }
       }
     }
   }

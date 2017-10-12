@@ -270,18 +270,15 @@ describe('expressions', () => {
       const condition = ConditionExpressionBuilder.buildFilterExpression(
         'myCollection',
         'IN',
-        [['myCollection', 'myOtherValue']],
+        [['myValue', 'myOtherValue']],
         undefined,
         undefined
       )
-      expect(condition.statement).toBe('#myCollection IN (:myCollection)')
+      expect(condition.statement).toBe('#myCollection IN (:myCollection_0, :myCollection_1)')
       expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
-      // TODO review not sure if the attribute should be L(ist) or S(et) or if both are supported, they both executed successfuly against dynamodb when testing but with unexpected result
-      // expect(condition.attributeValues).toEqual({
-      //   ':myCollection': { L: [{ S: 'myCollection' }, { S: 'myOtherValue' }] },
-      // })
       expect(condition.attributeValues).toEqual({
-        ':myCollection': { SS: ['myCollection', 'myOtherValue'] },
+        ':myCollection_0': { S: 'myValue' },
+        ':myCollection_1': { S: 'myOtherValue' },
       })
     })
 
