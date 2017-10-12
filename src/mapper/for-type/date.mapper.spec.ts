@@ -24,7 +24,7 @@ describe('date mapper', () => {
   })
 
   describe('from db', () => {
-    xit('simple', () => {
+    it('simple', () => {
       const now = new Date()
       const fromDb = dateMapper.fromDb({ N: `${now.getTime()}` })
 

@@ -1,6 +1,7 @@
 # Dynamo-Easy
 [![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
 [![Coverage Status](https://img.shields.io/coveralls/jekyll/jekyll.svg)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/shiftcode/dynamo-easy/badge.svg?branch=master)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
@@ -78,22 +79,9 @@ present on a property)
 
 Generic information is never available due to some serialization limitations at the time of writing.
 
-## A word on Collections (Array & Set)
-
-###Array
-Javascript Arrays with a a items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
-If an item of an Array has a complex type the type can be defined using the @TypedArray() Decorator.
-
-###Set
-ES6 Set types will be marshalled to dynamoDb set type if the type of the set is supported, if the type is not supported it will be
-marshalled to an dynamoDB List.  
-
-When one of the following decorators is added, the value is marshalled to a List type.
-@SortedSet(itemType?: ModelClazz), @TypedSet(itemType?: ModelClazz)
-
 ## Model
 
-###Custom TableName
+### Custom TableName
 Here is the rule how a table name is built `${kebabCase(modelName)}s` so for a model called Product the table will be named products, this is a default implementation.
 
 There are two possibilities to change the name:
@@ -121,17 +109,51 @@ Complex Types (properties with these types need some decorators to work properly
 - Map
 - Array<complexType>
 
+| TS Type       | Dynamo Type   |
+| ------------- |:-------------:|
+| String        | S             |
+| Number        | N             |
+| Boolean       | BOOL          |
+| moment.Moment | S (ISO-8601 formatted) |
+| null          | NULL          |
+| Array         | L, (S,N,B)S   |
+| ES6 Set       | L, (S,N,B)S   |
+| Object       | M   |
+|----|------|
+| Binary        | Not Supported |
+| ES6 Map       | Not Supported   |
+| Date          | Not Supported |
+
+## Custom Attribute Mapping
+It is always possible to define a custom mapping strategy, just implement the [MapperForType](https://shiftcode.github.io/dynamo-easy/interfaces/_mapper_for_type_base_mapper_.mapperfortype.html) class.
+
+## Collection Mapping (Array & Set)
+
+### Array
+Javascript Arrays with a items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
+If the items have a complex type it will be mapped to a L(ist).
+
+### Set
+An instance of ES6 Set type will be mapped to a S(et) type if the type of the items is supported (String, Number, Binary), otherwise it is mapped to a L(ist).  
+
+When one of the following decorators is present, the value is always mapped to a L(ist).
+
+- @SortedSet(itemType?: ModelClazz) - only L(ist) type preserves order
+- @TypedSet(itemType?: ModelClazz) - if the itemType is not one of String | Number | Binary
+- @TypedArray()
+
 ## Date
-Right now we only support (MomentJS)[http://momentjs.com/] Dates.
+Right now we only support [MomentJS](http://momentjs.com/) Dates.
 
 If you want to explicitly mark a property to be a Date use the @Date() decorator. If we find a moment value we automatically map it to a String (using ISO-8601 format).
 When coming from db we do a regex test for ISO-8601 format and map it back to a moment object.
 
-# Requests API
-To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
-We support all the common dynamodb operations.
+## Enum
+Enum values are persisted as Numbers (index of enum).
 
-The request api has support for the following operations:
+# Request API
+To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
+We support all the common dynamodb operations:
 
 - Put
 - Get
@@ -140,9 +162,6 @@ The request api has support for the following operations:
 - Scan
 - Query
 - MakeRequest (generic low level method for special scenarios)
-
-For most of the api there is probably no explanation required, here are some topics we think
-need some more info.
 
 There is always the possibility to access the Params object directly to add values which are not covered with our api.
 
@@ -154,8 +173,8 @@ The default implementation is a no-op function.
 ## Session Validity Ensurer
 Here is an example of an implementation using amazon cognito
 
-```
-function sessionValidityEnsurer(): Observable<>{
+```javascript
+function sessionValidityEnsurer(): Observable<boolean> {
   return Observable.of(this.isLoggedIn())
     .switchMap(isLoggedIn => {
        if (isLoggedIn) {
@@ -226,18 +245,17 @@ which publishes our code automatically on github and npm, plus generates automat
 We use 2 git hooks:
 
 `precommit`
-- to format the code with Prettier :nail_care: before sending it to the git repo.
+- to format the code with Prettier :nail_care:
 - to check if the commit message follows a [conventional commit message](https://github.com/conventional-changelog/conventional-changelog)
 
-
 `prepush`
-- if the code can be built running npm run build
-- if all the tests pass
+- to check if the code can be built running `npm run build`
+- to check if all tests pass
 
 ## Credits
-[https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) For the awesome project which helps to scaffold, develop and build a typescript library project
-[https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the chainable api
-[http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Thats where the base idea on how to implement the model decorators came came from
+- [https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) For the awesome project which helps to scaffold, develop and build a typescript library project
+- [https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the chainable api
+- [http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Thats where the base idea on how to implement the model decorators came came from
 
 ## Contributors
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
