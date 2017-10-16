@@ -11,9 +11,9 @@ import { PrimaryKey } from '../primary-key.type'
 import { REGEX_TABLE_NAME } from '../request/regex'
 import { SessionValidityEnsurer } from '../session-validity-ensurer.type'
 import { TableNameResolver } from '../table-name-resolver.type'
+import { BatchGetFullResponse } from './batch-get-full.response'
 import { BatchGetResponse } from './batch-get.response'
 
-// TODO add support for indexes
 export class BatchGetRequest {
   private readonly dynamoRx: DynamoRx
 
@@ -88,7 +88,27 @@ export class BatchGetRequest {
     return this
   }
 
-  execFullResponse() {}
+  execFullResponse(): Observable<BatchGetFullResponse> {
+    return this.dynamoRx.batchGetItems(this.params).map(response => {
+      const r = <BatchGetFullResponse>{
+        ConsumedCapacity: response.ConsumedCapacity,
+        UnprocessedKeys: response.UnprocessedKeys,
+        Responses: {},
+      }
+
+      if (response.Responses && Object.keys(response.Responses).length) {
+        const responses: { [key: string]: AttributeMap } = {}
+        Object.keys(response.Responses).forEach(tableName => {
+          const mapped = response.Responses![tableName].map(attributeMap =>
+            Mapper.fromDb(attributeMap, this.tables.get(tableName))
+          )
+          r.Responses![tableName] = mapped
+        })
+      }
+
+      return r
+    })
+  }
 
   exec(): Observable<BatchGetResponse> {
     return this.dynamoRx.batchGetItems(this.params).map(response => {
