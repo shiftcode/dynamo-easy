@@ -1,5 +1,6 @@
 import {
   AttributeMap,
+  BatchGetItemInput,
   DeleteItemInput,
   GetItemInput,
   Key,
