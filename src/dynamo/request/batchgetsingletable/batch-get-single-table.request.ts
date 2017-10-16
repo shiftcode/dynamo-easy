@@ -8,12 +8,7 @@ import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
-interface TableConfig<T> {
-  tableName: string
-  modelClazz: ModelConstructor<T>
-  keys: any[]
-}
-
+// TODO add support for indexes
 export class BatchGetSingleTableRequest<T> {
   readonly dynamoRx: DynamoRx
   readonly params: BatchGetItemInput
@@ -67,8 +62,6 @@ export class BatchGetSingleTableRequest<T> {
     })
   }
 
-  // TODO fix any
-  // TODO add support for indexes
   exec(): Observable<T[]> {
     return this.dynamoRx.batchGetItems(this.params).map(response => {
       if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {

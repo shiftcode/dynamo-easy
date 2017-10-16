@@ -1,5 +1,5 @@
 import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
-import { isObject } from 'lodash'
+import { isObject, isString } from 'lodash'
 import { Observable } from 'rxjs/Observable'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
@@ -7,23 +7,17 @@ import { ModelConstructor } from '../../model/model-constructor'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from '../default-table-name-resolver.const'
 import { DynamoRx } from '../dynamo-rx'
+import { PrimaryKey } from '../primary-key.type'
 import { REGEX_TABLE_NAME } from '../request/regex'
 import { SessionValidityEnsurer } from '../session-validity-ensurer.type'
 import { TableNameResolver } from '../table-name-resolver.type'
+import { BatchGetResponse } from './batch-get.response'
 
-interface TableConfig<T> {
-  tableName: string
-  modelClazz: ModelConstructor<T>
-  keys: any[]
-}
-
-// tslint:disable-next-line:interface-over-type-literal
-export type BatchGetItemResponse = { [tableName: string]: any[] }
-
+// TODO add support for indexes
 export class BatchGetRequest {
   private readonly dynamoRx: DynamoRx
 
-  private tables: Map<string, TableConfig<any>> = new Map()
+  private tables: Map<string, ModelConstructor<any>> = new Map()
   readonly params: BatchGetItemInput
 
   constructor(
@@ -41,11 +35,12 @@ export class BatchGetRequest {
    * @param {any[]} keys either a simple string for partition key or an object with partitionKey and sortKey
    * @returns {BatchGetSingleTableRequest}
    */
-  forModel<T>(modelClazz: ModelConstructor<T>, keys: any[]): BatchGetRequest {
+  forModel<T>(modelClazz: ModelConstructor<T>, keys: Array<string | PrimaryKey>): BatchGetRequest {
     const tableName = this.getTableName(modelClazz, this.tableNameResolver)
     if (this.tables.has(tableName)) {
       throw new Error('table name already exists, please provide all the keys for the same table at once')
     }
+    this.tables.set(tableName, modelClazz)
 
     const metadata = MetadataHelper.get(modelClazz)
     const attributeMaps: AttributeMap[] = []
@@ -54,8 +49,15 @@ export class BatchGetRequest {
     keys.forEach(key => {
       const idOb: AttributeMap = {}
 
-      if (isObject(key)) {
-        // TODO add some more checks
+      if (isString(key)) {
+        // got a simple primary key
+        const value = Mapper.toDbOne(key)
+        if (value === null) {
+          throw Error('please provide an actual value for partition key')
+        }
+
+        idOb[metadata.getPartitionKey()] = value
+      } else if (isObject(key) && key.partitionKey !== undefined && key.partitionKey !== null) {
         // got a composite primary key
 
         // partition key
@@ -73,13 +75,7 @@ export class BatchGetRequest {
 
         idOb[metadata.getSortKey()!] = mappedSortKey
       } else {
-        // got a simple primary key
-        const value = Mapper.toDbOne(key)
-        if (value === null) {
-          throw Error('please provide an actual value for partition key')
-        }
-
-        idOb[metadata.getPartitionKey()] = value
+        throw new Error('a key must either be a string or a PrimaryKey')
       }
 
       attributeMaps.push(idOb)
@@ -88,21 +84,20 @@ export class BatchGetRequest {
     this.params.RequestItems[tableName] = {
       Keys: attributeMaps,
     }
+
     return this
   }
 
   execFullResponse() {}
 
-  // TODO fix any
-  // TODO add support for indexes
-  exec(): Observable<BatchGetItemResponse> {
+  exec(): Observable<BatchGetResponse> {
     return this.dynamoRx.batchGetItems(this.params).map(response => {
-      const r = <BatchGetItemResponse>{}
+      const r = <BatchGetResponse>{}
       if (response.Responses && Object.keys(response.Responses).length) {
         const responses: { [key: string]: AttributeMap } = {}
         Object.keys(response.Responses).forEach(tableName => {
           const mapped = response.Responses![tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.tables.get(tableName)!.modelClazz)
+            Mapper.fromDb(attributeMap, this.tables.get(tableName))
           )
           r[tableName] = mapped
         })
