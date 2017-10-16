@@ -118,7 +118,7 @@ Complex Types (properties with these types need some decorators to work properly
 | Array         | L, (S,N,B)S   |
 | ES6 Set       | L, (S,N,B)S   |
 | Object       | M   |
-|----|------|
+|---|---|
 | Binary        | Not Supported |
 | ES6 Map       | Not Supported   |
 | Date          | Not Supported |
@@ -160,6 +160,7 @@ We support the following dynamodb operations with a fluent api:
 - Delete
 - Scan
 - Query
+- BatchGet
 - MakeRequest (generic low level method for special scenarios)
 
 There is always the possibility to access the Params object directly to add values which are not covered with our api.
@@ -224,6 +225,27 @@ these are the accessor rules for nested attribute types
 
 ## Pagination 
 TODO
+
+## BatchGet
+
+There are two scenarios for a batch get item request. One is requesting multiple items from one table by id and the other is requesting multiple items by id from multiple
+tables.
+The first scenario is support using DynamoStore.batchGet() the second one must be implemented using the BatchGetItem class.
+
+```
+const request = new BatchRequest()
+
+// table with simple primary key
+request.forModel(MyModelClass, ['idValue', 'idValue2'])
+
+// table with composite primary key (sortkey is optional)
+request.forModel(MyOtherModelClass, [{partitionKey: 'id', sortKey: 'sortKeyValue'}])
+
+request.exec().subscribe(response => {
+  // an object where the items are mapped to the table name 
+})
+
+```
 
 # Development
 
