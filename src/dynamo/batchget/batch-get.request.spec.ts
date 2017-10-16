@@ -1,4 +1,4 @@
-import { Organization } from '../../../../test/models/organization.model'
+import { Organization } from '../../../test/models/organization.model'
 import { BatchGetRequest } from './batch-get.request'
 
 describe('batch get', () => {
