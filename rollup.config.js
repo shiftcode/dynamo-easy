@@ -18,7 +18,6 @@ export default {
   sourcemap: true,
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: function (id) {
-    // console.log('external stuff', id)
     return /^(lodash|moment|aws-sdk|rxjs|reflect-metadata)/.test(id)
   },
   globals: function (id) {
@@ -27,7 +26,7 @@ export default {
   },
   plugins: [
     json({
-      include: ['node_modules/aws-sdk/**/*', 'node_modules/winston/**/*'],
+      include: ['node_modules/aws-sdk/**/*'],
     }),
     builtins(),
     // Allow node_modules resolution, so you can use 'external' to control
