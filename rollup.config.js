@@ -18,7 +18,8 @@ export default {
   sourcemap: true,
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: function (id) {
-    return /^(lodash|moment|aws-sdk|rxjs)/.test(id)
+    // console.log('external stuff', id)
+    return /^(lodash|moment|aws-sdk|rxjs|reflect-metadata)/.test(id)
   },
   globals: function (id) {
     console.log('global ' + id);
