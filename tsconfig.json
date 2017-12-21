@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "es2015",
+    "target": "es5",
     "module": "es2015",
     "lib": [
       "dom",
@@ -16,7 +16,8 @@
     "declarationDir": "dist/types",
     "outDir": "compiled",
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "downlevelIteration": true
   },
   "include": [
     "src/**/*"
