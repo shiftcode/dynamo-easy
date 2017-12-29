@@ -88,7 +88,7 @@
   },
   "devDependencies": {
     "@types/debug": "^0.0.30",
-    "@types/jest": "^21.1.2",
+    "@types/jest": "^22.0.0",
     "@types/lodash": "^4.14.74",
     "@types/node": "^8.0.26",
     "@types/uuid": "^3.4.1",
