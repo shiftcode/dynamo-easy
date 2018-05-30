@@ -257,7 +257,7 @@ export class ConditionExpressionBuilder {
   private static validateValues(operator: ConditionOperator, values?: any[]) {
     const parameterArity = operatorParameterArity(operator)
     if (values === null || values === undefined) {
-      if (!isNoParamFunctionOperator(operator)) {
+      if (isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
         // the operator needs some values to work
         throw new Error(
           `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`

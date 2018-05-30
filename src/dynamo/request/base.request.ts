@@ -9,7 +9,7 @@ import {
   ScanInput,
   UpdateItemInput,
 } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'

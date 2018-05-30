@@ -15,7 +15,10 @@ import { RequestSortKeyConditionFunction } from './type/sort-key-condition-funct
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
 import { UpdateAction } from './type/update-action.type'
-import { UpdateExpressionDefinitionChain } from './type/update-expression-definition-chain'
+import {
+  UpdateExpressionDefinitionChain,
+  UpdateExpressionDefinitionChainTyped,
+} from './type/update-expression-definition-chain'
 import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
 import { UpdateExpression } from './type/update-expression.type'
 import { UpdateExpressionBuilder } from './update-expression-builder'
@@ -106,6 +109,7 @@ export class RequestExpressionBuilder {
 
   static updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain
   static updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
+  static updateDefinitionFunction<T, K extends keyof T>(attributePath: K): UpdateExpressionDefinitionChainTyped<T, K>
 
   static updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain {
     const f = (operation: UpdateActionDef) => {

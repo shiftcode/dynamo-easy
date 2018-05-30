@@ -1,6 +1,6 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import moment from 'moment-es6'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { INDEX_ACTIVE_CREATED_AT, ModelWithABunchOfIndexes } from '../../../../test/models/model-with-indexes.model'

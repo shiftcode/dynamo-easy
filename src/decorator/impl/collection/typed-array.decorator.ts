@@ -1,6 +1,6 @@
 import { ModelConstructor } from '../../../model/model-constructor'
 import { TypeInfo } from '../../metadata/property-metadata.model'
-import { AttributeModelTypes, initOrUpdateProperty, KEY_PROPERTY } from '../property/property.decorator'
+import { initOrUpdateProperty } from '../property/property.decorator'
 
 /**
  * Makes sure the property will be mapped to a L(ist) type. The modelClass is required if the collection items

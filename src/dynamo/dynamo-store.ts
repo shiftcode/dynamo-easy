@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 import { MetadataHelper } from '../decorator/metadata/metadata-helper'
 import { Mapper } from '../mapper/mapper'
 import { ModelConstructor } from '../model/model-constructor'

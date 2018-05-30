@@ -17,4 +17,6 @@ export interface ConditionExpressionDefinitionChain {
   in: (value: any[]) => ConditionExpressionDefinitionFunction
   beginsWith: (value: any) => ConditionExpressionDefinitionFunction
   between: (value1: any, value2: any) => ConditionExpressionDefinitionFunction
+  attributeExists: () => ConditionExpressionDefinitionFunction
+  attributeNotExists: () => ConditionExpressionDefinitionFunction
 }

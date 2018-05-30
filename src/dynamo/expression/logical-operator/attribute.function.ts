@@ -2,7 +2,7 @@ import { RequestExpressionBuilder } from '../request-expression-builder'
 import { ConditionExpressionDefinitionChain } from '../type/condition-expression-definition-chain'
 
 /**
- * Use this method when accesing a top level attribute of a model
+ * Use this method when accessing a top level attribute of a model
  */
 export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
 

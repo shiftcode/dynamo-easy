@@ -58,10 +58,16 @@ export class Mapper {
 
       // use get accessor if available otherwise use value property of descriptor
       let propertyValue: any
-      if (propertyDescriptor.get) {
-        propertyValue = propertyDescriptor.get()
+      if (propertyDescriptor) {
+        if (propertyDescriptor.get) {
+          propertyValue = propertyDescriptor.get()
+        } else {
+          propertyValue = propertyDescriptor.value
+        }
       } else {
-        propertyValue = propertyDescriptor.value
+        throw new Error(
+          'there is no property descriptor for item ' + JSON.stringify(item) + ' and property key ' + propertyKey
+        )
       }
 
       /*

@@ -1,0 +1,38 @@
+{
+  "name": "dynamo-easy",
+  "version": "2.0.0",
+  "description": "Use the power of typescript to define your object mapping when using dynamodb. This library also provides a fluent api for easy interaction with dynamodb.",
+  "keywords": [
+    "aws",
+    "dynamo",
+    "dynamodb",
+    "api",
+    "mapper",
+    "orm",
+    "typescript",
+    "typescript-decorators",
+    "fluent-api"
+  ],
+  "main": "dynamo-easy.umd.js",
+  "module": "dynamo-easy.es5.js",
+  "typings": "types/dynamo-easy.d.ts",
+  "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shiftcode/dynamo-easy"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "peerDependencies": {
+    "aws-sdk": "^2.100.0",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "rxjs": "^6.0.0"
+  },
+  "dependencies": {
+    "moment-es6": "^1.0.0",
+    "reflect-metadata": "^0.1.10"
+  }
+}

@@ -3,13 +3,17 @@
     "tslint:latest",
     "tslint-config-prettier"
   ],
+  "rulesDirectory": [
+    "node_modules/rxjs-tslint"
+  ],
   "rules": {
     "no-angle-bracket-type-assertion": false,
-    "no-submodule-imports": false,
+    "no-submodule-imports": [true, "aws-sdk/clients/dynamodb", "rxjs/operators"],
     "interface-name": [
       true,
       "never-prefix"
     ],
+    "no-unused-variable": true,
     "variable-name": [
       true,
       "ban-keywords",
@@ -43,6 +47,10 @@
     "no-inferrable-types": [
       true,
       "ignore-params"
-    ]
+    ],
+    "rxjs-collapse-imports": true,
+    "rxjs-pipeable-operators-only": true,
+    "rxjs-no-static-observable-methods": true,
+    "rxjs-proper-imports": true
   }
 }

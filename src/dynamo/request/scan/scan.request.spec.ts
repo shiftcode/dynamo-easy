@@ -1,5 +1,5 @@
 import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { Request } from '../request.model'

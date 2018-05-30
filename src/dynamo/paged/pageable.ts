@@ -1,5 +1,5 @@
 import { Key, QueryOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
 import { QueryResponse } from '../request/query/query.response'
 import { ScanResponse } from '../request/scan/scan.response'
 

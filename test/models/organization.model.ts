@@ -1,14 +1,13 @@
-import moment from 'moment'
+import moment from 'moment-es6'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
-import { TypedSet, TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
+import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Property } from '../../src/decorator/impl/property/property.decorator'
 import { Transient } from '../../src/decorator/impl/transient/transient.decorator'
-import { NestedModel } from '../../src/sample.model'
 import { Employee } from './employee.model'
 
 // tslint:disable:max-classes-per-file
@@ -56,7 +55,7 @@ export class Organization {
   @Date() lastUpdated: moment.Moment
 
   // Boolean
-  active
+  active: boolean
 
   // Number
   count = 52
@@ -64,7 +63,7 @@ export class Organization {
   // @Property()
   // myMap: Map<string, string>;
 
-  @Transient() transient
+  @Transient() transient: any
 
   /*
    * collections

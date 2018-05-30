@@ -115,7 +115,7 @@ export class UpdateExpressionBuilder {
       case 'add':
         // TODO add validation to make sure expressionAttributeValue to be N(umber) or S(et)
         statement = `${namePlaceholder} ${valuePlaceholder}`
-        // TODO won't work for numbers, is always gonna be mapped to a collectio type
+        // TODO won't work for numbers, is always gonna be mapped to a collection type
         if ((values.length === 1 && Array.isArray(values[0])) || Util.isSet(values[0])) {
           // dealing with arr | set as single argument
         } else {
@@ -159,7 +159,7 @@ export class UpdateExpressionBuilder {
   private static isNoValueAction(action: UpdateAction) {
     return (
       action === 'remove' ||
-      // special cases: values are used in statement instaed of expressionValues
+      // special cases: values are used in statement instead of expressionValues
       action === 'removeFromListAt'
     )
   }

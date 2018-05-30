@@ -5,7 +5,8 @@ import {
   UpdateItemOutput,
 } from 'aws-sdk/clients/dynamodb'
 import { forEach } from 'lodash'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -20,6 +21,7 @@ import { UpdateExpressionDefinitionFunction } from '../../expression/type/update
 import { UpdateExpression } from '../../expression/type/update-expression.type'
 import { BaseRequest } from '../base.request'
 
+// FIXME TYPE update naming
 export type Bla = { [key in UpdateActionKeyword]: Expression[] }
 
 export class UpdateRequest<T> extends BaseRequest<T, any> {
@@ -64,12 +66,12 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<UpdateRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {
     const condition = and(...conditionDefFns)(undefined, this.metaData)
-    ParamUtil.addExpression('FilterExpression', condition, this.params)
+    ParamUtil.addExpression('ConditionExpression', condition, this.params)
     return this
   }
 
@@ -144,8 +146,10 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.updateItem(this.params).map(response => {
-      return
-    })
+    return this.dynamoRx.updateItem(this.params).pipe(
+      map(response => {
+        return
+      })
+    )
   }
 }

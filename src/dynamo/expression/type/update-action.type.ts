@@ -10,8 +10,6 @@
  *
  * we provide our own aliases for easier usage
  */
-import { UpdateActionKeyword } from './update-action-keyword.type'
-
 export type UpdateAction =
   | 'incrementBy'
   | 'decrementBy'

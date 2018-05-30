@@ -1,6 +1,7 @@
 import { AttributeMap, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -69,26 +70,30 @@ export class GetRequest<T> extends BaseRequest<T, any> {
   }
 
   execFullResponse(): Observable<GetResponse<T>> {
-    return this.dynamoRx.getItem(this.params).map(getItemResponse => {
-      const response: GetResponse<T> = <any>{ ...getItemResponse }
+    return this.dynamoRx.getItem(this.params).pipe(
+      map(getItemResponse => {
+        const response: GetResponse<T> = <any>{ ...getItemResponse }
 
-      if (getItemResponse.Item) {
-        response.Item = Mapper.fromDb(getItemResponse.Item, this.modelClazz)
-      } else {
-        response.Item = null
-      }
+        if (getItemResponse.Item) {
+          response.Item = Mapper.fromDb(getItemResponse.Item, this.modelClazz)
+        } else {
+          response.Item = null
+        }
 
-      return response
-    })
+        return response
+      })
+    )
   }
 
   exec(): Observable<T | null> {
-    return this.dynamoRx.getItem(this.params).map(response => {
-      if (response.Item) {
-        return Mapper.fromDb(response.Item, this.modelClazz)
-      } else {
-        return null
-      }
-    })
+    return this.dynamoRx.getItem(this.params).pipe(
+      map(response => {
+        if (response.Item) {
+          return Mapper.fromDb(response.Item, this.modelClazz)
+        } else {
+          return null
+        }
+      })
+    )
   }
 }

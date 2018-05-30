@@ -1,4 +1,5 @@
 import { ConditionOperator } from '../type/condition-operator.type'
+import { isFunctionOperator } from './is-function-operator.function'
 import { isNoParamFunctionOperator } from './is-no-param-function-operator.function'
 
 /**
@@ -8,7 +9,7 @@ import { isNoParamFunctionOperator } from './is-no-param-function-operator.funct
  * @returns {number} The amount of required method parameters when calling an operator function
  */
 export function operatorParameterArity(operator: ConditionOperator): number {
-  if (isNoParamFunctionOperator(operator)) {
+  if (isFunctionOperator(operator) && isNoParamFunctionOperator(operator)) {
     return 0
   } else {
     switch (operator) {

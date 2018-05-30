@@ -2,19 +2,6 @@
 // Reflect Metadata
 //
 import 'reflect-metadata'
-//
-// RxJs
-//
-import 'rxjs/add/observable/combineLatest'
-import 'rxjs/add/observable/fromPromise'
-import 'rxjs/add/observable/of'
-//
-import 'rxjs/add/operator/do'
-import 'rxjs/add/operator/finally'
-import 'rxjs/add/operator/map'
-import 'rxjs/add/operator/publishReplay'
-import 'rxjs/add/operator/share'
-import 'rxjs/add/operator/switchMap'
 import { Config } from './config'
 
 //

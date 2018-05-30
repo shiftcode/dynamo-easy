@@ -1,6 +1,7 @@
 import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject, isString } from 'lodash'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
@@ -89,44 +90,48 @@ export class BatchGetRequest {
   }
 
   execFullResponse(): Observable<BatchGetFullResponse> {
-    return this.dynamoRx.batchGetItems(this.params).map(response => {
-      const r = <BatchGetFullResponse>{
-        ConsumedCapacity: response.ConsumedCapacity,
-        UnprocessedKeys: response.UnprocessedKeys,
-        Responses: {},
-      }
+    return this.dynamoRx.batchGetItems(this.params).pipe(
+      map(response => {
+        const r = <BatchGetFullResponse>{
+          ConsumedCapacity: response.ConsumedCapacity,
+          UnprocessedKeys: response.UnprocessedKeys,
+          Responses: {},
+        }
 
-      if (response.Responses && Object.keys(response.Responses).length) {
-        const responses: { [key: string]: AttributeMap } = {}
-        Object.keys(response.Responses).forEach(tableName => {
-          const mapped = response.Responses![tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.tables.get(tableName))
-          )
-          r.Responses![tableName] = mapped
-        })
-      }
+        if (response.Responses && Object.keys(response.Responses).length) {
+          const responses: { [key: string]: AttributeMap } = {}
+          Object.keys(response.Responses).forEach(tableName => {
+            const mapped = response.Responses![tableName].map(attributeMap =>
+              Mapper.fromDb(attributeMap, this.tables.get(tableName))
+            )
+            r.Responses![tableName] = mapped
+          })
+        }
 
-      return r
-    })
+        return r
+      })
+    )
   }
 
   exec(): Observable<BatchGetResponse> {
-    return this.dynamoRx.batchGetItems(this.params).map(response => {
-      const r = <BatchGetResponse>{}
-      if (response.Responses && Object.keys(response.Responses).length) {
-        const responses: { [key: string]: AttributeMap } = {}
-        Object.keys(response.Responses).forEach(tableName => {
-          const mapped = response.Responses![tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.tables.get(tableName))
-          )
-          r[tableName] = mapped
-        })
+    return this.dynamoRx.batchGetItems(this.params).pipe(
+      map(response => {
+        const r = <BatchGetResponse>{}
+        if (response.Responses && Object.keys(response.Responses).length) {
+          const responses: { [key: string]: AttributeMap } = {}
+          Object.keys(response.Responses).forEach(tableName => {
+            const mapped = response.Responses![tableName].map(attributeMap =>
+              Mapper.fromDb(attributeMap, this.tables.get(tableName))
+            )
+            r[tableName] = mapped
+          })
 
-        return r
-      } else {
-        return {}
-      }
-    })
+          return r
+        } else {
+          return {}
+        }
+      })
+    )
   }
 
   private getTableName(modelClazz: ModelConstructor<any>, tableNameResolver: TableNameResolver) {

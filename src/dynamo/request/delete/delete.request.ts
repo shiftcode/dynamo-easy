@@ -5,7 +5,8 @@ import {
   ReturnConsumedCapacity,
   ReturnItemCollectionMetrics,
 } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -92,8 +93,10 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.deleteItem(this.params).map(response => {
-      return
-    })
+    return this.dynamoRx.deleteItem(this.params).pipe(
+      map(response => {
+        return
+      })
+    )
   }
 }

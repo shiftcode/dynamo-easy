@@ -125,8 +125,6 @@ function createNewProperty(
     }
   }
 
-  const propertyDescriptor: PropertyDescriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey)
-
   const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
     type: propertyType,
     isCustom: customType,

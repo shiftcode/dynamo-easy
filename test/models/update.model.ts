@@ -1,4 +1,5 @@
 import * as moment from 'moment'
+import { SortedSet } from '../../src/decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Property } from '../../src/decorator/impl/property/property.decorator'
@@ -35,6 +36,8 @@ export class UpdateModel {
 
   // maps to L(ist)
   addresses: Address[]
+
+  @SortedSet() numberValues: number[]
 
   // maps to M(ap)
   info: Info
