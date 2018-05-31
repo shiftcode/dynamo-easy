@@ -1,6 +1,6 @@
 import moment from 'moment-es6'
 import { Employee } from '../../test/models/employee.model'
-import { MomentType } from '../decorator/impl/date/moment.type'
+import { MomentType } from './type/moment.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 import { Util } from './util'

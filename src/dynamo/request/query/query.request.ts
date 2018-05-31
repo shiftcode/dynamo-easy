@@ -69,6 +69,8 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return RequestExpressionBuilder.addSortKeyCondition(sortKey, this)
   }
 
+  // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
+  // update2.function)
   whereAttribute(attributePath: keyof T): RequestConditionFunction<QueryRequest<T>> {
     return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
   }

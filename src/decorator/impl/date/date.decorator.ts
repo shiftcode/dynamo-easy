@@ -1,8 +1,7 @@
 import { DynamoEasy } from '../../../dynamo-easy'
-import { Util } from '../../../mapper/util'
+import { MomentType } from '../../../mapper/type/moment.type'
 import { TypeInfo } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/property.decorator'
-import { MomentType } from './moment.type'
 
 export function Date(): PropertyDecorator {
   return (target: any, propertyKey: string) => {

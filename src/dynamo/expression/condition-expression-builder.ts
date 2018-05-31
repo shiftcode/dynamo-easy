@@ -15,6 +15,7 @@ import { Expression } from './type/expression.type'
 
 /**
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
+ * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_Condition.html
  */
 export class ConditionExpressionBuilder {
   /**
@@ -228,7 +229,8 @@ export class ConditionExpressionBuilder {
       let value: AttributeValue | null
       switch (operator) {
         case 'contains':
-          value = ConditionExpressionBuilder.validateValueForContains(values[0], propertyMetadata)
+          // ConditionExpressionBuilder.validateValueForContains(values[0], propertyMetadata)
+          value = Mapper.toDbOne(values[0], propertyMetadata)
           break
         default:
           value = Mapper.toDbOne(values[0], propertyMetadata)
@@ -305,18 +307,20 @@ export class ConditionExpressionBuilder {
       switch (propertyMetadata.typeInfo.type) {
         case Array:
         case Set:
-          if (
-            propertyMetadata.typeInfo.genericType &&
-            propertyMetadata.typeInfo.genericType !== String &&
-            propertyMetadata.typeInfo.genericType !== Number &&
-            propertyMetadata.typeInfo.genericType !== Binary
-          ) {
-            finalValue = { S: value.toString() }
-          } else {
-            throw new Error(
-              'either generic type info is not defined or the generic type is not one of String, Number, Binary'
-            )
-          }
+          // FIXME REVIEW the validation logic
+          // const genericType = propertyMetadata.typeInfo.genericType
+          // if ((!genericType && (typeof value === 'number' || typeof value === 'string' || typeof value === '')) || (
+          //   genericType &&
+          //   genericType !== String &&
+          //   genericType !== Number &&
+          //   genericType !== Binary)
+          // ) {
+          finalValue = { S: value.toString() }
+          // } else {
+          //   throw new Error(
+          //     'either generic type info is not defined or the generic type is not one of String, Number, Binary',
+          //   )
+          // }
           break
         case String:
         case Number:

@@ -1,5 +1,5 @@
-import { MomentType } from '../../decorator/impl/date/moment.type'
 import { Binary } from './binary.type'
+import { MomentType } from './moment.type'
 import { NullType } from './null.type'
 import { UndefinedType } from './undefined.type'
 

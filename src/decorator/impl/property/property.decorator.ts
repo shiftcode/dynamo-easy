@@ -1,10 +1,10 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { DynamoEasy } from '../../../dynamo-easy'
 import { AttributeModelType } from '../../../mapper/type/attribute-model.type'
+import { MomentType } from '../../../mapper/type/moment.type'
 import { Util } from '../../../mapper/util'
 import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
 import { getMetadataType } from '../../util'
-import { MomentType } from '../date/moment.type'
 import { IndexType } from '../index/index-type.enum'
 import { PropertyData } from './property-data.model'
 
