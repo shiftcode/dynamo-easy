@@ -59,7 +59,7 @@ export class PutRequest<T> extends BaseRequest<T, any> {
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<PutRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): PutRequest<T> {

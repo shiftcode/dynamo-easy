@@ -20,7 +20,8 @@ export class Gift {
 export class Birthday {
   date: moment.Moment
 
-  @TypedArray(Gift) presents: Gift[]
+  @TypedArray(Gift)
+  presents: Gift[]
 
   constructor(date: moment.Moment, ...gifts: string[]) {
     this.date = date
@@ -46,13 +47,16 @@ export class OrganizationEvent {
 @Model({ tableName: 'Organization' })
 export class Organization {
   // String
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
   name: string
 
-  @SortKey() createdAtDate: moment.Moment
+  @SortKey()
+  createdAtDate: moment.Moment
 
-  @Date() lastUpdated: moment.Moment
+  @Date()
+  lastUpdated: moment.Moment
 
   // Boolean
   active: boolean
@@ -63,7 +67,8 @@ export class Organization {
   // @Property()
   // myMap: Map<string, string>;
 
-  @Transient() transient: any
+  @Transient()
+  transient: any
 
   /*
    * collections
@@ -80,7 +85,8 @@ export class Organization {
   randomDetails: any[]
 
   // complex type (requries metadata)
-  @TypedArray(Employee) employees: Employee[]
+  @TypedArray(Employee)
+  employees: Employee[]
 
   /*
    * SET
@@ -91,15 +97,19 @@ export class Organization {
   cities: Set<string>
 
   // set with complex type -> L(ist)
-  @TypedSet(Birthday) birthdays: Set<Birthday>
+  @TypedSet(Birthday)
+  birthdays: Set<Birthday>
 
   // set with simple type -> sorted -> L(ist)
-  @SortedSet() awards: Set<string>
+  @SortedSet()
+  awards: Set<string>
 
   // set with complex type -> sorted -> L(ist)
-  @SortedSet(OrganizationEvent) events: Set<OrganizationEvent>
+  @SortedSet(OrganizationEvent)
+  events: Set<OrganizationEvent>
 
-  @TypedSet() emptySet: Set<string> = new Set()
+  @TypedSet()
+  emptySet: Set<string> = new Set()
 
   // tslint:disable-next-line:no-empty
   constructor() {}

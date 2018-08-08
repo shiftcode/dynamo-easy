@@ -1,7 +1,3 @@
-import moment from 'moment-es6'
-import { MomentMapper } from './moment.mapper'
-import { NullMapper } from './null.mapper'
-import { NumberMapper } from './number.mapper'
 import { ObjectMapper } from './object.mapper'
 
 describe('object mapper', () => {

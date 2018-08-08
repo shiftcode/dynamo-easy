@@ -4,15 +4,15 @@ import { ConditionOperator } from '../type/condition-operator.type'
 
 export function operatorForAlias(alias: OperatorAlias): ConditionOperator | undefined {
   let operator: ConditionOperator | undefined
-  Object.keys(OPERATOR_TO_ALIAS_MAP).forEach((key: ConditionOperator) => {
-    const a: string | string[] = OPERATOR_TO_ALIAS_MAP[key]
-    if (Array.isArray(alias)) {
+  Object.keys(OPERATOR_TO_ALIAS_MAP).forEach(key => {
+    const a = OPERATOR_TO_ALIAS_MAP[key]
+    if (a instanceof Array) {
       if (a.includes(alias)) {
-        operator = key
+        operator = <ConditionOperator>key
       }
     } else {
       if (a === alias) {
-        operator = key
+        operator = <ConditionOperator>key
       }
     }
   })

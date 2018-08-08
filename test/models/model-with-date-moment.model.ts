@@ -7,9 +7,12 @@ import { Moment } from '../../src/moment.type'
 
 @Model()
 export class ModelWithDateMoment {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @SortKey() creationDate: moment.Moment
+  @SortKey()
+  creationDate: moment.Moment
 
-  @Date() lastUpdated: moment.Moment
+  @Date()
+  lastUpdated: moment.Moment
 }

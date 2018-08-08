@@ -4,5 +4,6 @@ import { BaseForm } from './base-form.model'
 
 @Model({ tableName: 'forms' })
 export class ProductBaseFormModel extends BaseForm {
-  @SortKey() productId: string
+  @SortKey()
+  productId: string
 }

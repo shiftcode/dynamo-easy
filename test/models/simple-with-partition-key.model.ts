@@ -3,7 +3,8 @@ import { Model } from '../../src/decorator/impl/model/model.decorator'
 
 @Model()
 export class SimpleWithPartitionKeyModel {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
   age: number
 }

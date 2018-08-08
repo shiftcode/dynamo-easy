@@ -4,7 +4,7 @@ import {
   ReturnItemCollectionMetrics,
   UpdateItemOutput,
 } from 'aws-sdk/clients/dynamodb'
-import { forEach } from 'lodash'
+import { forEach } from 'lodash-es'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
@@ -21,8 +21,7 @@ import { UpdateExpressionDefinitionFunction } from '../../expression/type/update
 import { UpdateExpression } from '../../expression/type/update-expression.type'
 import { BaseRequest } from '../base.request'
 
-// FIXME TYPE update naming
-export type Bla = { [key in UpdateActionKeyword]: Expression[] }
+export type SortedUpdateExpressions = { [key in UpdateActionKeyword]: UpdateExpression[] }
 
 export class UpdateRequest<T> extends BaseRequest<T, any> {
   constructor(
@@ -49,7 +48,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
       throw new Error('please provide an acutal value for partition key, got null')
     }
 
-    keyAttributeMap[this.metaData.getPartitionKey()] = partitionKeyValue
+    keyAttributeMap[<string>this.metaData.getPartitionKey()] = partitionKeyValue
 
     // sort key
     if (hasSortKey) {
@@ -59,14 +58,14 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
         throw new Error('please provide an actual value for sort key, got null')
       }
 
-      keyAttributeMap[this.metaData.getSortKey()!] = sortKeyValue
+      keyAttributeMap[<string>this.metaData.getSortKey()!] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<UpdateRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {
@@ -77,7 +76,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
 
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
     if (updateDefFns && updateDefFns.length) {
-      const sortedByActionKeyWord: Bla = updateDefFns
+      const sortedByActionKeyWord: SortedUpdateExpressions = updateDefFns
         .map(updateDefFn => {
           return updateDefFn(this.params.ExpressionAttributeValues, this.metaData)
         })
@@ -90,14 +89,14 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
             result[expr.type].push(expr)
             return result
           },
-          <Bla>{}
+          <SortedUpdateExpressions>{}
         )
 
       const actionStatements: string[] = []
       let attributeValues: AttributeMap = {}
       let attributeNames: { [key: string]: string } = {}
 
-      forEach(sortedByActionKeyWord, (value: UpdateExpression[], key: UpdateActionKeyword) => {
+      forEach(sortedByActionKeyWord, (value, key) => {
         const statements: string[] = []
         if (value && value.length) {
           value.forEach(updateExpression => {

@@ -20,7 +20,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<ScanRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('FilterExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): ScanRequest<T> {

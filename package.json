@@ -13,9 +13,10 @@
     "typescript-decorators",
     "fluent-api"
   ],
-  "main": "dist/dynamo-easy.umd.js",
-  "module": "dist/dynamo-easy.es5.js",
-  "typings": "dist/types/dynamo-easy.d.ts",
+  "main": "./dist/dynamo-easy.js",
+  "module": "./dist/_esm5/dynamo-easy.js",
+  "es2015": "./dist/_esm2015/dynamo-easy.js",
+  "typings": "./dist/_types/dynamo-easy.d.ts",
   "files": [
     "dist"
   ],
@@ -26,33 +27,35 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=8.10.0"
   },
+  "sideEffects": false,
   "scripts": {
-    "lint": "npx tslint -t codeFrame 'src/**/*.ts' 'test/**/*.ts' --fix",
-    "prebuild": "npx rimraf dist",
-    "build": "tsc && rollup -c && rimraf compiled",
-    "build:old": "tsc && rollup -c && rimraf compiled && typedoc --out dist/docs --target es6 --theme minimal sr",
-    "build:webpack": "webpack",
-    "start": "npx tsc-watch --onSuccess \"rollup -c\"",
-    "test": "npx jest",
-    "test:watch": "npx jest --watch",
+    "lint": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts' && tslint --fix -t codeFrame '{src,test}/**/*.ts'",
+    "prebuild": "rimraf dist",
+    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs && rollup -c",
+    "build:deprecated:old": "tsc && rollup -c && rimraf compiled && typedoc --out dist/docs --target es6 --theme minimal sr",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
-    "deploy-docs": "npx ts-node tools/gh-pages-publish",
+    "deploy-docs": "ts-node tools/gh-pages-publish",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
-    "commit": "npx git-cz",
-    "semantic-release": "npx semantic-release pre && npm publish && semantic-release post",
-    "semantic-release-prepare": "npx ts-node tools/semantic-release-prepare",
-    "prettier:all": "npx prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5 '(src|test|e2e)/**/*.ts'",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "prettier:all": "prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5 '(src|test|e2e)/**/*.ts'",
     "precommit": "npm run lint -- --fix && lint-staged",
     "prepush": "npm run test:prod && npm run build",
-    "commitmsg": "npx validate-commit-msg"
+    "commitmsg": "validate-commit-msg"
   },
   "lint-staged": {
-    "*.ts": [
-      "prettier --write --print-width 120 --single-quote --no-semi --trailing-comma es5",
-      "git add"
-    ]
+    "linters": {
+      "{src,test}/**/*.ts": [
+        "prettier --write --config ./.prettierrc.yml",
+        "tslint --fix -t codeFrame",
+        "git add"
+      ]
+    }
   },
   "config": {
     "commitizen": {
@@ -63,49 +66,26 @@
       "helpMessage": "Use \"npm run commit\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)"
     }
   },
-  "jest": {
-    "testEnvironment": "node",
-    "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/test/"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 10,
-        "functions": 10,
-        "lines": 10,
-        "statements": 10
-      }
-    }
-  },
   "devDependencies": {
     "@types/debug": "^0.0.30",
     "@types/jest": "^21.1.2",
-    "@types/lodash": "^4.14.109",
+    "@types/lodash-es": "^4.17.1",
     "@types/node": "^8.0.26",
     "@types/uuid": "^3.4.1",
-    "aws-sdk": "^2.245.1",
+    "@types/reflect-metadata": "^0.1.0",
+    "aws-sdk": "^2.286.1",
     "colors": "^1.1.2",
     "commitizen": "^2.10.1",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.5",
     "cz-conventional-changelog": "^2.0.0",
     "husky": "^0.14.0",
-    "jest": "^21.2.1",
-    "lint-staged": "^4.0.4",
-    "lodash": "^4.17.10",
+    "jest": "^23.4.2",
+    "lint-staged": "^7.2.0",
+    "lodash-es": "^4.17.10",
     "lodash.camelcase": "^4.3.0",
     "moment": "^2.22.1",
-    "prettier": "^1.6.1",
+    "prettier": "^1.14.0",
     "prompt": "^1.0.0",
     "replace-in-file": "^2.6.3",
     "rimraf": "^2.6.1",
@@ -117,25 +97,24 @@
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rxjs": "^6.0.0",
     "semantic-release": "^8.0.3",
-    "ts-jest": "^21.0.1",
-    "ts-loader": "^2.3.4",
-    "ts-node": "^6.0.5",
-    "tsc-watch": "^1.0.8",
-    "tslint": "^5.10.0",
-    "tslint-config-prettier": "^1.5.0",
-    "rxjs-tslint": "^0.1.4",
+    "ts-jest": "^23.0.1",
+    "ts-loader": "^4.4.2",
+    "ts-node": "^7.0.0",
+    "tsc-watch": "^1.0.26",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.14.0",
     "typedoc": "^0.11.1",
-    "typescript": "^2.8.3",
+    "typescript": "^2.9.2",
     "validate-commit-msg": "^2.14.0"
   },
   "peerDependencies": {
-    "aws-sdk": "^2.100.0",
-    "lodash": "^4.17.4",
+    "aws-sdk": "^2.286.1",
+    "lodash-es": "^4.17.10",
     "moment": "^2.18.1",
     "rxjs": "^6.0.0"
   },
   "dependencies": {
     "moment-es6": "^1.0.0",
-    "reflect-metadata": "^0.1.10"
+    "reflect-metadata": "^0.1.12"
   }
 }

@@ -1,17 +1,7 @@
-import {
-  ConditionExpression,
-  ExpressionAttributeNameMap,
-  ExpressionAttributeValueMap,
-  QueryInput,
-} from 'aws-sdk/clients/dynamodb'
-import { has } from 'lodash'
-import moment from 'moment-es6'
 import { getTableName } from '../../../test/helper/get-table-name.function'
 import { Organization } from '../../../test/models/organization.model'
-import { BaseRequest } from '../request/base.request'
 import { QueryRequest } from '../request/query/query.request'
 import { DYNAMO_RX_MOCK } from '../request/query/query.request.spec'
-import { ScanRequest } from '../request/scan/scan.request'
 import { RequestExpressionBuilder } from './request-expression-builder'
 
 describe('request expression builder', () => {

@@ -1,9 +1,6 @@
 import {
-  AttributeMap,
-  BatchGetItemInput,
   DeleteItemInput,
   GetItemInput,
-  Key,
   PutItemInput,
   QueryInput,
   ScanInput,
@@ -12,10 +9,8 @@ import {
 import { Observable } from 'rxjs'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
-import { Mapper } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
-import { PutRequest } from './put/put.request'
 
 export abstract class BaseRequest<
   T,

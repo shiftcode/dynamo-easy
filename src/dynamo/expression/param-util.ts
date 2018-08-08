@@ -5,7 +5,7 @@ import {
   ScanInput,
   UpdateItemInput,
 } from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash'
+import { isEmpty, isString } from 'lodash-es'
 import { Expression } from './type/expression.type'
 
 export class ParamUtil {

@@ -113,9 +113,9 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>> {
                 M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericType),
               }))
             } else {
-              attributeValue.L = <AttributeValue[]>(<any[]>propertyValue)
-                .map(value => Mapper.toDbOne(value))
-                .filter(value => value !== null)
+              attributeValue.L = <AttributeValue[]>(
+                (<any[]>propertyValue).map(value => Mapper.toDbOne(value)).filter(value => value !== null)
+              )
             }
             break
           default:

@@ -1,5 +1,5 @@
 import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
-import { isObject, isString } from 'lodash'
+import { isObject, isString } from 'lodash-es'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
@@ -56,8 +56,8 @@ export class BatchGetRequest {
         if (value === null) {
           throw Error('please provide an actual value for partition key')
         }
-
-        idOb[metadata.getPartitionKey()] = value
+        // FIXME: should work  without cast - because keyof T must be a string or symbol (error exists since update to  2.9.x -> check in a later version, there are some open issues)
+        idOb[<string>metadata.getPartitionKey()] = value
       } else if (isObject(key) && key.partitionKey !== undefined && key.partitionKey !== null) {
         // got a composite primary key
 
@@ -66,7 +66,7 @@ export class BatchGetRequest {
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
-        idOb[metadata.getPartitionKey()] = mappedPartitionKey
+        idOb[<string>metadata.getPartitionKey()] = mappedPartitionKey
 
         // sort key
         const mappedSortKey = Mapper.toDbOne(key.sortKey)
@@ -74,7 +74,7 @@ export class BatchGetRequest {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[metadata.getSortKey()!] = mappedSortKey
+        idOb[<string>metadata.getSortKey()!] = mappedSortKey
       } else {
         throw new Error('a key must either be a string or a PrimaryKey')
       }
@@ -99,7 +99,6 @@ export class BatchGetRequest {
         }
 
         if (response.Responses && Object.keys(response.Responses).length) {
-          const responses: { [key: string]: AttributeMap } = {}
           Object.keys(response.Responses).forEach(tableName => {
             const mapped = response.Responses![tableName].map(attributeMap =>
               Mapper.fromDb(attributeMap, this.tables.get(tableName))
@@ -118,7 +117,6 @@ export class BatchGetRequest {
       map(response => {
         const r = <BatchGetResponse>{}
         if (response.Responses && Object.keys(response.Responses).length) {
-          const responses: { [key: string]: AttributeMap } = {}
           Object.keys(response.Responses).forEach(tableName => {
             const mapped = response.Responses![tableName].map(attributeMap =>
               Mapper.fromDb(attributeMap, this.tables.get(tableName))

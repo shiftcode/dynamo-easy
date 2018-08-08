@@ -1,7 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { MetadataHelper } from '../decorator/metadata/metadata-helper'
-import { Mapper } from '../mapper/mapper'
 import { ModelConstructor } from '../model/model-constructor'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from './default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
@@ -20,13 +19,12 @@ import { TableNameResolver } from './table-name-resolver.type'
 
 export class DynamoStore<T> {
   private readonly dynamoRx: DynamoRx
-  private readonly mapper: Mapper
 
   readonly tableName: string
 
   constructor(
     private modelClazz: ModelConstructor<T>,
-    private tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
+    tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
     sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
   ) {
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
@@ -80,11 +78,12 @@ export class DynamoStore<T> {
     return this.dynamoRx.makeRequest(operation, params)
   }
 
-  private createBaseParams(): { TableName: string } {
-    const params: { TableName: string } = {
-      TableName: this.tableName,
-    }
-
-    return params
-  }
+  // Commented because not used at the moment
+  // private createBaseParams(): { TableName: string } {
+  //   const params: { TableName: string } = {
+  //     TableName: this.tableName,
+  //   }
+  //
+  //   return params
+  // }
 }

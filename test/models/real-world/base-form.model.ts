@@ -7,8 +7,10 @@ export const INDEX_CREATION_DATE = 'index-creationDate'
 
 @Model({ tableName: 'forms' })
 export class BaseForm {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @GSIPartitionKey(INDEX_CREATION_DATE) creationDate: moment.Moment
+  @GSIPartitionKey(INDEX_CREATION_DATE)
+  creationDate: moment.Moment
   lastSavedDate: moment.Moment
 }
