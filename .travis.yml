@@ -11,6 +11,12 @@ cache:
   directories:
   - "$HOME/.npm"
 
+before install:
+- npm install npm@^6.0.0 -g
+
+install:
+- npm ci
+
 notifications:
   email: false
 
