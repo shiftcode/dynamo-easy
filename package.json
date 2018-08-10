@@ -43,7 +43,7 @@
     "commit": "git-cz",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "prettier:all": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'",
-    "precommit": "npm run lint -- --fix && lint-staged",
+    "precommit": "lint-staged",
     "prepush": "npm run test:prod && npm run build",
     "commitmsg": "validate-commit-msg"
   },
