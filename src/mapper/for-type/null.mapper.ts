@@ -1,5 +1,4 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment-es6'
 import { MapperForType } from './base.mapper'
 
 export class NullMapper implements MapperForType<null> {
@@ -13,7 +12,7 @@ export class NullMapper implements MapperForType<null> {
     }
   }
 
-  toDb(value: null): AttributeValue {
+  toDb(value: null): AttributeValue | null {
     if (value !== null) {
       throw new Error(`null mapper only supports null value, got ${value}`)
     }

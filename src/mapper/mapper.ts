@@ -1,5 +1,4 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { MomentType } from '../decorator/impl/date/moment.type'
 import { Metadata } from '../decorator/metadata/metadata'
 import { MetadataHelper } from '../decorator/metadata/metadata-helper'
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
@@ -15,10 +14,11 @@ import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
 import { StringMapper } from './for-type/string.mapper'
 import { AttributeModelType } from './type/attribute-model.type'
-// import v1 from 'uuid'
 import { Binary } from './type/binary.type'
 import { EnumType } from './type/enum.type'
+import { MomentType } from './type/moment.type'
 import { NullType } from './type/null.type'
+import { UndefinedType } from './type/undefined.type'
 import { Util } from './util'
 
 // import debug from 'debug';
@@ -58,56 +58,69 @@ export class Mapper {
 
       // use get accessor if available otherwise use value property of descriptor
       let propertyValue: any
-      if (propertyDescriptor.get) {
-        propertyValue = propertyDescriptor.get()
-      } else {
-        propertyValue = propertyDescriptor.value
-      }
-
-      /*
-       * 2) decide how to map the property depending on type or value
-       */
-      let attributeValue: AttributeValue | undefined | null
-
-      let propertyMetadata: PropertyMetadata<any> | null | undefined
-      if (modelConstructor) {
-        propertyMetadata = MetadataHelper.forProperty(modelConstructor, propertyKey)
-      }
-
-      if (propertyMetadata) {
-        if (propertyMetadata.transient) {
-          // skip transient property
-          // Mapper.logger.log('transient property -> skip')
+      if (propertyDescriptor) {
+        if (propertyDescriptor.get) {
+          propertyValue = propertyDescriptor.get()
         } else {
-          /*
-           * 3a) property metadata is defined
-           */
-          attributeValue = Mapper.toDbOne(propertyValue, propertyMetadata)
+          propertyValue = propertyDescriptor.value
         }
       } else {
-        /*
-         * 3b) no metadata found
-         */
-        // let typeByConvention = Util.typeByConvention(propertyKey);
-        // if (typeByConvention) {
-        /*
-           * 4a) matches a convention
-           */
-        // attributeValue = Mapper.mapperForConvention(typeByConvention).toDb(propertyValue);
-        // } else {
-        //   /*
-        //    * 4b) no naming convention matches
-        //    */
-        attributeValue = Mapper.toDbOne(propertyValue)
-        // }
+        throw new Error(
+          'there is no property descriptor for item ' + JSON.stringify(item) + ' and property key ' + propertyKey
+        )
       }
 
-      if (attributeValue === undefined) {
-        // no-op transient field, just ignore it
-      } else if (attributeValue === null) {
-        // empty values (string, set, list) will be ignored too
+      let attributeValue: AttributeValue | undefined | null
+
+      // TODO concept maybe make this configurable how to map undefined & null values
+      if (propertyValue === undefined || propertyValue === null) {
+        // noop ignore because we can't map it
       } else {
-        mapped[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
+        /*
+         * 2) decide how to map the property depending on type or value
+         */
+
+        let propertyMetadata: PropertyMetadata<any> | null | undefined
+        if (modelConstructor) {
+          propertyMetadata = MetadataHelper.forProperty(modelConstructor, propertyKey)
+        }
+
+        if (propertyMetadata) {
+          if (propertyMetadata.transient) {
+            // skip transient property
+            // Mapper.logger.log('transient property -> skip')
+          } else {
+            /*
+             * 3a) property metadata is defined
+             */
+            attributeValue = Mapper.toDbOne(propertyValue, propertyMetadata)
+          }
+        } else {
+          /*
+           * 3b) no metadata found
+           */
+          // let typeByConvention = Util.typeByConvention(propertyKey);
+          // if (typeByConvention) {
+          /*
+             * 4a) matches a convention
+             */
+          // attributeValue = Mapper.mapperForConvention(typeByConvention).toDb(propertyValue);
+          // } else {
+          //   /*
+          //    * 4b) no naming convention matches
+          //    */
+
+          attributeValue = Mapper.toDbOne(propertyValue)
+          // }
+        }
+
+        if (attributeValue === undefined) {
+          // no-op transient field, just ignore it
+        } else if (attributeValue === null) {
+          // empty values (string, set, list) will be ignored too
+        } else {
+          mapped[propertyMetadata ? propertyMetadata.nameDb : <string>propertyKey] = attributeValue
+        }
       }
     })
 
@@ -230,54 +243,60 @@ export class Mapper {
   }
 
   static forType(type: AttributeModelType): MapperForType<any> {
-    if (!Mapper.mapperForType.has(type)) {
+    // FIXME HIGH review this, we now use toString to compare because we had issues with ng client for moment when
+    // using a GSI on creationDate (MomentType) was a different MomentType than for lastUpdatedDate
+    if (!Mapper.mapperForType.has(type.toString())) {
       let mapperForType: MapperForType<any>
-      switch (type) {
-        case String:
+      switch (type.toString()) {
+        case String.toString():
           mapperForType = new StringMapper()
           break
-        case Number:
+        case Number.toString():
           mapperForType = new NumberMapper()
           break
-        case Boolean:
+        case Boolean.toString():
           mapperForType = new BooleanMapper()
           break
-        case MomentType:
+        case MomentType.toString():
           mapperForType = new MomentMapper()
           break
-        case Date:
+        case Date.toString():
           mapperForType = new DateMapper()
           break
-        case EnumType:
+        case EnumType.toString():
           mapperForType = new EnumMapper()
           break
-        case Map:
+        case Map.toString():
           // Maps support complex types as keys, we only support String & Number as Keys, otherwise a .toString() method should be implemented,
           // so we now how to save a  key
           // mapperForType = new MapMapper()
           throw new Error('Map is not supported to be mapped for now')
-        case Array:
+        case Array.toString():
           mapperForType = new CollectionMapper()
           break
-        case Set:
+        case Set.toString():
           mapperForType = new CollectionMapper()
           break
-        case Object:
+        case Object.toString():
           mapperForType = new ObjectMapper()
           break
-        case NullType:
+        case NullType.toString():
           mapperForType = new NullMapper()
           break
-        case Binary:
+        case Binary.toString():
           // TODO LOW:BINARY add binary mapper
           throw new Error('no mapper for binary type implemented yet')
-        default:
+        case UndefinedType.toString():
           mapperForType = new ObjectMapper()
+          break
+        default:
+          throw new Error('no mapper defined for type ' + JSON.stringify(type))
+        // mapperForType = new ObjectMapper()
       }
 
-      this.mapperForType.set(type, mapperForType)
+      this.mapperForType.set(type.toString(), mapperForType)
     }
 
-    return this.mapperForType.get(type)!
+    return this.mapperForType.get(type.toString())!
   }
 }

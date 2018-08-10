@@ -1,14 +1,13 @@
-import moment from 'moment'
+import moment from 'moment-es6'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
-import { TypedSet, TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
+import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Property } from '../../src/decorator/impl/property/property.decorator'
 import { Transient } from '../../src/decorator/impl/transient/transient.decorator'
-import { NestedModel } from '../../src/sample.model'
 import { Employee } from './employee.model'
 
 // tslint:disable:max-classes-per-file
@@ -21,7 +20,8 @@ export class Gift {
 export class Birthday {
   date: moment.Moment
 
-  @TypedArray(Gift) presents: Gift[]
+  @TypedArray(Gift)
+  presents: Gift[]
 
   constructor(date: moment.Moment, ...gifts: string[]) {
     this.date = date
@@ -47,16 +47,19 @@ export class OrganizationEvent {
 @Model({ tableName: 'Organization' })
 export class Organization {
   // String
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
   name: string
 
-  @SortKey() createdAtDate: moment.Moment
+  @SortKey()
+  createdAtDate: moment.Moment
 
-  @Date() lastUpdated: moment.Moment
+  @Date()
+  lastUpdated: moment.Moment
 
   // Boolean
-  active
+  active: boolean
 
   // Number
   count = 52
@@ -64,7 +67,8 @@ export class Organization {
   // @Property()
   // myMap: Map<string, string>;
 
-  @Transient() transient
+  @Transient()
+  transient: any
 
   /*
    * collections
@@ -81,7 +85,8 @@ export class Organization {
   randomDetails: any[]
 
   // complex type (requries metadata)
-  @TypedArray(Employee) employees: Employee[]
+  @TypedArray(Employee)
+  employees: Employee[]
 
   /*
    * SET
@@ -92,15 +97,19 @@ export class Organization {
   cities: Set<string>
 
   // set with complex type -> L(ist)
-  @TypedSet(Birthday) birthdays: Set<Birthday>
+  @TypedSet(Birthday)
+  birthdays: Set<Birthday>
 
   // set with simple type -> sorted -> L(ist)
-  @SortedSet() awards: Set<string>
+  @SortedSet()
+  awards: Set<string>
 
   // set with complex type -> sorted -> L(ist)
-  @SortedSet(OrganizationEvent) events: Set<OrganizationEvent>
+  @SortedSet(OrganizationEvent)
+  events: Set<OrganizationEvent>
 
-  @TypedSet() emptySet: Set<string> = new Set()
+  @TypedSet()
+  emptySet: Set<string> = new Set()
 
   // tslint:disable-next-line:no-empty
   constructor() {}

@@ -7,7 +7,7 @@ export * from './impl/collection/typed-set.decorator'
 export * from './impl/collection/typed-array.decorator'
 // date
 export * from './impl/date/date.decorator'
-export * from './impl/date/moment.type'
+export * from '../mapper/type/moment.type'
 // index
 export * from './impl/index/secondary-index'
 export * from './impl/index/gsi-partition-key.decorator'

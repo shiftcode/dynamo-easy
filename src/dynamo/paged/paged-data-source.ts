@@ -1,10 +1,8 @@
 // tslint:disable:no-console
-import { AttributeMap, Key, QueryOutput } from 'aws-sdk/clients/dynamodb'
-import { findIndex } from 'lodash'
-import { BehaviorSubject } from 'rxjs/BehaviorSubject'
-import { Observable } from 'rxjs/Observable'
-import { Subject } from 'rxjs/Subject'
-import { BaseRequest } from '../request/base.request'
+import { Key } from 'aws-sdk/clients/dynamodb'
+import { findIndex } from 'lodash-es'
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs'
+import { finalize, map, publishReplay, refCount, share, switchMap, tap } from 'rxjs/operators'
 import { QueryRequest } from '../request/query/query.request'
 import { QueryResponse } from '../request/query/query.response'
 import { Request } from '../request/request.model'
@@ -34,52 +32,58 @@ export class PagedDataSource<
     this.loading$ = this.loadingSubject.asObservable()
     this.meta$ = this.metaSubject.asObservable()
 
-    request$ = request$
-      .do(() => this.reset())
-      .publishReplay(1)
-      .refCount()
+    request$ = request$.pipe(
+      tap(() => this.reset()),
+      publishReplay(1),
+      refCount()
+    )
 
-    const count$: Observable<number> = request$
-      .do(() => console.debug('fetch count'))
-      .switchMap(request =>
+    const count$: Observable<number> = request$.pipe(
+      tap(() => console.log('fetch count')),
+      switchMap(request =>
         request
           .limit(Request.INFINITE_LIMIT)
           .exclusiveStartKey(null)
           .execCount()
+      ),
+      tap(count => console.log('got count', count)),
+      share()
+    )
+
+    const data$: Observable<T[]> = combineLatest(request$, this.nextSubject).pipe(
+      tap(() => console.log('request changed or next page was requested, call for data')),
+      map(values => values[0]),
+      switchMap(request => this.fetchData(request)),
+      tap(data => this.data.push(...data)),
+      share()
+    )
+
+    combineLatest(data$, count$)
+      .pipe(
+        map(values => {
+          console.log('data or count changed -> hasMore', this.data.length < values[1])
+          return {
+            current: this.data.length,
+            total: values[1],
+            hasMore: this.data.length < values[1],
+          }
+        }),
+        share()
       )
-      .do(count => console.debug('got count', count))
-      .share()
-
-    const data$: Observable<T[]> = Observable.combineLatest(request$, this.nextSubject)
-      .do(() => console.debug('request changed or next page was requested, call for data'))
-      .map(values => values[0])
-      .switchMap(request => this.fetchData(request))
-      .do(data => this.data.push(...data))
-      .share()
-
-    Observable.combineLatest(data$, count$)
-      .map(values => {
-        console.debug('data or count changed -> hasMore', this.data.length < values[1])
-        return {
-          current: this.data.length,
-          total: values[1],
-          hasMore: this.data.length < values[1],
-        }
-      })
-      .share()
       .subscribe(meta => this.metaSubject.next(meta))
 
-    const hasMore$: Observable<boolean> = this.meta$
-      .map(meta => {
+    const hasMore$: Observable<boolean> = this.meta$.pipe(
+      map(meta => {
         return meta.hasMore
-      })
-      .share()
+      }),
+      share()
+    )
 
     this.hasMore$ = hasMore$
     this.count$ = count$
 
     // subscribe to get it rolling
-    data$.subscribe(() => console.debug('fetched data'), error => console.error('could not fetch data', error))
+    data$.subscribe(() => console.log('fetched data'), error => console.error('could not fetch data', error))
 
     // fetch the first set of data
     this.next()
@@ -94,7 +98,8 @@ export class PagedDataSource<
    * @param item
    */
   removeItem(item: T): void {
-    const index: number = findIndex(this.data, item)
+    // FIXME remove any when https://github.com/Microsoft/TypeScript/issues/21592 is fixed
+    const index: number = findIndex<any>(this.data, item)
     if (index !== -1) {
       this.data.splice(index, 1)
       const meta: PagedRequestMeta = this.metaSubject.getValue()
@@ -128,27 +133,29 @@ export class PagedDataSource<
   }
 
   private reset(): void {
-    console.debug('reset')
+    console.log('reset')
     this.data = []
     this.lastKey = null
   }
 
   private fetchData(request: Pageable<T, R, O>): Observable<T[]> {
-    console.debug('fetchData()')
+    console.log('fetchData()')
     this.loadingSubject.next(true)
 
     return request
       .exclusiveStartKey(this.lastKey)
       .limit(this.pageSize)
       .execFullResponse()
-      .do(response => {
-        console.debug(response)
-        this.lastKey = response.LastEvaluatedKey === undefined ? null : response.LastEvaluatedKey
-      })
-      .map(response => response.Items || [])
-      .finally(() => {
-        console.debug('fetchData(): finally')
-        this.loadingSubject.next(false)
-      })
+      .pipe(
+        tap(response => {
+          console.log(response)
+          this.lastKey = response.LastEvaluatedKey === undefined ? null : response.LastEvaluatedKey
+        }),
+        map(response => response.Items || []),
+        finalize(() => {
+          console.log('fetchData(): finally')
+          this.loadingSubject.next(false)
+        })
+      )
   }
 }

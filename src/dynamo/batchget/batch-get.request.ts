@@ -1,6 +1,7 @@
 import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
-import { isObject, isString } from 'lodash'
-import { Observable } from 'rxjs/Observable'
+import { isObject, isString } from 'lodash-es'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
@@ -55,8 +56,8 @@ export class BatchGetRequest {
         if (value === null) {
           throw Error('please provide an actual value for partition key')
         }
-
-        idOb[metadata.getPartitionKey()] = value
+        // FIXME: should work  without cast - because keyof T must be a string or symbol (error exists since update to  2.9.x -> check in a later version, there are some open issues)
+        idOb[<string>metadata.getPartitionKey()] = value
       } else if (isObject(key) && key.partitionKey !== undefined && key.partitionKey !== null) {
         // got a composite primary key
 
@@ -65,7 +66,7 @@ export class BatchGetRequest {
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
-        idOb[metadata.getPartitionKey()] = mappedPartitionKey
+        idOb[<string>metadata.getPartitionKey()] = mappedPartitionKey
 
         // sort key
         const mappedSortKey = Mapper.toDbOne(key.sortKey)
@@ -73,7 +74,7 @@ export class BatchGetRequest {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[metadata.getSortKey()!] = mappedSortKey
+        idOb[<string>metadata.getSortKey()!] = mappedSortKey
       } else {
         throw new Error('a key must either be a string or a PrimaryKey')
       }
@@ -89,44 +90,46 @@ export class BatchGetRequest {
   }
 
   execFullResponse(): Observable<BatchGetFullResponse> {
-    return this.dynamoRx.batchGetItems(this.params).map(response => {
-      const r = <BatchGetFullResponse>{
-        ConsumedCapacity: response.ConsumedCapacity,
-        UnprocessedKeys: response.UnprocessedKeys,
-        Responses: {},
-      }
+    return this.dynamoRx.batchGetItems(this.params).pipe(
+      map(response => {
+        const r = <BatchGetFullResponse>{
+          ConsumedCapacity: response.ConsumedCapacity,
+          UnprocessedKeys: response.UnprocessedKeys,
+          Responses: {},
+        }
 
-      if (response.Responses && Object.keys(response.Responses).length) {
-        const responses: { [key: string]: AttributeMap } = {}
-        Object.keys(response.Responses).forEach(tableName => {
-          const mapped = response.Responses![tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.tables.get(tableName))
-          )
-          r.Responses![tableName] = mapped
-        })
-      }
+        if (response.Responses && Object.keys(response.Responses).length) {
+          Object.keys(response.Responses).forEach(tableName => {
+            const mapped = response.Responses![tableName].map(attributeMap =>
+              Mapper.fromDb(attributeMap, this.tables.get(tableName))
+            )
+            r.Responses![tableName] = mapped
+          })
+        }
 
-      return r
-    })
+        return r
+      })
+    )
   }
 
   exec(): Observable<BatchGetResponse> {
-    return this.dynamoRx.batchGetItems(this.params).map(response => {
-      const r = <BatchGetResponse>{}
-      if (response.Responses && Object.keys(response.Responses).length) {
-        const responses: { [key: string]: AttributeMap } = {}
-        Object.keys(response.Responses).forEach(tableName => {
-          const mapped = response.Responses![tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.tables.get(tableName))
-          )
-          r[tableName] = mapped
-        })
+    return this.dynamoRx.batchGetItems(this.params).pipe(
+      map(response => {
+        const r = <BatchGetResponse>{}
+        if (response.Responses && Object.keys(response.Responses).length) {
+          Object.keys(response.Responses).forEach(tableName => {
+            const mapped = response.Responses![tableName].map(attributeMap =>
+              Mapper.fromDb(attributeMap, this.tables.get(tableName))
+            )
+            r[tableName] = mapped
+          })
 
-        return r
-      } else {
-        return {}
-      }
-    })
+          return r
+        } else {
+          return {}
+        }
+      })
+    )
   }
 
   private getTableName(modelClazz: ModelConstructor<any>, tableNameResolver: TableNameResolver) {

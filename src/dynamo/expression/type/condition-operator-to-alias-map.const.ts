@@ -1,15 +1,21 @@
 import { OperatorAlias } from './condition-operator-alias.type'
 import { ConditionOperator } from './condition-operator.type'
 
-export const OPERATOR_TO_ALIAS_MAP: { [key in ConditionOperator]: OperatorAlias | OperatorAlias[] } = {
+// mapped type
+export interface AliasedOperatorMapEntry extends Record<ConditionOperator, OperatorAlias | OperatorAlias[]> {
+  // index signature
+  [key: string]: OperatorAlias | OperatorAlias[]
+}
+
+export const OPERATOR_TO_ALIAS_MAP: AliasedOperatorMapEntry = {
   '=': ['equals', 'eq'],
   '<>': 'ne',
   '<=': 'lte',
   '<': 'lt',
   '>=': 'gte',
   '>': 'gt',
-  attribute_not_exists: 'null',
-  attribute_exists: 'notNull',
+  attribute_not_exists: ['attributeNotExists', 'null'],
+  attribute_exists: ['attributeExists', 'notNull'],
   attribute_type: 'type',
   contains: 'contains',
   IN: 'in',

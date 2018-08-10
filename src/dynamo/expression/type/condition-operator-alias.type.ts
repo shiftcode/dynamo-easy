@@ -13,3 +13,5 @@ export type OperatorAlias =
   | 'contains'
   | 'in'
   | 'between'
+  | 'attributeExists'
+  | 'attributeNotExists'

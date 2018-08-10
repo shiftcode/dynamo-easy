@@ -1,10 +1,17 @@
 # Dynamo-Easy
 [![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Coverage Status](https://coveralls.io/repos/github/shiftcode/dynamo-easy/badge.svg?branch=master)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors)
+
+This is the documentation for the new version of dynamo-easy released as a scoped package using the namespace 
+@shiftcoders (@shiftcoders/dynamo-easy). If you still want to use the 0.0.x version you can 
+by installing the old version `npm install dynamo-easy` (https://github
+.com/shiftcode/dynamo-easy/releases/tag/v0.10
+.1) 
 
 Abstracts away the complexity of the low level aws dynamosdk. Provides an easy to use fluent api to for requests and supports typescript decorators,
 to define some metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.

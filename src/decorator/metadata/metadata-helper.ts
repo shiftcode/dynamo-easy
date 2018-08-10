@@ -33,9 +33,9 @@ export class MetadataHelper {
 
       if (modelClass && !modelMetadata) {
         throw new Error(
-          `make sure the @Model decorator was added to the given modelClass ${Object.hasOwnProperty('name')
-            ? (<any>modelClass).name
-            : modelClass}, was not able to find model metadata`
+          `make sure the @Model decorator was added to the given modelClass ${
+            Object.hasOwnProperty('name') ? (<any>modelClass).name : modelClass
+          }, was not able to find model metadata`
         )
       }
 

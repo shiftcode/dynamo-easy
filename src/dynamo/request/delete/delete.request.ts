@@ -5,7 +5,8 @@ import {
   ReturnConsumedCapacity,
   ReturnItemCollectionMetrics,
 } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -13,7 +14,6 @@ import { and } from '../../expression/logical-operator/and.function'
 import { ParamUtil } from '../../expression/param-util'
 import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { BaseRequest } from '../base.request'
 
@@ -42,7 +42,7 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
       throw new Error('please provide an acutal value for partition key, got null')
     }
 
-    keyAttributeMap[this.metaData.getPartitionKey()] = partitionKeyValue
+    keyAttributeMap[<string>this.metaData.getPartitionKey()] = partitionKeyValue
 
     // sort key
     if (hasSortKey) {
@@ -52,14 +52,14 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
         throw new Error('please provide an actual value for sort key, got null')
       }
 
-      keyAttributeMap[this.metaData.getSortKey()!] = sortKeyValue
+      keyAttributeMap[<string>this.metaData.getSortKey()!] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<DeleteRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): DeleteRequest<T> {
@@ -92,8 +92,10 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.deleteItem(this.params).map(response => {
-      return
-    })
+    return this.dynamoRx.deleteItem(this.params).pipe(
+      map(response => {
+        return
+      })
+    )
   }
 }

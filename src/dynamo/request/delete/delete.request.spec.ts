@@ -2,8 +2,6 @@ import moment from 'moment-es6'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
-import { ModelConstructor } from '../../../model/model-constructor'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {

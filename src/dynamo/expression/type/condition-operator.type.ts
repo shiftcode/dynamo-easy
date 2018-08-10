@@ -1,6 +1,4 @@
 import { ComparatorOperator } from './comparator-operator.type'
-import { OperatorAlias } from './condition-operator-alias.type'
-import { OPERATOR_TO_ALIAS_MAP } from './condition-operator-to-alias-map.const'
 import { FunctionOperator } from './function-operator.type'
 
 /**

@@ -1,8 +1,5 @@
-import { AttributeMap, Key, QueryInput, ScanInput } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
-import { Metadata } from '../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
-import { Mapper } from '../../mapper/mapper'
+import { Key, QueryInput, QueryOutput, ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
 import { BaseRequest } from './base.request'
@@ -67,6 +64,8 @@ export abstract class Request<
   }
 
   abstract execFullResponse(): Observable<Z>
+
+  abstract execNoMap(): Observable<QueryOutput | ScanOutput>
 
   abstract exec(): Observable<T[]>
 

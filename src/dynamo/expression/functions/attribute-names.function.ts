@@ -16,7 +16,7 @@ export function resolveAttributeNames(
     const namePlaceholders: string[] = []
     // tslint:disable-next-line:no-conditional-assignment
     while ((re = NESTED_ATTR_PATH_CAPTURED_REGEX.exec(attributePath)) !== null) {
-      const fullMatch = re[0]
+      // path part is pos 1 - full match would be 0
       const pathPart = re[1]
       const collectionIndex = re[2]
 

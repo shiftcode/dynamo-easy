@@ -1,9 +1,9 @@
-import { MomentType } from '../src/decorator/impl/date/moment.type'
 import { Metadata } from '../src/decorator/metadata/metadata'
 import { MetadataHelper } from '../src/decorator/metadata/metadata-helper'
 import { ModelMetadata } from '../src/decorator/metadata/model-metadata.model'
 import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
 import { EnumType } from '../src/mapper/type/enum.type'
+import { MomentType } from '../src/mapper/type/moment.type'
 import { ComplexModel } from './models/complex.model'
 import { CustomTableNameModel } from './models/custom-table-name.model'
 import { ModelWithDateMoment } from './models/model-with-date-moment.model'
@@ -19,6 +19,8 @@ import {
   ModelWithWrongIndexes,
 } from './models/model-with-indexes.model'
 import { NestedObject } from './models/nested-object.model'
+import { ExtendedFormModel } from './models/real-world/extended-form.model'
+import { Form } from './models/real-world/form.model'
 import { SimpleModel } from './models/simple.model'
 import { Type } from './models/types.enum'
 
@@ -232,7 +234,7 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
         expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(Object)
+        expect(prop.typeInfo.type).toBe(Map)
       })
 
       it('transientField', () => {
@@ -384,6 +386,35 @@ describe('Decorators should add correct metadata', () => {
       const enumPropertyMetadata = metadata.forProperty('type')
       expect(enumPropertyMetadata.typeInfo).toBeDefined()
       expect(enumPropertyMetadata.typeInfo).toEqual({ type: EnumType, isCustom: true })
+    })
+  })
+
+  // FIXME TEST make this work
+  xdescribe('models inheritance', () => {
+    let metadata: Metadata<Form>
+
+    beforeEach(() => {
+      metadata = MetadataHelper.get(Form)
+    })
+
+    it('model metadata should be defined', () => {
+      const meta = metadata.forProperty('id')
+      expect(metadata.modelOptions.properties.length).toBe(4)
+      expect(meta).toBeDefined()
+    })
+  })
+
+  // FIXME TEST make this work
+  xdescribe('models inheritance', () => {
+    let metadata: Metadata<ExtendedFormModel>
+
+    beforeEach(() => {
+      metadata = MetadataHelper.get(Form)
+    })
+
+    it('model metadata schould be defined', () => {
+      expect(metadata).toBeDefined()
+      expect(metadata.modelOptions.properties!.length).toBe(2)
     })
   })
 })

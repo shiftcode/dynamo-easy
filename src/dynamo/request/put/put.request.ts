@@ -1,5 +1,6 @@
 import { PutItemOutput, ReturnConsumedCapacity, ReturnItemCollectionMetrics } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs/Observable'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -25,11 +26,11 @@ export class PutRequest<T> extends BaseRequest<T, any> {
     // FIXME should we check for sort key too?
     const conditionDefFns = []
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
-      conditionDefFns.push(attribute<T>(this.metaData.getPartitionKey()).null())
+      conditionDefFns.push(attribute<T>(this.metaData.getPartitionKey()).attributeNotExists())
 
       const sortKey = this.metaData.getSortKey()
       if (sortKey !== null) {
-        conditionDefFns.push(attribute<T>(sortKey).null())
+        conditionDefFns.push(attribute<T>(sortKey).attributeNotExists())
       }
 
       this.where(...conditionDefFns)
@@ -58,7 +59,7 @@ export class PutRequest<T> extends BaseRequest<T, any> {
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<PutRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): PutRequest<T> {
@@ -72,8 +73,10 @@ export class PutRequest<T> extends BaseRequest<T, any> {
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.putItem(this.params).map(response => {
-      return
-    })
+    return this.dynamoRx.putItem(this.params).pipe(
+      map(response => {
+        return
+      })
+    )
   }
 }

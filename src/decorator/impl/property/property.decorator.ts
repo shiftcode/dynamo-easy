@@ -1,10 +1,10 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
-import { DynamoEasy } from '../../../dynamo-easy'
+import { DynamoEasyConfig } from '../../../config/dynamo-easy-config'
 import { AttributeModelType } from '../../../mapper/type/attribute-model.type'
+import { MomentType } from '../../../mapper/type/moment.type'
 import { Util } from '../../../mapper/util'
 import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
 import { getMetadataType } from '../../util'
-import { MomentType } from '../date/moment.type'
 import { IndexType } from '../index/index-type.enum'
 import { PropertyData } from './property-data.model'
 
@@ -18,13 +18,15 @@ export interface IndexData {
 }
 
 export function Property(opts: Partial<PropertyData> = {}): PropertyDecorator {
-  return (target: any, propertyKey: string) => {
-    const propertyOptions: Partial<PropertyMetadata<any>> = {
-      name: propertyKey,
-      nameDb: opts.name || propertyKey,
-    }
+  return (target: object, propertyKey: string | symbol) => {
+    if (typeof propertyKey === 'string') {
+      const propertyOptions: Partial<PropertyMetadata<any>> = {
+        name: propertyKey,
+        nameDb: opts.name || propertyKey,
+      }
 
-    initOrUpdateProperty(propertyOptions, target, propertyKey)
+      initOrUpdateProperty(propertyOptions, target, propertyKey)
+    }
   }
 }
 
@@ -107,10 +109,10 @@ function createNewProperty(
   if (typeByConvention) {
     customType = true
 
-    if (DynamoEasy.config) {
+    if (DynamoEasyConfig.config) {
       switch (typeByConvention) {
         case 'date':
-          switch (DynamoEasy.config.dateType) {
+          switch (DynamoEasyConfig.config.dateType) {
             case 'default':
               propertyType = Date
               break
@@ -118,14 +120,12 @@ function createNewProperty(
               propertyType = MomentType
               break
             default:
-              throw new Error(`Unsupported date type on model metadata <${DynamoEasy.config.dateType}>`)
+              throw new Error(`Unsupported date type on model metadata <${DynamoEasyConfig.config.dateType}>`)
           }
           break
       }
     }
   }
-
-  const propertyDescriptor: PropertyDescriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey)
 
   const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
     type: propertyType,

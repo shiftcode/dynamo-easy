@@ -1,7 +1,3 @@
-import { PartitionKey } from '../../../decorator/impl/key/partition-key.decorator'
-import { Model } from '../../../decorator/impl/model/model.decorator'
-import { Property } from '../../../decorator/impl/property/property.decorator'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { and } from './and.function'
 import { attribute } from './attribute.function'
 import { not } from './not.function'
@@ -9,7 +5,7 @@ import { or } from './or.function'
 
 describe('chained conditions', () => {
   it('not', () => {
-    const condition = not(attribute('name').contains('Bla'))(undefined, undefined)
+    const condition = not(attribute('name').contains('SortedUpdateExpressions'))(undefined, undefined)
     expect(condition.statement).toBe('NOT contains (#name, :name)')
   })
 
@@ -31,20 +27,26 @@ describe('chained conditions', () => {
   })
 
   it('or', () => {
-    const condition = or(attribute('age').gt(10), attribute('name').contains('Bla'))(undefined, undefined)
+    const condition = or(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
+      undefined,
+      undefined
+    )
 
     expect(condition.statement).toBe('(#age > :age OR contains (#name, :name))')
   })
 
   it('and', () => {
-    const condition = and(attribute('age').gt(10), attribute('name').contains('Bla'))(undefined, undefined)
+    const condition = and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
+      undefined,
+      undefined
+    )
 
     expect(condition.statement).toBe('(#age > :age AND contains (#name, :name))')
   })
 
   it('mixed', () => {
     const condition = or(
-      and(attribute('age').gt(10), attribute('name').contains('Bla')),
+      and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions')),
       attribute('doAddCondition').beginsWith('Start')
     )(undefined, undefined)
 

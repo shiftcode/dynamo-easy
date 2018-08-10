@@ -1,8 +1,7 @@
-import moment from 'moment'
+import moment from 'moment-es6'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { PartitionKeyUUID } from '../../src/decorator/impl/key/partition-key-uuid.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
@@ -12,16 +11,20 @@ import { NestedObject } from './nested-object.model'
 
 @Model({ tableName: 'complex_model' })
 export class ComplexModel {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @SortKey() creationDate: moment.Moment
+  @SortKey()
+  creationDate: moment.Moment
 
-  @Date() lastUpdated: moment.Moment
+  @Date()
+  lastUpdated: moment.Moment
 
   @Property({ name: 'isActive' })
   active: boolean
 
-  @TypedSet() set: Set<string>
+  @TypedSet()
+  set: Set<string>
 
   // @Type(Map)
   // myMap: Map<String, String>;
@@ -30,15 +33,20 @@ export class ComplexModel {
    * actually this value is always mapped to an array, so the typing is not correct,
    * we still leave it to check if it works
    */
-  @SortedSet() sortedSet: Set<string>
+  @SortedSet()
+  sortedSet: Set<string>
 
-  @SortedSet(NestedObject) sortedComplexSet: Set<NestedObject>
+  @SortedSet(NestedObject)
+  sortedComplexSet: Set<NestedObject>
 
-  @Property() mapWithNoType: Map<string, string>
+  @Property()
+  mapWithNoType: Map<string, string>
 
   simpleProperty: number
 
-  @Transient() transientField: string
+  @Transient()
+  transientField: string
 
-  @Property() nestedObj: NestedObject
+  @Property()
+  nestedObj: NestedObject
 }

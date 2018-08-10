@@ -5,7 +5,9 @@ import { Property } from '../../src/decorator/impl/property/property.decorator'
 
 @Model()
 export class ModelWithDate {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @SortKey() creationDate: Date
+  @SortKey()
+  creationDate: Date
 }

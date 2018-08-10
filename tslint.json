@@ -3,9 +3,11 @@
     "tslint:latest",
     "tslint-config-prettier"
   ],
+  "rulesDirectory": [
+  ],
   "rules": {
     "no-angle-bracket-type-assertion": false,
-    "no-submodule-imports": false,
+    "no-submodule-imports": [true, "aws-sdk", "rxjs/operators"],
     "interface-name": [
       true,
       "never-prefix"
@@ -29,8 +31,15 @@
     "prefer-conditional-expression": false,
     "member-ordering": [
       true,
-      "static-before-instance",
-      "variables-before-functions"
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "constructor",
+          "instance-method"
+        ]
+      }
     ],
     "no-object-literal-type-assertion": false,
     "triple-equals": [
@@ -39,7 +48,6 @@
     ],
     "no-empty": false,
     "no-string-literal": false,
-    "no-switch-case-fall-through": true,
     "no-inferrable-types": [
       true,
       "ignore-params"

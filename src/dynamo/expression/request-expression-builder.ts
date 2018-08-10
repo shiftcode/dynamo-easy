@@ -1,4 +1,4 @@
-import { curry } from 'lodash'
+import { curry } from 'lodash-es'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { BaseRequest } from '../request/base.request'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
@@ -14,8 +14,10 @@ import { RequestConditionFunction } from './type/request-condition-function'
 import { RequestSortKeyConditionFunction } from './type/sort-key-condition-function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
-import { UpdateAction } from './type/update-action.type'
-import { UpdateExpressionDefinitionChain } from './type/update-expression-definition-chain'
+import {
+  UpdateExpressionDefinitionChain,
+  UpdateExpressionDefinitionChainTyped,
+} from './type/update-expression-definition-chain'
 import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
 import { UpdateExpression } from './type/update-expression.type'
 import { UpdateExpressionBuilder } from './update-expression-builder'
@@ -106,6 +108,7 @@ export class RequestExpressionBuilder {
 
   static updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain
   static updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
+  static updateDefinitionFunction<T, K extends keyof T>(attributePath: K): UpdateExpressionDefinitionChainTyped<T, K>
 
   static updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain {
     const f = (operation: UpdateActionDef) => {
@@ -120,7 +123,7 @@ export class RequestExpressionBuilder {
           UpdateExpression
         >(UpdateExpressionBuilder.buildUpdateExpression)
 
-        return curried(attributePath, operation, copy)
+        return curried(<string>attributePath, operation, copy)
       }
     }
 
@@ -134,7 +137,7 @@ export class RequestExpressionBuilder {
         const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, Expression>(
           ConditionExpressionBuilder.buildFilterExpression
         )
-        return curried(attributePath, operator, copy)
+        return <ConditionExpressionDefinitionFunction>curried(<string>attributePath, operator, copy)
       }
     }
 

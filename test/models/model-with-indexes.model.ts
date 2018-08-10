@@ -1,5 +1,5 @@
 // tslint:disable:max-classes-per-file
-import moment from 'moment'
+import moment from 'moment-es6'
 import { GSIPartitionKey } from '../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { GSISortKey } from '../../src/decorator/impl/index/gsi-sort-key.decorator'
 import { LSISortKey } from '../../src/decorator/impl/index/lsi-sort-key.decorator'
@@ -11,20 +11,24 @@ import { Property } from '../../src/decorator/impl/property/property.decorator'
 export const INDEX_ACTIVE = 'active-index'
 @Model()
 export class ModelWithGSI {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
   createdAt: moment.Moment
 
-  @GSIPartitionKey(INDEX_ACTIVE) active: boolean
+  @GSIPartitionKey(INDEX_ACTIVE)
+  active: boolean
 }
 
 @Model()
 export class ModelWithLSI {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
   createdAt: moment.Moment
 
-  @LSISortKey(INDEX_ACTIVE) active: boolean
+  @LSISortKey(INDEX_ACTIVE)
+  active: boolean
 }
 
 export const INDEX_COUNT = 'count-index'
@@ -40,27 +44,35 @@ export class ModelWithABunchOfIndexes {
   @GSISortKey(INDEX_ACTIVE_CREATED_AT)
   createdAt: moment.Moment
 
-  @GSIPartitionKey(INDEX_ACTIVE_CREATED_AT) active: boolean
+  @GSIPartitionKey(INDEX_ACTIVE_CREATED_AT)
+  active: boolean
 
-  @LSISortKey(INDEX_COUNT) count: number
+  @LSISortKey(INDEX_COUNT)
+  count: number
 }
 
 @Model()
 export class DifferentModel {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @GSISortKey(INDEX_ACTIVE) createdAt: boolean
+  @GSISortKey(INDEX_ACTIVE)
+  createdAt: boolean
 
-  @GSIPartitionKey(INDEX_ACTIVE) active: boolean
+  @GSIPartitionKey(INDEX_ACTIVE)
+  active: boolean
 }
 
 @Model()
 export class ModelWithWrongIndexes {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @GSISortKey(INDEX_ACTIVE) createdAt: boolean
+  @GSISortKey(INDEX_ACTIVE)
+  createdAt: boolean
 
-  @GSIPartitionKey(INDEX_ACTIVE) active: boolean
+  @GSIPartitionKey(INDEX_ACTIVE)
+  active: boolean
 
   // @GSISortKey(INDEX_ACTIVE)
   otherField: string

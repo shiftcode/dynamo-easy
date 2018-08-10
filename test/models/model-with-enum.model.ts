@@ -5,7 +5,9 @@ import { Type } from './types.enum'
 
 @Model()
 export class ModelWithEnum {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @Property() type: Type
+  @Property()
+  type: Type
 }
