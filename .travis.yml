@@ -20,4 +20,4 @@ script:
 after_success:
 - npm run report-coverage
 - npm run deploy-docs
-- npm run semantic-release
+- npx semantic-release

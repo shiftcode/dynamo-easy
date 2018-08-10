@@ -230,6 +230,7 @@ export class ConditionExpressionBuilder {
       let value: AttributeValue | null
       switch (operator) {
         case 'contains':
+          // TODO think about validation
           // ConditionExpressionBuilder.validateValueForContains(values[0], propertyMetadata)
           value = Mapper.toDbOne(values[0], propertyMetadata)
           break
