@@ -11,19 +11,20 @@ cache:
   directories:
   - "$HOME/.npm"
 
-before_install:
-- npm install npm@^6.0.0 -g
-
 install:
-- npm ci
+- npm install
 
 notifications:
   email: false
+
+before_script: npx greenkeeper-lockfile-update
 
 script:
 - npm run lint
 #- npm run test:prod
 - npm run build
+
+after_script: npx greenkeeper-lockfile-upload
 
 after_success:
 - npm run report-coverage
