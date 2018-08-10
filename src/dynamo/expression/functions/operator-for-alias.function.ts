@@ -6,7 +6,7 @@ export function operatorForAlias(alias: OperatorAlias): ConditionOperator | unde
   let operator: ConditionOperator | undefined
   Object.keys(OPERATOR_TO_ALIAS_MAP).forEach(key => {
     const a = OPERATOR_TO_ALIAS_MAP[key]
-    if (a instanceof Array) {
+    if (Array.isArray(a)) {
       if (a.includes(alias)) {
         operator = <ConditionOperator>key
       }
