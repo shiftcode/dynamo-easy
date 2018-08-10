@@ -1,7 +1,5 @@
-import { kebabCase } from 'lodash'
-import { ModelMetadata } from '../../metadata/model-metadata.model'
+import { kebabCase } from 'lodash-es'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
-import { getMetadataType } from '../../util'
 import { SecondaryIndex } from '../index/secondary-index'
 import { KEY_PROPERTY } from '../property/property.decorator'
 import { ModelData } from './model-data.model'
@@ -13,7 +11,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
   return (constructor: Function) => {
     // logger.debug('defining metadata for thing')
     // Make sure everything is valid
-    const classType = getMetadataType(constructor)
+    // const classType = getMetadataType(constructor)
     const type = constructor as any
 
     // get all the properties with @Property() annotation
@@ -32,7 +30,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
     const localSecondaryIndexes: any = getLocalSecondaryIndexes(partitionKeyName, properties) || []
     const indexes: Map<string, SecondaryIndex<any>> = new Map([...globalSecondaryIndexes, ...localSecondaryIndexes])
 
-    const transientProperties: string[] =
+    const transientProperties =
       properties && properties.length
         ? properties.filter(property => property.transient === true).map(property => property.name)
         : []
@@ -70,7 +68,9 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
             case 'HASH':
               if (gsi.partitionKey) {
                 throw new Error(
-                  `there is already a partition key defined for global secondary index ${indexName} (property name: ${property.nameDb})`
+                  `there is already a partition key defined for global secondary index ${indexName} (property name: ${
+                    property.nameDb
+                  })`
                 )
               }
 
@@ -79,7 +79,9 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
             case 'RANGE':
               if (gsi.sortKey) {
                 throw new Error(
-                  `there is already a sort key defined for global secondary index ${indexName} (property name: ${property.nameDb})`
+                  `there is already a sort key defined for global secondary index ${indexName} (property name: ${
+                    property.nameDb
+                  })`
                 )
               }
 
@@ -119,7 +121,9 @@ function getLocalSecondaryIndexes(
         property.sortKeyForLSI!.forEach(indexName => {
           if (map.has(indexName)) {
             throw new Error(
-              `only one sort key can be defined for the same local secondary index, ${property.nameDb} is already defined as sort key for index ${indexName}`
+              `only one sort key can be defined for the same local secondary index, ${
+                property.nameDb
+              } is already defined as sort key for index ${indexName}`
             )
           }
 

@@ -5,9 +5,11 @@ import { Model } from '../../src/decorator/impl/model/model.decorator'
 
 @Model()
 export class SimpleWithCompositePartitionKeyModel {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
-  @SortKey() creationDate: moment.Moment
+  @SortKey()
+  creationDate: moment.Moment
 
   age: number
 }

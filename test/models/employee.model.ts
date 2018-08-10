@@ -10,7 +10,8 @@ export class Employee {
 
   createdAt: moment.Moment | null
 
-  @SortedSet() sortedSet: Set<string>
+  @SortedSet()
+  sortedSet: Set<string>
 
   constructor(name: string, age: number, createdAt: moment.Moment | null, sortedListValues: any[] | null) {
     this.name = name

@@ -1,21 +1,23 @@
 language: node_js
+node_js:
+- lts/*
+
 branches:
   only:
-    - master
-    - /^greenkeeper/.*$/
+  - master
+  - /^greenkeeper/.*$/
+
 cache:
-  yarn: true
   directories:
-    - node_modules
+  - "$HOME/.npm"
+
 notifications:
   email: false
-node_js:
-  - '8'
-#before_script:
-#  - npm prune && npm cache clean
+
 script:
-  - npm run test:prod && npm run build
+- npm run test:prod && npm run build
+
 after_success:
-  - npm run report-coverage
-  - npm run deploy-docs
-  - npm run semantic-release
+- npm run report-coverage
+- npm run deploy-docs
+- npm run semantic-release

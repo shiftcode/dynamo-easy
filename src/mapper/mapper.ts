@@ -120,7 +120,7 @@ export class Mapper {
         } else if (attributeValue === null) {
           // empty values (string, set, list) will be ignored too
         } else {
-          mapped[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
+          mapped[propertyMetadata ? propertyMetadata.nameDb : <string>propertyKey] = attributeValue
         }
       }
     })

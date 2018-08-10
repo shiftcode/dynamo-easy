@@ -1,6 +1,6 @@
 // tslint:disable:no-console
 import { Key } from 'aws-sdk/clients/dynamodb'
-import { findIndex } from 'lodash'
+import { findIndex } from 'lodash-es'
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs'
 import { finalize, map, publishReplay, refCount, share, switchMap, tap } from 'rxjs/operators'
 import { QueryRequest } from '../request/query/query.request'
@@ -32,22 +32,26 @@ export class PagedDataSource<
     this.loading$ = this.loadingSubject.asObservable()
     this.meta$ = this.metaSubject.asObservable()
 
-    request$ = request$.pipe(tap(() => this.reset()), publishReplay(1), refCount())
+    request$ = request$.pipe(
+      tap(() => this.reset()),
+      publishReplay(1),
+      refCount()
+    )
 
     const count$: Observable<number> = request$.pipe(
-      tap(() => console.debug('fetch count')),
+      tap(() => console.log('fetch count')),
       switchMap(request =>
         request
           .limit(Request.INFINITE_LIMIT)
           .exclusiveStartKey(null)
           .execCount()
       ),
-      tap(count => console.debug('got count', count)),
+      tap(count => console.log('got count', count)),
       share()
     )
 
     const data$: Observable<T[]> = combineLatest(request$, this.nextSubject).pipe(
-      tap(() => console.debug('request changed or next page was requested, call for data')),
+      tap(() => console.log('request changed or next page was requested, call for data')),
       map(values => values[0]),
       switchMap(request => this.fetchData(request)),
       tap(data => this.data.push(...data)),
@@ -57,7 +61,7 @@ export class PagedDataSource<
     combineLatest(data$, count$)
       .pipe(
         map(values => {
-          console.debug('data or count changed -> hasMore', this.data.length < values[1])
+          console.log('data or count changed -> hasMore', this.data.length < values[1])
           return {
             current: this.data.length,
             total: values[1],
@@ -79,7 +83,7 @@ export class PagedDataSource<
     this.count$ = count$
 
     // subscribe to get it rolling
-    data$.subscribe(() => console.debug('fetched data'), error => console.error('could not fetch data', error))
+    data$.subscribe(() => console.log('fetched data'), error => console.error('could not fetch data', error))
 
     // fetch the first set of data
     this.next()
@@ -129,13 +133,13 @@ export class PagedDataSource<
   }
 
   private reset(): void {
-    console.debug('reset')
+    console.log('reset')
     this.data = []
     this.lastKey = null
   }
 
   private fetchData(request: Pageable<T, R, O>): Observable<T[]> {
-    console.debug('fetchData()')
+    console.log('fetchData()')
     this.loadingSubject.next(true)
 
     return request
@@ -144,12 +148,12 @@ export class PagedDataSource<
       .execFullResponse()
       .pipe(
         tap(response => {
-          console.debug(response)
+          console.log(response)
           this.lastKey = response.LastEvaluatedKey === undefined ? null : response.LastEvaluatedKey
         }),
         map(response => response.Items || []),
         finalize(() => {
-          console.debug('fetchData(): finally')
+          console.log('fetchData(): finally')
           this.loadingSubject.next(false)
         })
       )

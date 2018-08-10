@@ -1,4 +1,4 @@
-import { AttributeMap, QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
+import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
@@ -25,7 +25,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     if (this.params.IndexName) {
       const index = this.metaData.getIndex(this.params.IndexName)
       if (index) {
-        partitionKey = index.partitionKey
+        partitionKey = <string>index.partitionKey
         if (!partitionKey) {
           throw new Error(`there is no parition key defined for index <${this.params.IndexName}>`)
         }
@@ -33,7 +33,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
         throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
       }
     } else {
-      partitionKey = this.metaData.getPartitionKey()
+      partitionKey = <string>this.metaData.getPartitionKey()
     }
 
     return RequestExpressionBuilder.addSortKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData).equals(
@@ -51,7 +51,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
       const index = this.metaData.getIndex(this.params.IndexName)
       if (index) {
         if (index.sortKey) {
-          sortKey = index.sortKey
+          sortKey = <string>index.sortKey
         } else {
           throw new Error(`there is no sort key defined for index <${this.params.IndexName}>`)
         }
@@ -59,7 +59,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
         throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
       }
     } else {
-      sortKey = this.metaData.getSortKey()
+      sortKey = <string>this.metaData.getSortKey()
     }
 
     if (!sortKey) {
@@ -72,7 +72,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
   // update2.function)
   whereAttribute(attributePath: keyof T): RequestConditionFunction<QueryRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', attributePath, this, this.metaData)
+    return RequestExpressionBuilder.addCondition('FilterExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {

@@ -234,7 +234,7 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
         expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(Object)
+        expect(prop.typeInfo.type).toBe(Map)
       })
 
       it('transientField', () => {

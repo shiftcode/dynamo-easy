@@ -4,21 +4,19 @@ import sourceMaps from 'rollup-plugin-sourcemaps'
 import json from 'rollup-plugin-json'
 import builtins from 'rollup-plugin-node-builtins'
 
-const pkg = require('./package.json')
 const camelCase = require('lodash.camelcase')
 
 const libraryName = 'dynamo-easy'
 
 export default {
-  input: `compiled/${libraryName}.js`,
+  input: `dist/_esm5/${libraryName}.js`,
   output: [
-    {file: pkg.main, format: 'umd', name: camelCase(libraryName)},
-    {file: pkg.module, format: 'es'}
+    {file: `dist/_bundles/${libraryName}.umd.js`, format: 'umd', name: camelCase(libraryName)},
   ],
   sourcemap: true,
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: function (id) {
-    return /^(lodash|moment|aws-sdk|rxjs|reflect-metadata)/.test(id)
+    return /^(lodash-es|moment|aws-sdk|rxjs|reflect-metadata)/.test(id)
   },
   globals: function (id) {
     console.log('global ' + id);

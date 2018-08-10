@@ -1,5 +1,4 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment-es6'
 import { MapperForType } from '../../mapper/for-type/base.mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 

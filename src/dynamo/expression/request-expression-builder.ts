@@ -1,4 +1,4 @@
-import { curry } from 'lodash'
+import { curry } from 'lodash-es'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { BaseRequest } from '../request/base.request'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
@@ -14,7 +14,6 @@ import { RequestConditionFunction } from './type/request-condition-function'
 import { RequestSortKeyConditionFunction } from './type/sort-key-condition-function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
-import { UpdateAction } from './type/update-action.type'
 import {
   UpdateExpressionDefinitionChain,
   UpdateExpressionDefinitionChainTyped,
@@ -124,7 +123,7 @@ export class RequestExpressionBuilder {
           UpdateExpression
         >(UpdateExpressionBuilder.buildUpdateExpression)
 
-        return curried(attributePath, operation, copy)
+        return curried(<string>attributePath, operation, copy)
       }
     }
 
@@ -138,7 +137,7 @@ export class RequestExpressionBuilder {
         const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, Expression>(
           ConditionExpressionBuilder.buildFilterExpression
         )
-        return curried(attributePath, operator, copy)
+        return <ConditionExpressionDefinitionFunction>curried(<string>attributePath, operator, copy)
       }
     }
 

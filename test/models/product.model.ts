@@ -13,7 +13,8 @@ export class ProductNested {
   // @SortedArray()
   // @Set()
   // @Date()
-  @SortedSet() collection: Set<string>
+  @SortedSet()
+  collection: Set<string>
 
   counter = 0
 
@@ -27,10 +28,12 @@ export class ProductNested {
 
 @Model()
 export class Product {
-  @Property() nestedValue: NestedComplexModel
+  @Property()
+  nestedValue: NestedComplexModel
 
   // @Type(Array, ProductNested)
-  @TypedArray(ProductNested) list: ProductNested[]
+  @TypedArray(ProductNested)
+  list: ProductNested[]
 
   constructor() {
     this.nestedValue = new NestedComplexModel()

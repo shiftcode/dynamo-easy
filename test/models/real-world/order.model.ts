@@ -100,11 +100,14 @@ export class BaseOrder {
   @CustomMapper(OrderIdMapper)
   id: OrderId
 
-  @GSIPartitionKey('order_product_id_creation_date') productId: string
+  @GSIPartitionKey('order_product_id_creation_date')
+  productId: string
 
-  @GSISortKey('order_product_id_creation_date') creationDate: moment.Moment
+  @GSISortKey('order_product_id_creation_date')
+  creationDate: moment.Moment
 
-  @CustomMapper(FormIdsMapper) formIds: FormId[]
+  @CustomMapper(FormIdsMapper)
+  formIds: FormId[]
 
   // FIXME DE check if persisted
   // internal use for UI only, should not be persisted
@@ -113,8 +116,10 @@ export class BaseOrder {
 
 @Model()
 export class Order extends BaseOrder {
-  @CustomMapper(NumberEnumMapper) types: FormType[]
+  @CustomMapper(NumberEnumMapper)
+  types: FormType[]
   displayOrderCustomerIdentNr: string
   orderCustomerIdentNr: string // lowercase for search
-  @CustomMapper(FormIdsMapper) formIds: FormId[]
+  @CustomMapper(FormIdsMapper)
+  formIds: FormId[]
 }

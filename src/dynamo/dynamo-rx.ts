@@ -1,4 +1,4 @@
-import * as AWS from 'aws-sdk'
+import { Config } from 'aws-sdk'
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { from, Observable } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
@@ -19,7 +19,7 @@ export class DynamoRx {
     this.sessionValidityEnsurer = sessionValidityEnsurer
   }
 
-  updateAwsConfigCredentials(newConfig: AWS.Config): void {
+  updateAwsConfigCredentials(newConfig: Config): void {
     this.dynamoDb.config.update({ credentials: newConfig.credentials })
   }
 

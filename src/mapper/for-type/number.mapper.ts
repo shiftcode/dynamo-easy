@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { isNumber } from 'lodash'
+import { isNumber } from 'lodash-es'
 import { MapperForType } from './base.mapper'
 
 export class NumberMapper implements MapperForType<number> {
@@ -16,7 +16,7 @@ export class NumberMapper implements MapperForType<number> {
     }
   }
 
-  toDb(modelValue: number): AttributeValue {
+  toDb(modelValue: number): AttributeValue | null {
     if (!isNumber(modelValue)) {
       throw new Error('this mapper only support values of type number')
     }

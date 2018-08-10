@@ -1,9 +1,8 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { curryRight, forEach, isPlainObject } from 'lodash'
+import { curryRight, forEach, isPlainObject } from 'lodash-es'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
-import { Binary } from '../../mapper/type/binary.type'
 import { Util } from '../../mapper/util'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { isFunctionOperator } from './functions/is-function-operator.function'
@@ -155,8 +154,10 @@ export class ConditionExpressionBuilder {
     const attributeValues: AttributeMap = (<any[]>values[0])
       .map(value => Mapper.toDbOne(value, propertyMetadata))
       .reduce(
-        (result, mappedValue: AttributeValue, index: number) => {
-          result[`${valuePlaceholder}_${index}`] = mappedValue
+        (result, mappedValue: AttributeValue | null, index: number) => {
+          if (mappedValue !== null) {
+            result[`${valuePlaceholder}_${index}`] = mappedValue
+          }
           return result
         },
         <AttributeMap>{}
@@ -301,45 +302,45 @@ export class ConditionExpressionBuilder {
   }
 
   // TODO should we support other types than String, Number, Binary (can we search a boolean set for example with boolean as string?)
-  private static validateValueForContains(value: any, propertyMetadata?: PropertyMetadata<any>): { S: string } {
-    let finalValue: { S: string }
-    if (propertyMetadata && propertyMetadata.typeInfo) {
-      switch (propertyMetadata.typeInfo.type) {
-        case Array:
-        case Set:
-          // FIXME REVIEW the validation logic
-          // const genericType = propertyMetadata.typeInfo.genericType
-          // if ((!genericType && (typeof value === 'number' || typeof value === 'string' || typeof value === '')) || (
-          //   genericType &&
-          //   genericType !== String &&
-          //   genericType !== Number &&
-          //   genericType !== Binary)
-          // ) {
-          finalValue = { S: value.toString() }
-          // } else {
-          //   throw new Error(
-          //     'either generic type info is not defined or the generic type is not one of String, Number, Binary',
-          //   )
-          // }
-          break
-        case String:
-        case Number:
-        case Binary:
-          finalValue = { S: value.toString() }
-          break
-        default:
-          throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)
-      }
-    } else {
-      // no explicit type defined -> try to detect the type from value
-      const type = Util.typeOf(value)
-      if (type === String || type === Number || type === Binary) {
-        finalValue = { S: value.toString() }
-      } else {
-        throw new Error(`contains expression is not supported for type ${type}`)
-      }
-    }
-
-    return finalValue
-  }
+  // private static validateValueForContains(value: any, propertyMetadata?: PropertyMetadata<any>): { S: string } {
+  //   let finalValue: { S: string }
+  //   if (propertyMetadata && propertyMetadata.typeInfo) {
+  //     switch (propertyMetadata.typeInfo.type) {
+  //       case Array:
+  //       case Set:
+  //         // FIXME REVIEW the validation logic
+  //         // const genericType = propertyMetadata.typeInfo.genericType
+  //         // if ((!genericType && (typeof value === 'number' || typeof value === 'string' || typeof value === '')) || (
+  //         //   genericType &&
+  //         //   genericType !== String &&
+  //         //   genericType !== Number &&
+  //         //   genericType !== Binary)
+  //         // ) {
+  //         finalValue = { S: value.toString() }
+  //         // } else {
+  //         //   throw new Error(
+  //         //     'either generic type info is not defined or the generic type is not one of String, Number, Binary',
+  //         //   )
+  //         // }
+  //         break
+  //       case String:
+  //       case Number:
+  //       case Binary:
+  //         finalValue = { S: value.toString() }
+  //         break
+  //       default:
+  //         throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)
+  //     }
+  //   } else {
+  //     // no explicit type defined -> try to detect the type from value
+  //     const type = Util.typeOf(value)
+  //     if (type === String || type === Number || type === Binary) {
+  //       finalValue = { S: value.toString() }
+  //     } else {
+  //       throw new Error(`contains expression is not supported for type ${type}`)
+  //     }
+  //   }
+  //
+  //   return finalValue
+  // }
 }

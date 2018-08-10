@@ -38,8 +38,8 @@ export class FormId {
     const type: FormType | null | undefined = FormId.PREFIX_TO_TYPE_MAP.has(typeString)
       ? FormId.PREFIX_TO_TYPE_MAP.get(typeString)
       : null
-    const counter: number = Number.parseInt(formId.slice(2 + addition, 6 + addition).replace('0', ''))
-    const year: number = Number.parseInt(formId.slice(6 + addition, 10 + addition))
+    const counter: number = Number.parseInt(formId.slice(2 + addition, 6 + addition).replace('0', ''), 10)
+    const year: number = Number.parseInt(formId.slice(6 + addition, 10 + addition), 10)
     const postfix: string | null = formId.length > 10 + addition ? formId.slice(11 + addition) : null
     return new FormId(type!, counter, year, postfix)
   }

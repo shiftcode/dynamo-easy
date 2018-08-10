@@ -4,16 +4,14 @@
     "tslint-config-prettier"
   ],
   "rulesDirectory": [
-    "node_modules/rxjs-tslint"
   ],
   "rules": {
     "no-angle-bracket-type-assertion": false,
-    "no-submodule-imports": [true, "aws-sdk/clients/dynamodb", "rxjs/operators"],
+    "no-submodule-imports": [true, "aws-sdk", "rxjs/operators"],
     "interface-name": [
       true,
       "never-prefix"
     ],
-    "no-unused-variable": true,
     "variable-name": [
       true,
       "ban-keywords",
@@ -33,8 +31,15 @@
     "prefer-conditional-expression": false,
     "member-ordering": [
       true,
-      "static-before-instance",
-      "variables-before-functions"
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "constructor",
+          "instance-method"
+        ]
+      }
     ],
     "no-object-literal-type-assertion": false,
     "triple-equals": [
@@ -43,14 +48,9 @@
     ],
     "no-empty": false,
     "no-string-literal": false,
-    "no-switch-case-fall-through": true,
     "no-inferrable-types": [
       true,
       "ignore-params"
-    ],
-    "rxjs-collapse-imports": true,
-    "rxjs-pipeable-operators-only": true,
-    "rxjs-no-static-observable-methods": true,
-    "rxjs-proper-imports": true
+    ]
   }
 }

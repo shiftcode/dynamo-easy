@@ -21,7 +21,8 @@ export class Info {
 // tslint:disable-next-line:max-classes-per-file
 @Model()
 export class UpdateModel {
-  @PartitionKey() id: string
+  @PartitionKey()
+  id: string
 
   creationDate: moment.Moment
 
@@ -37,7 +38,8 @@ export class UpdateModel {
   // maps to L(ist)
   addresses: Address[]
 
-  @SortedSet() numberValues: number[]
+  @SortedSet()
+  numberValues: number[]
 
   // maps to M(ap)
   info: Info

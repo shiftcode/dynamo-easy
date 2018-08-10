@@ -1,5 +1,5 @@
 import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
-import { isObject } from 'lodash'
+import { isObject } from 'lodash-es'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Metadata } from '../../../decorator/metadata/metadata'
@@ -91,7 +91,7 @@ export class BatchGetSingleTableRequest<T> {
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
-        idOb[this.metaData.getPartitionKey()] = mappedPartitionKey
+        idOb[<string>this.metaData.getPartitionKey()] = mappedPartitionKey
 
         // sort key
         const mappedSortKey = Mapper.toDbOne(key.sortKey)
@@ -99,7 +99,7 @@ export class BatchGetSingleTableRequest<T> {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[this.metaData.getSortKey()!] = mappedSortKey
+        idOb[<string>this.metaData.getSortKey()!] = mappedSortKey
       } else {
         // got a simple primary key
         const value = Mapper.toDbOne(key)
@@ -107,7 +107,7 @@ export class BatchGetSingleTableRequest<T> {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[this.metaData.getPartitionKey()] = value
+        idOb[<string>this.metaData.getPartitionKey()] = value
       }
 
       attributeMaps.push(idOb)

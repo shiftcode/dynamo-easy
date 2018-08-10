@@ -1,5 +1,5 @@
 import { AttributeMap, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
-import { values as objValues } from 'lodash'
+import { values as objValues } from 'lodash-es'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
@@ -34,7 +34,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
       throw new Error('please provide an acutal value for partition key, got null')
     }
 
-    keyAttributeMap[this.metaData.getPartitionKey()] = partitionKeyValue
+    keyAttributeMap[<string>this.metaData.getPartitionKey()] = partitionKeyValue
 
     // sort key
     if (hasSortKey) {
@@ -44,7 +44,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
         throw new Error('please provide an actual value for sort key, got null')
       }
 
-      keyAttributeMap[this.metaData.getSortKey()!] = sortKeyValue
+      keyAttributeMap[<string>this.metaData.getSortKey()!] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap

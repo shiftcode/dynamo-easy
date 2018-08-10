@@ -6,7 +6,6 @@ import { Util } from '../../mapper/util'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
-import { Expression } from './type/expression.type'
 import { UpdateActionDef } from './type/update-action-def'
 import { UpdateAction } from './type/update-action.type'
 import { UpdateExpression } from './type/update-expression.type'
@@ -109,7 +108,6 @@ export class UpdateExpressionBuilder {
         statement = `${namePlaceholder}`
         break
       case 'removeFromListAt':
-        const positions: number[] = values
         statement = values.map(pos => `${namePlaceholder}[${pos}]`).join(', ')
         break
       case 'add':

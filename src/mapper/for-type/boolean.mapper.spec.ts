@@ -1,6 +1,4 @@
-import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { BooleanMapper } from './boolean.mapper'
-import { EnumMapper } from './enum.mapper'
 
 describe('boolean mapper', () => {
   let mapper: BooleanMapper

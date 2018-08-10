@@ -7,16 +7,18 @@ import { initOrUpdateProperty } from '../property/property.decorator'
  * have some property decorators, so we can retrieve this information using the model class.
  */
 export function TypedArray<T>(modelClass?: ModelConstructor<T>): PropertyDecorator {
-  return (target: any, propertyKey: string) => {
-    const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
-      type: Array,
-      isCustom: true,
-    }
+  return (target: object, propertyKey: string | symbol) => {
+    if (typeof propertyKey === 'string') {
+      const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
+        type: Array,
+        isCustom: true,
+      }
 
-    if (modelClass) {
-      typeInfo.genericType = modelClass
-    }
+      if (modelClass) {
+        typeInfo.genericType = modelClass
+      }
 
-    initOrUpdateProperty({ typeInfo }, target, propertyKey)
+      initOrUpdateProperty({ typeInfo }, target, propertyKey)
+    }
   }
 }

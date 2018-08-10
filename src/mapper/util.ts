@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { isNumber, isString } from 'lodash'
+import { isNumber, isString } from 'lodash-es'
 import moment from 'moment-es6'
 import { AttributeCollectionType } from './type/attribute-collection.type'
 import { AttributeModelType } from './type/attribute-model.type'
@@ -230,17 +230,13 @@ export class Util {
       // TODO LOW:BINARY should add || data instanceof Stream
       return Buffer.isBuffer(data)
     } else {
-      BUFFER_TYPES.forEach(type => {
-        if (data !== undefined && data.constructor) {
-          if (Util.isType(data, type)) {
-            return true
-          } else if (Util.typeName(data.constructor) === type) {
-            return true
-          }
-        }
-      })
+      return BUFFER_TYPES.some(
+        type =>
+          data !== undefined &&
+          data.constructor &&
+          (Util.isType(data, type) || Util.typeName(data.constructor) === type)
+      )
     }
-    return false
   }
 
   static isBufferType(type: any): boolean {
