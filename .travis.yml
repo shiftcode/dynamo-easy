@@ -22,7 +22,8 @@ notifications:
 
 script:
 - npm run lint
-- npm run test:prod && npm run build
+#- npm run test:prod
+- npm run build
 
 after_success:
 - npm run report-coverage
