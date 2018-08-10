@@ -6,6 +6,12 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors)
 
+# Deprecation Warning
+This package is not maintained anymore, please use the new scoped package [@shiftcoders/dynamo-easy](https://www.npmjs.com/package/@shiftcoders/dynamo-easy) for the latest 
+release
+
+# What it is
+
 Abstracts away the complexity of the low level aws dynamosdk. Provides an easy to use fluent api to for requests and supports typescript decorators,
 to define some metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
 
