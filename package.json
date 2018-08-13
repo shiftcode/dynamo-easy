@@ -65,6 +65,11 @@
       "helpMessage": "Use \"npm run commit\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)"
     }
   },
+  "greenkeeper": {
+    "ignore": [
+      "@types/node"
+    ]
+  },
   "devDependencies": {
     "@types/debug": "^0.0.30",
     "@types/jest": "^23.3.1",
