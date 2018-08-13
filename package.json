@@ -70,6 +70,9 @@
       "@types/node"
     ]
   },
+  "publishConfig": {
+    "tag": "alpha"
+  },
   "devDependencies": {
     "@types/debug": "^0.0.30",
     "@types/jest": "^23.3.1",
