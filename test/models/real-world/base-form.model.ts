@@ -1,4 +1,4 @@
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { PartitionKey } from '../../../src/decorator/impl/key/partition-key.decorator'
 import { Model } from '../../../src/decorator/impl/model/model.decorator'

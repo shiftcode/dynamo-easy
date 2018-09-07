@@ -1,4 +1,4 @@
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'
