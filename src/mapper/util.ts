@@ -1,6 +1,6 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { isNumber, isString } from 'lodash-es'
-import moment from 'moment-es6'
+import { isMoment } from 'moment'
 import { AttributeCollectionType } from './type/attribute-collection.type'
 import { AttributeModelType } from './type/attribute-model.type'
 import { AttributeType } from './type/attribute.type'
@@ -166,7 +166,7 @@ export class Util {
         return Map
       } else if (data instanceof Date) {
         return Date
-      } else if (moment.isMoment(data)) {
+      } else if (isMoment(data)) {
         return MomentType
       } else if (Util.isBinary(data)) {
         return Binary

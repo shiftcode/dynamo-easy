@@ -10,17 +10,18 @@ const libraryName = 'dynamo-easy'
 
 export default {
   input: `dist/_esm5/${libraryName}.js`,
-  output: [
-    {file: `dist/_bundles/${libraryName}.umd.js`, format: 'umd', name: camelCase(libraryName)},
+  output: [{
+    file: `dist/_bundles/${libraryName}.umd.js`, format: 'umd', name: camelCase(libraryName),
+    sourcemap: true,
+    globals: function (id) {
+      console.log('global ' + id);
+      return false
+    },
+  },
   ],
-  sourcemap: true,
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: function (id) {
     return /^(lodash-es|moment|aws-sdk|rxjs|reflect-metadata)/.test(id)
-  },
-  globals: function (id) {
-    console.log('global ' + id);
-    return false
   },
   plugins: [
     json({
