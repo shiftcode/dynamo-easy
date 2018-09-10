@@ -4,7 +4,7 @@ import {
   ReturnItemCollectionMetrics,
   UpdateItemOutput,
 } from 'aws-sdk/clients/dynamodb'
-import { forEach } from 'lodash-es'
+import { forEach } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'

@@ -1,4 +1,4 @@
-import { has } from 'lodash-es'
+import { has } from 'lodash'
 import * as moment from 'moment'
 import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
 import { Model } from '../../decorator/impl/model/model.decorator'

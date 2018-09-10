@@ -1,5 +1,5 @@
 import { AttributeMap, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
-import { values as objValues } from 'lodash-es'
+import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'

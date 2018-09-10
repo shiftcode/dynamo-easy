@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { isNumber } from 'lodash-es'
+import { isNumber } from 'lodash'
 import { MapperForType } from './base.mapper'
 
 export class NumberMapper implements MapperForType<number> {

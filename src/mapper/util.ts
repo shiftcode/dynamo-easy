@@ -1,5 +1,5 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { isNumber, isString } from 'lodash-es'
+import { isNumber, isString } from 'lodash'
 import { isMoment } from 'moment'
 import { AttributeCollectionType } from './type/attribute-collection.type'
 import { AttributeModelType } from './type/attribute-model.type'

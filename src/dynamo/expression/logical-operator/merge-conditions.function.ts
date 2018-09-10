@@ -1,4 +1,4 @@
-import { mapKeys } from 'lodash-es'
+import { mapKeys } from 'lodash'
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { uniqAttributeValueName } from '../functions/unique-attribute-value-name.function'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'

@@ -1,6 +1,6 @@
 // tslint:disable:no-console
 import { Key } from 'aws-sdk/clients/dynamodb'
-import { findIndex } from 'lodash-es'
+import { findIndex } from 'lodash'
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs'
 import { finalize, map, publishReplay, refCount, share, switchMap, tap } from 'rxjs/operators'
 import { QueryRequest } from '../request/query/query.request'

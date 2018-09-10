@@ -1,4 +1,4 @@
-import { kebabCase } from 'lodash-es'
+import { kebabCase } from 'lodash'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'
 import { KEY_PROPERTY } from '../property/property.decorator'
