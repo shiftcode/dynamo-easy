@@ -1,5 +1,5 @@
 import { PutItemInput } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { SimpleWithCompositePartitionKeyModel } from '../../../../test/models/simple-with-composite-partition-key.model'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'

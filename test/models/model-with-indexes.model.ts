@@ -1,5 +1,5 @@
 // tslint:disable:max-classes-per-file
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { GSIPartitionKey } from '../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { GSISortKey } from '../../src/decorator/impl/index/gsi-sort-key.decorator'
 import { LSISortKey } from '../../src/decorator/impl/index/lsi-sort-key.decorator'

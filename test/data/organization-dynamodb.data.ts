@@ -1,6 +1,5 @@
 import { AttributeMap } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment-es6'
-import { Organization } from '../models/organization.model'
+import * as moment from 'moment'
 
 export const organization1CreatedAt: moment.Moment = moment('2017-05-15', 'YYYY-MM-DD')
 export const organization1LastUpdated: moment.Moment = moment('2017-07-25', 'YYYY-MM-DD')

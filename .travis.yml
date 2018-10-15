@@ -12,8 +12,8 @@ cache:
   - $HOME/.npm
   - node_modules
 
-before_install:
-  - npm install npm@^6.0.0 -g
+#before_install:
+#- npm install npm@^6.0.0 -g
 
 # npm ci will not work with branches created from greenkeeper, because those need to update the package-lock.json
 # From https://github.com/greenkeeperio/greenkeeper-lockfile#npm:
@@ -21,7 +21,10 @@ before_install:
 # of updating the package lock.
 install:
 #  decide if running on greenkeeper branch or not
-- case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
+#- case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
+# somehow the above command fails when we have a cache available on travis - needs some more investigation, stick with
+# npm i for now
+- npm i
 
 notifications:
   email: false

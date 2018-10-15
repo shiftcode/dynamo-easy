@@ -1,4 +1,4 @@
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { MomentMapper } from './moment.mapper'
 
 describe('moment mapper', () => {

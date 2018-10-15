@@ -33,7 +33,7 @@
   "scripts": {
     "lint": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts' && tslint --fix -t codeFrame '{src,test}/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs && rollup -c",
+    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
     "build:deprecated:old": "tsc && rollup -c && rimraf compiled && typedoc --out dist/docs --target es6 --theme minimal sr",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -76,7 +76,7 @@
   "devDependencies": {
     "@types/debug": "^0.0.30",
     "@types/jest": "^23.3.1",
-    "@types/lodash-es": "^4.17.1",
+    "@types/lodash": "^4.14.116",
     "@types/node": "^8.0.26",
     "@types/reflect-metadata": "^0.1.0",
     "@types/uuid": "^3.4.1",
@@ -90,7 +90,7 @@
     "husky": "^0.14.0",
     "jest": "^23.5.0",
     "lint-staged": "^7.2.0",
-    "lodash-es": "^4.17.10",
+    "lodash": "^4.17.10",
     "lodash.camelcase": "^4.3.0",
     "moment": "^2.22.1",
     "prettier": "^1.14.0",
@@ -117,12 +117,11 @@
   },
   "peerDependencies": {
     "aws-sdk": "^2.286.1",
-    "lodash-es": "^4.17.10",
-    "moment": "^2.18.1",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "rxjs": "^6.0.0"
   },
   "dependencies": {
-    "moment-es6": "^1.0.0",
     "reflect-metadata": "^0.1.12"
   }
 }

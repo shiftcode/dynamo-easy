@@ -8,9 +8,6 @@ module.exports = {
   transform: {
     ".(ts|tsx|js)": "ts-jest"
   },
-  transformIgnorePatterns: [
-    "<rootDir>/node_modules/(?!lodash-es)"
-  ],
   testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
   moduleFileExtensions: [
     "ts",

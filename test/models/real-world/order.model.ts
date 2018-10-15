@@ -1,6 +1,6 @@
 // tslint:disable:max-classes-per-file
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { GSISortKey } from '../../../src/decorator/impl/index/gsi-sort-key.decorator'
 import { PartitionKey } from '../../../src/decorator/impl/key/partition-key.decorator'

@@ -1,4 +1,4 @@
-import { curry } from 'lodash-es'
+import { curry } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { BaseRequest } from '../request/base.request'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
