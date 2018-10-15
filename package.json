@@ -82,7 +82,7 @@
     "@types/uuid": "^3.4.1",
     "aws-sdk": "^2.286.1",
     "colors": "^1.1.2",
-    "commitizen": "^2.10.1",
+    "commitizen": "^3.0.0",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.5",
     "cz-conventional-changelog": "^2.0.0",
