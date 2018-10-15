@@ -74,7 +74,7 @@
     "tag": "alpha"
   },
   "devDependencies": {
-    "@types/debug": "^0.0.30",
+    "@types/debug": "^0.0.31",
     "@types/jest": "^23.3.1",
     "@types/lodash": "^4.14.116",
     "@types/node": "^8.0.26",
@@ -87,7 +87,7 @@
     "cross-env": "^5.0.5",
     "cz-conventional-changelog": "^2.0.0",
     "greenkeeper-lockfile": "^1.15.1",
-    "husky": "^0.14.0",
+    "husky": "^1.0.0",
     "jest": "^23.5.0",
     "lint-staged": "^7.2.0",
     "lodash": "^4.17.10",
