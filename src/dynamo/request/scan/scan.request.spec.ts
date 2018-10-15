@@ -1,5 +1,5 @@
 import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
 import { Request } from '../request.model'
@@ -7,7 +7,7 @@ import { ScanRequest } from './scan.request'
 
 class DynamoRxMock {
   scan(): Observable<ScanOutput> {
-    return Observable.of({ Count: 10 })
+    return of({ Count: 10 })
   }
 }
 
