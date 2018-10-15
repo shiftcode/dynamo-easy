@@ -168,6 +168,32 @@ export class Mapper {
     }
   }
 
+  static createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: T) => AttributeMap {
+    const metadata = MetadataHelper.get(modelConstructor)
+    const properties = metadata.modelOptions.properties
+    if (!properties) {
+      throw new Error('metadata properties is not defined')
+    }
+    const keyProps = properties.filter(p => !!p.key)
+
+    return (item: T) =>
+      keyProps.reduce(
+        (key, propMeta) => {
+          const propertyValue = Mapper.getPropertyValue(item, propMeta.name)
+          if (propertyValue === null || propertyValue === undefined) {
+            throw new Error(`there is no value for property ${propMeta.name} but is the ${propMeta.key!.type} key`)
+          }
+          const attributeValue = Mapper.toDbOne(propertyValue, propMeta)!
+          return { ...key, [<string>propMeta.name]: attributeValue }
+        },
+        <AttributeMap>{}
+      )
+  }
+
+  static toKey<T>(item: T, modelConstructor: ModelConstructor<T>): AttributeMap {
+    return Mapper.createToKeyFn(modelConstructor)(item)
+  }
+
   static fromDb<T>(attributeMap: AttributeMap, modelClass?: ModelConstructor<T>): T {
     const model: T = <T>{}
 
@@ -298,5 +324,22 @@ export class Mapper {
     }
 
     return this.mapperForType.get(type.toString())!
+  }
+
+  static getPropertyValue(item: any, propertyKey: PropertyKey) {
+    const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
+
+    // use get accessor if available otherwise use value property of descriptor
+    if (propertyDescriptor) {
+      if (propertyDescriptor.get) {
+        return propertyDescriptor.get()
+      } else {
+        return propertyDescriptor.value
+      }
+    } else {
+      throw new Error(
+        `there is no property descriptor for item ${JSON.stringify(item)} and property key ${<string>propertyKey}`
+      )
+    }
   }
 }
