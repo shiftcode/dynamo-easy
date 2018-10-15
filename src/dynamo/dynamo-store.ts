@@ -7,7 +7,7 @@ import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const
 import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoRx } from './dynamo-rx'
 import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
-import { BatchWriteManyRequest } from './request/batchwritemany/batch-write-many.request'
+import { BatchWriteRequest } from './request/batchwrite/batch-write.request'
 import { DeleteRequest } from './request/delete/delete.request'
 import { GetRequest } from './request/get/get.request'
 import { PutRequest } from './request/put/put.request'
@@ -59,8 +59,8 @@ export class DynamoStore<T> {
     return new DeleteRequest(this.dynamoRx, this.modelClazz, this.tableName, partitionKey, sortKey)
   }
 
-  batchWriteMany(): BatchWriteManyRequest<T> {
-    return new BatchWriteManyRequest<T>(this.dynamoRx, this.modelClazz, this.tableName)
+  batchWriteMany(): BatchWriteRequest<T> {
+    return new BatchWriteRequest<T>(this.dynamoRx, this.modelClazz, this.tableName)
   }
 
   scan(): ScanRequest<T> {

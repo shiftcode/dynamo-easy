@@ -5,14 +5,14 @@ import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { Organization } from '../../../../test/models/organization.model'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../../default-session-validity-ensurer.const'
 import { DynamoRx } from '../../dynamo-rx'
-import { BatchWriteManyRequest } from './batch-write-many.request'
+import { BatchWriteRequest } from './batch-write.request'
 
 describe('batch write many', () => {
   const tableName = getTableName(Organization)
 
   let item: Organization
   let dynamoRx: DynamoRx
-  let request: BatchWriteManyRequest<Organization>
+  let request: BatchWriteRequest<Organization>
 
   let nextSpyFn: () => { value: number }
   const generatorMock = (i: number) => <any>{ next: nextSpyFn }
@@ -29,7 +29,7 @@ describe('batch write many', () => {
   describe('correct params', () => {
     beforeEach(() => {
       dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
-      request = new BatchWriteManyRequest(dynamoRx, Organization, tableName)
+      request = new BatchWriteRequest(dynamoRx, Organization, tableName)
 
       const output: DynamoDB.BatchWriteItemOutput = {}
       spyOn(dynamoRx, 'batchWriteItem').and.returnValue(of(output))
@@ -96,7 +96,7 @@ describe('batch write many', () => {
   describe('correct backoff', () => {
     beforeEach(() => {
       dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
-      request = new BatchWriteManyRequest(dynamoRx, Organization, tableName)
+      request = new BatchWriteRequest(dynamoRx, Organization, tableName)
 
       const output: DynamoDB.BatchWriteItemOutput = {
         UnprocessedItems: {

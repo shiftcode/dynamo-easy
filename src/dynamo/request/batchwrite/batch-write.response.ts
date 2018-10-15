@@ -1,6 +1,6 @@
 import { ConsumedCapacityMultiple } from 'aws-sdk/clients/dynamodb'
 
-export interface BatchWriteManyResponse {
+export interface BatchWriteResponse {
   remainingItems: number
   capacityExceeded: boolean
   consumedCapacity?: ConsumedCapacityMultiple

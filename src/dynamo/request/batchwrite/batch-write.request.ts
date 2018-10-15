@@ -11,11 +11,11 @@ import { DynamoRx } from '../../../dynamo/dynamo-rx'
 import { randomExponentialBackoffTimer } from '../../../helper'
 import { Mapper } from '../../../mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
-import { BatchWriteManyResponse } from './batch-write-many.response'
+import { BatchWriteResponse } from './batch-write.response'
 
 const MAX_BATCH_WRITE_ITEMS = 25
 
-export class BatchWriteManyRequest<T> {
+export class BatchWriteRequest<T> {
   private get toKey(): (item: T) => AttributeMap {
     if (!this._keyFn) {
       this._keyFn = Mapper.createToKeyFn(this.modelClazz)
@@ -42,19 +42,19 @@ export class BatchWriteManyRequest<T> {
     this.itemsToProcess = []
   }
 
-  delete(items: T[]): BatchWriteManyRequest<T> {
+  delete(items: T[]): BatchWriteRequest<T> {
     this.itemsToProcess.push(...items.map<WriteRequest>(item => ({ DeleteRequest: { Key: this.toKey(item) } })))
     return this
   }
 
-  put(items: T[]): BatchWriteManyRequest<T> {
+  put(items: T[]): BatchWriteRequest<T> {
     this.itemsToProcess.push(
       ...items.map<WriteRequest>(item => ({ PutRequest: { Item: Mapper.toDb(item, this.modelClazz) } }))
     )
     return this
   }
 
-  private execNextBatch(): Observable<BatchWriteManyResponse> {
+  private execNextBatch(): Observable<BatchWriteResponse> {
     const batch = this.itemsToProcess.splice(0, MAX_BATCH_WRITE_ITEMS)
     const batchWriteItemInput: BatchWriteItemInput = {
       RequestItems: {
@@ -80,7 +80,7 @@ export class BatchWriteManyRequest<T> {
     let rBoT = backoffTimer(throttleTimeSlot)
     let backoffTime = 0
     return this.execNextBatch().pipe(
-      mergeMap((r: BatchWriteManyResponse) => {
+      mergeMap((r: BatchWriteResponse) => {
         if (!r.capacityExceeded) {
           rBoT = backoffTimer(throttleTimeSlot)
           backoffTime = 0
@@ -89,7 +89,7 @@ export class BatchWriteManyRequest<T> {
         }
         return of(r).pipe(delay(backoffTime))
       }),
-      mergeMap((r: BatchWriteManyResponse) => {
+      mergeMap((r: BatchWriteResponse) => {
         if (r.remainingItems > 0) {
           return this.exec()
         } else {
