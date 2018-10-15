@@ -33,7 +33,7 @@
   "scripts": {
     "lint": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts' && tslint --fix -t codeFrame '{src,test}/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs && rollup -c",
+    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
     "build:deprecated:old": "tsc && rollup -c && rimraf compiled && typedoc --out dist/docs --target es6 --theme minimal sr",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -74,30 +74,30 @@
     "tag": "alpha"
   },
   "devDependencies": {
-    "@types/debug": "^0.0.30",
+    "@types/debug": "^0.0.31",
     "@types/jest": "^23.3.1",
-    "@types/lodash-es": "^4.17.1",
+    "@types/lodash": "^4.14.116",
     "@types/node": "^8.0.26",
     "@types/reflect-metadata": "^0.1.0",
     "@types/uuid": "^3.4.1",
     "aws-sdk": "^2.286.1",
     "colors": "^1.1.2",
-    "commitizen": "^2.10.1",
+    "commitizen": "^3.0.0",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.5",
     "cz-conventional-changelog": "^2.0.0",
     "greenkeeper-lockfile": "^1.15.1",
-    "husky": "^0.14.0",
+    "husky": "^1.0.0",
     "jest": "^23.5.0",
     "lint-staged": "^7.2.0",
-    "lodash-es": "^4.17.10",
+    "lodash": "^4.17.10",
     "lodash.camelcase": "^4.3.0",
     "moment": "^2.22.1",
     "prettier": "^1.14.0",
     "prompt": "^1.0.0",
     "replace-in-file": "^3.4.0",
     "rimraf": "^2.6.1",
-    "rollup": "^0.64.1",
+    "rollup": "^0.65.0",
     "rollup-plugin-commonjs": "^9.1.5",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-builtins": "^2.1.2",
@@ -117,12 +117,11 @@
   },
   "peerDependencies": {
     "aws-sdk": "^2.286.1",
-    "lodash-es": "^4.17.10",
-    "moment": "^2.18.1",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "rxjs": "^6.0.0"
   },
   "dependencies": {
-    "moment-es6": "^1.0.0",
     "reflect-metadata": "^0.1.12"
   }
 }

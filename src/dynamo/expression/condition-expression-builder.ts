@@ -1,5 +1,5 @@
 import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { curryRight, forEach, isPlainObject } from 'lodash-es'
+import { curryRight, forEach, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'

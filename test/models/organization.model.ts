@@ -1,4 +1,4 @@
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
 import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'

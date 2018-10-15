@@ -6,7 +6,7 @@ import {
   MapAttributeValue,
   StringSetAttributeValue,
 } from 'aws-sdk/clients/dynamodb'
-import moment from 'moment-es6'
+import * as moment from 'moment'
 import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
 import { Mapper } from '../src/mapper/mapper'
 import { EnumType } from '../src/mapper/type/enum.type'

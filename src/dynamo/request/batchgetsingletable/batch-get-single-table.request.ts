@@ -1,5 +1,5 @@
 import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
-import { isObject } from 'lodash-es'
+import { isObject } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Metadata } from '../../../decorator/metadata/metadata'
