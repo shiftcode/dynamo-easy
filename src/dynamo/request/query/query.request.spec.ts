@@ -1,8 +1,12 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import * as moment from 'moment'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { getTableName } from '../../../../test/helper/get-table-name.function'
 import { ComplexModel } from '../../../../test/models/complex.model'
+import {
+  CustomId,
+  ModelWithCustomMapperForSortKeyModel,
+} from '../../../../test/models/model-with-custom-mapper-for-sort-key.model'
 import { INDEX_ACTIVE_CREATED_AT, ModelWithABunchOfIndexes } from '../../../../test/models/model-with-indexes.model'
 import { DynamoRx } from '../../dynamo-rx'
 import { attribute } from '../../expression/logical-operator/attribute.function'
@@ -10,7 +14,7 @@ import { QueryRequest } from './query.request'
 
 export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
   query(params: QueryInput): Observable<QueryOutput> {
-    return Observable.of({})
+    return of({})
   },
 }
 
@@ -85,6 +89,24 @@ describe('query request', () => {
 
       const params = request.params
       expect(params.FilterExpression).toBe('(#active = :active AND #creationDate < :creationDate)')
+    })
+  })
+
+  describe('uses custom mapper for sortKey', () => {
+    const request = new QueryRequest(
+      <any>null,
+      ModelWithCustomMapperForSortKeyModel,
+      getTableName(ModelWithCustomMapperForSortKeyModel)
+    )
+
+    request.whereSortKey().between(new CustomId(moment('2018-01-01'), 0), new CustomId(moment('2018-12-31'), 99999))
+
+    it('correct mapping', () => {
+      expect(request.params.ExpressionAttributeValues).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':customId': { N: '2018010100000' },
+        ':customId_2': { N: '2018123199999' },
+      })
     })
   })
 
