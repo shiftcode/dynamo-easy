@@ -33,7 +33,7 @@
   "scripts": {
     "lint": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts' && tslint --fix -t codeFrame '{src,test}/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5",
+    "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
     "build:docs": "typedoc --out dist/docs --target es6 --theme minimal",
     "build:deprecated:old": "tsc && rollup -c && rimraf compiled && typedoc --out dist/docs --target es6 --theme minimal sr",
     "test": "jest",
