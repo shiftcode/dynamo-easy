@@ -54,21 +54,7 @@ export class Mapper {
       /*
        * 1) get the value of the property
        */
-      const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
-
-      // use get accessor if available otherwise use value property of descriptor
-      let propertyValue: any
-      if (propertyDescriptor) {
-        if (propertyDescriptor.get) {
-          propertyValue = propertyDescriptor.get()
-        } else {
-          propertyValue = propertyDescriptor.value
-        }
-      } else {
-        throw new Error(
-          'there is no property descriptor for item ' + JSON.stringify(item) + ' and property key ' + propertyKey
-        )
-      }
+      const propertyValue = Mapper.getPropertyValue(item, propertyKey)
 
       let attributeValue: AttributeValue | undefined | null
 
@@ -168,6 +154,10 @@ export class Mapper {
     }
   }
 
+  /**
+   * returns the function for the given ModelConstructor to create the AttributeMap with HASH (and RANGE) Key of a given item. used to delete items
+   * @param modelConstructor
+   */
   static createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: T) => AttributeMap {
     const metadata = MetadataHelper.get(modelConstructor)
     const properties = metadata.modelOptions.properties
@@ -326,7 +316,7 @@ export class Mapper {
     return this.mapperForType.get(type.toString())!
   }
 
-  static getPropertyValue(item: any, propertyKey: PropertyKey) {
+  static getPropertyValue(item: any, propertyKey: PropertyKey): any {
     const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
 
     // use get accessor if available otherwise use value property of descriptor

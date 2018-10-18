@@ -68,6 +68,9 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     return this.dynamoRx.scan(params).pipe(map(response => response.Count!))
   }
 
+  /**
+   * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
+   */
   execFetchAll(): Observable<T[]> {
     return fetchAll(this)
   }

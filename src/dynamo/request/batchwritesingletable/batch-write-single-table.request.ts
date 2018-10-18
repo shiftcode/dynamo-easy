@@ -11,11 +11,11 @@ import { DynamoRx } from '../../../dynamo/dynamo-rx'
 import { randomExponentialBackoffTimer } from '../../../helper'
 import { Mapper } from '../../../mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
-import { BatchWriteResponse } from './batch-write.response'
+import { BatchWriteSingleTableResponse } from './batch-write-single-table.response'
 
 const MAX_BATCH_WRITE_ITEMS = 25
 
-export class BatchWriteRequest<T> {
+export class BatchWriteSingleTableRequest<T> {
   private get toKey(): (item: T) => AttributeMap {
     if (!this._keyFn) {
       this._keyFn = Mapper.createToKeyFn(this.modelClazz)
@@ -42,19 +42,19 @@ export class BatchWriteRequest<T> {
     this.itemsToProcess = []
   }
 
-  delete(items: T[]): BatchWriteRequest<T> {
+  delete(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(...items.map<WriteRequest>(item => ({ DeleteRequest: { Key: this.toKey(item) } })))
     return this
   }
 
-  put(items: T[]): BatchWriteRequest<T> {
+  put(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(
       ...items.map<WriteRequest>(item => ({ PutRequest: { Item: Mapper.toDb(item, this.modelClazz) } }))
     )
     return this
   }
 
-  private execNextBatch(): Observable<BatchWriteResponse> {
+  private execNextBatch(): Observable<BatchWriteSingleTableResponse> {
     const batch = this.itemsToProcess.splice(0, MAX_BATCH_WRITE_ITEMS)
     const batchWriteItemInput: BatchWriteItemInput = {
       RequestItems: {
@@ -76,20 +76,25 @@ export class BatchWriteRequest<T> {
     )
   }
 
+  /**
+   *
+   * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
+   * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
+   */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = 1000): Observable<void> {
-    let rBoT = backoffTimer(throttleTimeSlot)
+    let rBoT = backoffTimer()
     let backoffTime = 0
     return this.execNextBatch().pipe(
-      mergeMap((r: BatchWriteResponse) => {
+      mergeMap((r: BatchWriteSingleTableResponse) => {
         if (!r.capacityExceeded) {
-          rBoT = backoffTimer(throttleTimeSlot)
+          rBoT = backoffTimer()
           backoffTime = 0
         } else {
           backoffTime = rBoT.next().value
         }
-        return of(r).pipe(delay(backoffTime))
+        return of(r).pipe(delay(backoffTime * throttleTimeSlot))
       }),
-      mergeMap((r: BatchWriteResponse) => {
+      mergeMap((r: BatchWriteSingleTableResponse) => {
         if (r.remainingItems > 0) {
           return this.exec()
         } else {

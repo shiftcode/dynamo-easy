@@ -134,6 +134,9 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     )
   }
 
+  /**
+   * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
+   */
   execFetchAll(): Observable<T[]> {
     return fetchAll(this)
   }
