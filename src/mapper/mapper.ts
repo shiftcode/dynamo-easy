@@ -134,38 +134,30 @@ export class Mapper {
         : null
     const type: AttributeModelType = explicitType || Util.typeOf(propertyValue)
 
+    const mapper = propertyMetadata && propertyMetadata.mapper ? new propertyMetadata.mapper() : Mapper.forType(type)
+
+    const attrValue: AttributeValue | null = explicitType
+      ? mapper.toDb(propertyValue, propertyMetadata)
+      : mapper.toDb(propertyValue)
+
     // some basic validation
+    // todo: null is probably not ok !?
     if (
       propertyMetadata &&
       propertyMetadata.key &&
-      propertyMetadata.key.type === 'HASH' &&
-      !propertyMetadata.mapper &&
-      type !== String &&
-      type !== Number &&
-      type !== Binary
+      attrValue !== null &&
+      !('S' in attrValue) &&
+      !('N' in attrValue) &&
+      !('B' in attrValue)
     ) {
       throw new Error(
-        `make sure to define a custom mapper which returns a string or number value for partition key, type ${type} cannot be used as partition key, value = ${JSON.stringify(
-          propertyValue
-        )}`
+        `\
+DynamoDb only allows string, number or binary type for RANGE and HASH key. \
+Make sure to define a custom mapper which returns a string, number or binary value for partition key, \
+type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyValue)}`
       )
     }
-
-    if (propertyMetadata && propertyMetadata.mapper) {
-      // custom mapper
-      if (explicitType) {
-        return new propertyMetadata.mapper().toDb(propertyValue, propertyMetadata)
-      } else {
-        return new propertyMetadata.mapper().toDb(propertyValue)
-      }
-    } else {
-      // mapper by type
-      if (explicitType) {
-        return Mapper.forType(type).toDb(propertyValue, propertyMetadata)
-      } else {
-        return Mapper.forType(type).toDb(propertyValue)
-      }
-    }
+    return attrValue
   }
 
   static fromDb<T>(attributeMap: AttributeMap, modelClass?: ModelConstructor<T>): T {
