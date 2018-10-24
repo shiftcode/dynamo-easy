@@ -143,13 +143,13 @@ export class Mapper {
     // some basic validation
     if (propertyMetadata && propertyMetadata.key) {
       if (attrValue === null) {
-        throw new Error(`null but is key`)
+        throw new Error(`${propertyMetadata.name.toString()} is null but is a ${propertyMetadata.key.type} key`)
       }
       if (!('S' in attrValue) && !('N' in attrValue) && !('B' in attrValue)) {
         throw new Error(
           `\
 DynamoDb only allows string, number or binary type for RANGE and HASH key. \
-Make sure to define a custom mapper which returns a string, number or binary value for partition key, \
+Make sure to define a custom mapper for '${propertyMetadata.name.toString()}' which returns a string, number or binary value for partition key, \
 type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyValue)}`
         )
       }
