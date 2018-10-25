@@ -59,13 +59,15 @@ export class BatchWriteSingleTableRequest<T> {
 
     return this.dynamoRx.batchWriteItem(batchWriteItemInput).pipe(
       tap((batchWriteManyResponse: BatchWriteItemOutput) => {
-        if (batchWriteManyResponse.UnprocessedItems) {
+        if (batchWriteManyResponse.UnprocessedItems && batchWriteManyResponse.UnprocessedItems[this.tableName]) {
           this.itemsToProcess.unshift(...batchWriteManyResponse.UnprocessedItems[this.tableName])
         }
       }),
       map((batchWriteManyResponse: BatchWriteItemOutput) => ({
         remainingItems: this.itemsToProcess.length,
-        capacityExceeded: !!batchWriteManyResponse.UnprocessedItems,
+        capacityExceeded: !!(
+          batchWriteManyResponse.UnprocessedItems && batchWriteManyResponse.UnprocessedItems[this.tableName]
+        ),
         consumedCapacity: batchWriteManyResponse.ConsumedCapacity,
       }))
     )
