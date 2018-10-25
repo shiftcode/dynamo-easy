@@ -7,6 +7,7 @@ import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const
 import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoRx } from './dynamo-rx'
 import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
+import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
 import { DeleteRequest } from './request/delete/delete.request'
 import { GetRequest } from './request/get/get.request'
 import { PutRequest } from './request/put/put.request'
@@ -58,6 +59,15 @@ export class DynamoStore<T> {
     return new DeleteRequest(this.dynamoRx, this.modelClazz, this.tableName, partitionKey, sortKey)
   }
 
+  /**
+   * This is a special implementation of batchWriteItem request, because it only supports one table,
+   * if you wish to write items to multiple tables
+   * create an instance of BatchWriteItemInput and use store.makeRequest with it.
+   */
+  batchWrite(): BatchWriteSingleTableRequest<T> {
+    return new BatchWriteSingleTableRequest<T>(this.dynamoRx, this.modelClazz, this.tableName)
+  }
+
   scan(): ScanRequest<T> {
     return new ScanRequest<T>(this.dynamoRx, this.modelClazz, this.tableName)
   }
@@ -67,8 +77,9 @@ export class DynamoStore<T> {
   }
 
   /**
-   * This is a special implementation of BatchGetItem request, because it only supports one table, if you wish to retrieve items from multiple tables
-   * get an instance of BatchGetItem request and call it there.
+   * This is a special implementation of BatchGetItem request, because it only supports one table,
+   * if you wish to retrieve items from multiple tables
+   * create an instance of BatchGetItemInput and use store.makeRequest with it.
    */
   batchGetItem(keys: any[]): BatchGetSingleTableRequest<T> {
     return new BatchGetSingleTableRequest(this.dynamoRx, this.modelClazz, this.tableName, keys)

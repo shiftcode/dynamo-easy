@@ -1,6 +1,7 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { fetchAll } from '../../../helper'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -131,5 +132,12 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
         }
       })
     )
+  }
+
+  /**
+   * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
+   */
+  execFetchAll(): Observable<T[]> {
+    return fetchAll(this)
   }
 }

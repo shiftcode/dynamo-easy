@@ -6,8 +6,16 @@
   "rulesDirectory": [
   ],
   "rules": {
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
     "no-angle-bracket-type-assertion": false,
-    "no-submodule-imports": [true, "aws-sdk", "rxjs/operators"],
+    "no-submodule-imports": [
+      true,
+      "aws-sdk",
+      "rxjs/operators"
+    ],
     "interface-name": [
       true,
       "never-prefix"
