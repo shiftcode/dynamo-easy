@@ -67,7 +67,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
       throw new Error('There was no sort key defined for current schema')
     }
 
-    return RequestExpressionBuilder.addSortKeyCondition(sortKey, this)
+    return RequestExpressionBuilder.addSortKeyCondition(sortKey, this, this.metaData)
   }
 
   // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
