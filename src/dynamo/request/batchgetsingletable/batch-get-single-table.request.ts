@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators'
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
@@ -49,7 +50,7 @@ export class BatchGetSingleTableRequest<T> {
         let items: T[]
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
           const mapped: T[] = response.Responses![this.tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.modelClazz)
+            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
           )
           items = mapped
         } else {
@@ -69,7 +70,9 @@ export class BatchGetSingleTableRequest<T> {
     return this.dynamoRx.batchGetItems(this.params).pipe(
       map(response => {
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          return response.Responses![this.tableName].map(attributeMap => Mapper.fromDb(attributeMap, this.modelClazz))
+          return response.Responses![this.tableName].map(attributeMap =>
+            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
+          )
         } else {
           return []
         }

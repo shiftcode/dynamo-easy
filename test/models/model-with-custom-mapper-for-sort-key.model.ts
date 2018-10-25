@@ -1,12 +1,12 @@
 // tslint:disable:max-classes-per-file
 
-import { DynamoDB } from 'aws-sdk'
 import * as moment from 'moment'
 import { PropertyMetadata, SortKey } from '../../src/decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { CustomMapper } from '../../src/decorator/impl/mapper/custom-mapper.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { MapperForType } from '../../src/mapper/for-type/base.mapper'
+import { NumberAttribute } from '../../src/mapper/type/attribute.type'
 
 export class CustomId {
   private static MULTIPLIER = Math.pow(10, 5)
@@ -30,12 +30,12 @@ export class CustomId {
   }
 }
 
-export class CustomIdMapper implements MapperForType<CustomId> {
-  fromDb(attributeValue: DynamoDB.AttributeValue, propertyMetadata?: PropertyMetadata<CustomId>): CustomId {
-    return CustomId.parse(parseInt(attributeValue.N!, 10))
+export class CustomIdMapper implements MapperForType<CustomId, NumberAttribute> {
+  fromDb(attributeValue: NumberAttribute, propertyMetadata?: PropertyMetadata<CustomId>): CustomId {
+    return CustomId.parse(parseInt(attributeValue.N, 10))
   }
 
-  toDb(propertyValue: CustomId, propertyMetadata?: PropertyMetadata<CustomId>): DynamoDB.AttributeValue {
+  toDb(propertyValue: CustomId, propertyMetadata?: PropertyMetadata<CustomId>): NumberAttribute {
     return { N: `${CustomId.unparse(propertyValue)}` }
   }
 }

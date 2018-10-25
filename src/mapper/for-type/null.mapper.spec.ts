@@ -28,7 +28,7 @@ describe('null mapper', () => {
 
     it('should throw (no null value)', () => {
       expect(() => {
-        mapper.fromDb({ S: 'nullValue' })
+        mapper.fromDb(<any>{ S: 'nullValue' })
       }).toThrowError()
     })
   })

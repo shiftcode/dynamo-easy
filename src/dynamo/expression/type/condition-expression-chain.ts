@@ -1,4 +1,4 @@
-import { AttributeType } from '../../../mapper/type/attribute.type'
+import { AttributeType } from '../../../mapper/type/attribute-type.type'
 import { Expression } from './expression.type'
 
 export interface ConditionExpressionChain {

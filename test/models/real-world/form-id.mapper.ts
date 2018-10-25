@@ -1,31 +1,36 @@
 // tslint:disable:max-classes-per-file
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { PropertyMetadata } from '../../../src/decorator'
 import { MapperForType } from '../../../src/mapper'
+import { ListAttribute, StringAttribute } from '../../../src/mapper/type/attribute.type'
 import { FormId } from './form-id.model'
 
-export class FormIdMapper implements MapperForType<FormId> {
-  fromDb(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<FormId>): FormId {
-    return FormId.parse(attributeValue.S!)
+export class FormIdMapper implements MapperForType<FormId, StringAttribute> {
+  fromDb(attributeValue: StringAttribute, propertyMetadata?: PropertyMetadata<FormId>): FormId {
+    return FormId.parse(attributeValue.S)
   }
 
-  toDb(propertyValue: FormId, propertyMetadata?: PropertyMetadata<FormId>): AttributeValue | null {
+  toDb(propertyValue: FormId, propertyMetadata?: PropertyMetadata<FormId>): StringAttribute | null {
     return { S: FormId.toString(propertyValue) }
   }
 }
 
-export class FormIdsMapper implements MapperForType<FormId[] | FormId> {
-  fromDb(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<FormId[]>): FormId[] | FormId {
-    if (attributeValue.L) {
-      return attributeValue.L!.map(formIdDb => FormId.parse(formIdDb.S!))
-    } else if (attributeValue.S) {
-      return FormId.parse(attributeValue.S!)
+type AttributeStringOrListValue = StringAttribute | ListAttribute
+
+export class FormIdsMapper implements MapperForType<FormId[] | FormId, AttributeStringOrListValue> {
+  fromDb(attributeValue: AttributeStringOrListValue, propertyMetadata?: PropertyMetadata<FormId[]>): FormId[] | FormId {
+    if ('L' in attributeValue) {
+      return attributeValue.L.map(formIdDb => FormId.parse(formIdDb.S!))
+    } else if ('S' in attributeValue) {
+      return FormId.parse(attributeValue.S)
     } else {
-      throw new Error('there is no mappind defined to read attributeValue ' + JSON.stringify(attributeValue))
+      throw new Error('there is no mapping defined to read attributeValue ' + JSON.stringify(attributeValue))
     }
   }
 
-  toDb(propertyValue: FormId[] | FormId, propertyMetadata?: PropertyMetadata<FormId[]>): AttributeValue | null {
+  toDb(
+    propertyValue: FormId[] | FormId,
+    propertyMetadata?: PropertyMetadata<FormId[]>
+  ): AttributeStringOrListValue | null {
     if (Array.isArray(propertyValue)) {
       return { L: propertyValue.map(a => ({ S: FormId.toString(a) })) }
     } else {

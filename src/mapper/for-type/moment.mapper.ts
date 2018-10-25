@@ -1,9 +1,9 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import * as moment from 'moment'
+import { StringAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
-export class MomentMapper implements MapperForType<moment.Moment> {
-  fromDb(value: AttributeValue): moment.Moment {
+export class MomentMapper implements MapperForType<moment.Moment, StringAttribute> {
+  fromDb(value: StringAttribute): moment.Moment {
     const parsed: moment.Moment = moment(value.S, moment.ISO_8601)
     if (!parsed.isValid()) {
       throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
@@ -12,7 +12,7 @@ export class MomentMapper implements MapperForType<moment.Moment> {
     return parsed
   }
 
-  toDb(value: moment.Moment): AttributeValue {
+  toDb(value: moment.Moment): StringAttribute {
     if (moment.isMoment(value)) {
       if (value.isValid()) {
         // always store in utc, default format is ISO_8601

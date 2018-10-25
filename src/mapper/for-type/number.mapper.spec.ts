@@ -34,7 +34,7 @@ describe('number mapper', () => {
 
     it('should throw (no number value)', () => {
       expect(() => {
-        mapper.fromDb({ S: '56' })
+        mapper.fromDb(<any>{ S: '56' })
       }).toThrowError()
     })
   })

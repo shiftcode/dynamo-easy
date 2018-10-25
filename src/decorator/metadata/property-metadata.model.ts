@@ -1,5 +1,6 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { MapperForType } from '../../mapper/for-type/base.mapper'
+import { Attribute } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 
 export interface TypeInfo {
@@ -14,7 +15,7 @@ export interface Key {
   uuid?: boolean
 }
 
-export interface PropertyMetadata<T> {
+export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   // this property desribes a key attribute (either partition or sort) for the table
   key?: Key
 
@@ -35,7 +36,7 @@ export interface PropertyMetadata<T> {
    */
   isSortedCollection?: boolean
 
-  mapper?: ModelConstructor<MapperForType<any>>
+  mapper?: ModelConstructor<MapperForType<any, R>>
 
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
   keyForGSI?: { [key: string]: KeyType }
@@ -47,6 +48,6 @@ export interface PropertyMetadata<T> {
   transient?: boolean
 }
 
-export function hasGenericType(propertyMetadata?: PropertyMetadata<any>): boolean {
+export function hasGenericType(propertyMetadata?: PropertyMetadata<any, any>): boolean {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType)
 }

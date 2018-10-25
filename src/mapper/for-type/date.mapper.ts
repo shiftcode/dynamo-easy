@@ -1,8 +1,8 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
-export class DateMapper implements MapperForType<Date> {
-  fromDb(attributeValue: AttributeValue): Date {
+export class DateMapper implements MapperForType<Date, NumberAttribute> {
+  fromDb(attributeValue: NumberAttribute): Date {
     if (attributeValue.N) {
       return new Date(parseInt(attributeValue.N, 10))
     } else {
@@ -10,7 +10,8 @@ export class DateMapper implements MapperForType<Date> {
     }
   }
 
-  toDb(modelValue: Date): AttributeValue {
+  toDb(modelValue: Date): NumberAttribute {
+    // noinspection SuspiciousInstanceOfGuard
     if (modelValue && modelValue instanceof Date) {
       return { N: `${modelValue.getTime()}` }
     } else {

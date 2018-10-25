@@ -1,10 +1,11 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { NullAttribute } from '../type/attribute.type'
+
 import { MapperForType } from './base.mapper'
 
-export class NullMapper implements MapperForType<null> {
+export class NullMapper implements MapperForType<null, NullAttribute> {
   constructor() {}
 
-  fromDb(value: AttributeValue): null {
+  fromDb(value: NullAttribute): null {
     if (value.NULL) {
       return null
     } else {
@@ -12,7 +13,7 @@ export class NullMapper implements MapperForType<null> {
     }
   }
 
-  toDb(value: null): AttributeValue | null {
+  toDb(value: null): NullAttribute | null {
     if (value !== null) {
       throw new Error(`null mapper only supports null value, got ${value}`)
     }

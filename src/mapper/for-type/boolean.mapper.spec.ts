@@ -44,13 +44,13 @@ describe('boolean mapper', () => {
 
     it('should throw (S cannot be mapped to boolean)', () => {
       expect(() => {
-        mapper.fromDb({ S: 'true' })
+        mapper.fromDb(<any>{ S: 'true' })
       }).toThrowError()
     })
 
     it('should throw (N cannot be mapped to boolean)', () => {
       expect(() => {
-        mapper.fromDb({ N: '1' })
+        mapper.fromDb(<any>{ N: '1' })
       }).toThrowError()
     })
   })

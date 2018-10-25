@@ -1,4 +1,3 @@
-import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../decorator/metadata/metadata'
 import { MetadataHelper } from '../decorator/metadata/metadata-helper'
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
@@ -13,7 +12,8 @@ import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
 import { StringMapper } from './for-type/string.mapper'
-import { AttributeModelType } from './type/attribute-model.type'
+import { AttributeValueType } from './type/attribute-value-type.type'
+import { Attribute, Attributes } from './type/attribute.type'
 import { Binary } from './type/binary.type'
 import { EnumType } from './type/enum.type'
 import { MomentType } from './type/moment.type'
@@ -27,12 +27,12 @@ import { Util } from './util'
  *
  */
 export class Mapper {
-  static mapperForType: Map<AttributeModelType, MapperForType<any>> = new Map()
+  static mapperForType: Map<AttributeValueType, MapperForType<any, any>> = new Map()
 
   // static logger = debug('Mapper');
 
-  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): AttributeMap {
-    const mapped: AttributeMap = <AttributeMap>{}
+  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attributes {
+    const mapped: Attributes = <Attributes>{}
 
     if (modelConstructor) {
       const metadata: Metadata<T> = MetadataHelper.get(modelConstructor)
@@ -70,7 +70,7 @@ export class Mapper {
         )
       }
 
-      let attributeValue: AttributeValue | undefined | null
+      let attributeValue: any | undefined | null
 
       // TODO concept maybe make this configurable how to map undefined & null values
       if (propertyValue === undefined || propertyValue === null) {
@@ -80,7 +80,7 @@ export class Mapper {
          * 2) decide how to map the property depending on type or value
          */
 
-        let propertyMetadata: PropertyMetadata<any> | null | undefined
+        let propertyMetadata: PropertyMetadata<any, any> | null | undefined
         if (modelConstructor) {
           propertyMetadata = MetadataHelper.forProperty(modelConstructor, propertyKey)
         }
@@ -127,16 +127,16 @@ export class Mapper {
     return mapped
   }
 
-  static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): AttributeValue | null {
-    const explicitType: AttributeModelType | null =
+  static toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): Attribute | null {
+    const explicitType: AttributeValueType | null =
       propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
         ? propertyMetadata.typeInfo.type!
         : null
-    const type: AttributeModelType = explicitType || Util.typeOf(propertyValue)
+    const type: AttributeValueType = explicitType || Util.typeOf(propertyValue)
 
     const mapper = propertyMetadata && propertyMetadata.mapper ? new propertyMetadata.mapper() : Mapper.forType(type)
 
-    const attrValue: AttributeValue | null = explicitType
+    const attrValue: Attribute | null = explicitType
       ? mapper.toDb(propertyValue, propertyMetadata)
       : mapper.toDb(propertyValue)
 
@@ -157,20 +157,20 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
     return attrValue
   }
 
-  static fromDb<T>(attributeMap: AttributeMap, modelClass?: ModelConstructor<T>): T {
+  static fromDb<T>(attributeMap: Attributes, modelClass?: ModelConstructor<T>): T {
     const model: T = <T>{}
 
     Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {
       /*
        * 1) get the value of the property
        */
-      const attributeValue: AttributeValue = attributeMap[attributeName]
+      const attributeValue = attributeMap[attributeName]
 
       /*
        * 2) decide how to map the property depending on type or value
        */
       let modelValue: any
-      let propertyMetadata: PropertyMetadata<any> | null | undefined
+      let propertyMetadata: PropertyMetadata<any, any> | null | undefined
       if (modelClass) {
         propertyMetadata = MetadataHelper.forProperty(modelClass, attributeName)
       }
@@ -215,12 +215,12 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
     return model
   }
 
-  static fromDbOne<T>(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): T {
-    const explicitType: AttributeModelType | null =
+  static fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: PropertyMetadata<any, any>): T {
+    const explicitType: AttributeValueType | null =
       propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
         ? propertyMetadata.typeInfo.type!
         : null
-    const type: AttributeModelType = explicitType || Util.typeOfFromDb(attributeValue)
+    const type: AttributeValueType = explicitType || Util.typeOfFromDb(attributeValue)
 
     // Mapper.logger.log(`mapFromDbOne for type ${type}`)
 
@@ -231,11 +231,11 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
     }
   }
 
-  static forType(type: AttributeModelType): MapperForType<any> {
+  static forType(type: AttributeValueType): MapperForType<any, Attribute> {
     // FIXME HIGH review this, we now use toString to compare because we had issues with ng client for moment when
     // using a GSI on creationDate (MomentType) was a different MomentType than for lastUpdatedDate
     if (!Mapper.mapperForType.has(type.toString())) {
-      let mapperForType: MapperForType<any>
+      let mapperForType: MapperForType<any, Attribute>
       switch (type.toString()) {
         case String.toString():
           mapperForType = new StringMapper()

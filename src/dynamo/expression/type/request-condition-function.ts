@@ -1,4 +1,4 @@
-import { AttributeType } from '../../../mapper/type/attribute.type'
+import { AttributeType } from '../../../mapper/type/attribute-type.type'
 import { BaseRequest } from '../../request/base.request'
 
 export interface RequestConditionFunction<T extends BaseRequest<any, any>> {
