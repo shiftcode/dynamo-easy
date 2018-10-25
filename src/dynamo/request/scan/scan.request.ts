@@ -1,6 +1,7 @@
 import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { fetchAll } from '../../../helper'
 import { Mapper } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -68,5 +69,12 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     params.Select = 'COUNT'
 
     return this.dynamoRx.scan(params).pipe(map(response => response.Count!))
+  }
+
+  /**
+   * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
+   */
+  execFetchAll(): Observable<T[]> {
+    return fetchAll(this)
   }
 }

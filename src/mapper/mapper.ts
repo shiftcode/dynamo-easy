@@ -54,21 +54,7 @@ export class Mapper {
       /*
        * 1) get the value of the property
        */
-      const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
-
-      // use get accessor if available otherwise use value property of descriptor
-      let propertyValue: any
-      if (propertyDescriptor) {
-        if (propertyDescriptor.get) {
-          propertyValue = propertyDescriptor.get()
-        } else {
-          propertyValue = propertyDescriptor.value
-        }
-      } else {
-        throw new Error(
-          'there is no property descriptor for item ' + JSON.stringify(item) + ' and property key ' + propertyKey
-        )
-      }
+      const propertyValue = Mapper.getPropertyValue(item, propertyKey)
 
       let attributeValue: any | undefined | null
 
@@ -155,6 +141,36 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
       }
     }
     return attrValue
+  }
+
+  /**
+   * returns the function for the given ModelConstructor to create the AttributeMap with HASH (and RANGE) Key of a given item. used to delete items
+   * @param modelConstructor
+   */
+  static createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: T) => Attributes {
+    const metadata = MetadataHelper.get(modelConstructor)
+    const properties = metadata.modelOptions.properties
+    if (!properties) {
+      throw new Error('metadata properties is not defined')
+    }
+    const keyProps = properties.filter(p => !!p.key)
+
+    return (item: T) =>
+      keyProps.reduce(
+        (key, propMeta) => {
+          const propertyValue = Mapper.getPropertyValue(item, propMeta.name)
+          if (propertyValue === null || propertyValue === undefined) {
+            throw new Error(`there is no value for property ${propMeta.name} but is the ${propMeta.key!.type} key`)
+          }
+          const attributeValue = Mapper.toDbOne(propertyValue, propMeta)!
+          return { ...key, [<string>propMeta.name]: attributeValue }
+        },
+        <Attributes>{}
+      )
+  }
+
+  static toKey<T>(item: T, modelConstructor: ModelConstructor<T>): Attributes {
+    return Mapper.createToKeyFn(modelConstructor)(item)
   }
 
   static fromDb<T>(attributeMap: Attributes, modelClass?: ModelConstructor<T>): T {
@@ -287,5 +303,22 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
     }
 
     return this.mapperForType.get(type.toString())!
+  }
+
+  static getPropertyValue(item: any, propertyKey: PropertyKey): any {
+    const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
+
+    // use get accessor if available otherwise use value property of descriptor
+    if (propertyDescriptor) {
+      if (propertyDescriptor.get) {
+        return propertyDescriptor.get()
+      } else {
+        return propertyDescriptor.value
+      }
+    } else {
+      throw new Error(
+        `there is no property descriptor for item ${JSON.stringify(item)} and property key ${<string>propertyKey}`
+      )
+    }
   }
 }
