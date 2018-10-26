@@ -1,4 +1,1 @@
 branch: master
-publishConfig:
-#  FIXME this does not work
-  tag: next
