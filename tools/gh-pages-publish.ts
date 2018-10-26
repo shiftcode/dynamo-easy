@@ -2,10 +2,14 @@ const { cd, exec, echo, touch } = require('shelljs')
 const { readFileSync } = require('fs')
 const url = require('url')
 
-const branchName = process.env.TRAVIS_BRANCH
-echo(`running on branch ${branchName}`)
+const info = {
+  TRAVIS_BRANCH: process.env.TRAVIS_BRANCH,
+  TRAVIS_PULL_REQUEST: process.env.TRAVIS_PULL_REQUEST,
+  TRAVIS_PULL_REQUEST_BRANCH: process.env.TRAVIS_PULL_REQUEST_BRANCH,
+}
+echo(`running on branch ${JSON.stringify(info)}`)
 
-if (branchName === 'master') {
+if (info.TRAVIS_BRANCH === 'master' && info.TRAVIS_PULL_REQUEST === 'false') {
   const pkg = JSON.parse(readFileSync('package.json') as any)
   let repoUrl
   if (typeof pkg.repository === 'object') {
@@ -34,5 +38,5 @@ if (branchName === 'master') {
   )
   echo('Docs deployed!!')
 } else {
-  echo('Not running on master, therefor docs are not deployed')
+  echo('Not running on master -> skipping docs deployment')
 }
