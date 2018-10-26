@@ -1,31 +1,42 @@
-const { cd, exec, echo, touch } = require("shelljs")
-const { readFileSync } = require("fs")
-const url = require("url")
+const { cd, exec, echo, touch } = require('shelljs')
+const { readFileSync } = require('fs')
+const url = require('url')
 
-let repoUrl
-let pkg = JSON.parse(readFileSync("package.json") as any)
-if (typeof pkg.repository === "object") {
-  if (!pkg.repository.hasOwnProperty("url")) {
-    throw new Error("URL does not exist in repository section")
-  }
-  repoUrl = pkg.repository.url
-} else {
-  repoUrl = pkg.repository
+const info = {
+  TRAVIS_BRANCH: process.env.TRAVIS_BRANCH,
+  TRAVIS_PULL_REQUEST: process.env.TRAVIS_PULL_REQUEST,
+  TRAVIS_PULL_REQUEST_BRANCH: process.env.TRAVIS_PULL_REQUEST_BRANCH,
 }
+echo(`running on branch ${JSON.stringify(info)}`)
 
-let parsedUrl = url.parse(repoUrl)
-let repository = (parsedUrl.host || "") + (parsedUrl.path || "")
-let ghToken = process.env.GH_TOKEN
+if (info.TRAVIS_BRANCH === 'master' && info.TRAVIS_PULL_REQUEST === 'false') {
+  const pkg = JSON.parse(readFileSync('package.json') as any)
+  let repoUrl
+  if (typeof pkg.repository === 'object') {
+    if (!pkg.repository.hasOwnProperty('url')) {
+      throw new Error('URL does not exist in repository section')
+    }
+    repoUrl = pkg.repository.url
+  } else {
+    repoUrl = pkg.repository
+  }
 
-echo("Deploying docs!!!")
-cd("dist/docs")
-touch(".nojekyll")
-exec("git init")
-exec("git add .")
-exec('git config user.name "Michael Wittwer"')
-exec('git config user.email "michael.wittwer@shiftcode.ch"')
-exec('git commit -m "docs(docs): update gh-pages"')
-exec(
-  `git push --force --quiet "https://${ghToken}@${repository}" master:gh-pages`
-)
-echo("Docs deployed!!")
+  const parsedUrl = url.parse(repoUrl)
+  const repository = (parsedUrl.host || '') + (parsedUrl.path || '')
+  const ghToken = process.env.GH_TOKEN
+
+  echo('Deploying docs!!!')
+  cd('dist/docs')
+  touch('.nojekyll')
+  exec('git init')
+  exec('git add .')
+  exec('git config user.name "Michael Wittwer"')
+  exec('git config user.email "michael.wittwer@shiftcode.ch"')
+  exec('git commit -m "docs(docs): update gh-pages"')
+  exec(
+    `git push --force --quiet "https://${ghToken}@${repository}" master:gh-pages`
+  )
+  echo('Docs deployed!!')
+} else {
+  echo('Not running on master -> skipping docs deployment')
+}
