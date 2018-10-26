@@ -1,10 +1,10 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { StringAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
-export class StringMapper implements MapperForType<string> {
+export class StringMapper implements MapperForType<string, StringAttribute> {
   constructor() {}
 
-  fromDb(attributeValue: AttributeValue): string {
+  fromDb(attributeValue: StringAttribute): string {
     if (attributeValue.S) {
       return attributeValue.S
     } else {
@@ -12,7 +12,7 @@ export class StringMapper implements MapperForType<string> {
     }
   }
 
-  toDb(modelValue: string): AttributeValue | null {
+  toDb(modelValue: string): StringAttribute | null {
     // an empty string is not a valid value for string attribute
     if (modelValue === '' || modelValue === null || modelValue === undefined) {
       return null

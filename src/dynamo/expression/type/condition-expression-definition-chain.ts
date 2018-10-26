@@ -1,4 +1,4 @@
-import { AttributeType } from '../../../mapper/type/attribute.type'
+import { AttributeType } from '../../../mapper/type/attribute-type.type'
 import { ConditionExpressionDefinitionFunction } from './condition-expression-definition-function'
 
 export interface ConditionExpressionDefinitionChain {

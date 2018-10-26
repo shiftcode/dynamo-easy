@@ -1,8 +1,9 @@
-import { AttributeMap, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
+import { ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
@@ -25,7 +26,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
       throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
     }
 
-    const keyAttributeMap: AttributeMap = {}
+    const keyAttributeMap: Attributes = {}
 
     // partition key
     const partitionKeyValue = Mapper.toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
@@ -75,7 +76,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
 
         if (getItemResponse.Item) {
-          response.Item = Mapper.fromDb(getItemResponse.Item, this.modelClazz)
+          response.Item = Mapper.fromDb(<Attributes>getItemResponse.Item, this.modelClazz)
         } else {
           response.Item = null
         }
@@ -89,7 +90,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     return this.dynamoRx.getItem(this.params).pipe(
       map(response => {
         if (response.Item) {
-          return Mapper.fromDb(response.Item, this.modelClazz)
+          return Mapper.fromDb(<Attributes>response.Item, this.modelClazz)
         } else {
           return null
         }

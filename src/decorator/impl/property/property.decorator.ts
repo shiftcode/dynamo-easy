@@ -1,6 +1,7 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { DynamoEasyConfig } from '../../../config/dynamo-easy-config'
-import { AttributeModelType } from '../../../mapper/type/attribute-model.type'
+import { AttributeValueType } from '../../../mapper/type/attribute-value-type.type'
+import { Attribute } from '../../../mapper/type/attribute.type'
 import { MomentType } from '../../../mapper/type/moment.type'
 import { Util } from '../../../mapper/util'
 import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
@@ -74,7 +75,7 @@ function initOrUpdateLSI(indexes: string[], indexData: IndexData): Partial<Prope
 }
 
 export function initOrUpdateProperty(
-  propertyMetadata: Partial<PropertyMetadata<any>> = {},
+  propertyMetadata: Partial<PropertyMetadata<any, Attribute>> = {},
   target: any,
   propertyKey: string
 ): void {
@@ -86,7 +87,10 @@ export function initOrUpdateProperty(
   if (existingProperty) {
     // merge property options
     // console.log('merge into existing property', existingProperty, propertyMetadata);
-    Object.assign<PropertyMetadata<any>, Partial<PropertyMetadata<any>>>(existingProperty, propertyMetadata)
+    Object.assign<PropertyMetadata<any, Attribute>, Partial<PropertyMetadata<any, Attribute>>>(
+      existingProperty,
+      propertyMetadata
+    )
   } else {
     // add new options
     const newProperty: PropertyMetadata<any> = createNewProperty(propertyMetadata, target, propertyKey)
@@ -98,11 +102,11 @@ export function initOrUpdateProperty(
 }
 
 function createNewProperty(
-  propertyOptions: Partial<PropertyMetadata<any>> = {},
+  propertyOptions: Partial<PropertyMetadata<any, Attribute>> = {},
   target: any,
   propertyKey: string
 ): PropertyMetadata<any> {
-  let propertyType: AttributeModelType = getMetadataType(target, propertyKey)
+  let propertyType: AttributeValueType = getMetadataType(target, propertyKey)
   let customType = isCustomType(propertyType)
 
   const typeByConvention = Util.typeByConvention(propertyKey)

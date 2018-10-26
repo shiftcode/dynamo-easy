@@ -1,11 +1,11 @@
 // tslint:disable:max-classes-per-file
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import * as moment from 'moment'
 import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { GSISortKey } from '../../../src/decorator/impl/index/gsi-sort-key.decorator'
 import { PartitionKey } from '../../../src/decorator/impl/key/partition-key.decorator'
 import { CustomMapper } from '../../../src/decorator/impl/mapper/custom-mapper.decorator'
 import { Model } from '../../../src/decorator/impl/model/model.decorator'
+import { StringAttribute } from '../../../src/mapper/type/attribute.type'
 import { FormIdsMapper } from './form-id.mapper'
 import { FormId } from './form-id.model'
 import { NumberEnumMapper } from './number-enum.mapper'
@@ -72,11 +72,11 @@ export class OrderId {
     return leadingZeroes + formId.counter + formId.year
   }
 
-  static toDb(modelValue: OrderId): AttributeValue {
+  static toDb(modelValue: OrderId): StringAttribute {
     return { S: modelValue.toString() }
   }
 
-  static fromDb(dbValue: AttributeValue): OrderId {
+  static fromDb(dbValue: StringAttribute): OrderId {
     return OrderId.parse(dbValue['S'])
   }
 

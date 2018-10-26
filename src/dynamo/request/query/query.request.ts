@@ -3,6 +3,7 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { fetchAll } from '../../../helper'
 import { Mapper } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { and } from '../../expression/logical-operator/and.function'
@@ -103,7 +104,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this.dynamoRx.query(this.params).pipe(
       map(queryResponse => {
         const response: QueryResponse<T> = <any>{ ...queryResponse }
-        response.Items = queryResponse.Items!.map(item => Mapper.fromDb(item, this.modelClazz))
+        response.Items = queryResponse.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))
 
         return response
       })
@@ -113,7 +114,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   exec(): Observable<T[]> {
     return this.dynamoRx
       .query(this.params)
-      .pipe(map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz))))
+      .pipe(map(response => response.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))))
   }
 
   execNoMap(): Observable<QueryOutput> {
@@ -126,7 +127,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this.dynamoRx.query(this.params).pipe(
       map(response => {
         if (response.Count) {
-          return Mapper.fromDb(response.Items![0], this.modelClazz)
+          return Mapper.fromDb(<Attributes>response.Items![0], this.modelClazz)
         } else {
           return null
         }

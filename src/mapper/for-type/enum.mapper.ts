@@ -1,14 +1,14 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
+import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 /**
  * Enums are mapped to numbers by default
  */
-export class EnumMapper<E> implements MapperForType<E> {
+export class EnumMapper<E> implements MapperForType<E, NumberAttribute> {
   constructor() {}
 
-  toDb(value: E, propertyMetadata?: PropertyMetadata<any>) {
+  toDb(value: E, propertyMetadata?: PropertyMetadata<any, NumberAttribute>): NumberAttribute {
     if (Number.isInteger(<any>value)) {
       if (hasGenericType(propertyMetadata) && (<any>propertyMetadata!.typeInfo!.genericType)[value] === undefined) {
         throw new Error(`${value} is not a valid value for enum ${propertyMetadata!.typeInfo!.genericType}`)
@@ -19,7 +19,7 @@ export class EnumMapper<E> implements MapperForType<E> {
     }
   }
 
-  fromDb(attributeValue: AttributeValue, propertyMetadata?: PropertyMetadata<any>): E {
+  fromDb(attributeValue: NumberAttribute, propertyMetadata?: PropertyMetadata<any, NumberAttribute>): E {
     if (!isNaN(parseInt(attributeValue.N!, 10))) {
       const enumValue = <any>parseInt(attributeValue.N!, 10)
       if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType) {

@@ -1,20 +1,20 @@
-import { AttributeMap, AttributeValue, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../mapper'
+import { MapAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
-export class ObjectMapper<T> implements MapperForType<any> {
+export class ObjectMapper<T> implements MapperForType<any, MapAttribute> {
   constructor() {}
 
-  fromDb(val: AttributeValue, propertyMetadata?: PropertyMetadata<any>): any {
+  fromDb(val: MapAttribute, propertyMetadata?: PropertyMetadata<any, MapAttribute>): any {
     if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom) {
-      return Mapper.fromDb(<AttributeMap>val.M, propertyMetadata.typeInfo.type)
+      return Mapper.fromDb(val.M, propertyMetadata.typeInfo.type)
     } else {
-      return Mapper.fromDb(<AttributeMap>val.M)
+      return Mapper.fromDb(val.M)
     }
   }
 
-  toDb(modelValue: any, propertyMetadata?: PropertyMetadata<any>): MapAttributeValue {
+  toDb(modelValue: any, propertyMetadata?: PropertyMetadata<any, MapAttribute>): MapAttribute {
     let value: any
     if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom) {
       value = Mapper.toDb(modelValue, propertyMetadata.typeInfo.type)

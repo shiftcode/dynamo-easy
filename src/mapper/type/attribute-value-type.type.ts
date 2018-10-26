@@ -3,7 +3,7 @@ import { MomentType } from './moment.type'
 import { NullType } from './null.type'
 import { UndefinedType } from './undefined.type'
 
-export type AttributeModelType =
+export type AttributeValueType =
   | string
   | number
   | boolean

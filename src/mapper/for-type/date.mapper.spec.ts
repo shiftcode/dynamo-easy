@@ -33,7 +33,7 @@ describe('date mapper', () => {
 
     it('throws', () => {
       expect(() => {
-        dateMapper.fromDb({ S: <any>'noDate' })
+        dateMapper.fromDb(<any>{ S: 'noDate' })
       }).toThrowError()
     })
   })

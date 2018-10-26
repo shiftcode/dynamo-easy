@@ -1,8 +1,8 @@
-import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { curryRight, forEach, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
+import { Attribute, Attributes } from '../../mapper/type/attribute.type'
 import { Util } from '../../mapper/util'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { isFunctionOperator } from './functions/is-function-operator.function'
@@ -151,17 +151,15 @@ export class ConditionExpressionBuilder {
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined
   ): Expression {
-    const attributeValues: AttributeMap = (<any[]>values[0])
-      .map(value => Mapper.toDbOne(value, propertyMetadata))
-      .reduce(
-        (result, mappedValue: AttributeValue | null, index: number) => {
-          if (mappedValue !== null) {
-            result[`${valuePlaceholder}_${index}`] = mappedValue
-          }
-          return result
-        },
-        <AttributeMap>{}
-      )
+    const attributeValues: Attributes = (<any[]>values[0]).map(value => Mapper.toDbOne(value, propertyMetadata)).reduce(
+      (result, mappedValue: Attribute | null, index: number) => {
+        if (mappedValue !== null) {
+          result[`${valuePlaceholder}_${index}`] = mappedValue
+        }
+        return result
+      },
+      <Attributes>{}
+    )
 
     const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
@@ -181,7 +179,7 @@ export class ConditionExpressionBuilder {
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined
   ): Expression {
-    const attributeValues: AttributeMap = {}
+    const attributes: Attributes = {}
     const mappedValue1 = Mapper.toDbOne(values[0], propertyMetadata)
     const mappedValue2 = Mapper.toDbOne(values[1], propertyMetadata)
 
@@ -192,13 +190,13 @@ export class ConditionExpressionBuilder {
     const value2Placeholder = uniqAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
     const statement = `${namePlaceholder} BETWEEN ${valuePlaceholder} AND ${value2Placeholder}`
-    attributeValues[valuePlaceholder] = mappedValue1
-    attributeValues[value2Placeholder] = mappedValue2
+    attributes[valuePlaceholder] = mappedValue1
+    attributes[value2Placeholder] = mappedValue2
 
     return {
       statement,
       attributeNames,
-      attributeValues,
+      attributeValues: attributes,
     }
   }
 
@@ -225,28 +223,28 @@ export class ConditionExpressionBuilder {
       statement = [namePlaceholder, operator, valuePlaceholder].join(' ')
     }
 
-    const attributeValues: AttributeMap = {}
+    const attributes: Attributes = {}
     if (hasValue) {
-      let value: AttributeValue | null
+      let attribute: Attribute | null
       switch (operator) {
         case 'contains':
           // TODO think about validation
           // ConditionExpressionBuilder.validateValueForContains(values[0], propertyMetadata)
-          value = Mapper.toDbOne(values[0], propertyMetadata)
+          attribute = Mapper.toDbOne(values[0], propertyMetadata)
           break
         default:
-          value = Mapper.toDbOne(values[0], propertyMetadata)
+          attribute = Mapper.toDbOne(values[0], propertyMetadata)
       }
 
-      if (value) {
-        attributeValues[valuePlaceholder] = value
+      if (attribute) {
+        attributes[valuePlaceholder] = attribute
       }
     }
 
     return {
       statement,
       attributeNames,
-      attributeValues,
+      attributeValues: attributes,
     }
   }
 

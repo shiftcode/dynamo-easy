@@ -3,6 +3,7 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { fetchAll } from '../../../helper'
 import { Mapper } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { and } from '../../expression/logical-operator/and.function'
@@ -36,7 +37,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     return this.dynamoRx.scan(this.params).pipe(
       map(queryResponse => {
         const response: ScanResponse<T> = <any>{ ...queryResponse }
-        response.Items = queryResponse.Items!.map(item => Mapper.fromDb(item, this.modelClazz))
+        response.Items = queryResponse.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))
 
         return response
       })
@@ -52,13 +53,15 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
 
     return this.dynamoRx
       .scan(this.params)
-      .pipe(map(response => response.Items!.map(item => Mapper.fromDb(item, this.modelClazz))))
+      .pipe(map(response => response.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))))
   }
 
   execSingle(): Observable<T | null> {
     delete this.params.Select
 
-    return this.dynamoRx.scan(this.params).pipe(map(response => Mapper.fromDb(response.Items![0], this.modelClazz)))
+    return this.dynamoRx
+      .scan(this.params)
+      .pipe(map(response => Mapper.fromDb(<Attributes>response.Items![0], this.modelClazz)))
   }
 
   execCount(): Observable<number> {

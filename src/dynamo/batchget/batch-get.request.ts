@@ -1,9 +1,10 @@
-import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
+import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject, isString } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../mapper/mapper'
+import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from '../default-table-name-resolver.const'
@@ -44,11 +45,11 @@ export class BatchGetRequest {
     this.tables.set(tableName, modelClazz)
 
     const metadata = MetadataHelper.get(modelClazz)
-    const attributeMaps: AttributeMap[] = []
+    const attributeMaps: Attributes[] = []
 
     // loop over all the keys
     keys.forEach(key => {
-      const idOb: AttributeMap = {}
+      const idOb: Attributes = {}
 
       if (isString(key)) {
         // got a simple primary key
@@ -100,8 +101,8 @@ export class BatchGetRequest {
 
         if (response.Responses && Object.keys(response.Responses).length) {
           Object.keys(response.Responses).forEach(tableName => {
-            const mapped = response.Responses![tableName].map(attributeMap =>
-              Mapper.fromDb(attributeMap, this.tables.get(tableName))
+            const mapped = response.Responses![tableName].map(attributes =>
+              Mapper.fromDb(<Attributes>attributes, this.tables.get(tableName))
             )
             r.Responses![tableName] = mapped
           })
@@ -119,7 +120,7 @@ export class BatchGetRequest {
         if (response.Responses && Object.keys(response.Responses).length) {
           Object.keys(response.Responses).forEach(tableName => {
             const mapped = response.Responses![tableName].map(attributeMap =>
-              Mapper.fromDb(attributeMap, this.tables.get(tableName))
+              Mapper.fromDb(<Attributes>attributeMap, this.tables.get(tableName))
             )
             r[tableName] = mapped
           })

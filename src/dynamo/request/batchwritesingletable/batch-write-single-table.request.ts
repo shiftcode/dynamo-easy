@@ -1,22 +1,17 @@
-import {
-  AttributeMap,
-  BatchWriteItemInput,
-  BatchWriteItemOutput,
-  WriteRequest,
-  WriteRequests,
-} from 'aws-sdk/clients/dynamodb'
+import { BatchWriteItemInput, BatchWriteItemOutput, WriteRequest, WriteRequests } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap, tap } from 'rxjs/operators'
 import { DynamoRx } from '../../../dynamo/dynamo-rx'
 import { randomExponentialBackoffTimer } from '../../../helper'
 import { Mapper } from '../../../mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { BatchWriteSingleTableResponse } from './batch-write-single-table.response'
 
 const MAX_BATCH_WRITE_ITEMS = 25
 
 export class BatchWriteSingleTableRequest<T> {
-  private get toKey(): (item: T) => AttributeMap {
+  private get toKey(): (item: T) => Attributes {
     if (!this._keyFn) {
       this._keyFn = Mapper.createToKeyFn(this.modelClazz)
     }

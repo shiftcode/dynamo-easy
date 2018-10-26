@@ -1,10 +1,11 @@
-import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
+import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
 import { Mapper } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
@@ -49,7 +50,7 @@ export class BatchGetSingleTableRequest<T> {
         let items: T[]
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
           const mapped: T[] = response.Responses![this.tableName].map(attributeMap =>
-            Mapper.fromDb(attributeMap, this.modelClazz)
+            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
           )
           items = mapped
         } else {
@@ -69,7 +70,9 @@ export class BatchGetSingleTableRequest<T> {
     return this.dynamoRx.batchGetItems(this.params).pipe(
       map(response => {
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          return response.Responses![this.tableName].map(attributeMap => Mapper.fromDb(attributeMap, this.modelClazz))
+          return response.Responses![this.tableName].map(attributeMap =>
+            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
+          )
         } else {
           return []
         }
@@ -78,10 +81,10 @@ export class BatchGetSingleTableRequest<T> {
   }
 
   private addKeyParams(keys: any[]) {
-    const attributeMaps: AttributeMap[] = []
+    const attributeMaps: Attributes[] = []
 
     keys.forEach(key => {
-      const idOb: AttributeMap = {}
+      const idOb: Attributes = {}
       if (isObject(key)) {
         // TODO add some more checks
         // got a composite primary key

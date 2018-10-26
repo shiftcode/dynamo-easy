@@ -1,7 +1,7 @@
-import { AttributeMap, AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { Mapper } from '../../mapper/mapper'
+import { Attribute, Attributes } from '../../mapper/type/attribute.type'
 import { Util } from '../../mapper/util'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
@@ -137,12 +137,12 @@ export class UpdateExpressionBuilder {
 
     const hasValue = !UpdateExpressionBuilder.isNoValueAction(operator.action)
 
-    const attributeValues: AttributeMap = {}
+    const attributes: Attributes = {}
     if (hasValue) {
-      const value: AttributeValue | null = Mapper.toDbOne(values[0], propertyMetadata)
+      const attribute: Attribute | null = Mapper.toDbOne(values[0], propertyMetadata)
 
-      if (value) {
-        attributeValues[valuePlaceholder] = value
+      if (attribute) {
+        attributes[valuePlaceholder] = attribute
       }
     }
 
@@ -150,7 +150,7 @@ export class UpdateExpressionBuilder {
       type: operator.actionKeyword,
       statement,
       attributeNames,
-      attributeValues,
+      attributeValues: attributes,
     }
   }
 

@@ -19,12 +19,12 @@ describe('string mapper', () => {
     })
 
     it('should work (null)', () => {
-      const attributeValue = mapper.toDb(null)
+      const attributeValue = mapper.toDb(<any>null)
       expect(attributeValue).toBe(null)
     })
 
     it('should work (undefined)', () => {
-      const attributeValue = mapper.toDb(undefined)
+      const attributeValue = mapper.toDb(<any>undefined)
       expect(attributeValue).toBe(null)
     })
   })

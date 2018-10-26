@@ -1,4 +1,5 @@
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
+import { NumberAttribute } from '../type/attribute.type'
 import { EnumMapper } from './enum.mapper'
 
 enum Tags {
@@ -8,7 +9,7 @@ enum Tags {
 }
 
 describe('enum mapper', () => {
-  const propertyMetadata: PropertyMetadata<any> = <any>{
+  const propertyMetadata: PropertyMetadata<any, NumberAttribute> = <any>{
     typeInfo: {
       genericType: Tags,
     },
@@ -27,7 +28,7 @@ describe('enum mapper', () => {
     })
 
     it('should work', () => {
-      const attributeValue = mapper.toDb(Tags.ONE, propertyMetadata)
+      const attributeValue = <NumberAttribute>mapper.toDb(Tags.ONE, propertyMetadata)
       expect(attributeValue).toEqual({ N: '0' })
     })
 
@@ -57,13 +58,13 @@ describe('enum mapper', () => {
 
     it('should throw', () => {
       expect(() => {
-        mapper.fromDb({ S: '2' }, propertyMetadata)
+        mapper.fromDb(<any>{ S: '2' }, propertyMetadata)
       }).toThrowError()
     })
 
     it('should throw', () => {
       expect(() => {
-        mapper.fromDb({ S: '2' })
+        mapper.fromDb(<any>{ S: '2' })
       }).toThrowError()
     })
   })
