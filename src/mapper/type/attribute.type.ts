@@ -1,3 +1,4 @@
+// TODO investigate if we can make Attribute generic, would be useful for Map- / ListAttribute
 export type Attribute =
   | StringAttribute
   | NumberAttribute
@@ -10,9 +11,7 @@ export type Attribute =
   | NullAttribute
   | BooleanAttribute
 
-export interface Attributes {
-  [key: string]: Attribute
-}
+export type Attributes<T = any> = { [key in keyof T & string]: Attribute }
 
 /**
  * An attribute of type String. For example:  "S": "Hello"

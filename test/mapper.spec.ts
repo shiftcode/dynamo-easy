@@ -1,14 +1,18 @@
-import {
-  AttributeMap,
-  AttributeValue,
-  AttributeValueList,
-  ListAttributeValue,
-  MapAttributeValue,
-  StringSetAttributeValue,
-} from 'aws-sdk/clients/dynamodb'
+import { AttributeMap, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
 import * as moment from 'moment'
 import { PropertyMetadata } from '../src/decorator/metadata/property-metadata.model'
 import { Mapper } from '../src/mapper/mapper'
+import {
+  Attribute,
+  Attributes,
+  BooleanAttribute,
+  ListAttribute,
+  MapAttribute,
+  NullAttribute,
+  NumberAttribute,
+  StringAttribute,
+  StringSetAttribute,
+} from '../src/mapper/type/attribute.type'
 import { EnumType } from '../src/mapper/type/enum.type'
 import { MomentType } from '../src/mapper/type/moment.type'
 import {
@@ -32,33 +36,33 @@ describe('Mapper', () => {
   describe('should map single values', () => {
     describe('to db', () => {
       it('string', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne('foo')!
+        const attrValue = <StringAttribute>Mapper.toDbOne('foo')!
         expect(attrValue).toBeDefined()
         expect(attrValue!.S).toBeDefined()
         expect(attrValue!.S).toBe('foo')
       })
 
       it('string (empty)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne('')!
+        const attrValue = <StringAttribute>Mapper.toDbOne('')!
         expect(attrValue).toBe(null)
       })
 
       it('number', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(3)!
+        const attrValue = <NumberAttribute>Mapper.toDbOne(3)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('N')
         expect(attrValue!.N).toBe('3')
       })
 
       it('boolean', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(false)!
+        const attrValue = <BooleanAttribute>Mapper.toDbOne(false)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('BOOL')
         expect(attrValue!.BOOL).toBe(false)
       })
 
       it('null', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(null)!
+        const attrValue = <NullAttribute>Mapper.toDbOne(null)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('NULL')
         expect(attrValue!.NULL).toBe(true)
@@ -66,7 +70,7 @@ describe('Mapper', () => {
 
       it('date (moment)', () => {
         const m = moment()
-        const attrValue: AttributeValue = Mapper.toDbOne(m)!
+        const attrValue = <StringAttribute>Mapper.toDbOne(m)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('S')
         expect(attrValue!.S).toBe(
@@ -78,14 +82,14 @@ describe('Mapper', () => {
       })
 
       it('enum (no enum decorator)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(Type.FirstType)!
+        const attrValue = <NumberAttribute>Mapper.toDbOne(Type.FirstType)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('N')
         expect(attrValue!.N).toBe('0')
       })
 
       it('enum (propertyMetadata -> no enum decorator)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(Type.FirstType, <any>{
+        const attrValue: Attribute = <MapAttribute>Mapper.toDbOne(Type.FirstType, <any>{
           typeInfo: { type: Object, isCustom: true },
         })!
         expect(attrValue).toBeDefined()
@@ -94,7 +98,7 @@ describe('Mapper', () => {
       })
 
       it('enum (with decorator)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(Type.FirstType, <any>{
+        const attrValue = <NumberAttribute>Mapper.toDbOne(Type.FirstType, <any>{
           typeInfo: { type: EnumType, isCustom: true },
         })!
         expect(attrValue).toBeDefined()
@@ -103,7 +107,7 @@ describe('Mapper', () => {
       })
 
       it('array -> SS (homogen, no duplicates)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(['foo', 'bar'])!
+        const attrValue = <StringSetAttribute>Mapper.toDbOne(['foo', 'bar'])!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('SS')
         expect(attrValue!.SS![0]).toBe('foo')
@@ -114,35 +118,35 @@ describe('Mapper', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
           typeInfo: { type: Array, isCustom: true },
         }
-        const attrValue: AttributeValue = Mapper.toDbOne(['foo', 'bar'], <any>propertyMetadata)!
+        const attrValue = <ListAttribute>Mapper.toDbOne(['foo', 'bar'], <any>propertyMetadata)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('L')
 
         expect(keyOf(attrValue!.L![0])).toBe('S')
-        expect(attrValue!.L![0].S).toBe('foo')
+        expect((<StringAttribute>attrValue!.L![0]).S).toBe('foo')
 
         expect(keyOf(attrValue!.L![1])).toBe('S')
-        expect(attrValue!.L![1].S).toBe('bar')
+        expect((<StringAttribute>attrValue!.L![1]).S).toBe('bar')
       })
 
       it('array -> L (heterogen, no duplicates)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(['foo', 56, true])!
+        const attrValue = <ListAttribute>Mapper.toDbOne(['foo', 56, true])!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
         expect(attrValue.L).toBeDefined()
         expect(attrValue.L!.length).toBe(3)
 
-        const foo: AttributeValue = attrValue.L![0]
+        const foo = <StringAttribute>attrValue.L![0]
         expect(foo).toBeDefined()
         expect(keyOf(foo)).toBe('S')
         expect(foo.S).toBe('foo')
 
-        const no: AttributeValue = attrValue.L![1]
+        const no = <NumberAttribute>attrValue.L![1]
         expect(no).toBeDefined()
         expect(keyOf(no)).toBe('N')
         expect(no.N).toBe('56')
 
-        const bool: AttributeValue = attrValue.L![2]
+        const bool = <BooleanAttribute>attrValue.L![2]
         expect(bool).toBeDefined()
         expect(keyOf(bool)).toBe('BOOL')
         expect(bool.BOOL).toBe(true)
@@ -150,25 +154,24 @@ describe('Mapper', () => {
 
       it('array -> L (homogen, complex type)', () => {
         const now = moment()
-        const attrValue: AttributeValue = Mapper.toDbOne([
-          new Employee('max', 25, now, null),
-          new Employee('anna', 65, now, null),
-        ])!
+        const attrValue = <ListAttribute>(
+          Mapper.toDbOne([new Employee('max', 25, now, null), new Employee('anna', 65, now, null)])!
+        )
 
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
 
-        const employee1 = attrValue.L![0]
+        const employee1 = <MapAttribute>attrValue.L![0]
         expect(employee1).toBeDefined()
         expect(keyOf(employee1)).toBe('M')
         expect(Object.keys(employee1.M!).length).toBe(3)
         expect(employee1.M!['name']).toBeDefined()
         expect(keyOf(employee1.M!['name'])).toBe('S')
-        expect(employee1.M!['name']['S']).toBe('max')
+        expect((<StringAttribute>employee1.M!['name']).S).toBe('max')
 
         expect(employee1.M!['age']).toBeDefined()
         expect(keyOf(employee1.M!['age'])).toBe('N')
-        expect(employee1.M!['age']['N']).toBe('25')
+        expect((<NumberAttribute>employee1.M!['age']).N).toBe('25')
 
         expect(employee1.M!['createdAt']).toEqual({
           S: now
@@ -179,7 +182,7 @@ describe('Mapper', () => {
       })
 
       it('set', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(new Set(['foo', 'bar', 25]))!
+        const attrValue = <ListAttribute>Mapper.toDbOne(new Set(['foo', 'bar', 25]))!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
         expect(attrValue.L![0]).toEqual({ S: 'foo' })
@@ -188,49 +191,51 @@ describe('Mapper', () => {
       })
 
       it('set (empty)', () => {
-        const attrValue: AttributeValue = Mapper.toDbOne(new Set())!
+        const attrValue = <NullAttribute>Mapper.toDbOne(new Set())!
         expect(attrValue).toBe(null)
       })
 
       it('set of employees', () => {
         const cd: moment.Moment = moment('2017-02-03', 'YYYY-MM-DD')
         const cd2: moment.Moment = moment('2017-02-28', 'YYYY-MM-DD')
-        const attrValue: AttributeValue = Mapper.toDbOne(
-          new Set([
-            <Employee>{ name: 'foo', age: 56, createdAt: cd },
-            <Employee>{ name: 'anna', age: 26, createdAt: cd2 },
-          ])
-        )!
+        const attrValue = <ListAttribute>(
+          Mapper.toDbOne(
+            new Set([
+              <Employee>{ name: 'foo', age: 56, createdAt: cd },
+              <Employee>{ name: 'anna', age: 26, createdAt: cd2 },
+            ])
+          )!
+        )
 
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
         expect(attrValue.L!.length).toBe(2)
-        expect(attrValue.L![0].M).toBeDefined()
-        expect(attrValue.L![0].M!['name']).toBeDefined()
-        expect(keyOf(attrValue.L![0].M!['name'])).toBe('S')
-        expect(attrValue.L![0].M!['name'].S).toBe('foo')
+        expect((<MapAttribute>attrValue.L![0]).M).toBeDefined()
+        expect((<MapAttribute>attrValue.L![0]).M['name']).toBeDefined()
+        expect(keyOf((<MapAttribute>attrValue.L![0]).M['name'])).toBe('S')
+        expect((<StringAttribute>(<MapAttribute>attrValue.L![0]).M['name']).S).toBe('foo')
       })
 
       it('object (Employee created using Object literal)', () => {
         const cr: moment.Moment = moment('2017-03-03', 'YYYY-MM-DD')
-        const attrValue: AttributeValue = Mapper.toDbOne(<Employee>{ name: 'foo', age: 56, createdAt: cr })!
+        const attrValue = <MapAttribute>Mapper.toDbOne(<Employee>{ name: 'foo', age: 56, createdAt: cr })!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('M')
 
         // name
         expect(attrValue.M!['name']).toBeDefined()
         expect(keyOf(attrValue.M!['name'])).toBe('S')
-        expect(attrValue.M!['name'].S).toBe('foo')
+        expect((<StringAttribute>attrValue.M!['name']).S).toBe('foo')
 
         // age
         expect(attrValue.M!['age']).toBeDefined()
         expect(keyOf(attrValue.M!['age'])).toBe('N')
-        expect(attrValue.M!['age'].N).toBe('56')
+        expect((<NumberAttribute>attrValue.M!['age']).N).toBe('56')
 
         // createdAt
         expect(attrValue.M!['createdAt']).toBeDefined()
         expect(keyOf(attrValue.M!['createdAt'])).toBe('S')
-        expect(attrValue.M!['createdAt'].S).toBe(
+        expect((<StringAttribute>attrValue.M!['createdAt']).S).toBe(
           cr
             .clone()
             .utc()
@@ -240,24 +245,24 @@ describe('Mapper', () => {
 
       it('object (Employee created using constructor)', () => {
         const cr: moment.Moment = moment('2017-05-03', 'YYYY-MM-DD')
-        const attrValue: AttributeValue = Mapper.toDbOne(new Employee('foo', 56, cr, []))!
+        const attrValue = <MapAttribute>Mapper.toDbOne(new Employee('foo', 56, cr, []))!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue!)).toBe('M')
 
         // name
         expect(attrValue!.M!['name']).toBeDefined()
         expect(keyOf(attrValue!.M!['name'])).toBe('S')
-        expect(attrValue!.M!['name'].S).toBe('foo')
+        expect((<StringAttribute>attrValue!.M!['name']).S).toBe('foo')
 
         // age
         expect(attrValue!.M!['age']).toBeDefined()
         expect(keyOf(attrValue!.M!['age'])).toBe('N')
-        expect(attrValue!.M!['age'].N).toBe('56')
+        expect((<NumberAttribute>attrValue!.M!['age']).N).toBe('56')
 
         // createdAt
         expect(attrValue!.M!['createdAt']).toBeDefined()
         expect(keyOf(attrValue!.M!['createdAt'])).toBe('S')
-        expect(attrValue!.M!['createdAt'].S).toBe(
+        expect((<StringAttribute>attrValue!.M!['createdAt']).S).toBe(
           cr
             .clone()
             .utc()
@@ -429,7 +434,7 @@ describe('Mapper', () => {
     describe('to db', () => {
       describe('model class created with new', () => {
         let organization: Organization
-        let organizationAttrMap: AttributeMap
+        let organizationAttrMap: Attributes<Organization>
         let createdAt: moment.Moment
         let lastUpdated: moment.Moment
         let createdAtDateEmployee1: moment.Moment
@@ -489,8 +494,8 @@ describe('Mapper', () => {
 
           it('createdAtDate', () => {
             expect(organizationAttrMap.createdAtDate).toBeDefined()
-            expect(organizationAttrMap.createdAtDate.S).toBeDefined()
-            expect(organizationAttrMap.createdAtDate.S).toBe(
+            expect((<StringAttribute>organizationAttrMap.createdAtDate).S).toBeDefined()
+            expect((<StringAttribute>organizationAttrMap.createdAtDate).S).toBe(
               createdAt
                 .clone()
                 .utc()
@@ -500,8 +505,8 @@ describe('Mapper', () => {
 
           it('lastUpdated', () => {
             expect(organizationAttrMap.lastUpdated).toBeDefined()
-            expect(organizationAttrMap.lastUpdated.S).toBeDefined()
-            expect(organizationAttrMap.lastUpdated.S).toBe(
+            expect((<StringAttribute>organizationAttrMap.lastUpdated).S).toBeDefined()
+            expect((<StringAttribute>organizationAttrMap.lastUpdated).S).toBe(
               lastUpdated
                 .clone()
                 .utc()
@@ -511,8 +516,8 @@ describe('Mapper', () => {
 
           it('active', () => {
             expect(organizationAttrMap.active).toBeDefined()
-            expect(organizationAttrMap.active.BOOL).toBeDefined()
-            expect(organizationAttrMap.active.BOOL).toBe(true)
+            expect((<BooleanAttribute>organizationAttrMap.active).BOOL).toBeDefined()
+            expect((<BooleanAttribute>organizationAttrMap.active).BOOL).toBe(true)
           })
 
           it('count', () => {
@@ -522,7 +527,7 @@ describe('Mapper', () => {
           it('domains', () => {
             expect(organizationAttrMap.domains).toBeDefined()
 
-            const domains: StringSetAttributeValue = organizationAttrMap.domains.SS!
+            const domains = (<StringSetAttribute>organizationAttrMap.domains).SS
             expect(domains).toBeDefined()
             expect(domains.length).toBe(3)
 
@@ -534,39 +539,39 @@ describe('Mapper', () => {
           it('random details', () => {
             expect(organizationAttrMap.randomDetails).toBeDefined()
 
-            const randomDetails: ListAttributeValue = organizationAttrMap.randomDetails.L!
+            const randomDetails = (<ListAttribute>organizationAttrMap.randomDetails).L
             expect(randomDetails).toBeDefined()
             expect(randomDetails.length).toBe(3)
 
             expect(keyOf(randomDetails[0])).toBe('S')
-            expect(randomDetails[0].S).toBe('sample')
+            expect((<StringAttribute>randomDetails[0]).S).toBe('sample')
 
             expect(keyOf(randomDetails[1])).toBe('N')
-            expect(randomDetails[1].N).toBe('26')
+            expect((<NumberAttribute>randomDetails[1]).N).toBe('26')
 
             expect(keyOf(randomDetails[2])).toBe('BOOL')
-            expect(randomDetails[2].BOOL).toBe(true)
+            expect((<BooleanAttribute>randomDetails[2]).BOOL).toBe(true)
           })
 
           it('employees', () => {
             expect(organizationAttrMap.employees).toBeDefined()
-            const employeesL: AttributeValueList = organizationAttrMap.employees.L!
+            const employeesL = (<ListAttribute>organizationAttrMap.employees).L
             expect(employeesL).toBeDefined()
             expect(employeesL.length).toBe(2)
             expect(employeesL[0]).toBeDefined()
-            expect(employeesL[0].M).toBeDefined()
+            expect((<MapAttribute>employeesL[0]).M).toBeDefined()
 
             // test employee1
-            const employee1: MapAttributeValue = employeesL[0].M!
+            const employee1 = (<MapAttribute>employeesL[0]).M
             expect(employee1['name']).toBeDefined()
-            expect(employee1['name'].S).toBeDefined()
-            expect(employee1['name'].S).toBe('max')
+            expect((<StringAttribute>employee1['name']).S).toBeDefined()
+            expect((<StringAttribute>employee1['name']).S).toBe('max')
             expect(employee1['age']).toBeDefined()
-            expect(employee1['age'].N).toBeDefined()
-            expect(employee1['age'].N).toBe('50')
+            expect((<NumberAttribute>employee1['age']).N).toBeDefined()
+            expect((<NumberAttribute>employee1['age']).N).toBe('50')
             expect(employee1['createdAt']).toBeDefined()
-            expect(employee1['createdAt'].S).toBeDefined()
-            expect(employee1['createdAt'].S).toBe(
+            expect((<StringAttribute>employee1['createdAt']).S).toBeDefined()
+            expect((<StringAttribute>employee1['createdAt']).S).toBe(
               createdAtDateEmployee1
                 .clone()
                 .utc()
@@ -574,7 +579,7 @@ describe('Mapper', () => {
             )
 
             // test employee2
-            const employee2: MapAttributeValue = employeesL[1].M!
+            const employee2: MapAttributeValue = (<MapAttribute>employeesL[1]).M
             expect(employee2['name']).toBeDefined()
             expect(employee2['name'].S).toBeDefined()
             expect(employee2['name'].S).toBe('anna')
@@ -594,7 +599,7 @@ describe('Mapper', () => {
           it('cities', () => {
             expect(organizationAttrMap.cities).toBeDefined()
 
-            const citiesSS: StringSetAttributeValue = organizationAttrMap.cities.SS!
+            const citiesSS = (<StringSetAttribute>organizationAttrMap.cities).SS
             expect(citiesSS).toBeDefined()
             expect(citiesSS.length).toBe(2)
             expect(citiesSS[0]).toBe('zürich')
@@ -604,17 +609,17 @@ describe('Mapper', () => {
           it('birthdays', () => {
             expect(organizationAttrMap.birthdays).toBeDefined()
 
-            const birthdays: ListAttributeValue = organizationAttrMap.birthdays.L!
+            const birthdays = (<ListAttribute>organizationAttrMap.birthdays).L
             expect(birthdays).toBeDefined()
             expect(birthdays.length).toBe(2)
 
             expect(keyOf(birthdays[0])).toBe('M')
 
             // birthday 1
-            const birthday1: MapAttributeValue = birthdays[0]['M']!
+            const birthday1 = (<MapAttribute>birthdays[0]).M
             expect(birthday1['date']).toBeDefined()
             expect(keyOf(birthday1['date'])).toBe('S')
-            expect(birthday1['date']['S']).toBe(
+            expect((<StringAttribute>birthday1['date']).S).toBe(
               birthday1Date
                 .clone()
                 .utc()
@@ -623,26 +628,26 @@ describe('Mapper', () => {
 
             expect(birthday1['presents']).toBeDefined()
             expect(keyOf(birthday1['presents'])).toBe('L')
-            expect(birthday1['presents']['L']!.length).toBe(2)
-            expect(keyOf(birthday1['presents']['L']![0])).toBe('M')
+            expect((<ListAttribute>birthday1['presents']).L.length).toBe(2)
+            expect(keyOf((<ListAttribute>birthday1['presents']).L[0])).toBe('M')
 
-            expect(keyOf(birthday1['presents']['L']![0])).toBe('M')
+            expect(keyOf((<ListAttribute>birthday1['presents']).L[0])).toBe('M')
 
-            const birthday1gift1 = birthday1['presents']['L']![0]['M']!
+            const birthday1gift1 = (<MapAttribute>(<ListAttribute>birthday1['presents']).L[0]).M
             expect(birthday1gift1['description']).toBeDefined()
             expect(keyOf(birthday1gift1['description'])).toBe('S')
-            expect(birthday1gift1['description']['S']).toBe('ticket to rome')
+            expect((<StringAttribute>birthday1gift1['description']).S).toBe('ticket to rome')
 
-            const birthday1gift2 = birthday1['presents']['L']![1]['M']!
+            const birthday1gift2 = (<MapAttribute>(<ListAttribute>birthday1['presents']).L[1]).M
             expect(birthday1gift2['description']).toBeDefined()
             expect(keyOf(birthday1gift2['description'])).toBe('S')
-            expect(birthday1gift2['description']['S']).toBe('camper van')
+            expect((<StringAttribute>birthday1gift2['description']).S).toBe('camper van')
 
             // birthday 2
-            const birthday2: MapAttributeValue = birthdays[1]['M']!
+            const birthday2 = (<MapAttribute>birthdays[1]).M
             expect(birthday2['date']).toBeDefined()
             expect(keyOf(birthday2['date'])).toBe('S')
-            expect(birthday2['date']['S']).toBe(
+            expect((<StringAttribute>birthday2['date']).S).toBe(
               birthday2Date
                 .clone()
                 .utc()
@@ -651,49 +656,51 @@ describe('Mapper', () => {
 
             expect(birthday2['presents']).toBeDefined()
             expect(keyOf(birthday2['presents'])).toBe('L')
-            expect(birthday2['presents']['L']!.length).toBe(2)
-            expect(keyOf(birthday2['presents']['L']![0])).toBe('M')
+            expect((<ListAttribute>birthday2['presents']).L.length).toBe(2)
+            expect(keyOf((<ListAttribute>birthday2['presents']).L[0])).toBe('M')
 
-            expect(keyOf(birthday2['presents']['L']![0])).toBe('M')
+            expect(keyOf((<ListAttribute>birthday2['presents']).L[0])).toBe('M')
 
-            const birthday2gift1 = birthday2['presents']['L']![0]['M']!
+            const birthday2gift1 = (<MapAttribute>(<ListAttribute>birthday2['presents']).L[0]).M
             expect(birthday2gift1['description']).toBeDefined()
             expect(keyOf(birthday2gift1['description'])).toBe('S')
-            expect(birthday2gift1['description']['S']).toBe('car')
+            expect((<StringAttribute>birthday2gift1['description']).S).toBe('car')
 
-            const birthday2gift2 = birthday2['presents']['L']![1]['M']!
+            const birthday2gift2 = (<MapAttribute>(<ListAttribute>birthday2['presents']).L[1]).M
             expect(birthday2gift2['description']).toBeDefined()
             expect(keyOf(birthday2gift2['description'])).toBe('S')
-            expect(birthday2gift2['description']['S']).toBe('gin')
+            expect((<StringAttribute>birthday2gift2['description']).S).toBe('gin')
           })
 
           it('awards', () => {
             expect(organizationAttrMap.awards).toBeDefined()
-            const awards: ListAttributeValue = organizationAttrMap.awards.L!
+            const awards = (<ListAttribute>organizationAttrMap.awards).L
             expect(awards).toBeDefined()
             expect(awards.length).toBe(2)
 
             expect(keyOf(awards[0])).toBe('S')
-            expect(awards[0].S).toBe('good, better, shiftcode')
+            expect((<StringAttribute>awards[0]).S).toBe('good, better, shiftcode')
 
-            expect(keyOf(awards[0])).toBe('S')
-            expect(awards[1].S).toBe('jus kiddin')
+            expect(keyOf(awards[1])).toBe('S')
+            expect((<StringAttribute>awards[1]).S).toBe('jus kiddin')
           })
 
           it('events', () => {
             expect(organizationAttrMap.events).toBeDefined()
-            const events: ListAttributeValue = organizationAttrMap.events.L!
+            const events = (<ListAttribute>organizationAttrMap.events).L
             expect(events).toBeDefined()
             expect(events.length).toBe(1)
 
-            expect(keyOf(events[0])).toBe('M')
-            expect(events[0]['M']!['name']).toBeDefined()
-            expect(keyOf(events[0]['M']!['name'])).toBe('S')
-            expect(events[0]['M']!['name']['S']).toBe('shift the web')
+            const a = <MapAttribute>events[0]
 
-            expect(events[0]['M']!['participantCount']).toBeDefined()
-            expect(keyOf(events[0]['M']!['participantCount'])).toBe('N')
-            expect(events[0]['M']!['participantCount']['N']).toBe('1520')
+            expect(keyOf(a)).toBe('M')
+            expect(a.M['name']).toBeDefined()
+            expect(keyOf(a.M['name'])).toBe('S')
+            expect((<StringAttribute>a.M['name']).S).toBe('shift the web')
+
+            expect(a.M['participantCount']).toBeDefined()
+            expect(keyOf(a.M['participantCount'])).toBe('N')
+            expect((<NumberAttribute>a.M['participantCount']).N).toBe('1520')
           })
 
           it('transient', () => {
@@ -906,7 +913,7 @@ describe('Mapper', () => {
   })
 })
 
-function keyOf(attributeValue: AttributeValue): string | null {
+function keyOf(attributeValue: Attribute): string | null {
   if (attributeValue && Object.keys(attributeValue).length) {
     return Object.keys(attributeValue)[0]
   } else {

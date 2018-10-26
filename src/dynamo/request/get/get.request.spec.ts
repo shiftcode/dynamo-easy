@@ -8,7 +8,7 @@ describe('get requst', () => {
 
   beforeEach(() => {
     request = new GetRequest(
-      null,
+      <any>null,
       SimpleWithPartitionKeyModel,
       getTableName(SimpleWithPartitionKeyModel),
       'partitionKeyValue'

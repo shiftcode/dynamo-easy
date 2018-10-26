@@ -1,7 +1,7 @@
-import { AttributeMap } from 'aws-sdk/clients/dynamodb'
+import { Attributes } from '../../../mapper/type/attribute.type'
 
 export interface Expression {
   attributeNames: { [key: string]: string }
-  attributeValues: AttributeMap
+  attributeValues: Attributes
   statement: string
 }

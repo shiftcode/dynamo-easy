@@ -1,5 +1,4 @@
 import {
-  AttributeMap,
   DeleteItemInput,
   DeleteItemOutput,
   ReturnConsumedCapacity,
@@ -8,6 +7,7 @@ import {
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { and } from '../../expression/logical-operator/and.function'
@@ -33,7 +33,7 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
       throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
     }
 
-    const keyAttributeMap: AttributeMap = {}
+    const keyAttributeMap: Attributes = {}
 
     // partition key
     const partitionKeyValue = Mapper.toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))

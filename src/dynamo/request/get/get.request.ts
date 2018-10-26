@@ -1,4 +1,4 @@
-import { AttributeMap, ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
+import { ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -26,7 +26,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
       throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
     }
 
-    const keyAttributeMap: AttributeMap = {}
+    const keyAttributeMap: Attributes = {}
 
     // partition key
     const partitionKeyValue = Mapper.toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))

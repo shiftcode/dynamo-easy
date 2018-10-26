@@ -1,8 +1,8 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
 import { isNumber, isString } from 'lodash'
 import { isMoment } from 'moment'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
+import { Attribute, StringAttribute } from './type/attribute.type'
 import { Binary } from './type/binary.type'
 import { MomentType } from './type/moment.type'
 import { NullType } from './type/null.type'
@@ -192,12 +192,12 @@ export class Util {
    * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
    * should we work with string match
    */
-  static typeOfFromDb(attributeValue?: AttributeValue): AttributeValueType {
+  static typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
     if (attributeValue) {
       const dynamoType: AttributeType = <AttributeType>Object.keys(attributeValue)[0]
       switch (dynamoType) {
         case 'S':
-          if (Util.DATE_TIME_ISO8601.test(attributeValue.S!)) {
+          if (Util.DATE_TIME_ISO8601.test((<StringAttribute>attributeValue).S)) {
             return MomentType
           } else {
             return String

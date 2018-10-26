@@ -1,4 +1,4 @@
-import { AttributeMap, BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
+import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject, isString } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
@@ -45,11 +45,11 @@ export class BatchGetRequest {
     this.tables.set(tableName, modelClazz)
 
     const metadata = MetadataHelper.get(modelClazz)
-    const attributeMaps: AttributeMap[] = []
+    const attributeMaps: Attributes[] = []
 
     // loop over all the keys
     keys.forEach(key => {
-      const idOb: AttributeMap = {}
+      const idOb: Attributes = {}
 
       if (isString(key)) {
         // got a simple primary key
@@ -101,8 +101,8 @@ export class BatchGetRequest {
 
         if (response.Responses && Object.keys(response.Responses).length) {
           Object.keys(response.Responses).forEach(tableName => {
-            const mapped = response.Responses![tableName].map(attributeMap =>
-              Mapper.fromDb(<Attributes>attributeMap, this.tables.get(tableName))
+            const mapped = response.Responses![tableName].map(attributes =>
+              Mapper.fromDb(<Attributes>attributes, this.tables.get(tableName))
             )
             r.Responses![tableName] = mapped
           })

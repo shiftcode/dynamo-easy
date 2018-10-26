@@ -31,8 +31,8 @@ export class Mapper {
 
   // static logger = debug('Mapper');
 
-  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attributes {
-    const mapped: Attributes = <Attributes>{}
+  static toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attributes<T> {
+    const mapped = <Attributes<T>>{}
 
     if (modelConstructor) {
       const metadata: Metadata<T> = MetadataHelper.get(modelConstructor)
@@ -66,7 +66,7 @@ export class Mapper {
          * 2) decide how to map the property depending on type or value
          */
 
-        let propertyMetadata: PropertyMetadata<any, any> | null | undefined
+        let propertyMetadata: PropertyMetadata<T, any> | null | undefined
         if (modelConstructor) {
           propertyMetadata = MetadataHelper.forProperty(modelConstructor, propertyKey)
         }
