@@ -56,7 +56,7 @@ export class Mapper {
        */
       const propertyValue = Mapper.getPropertyValue(item, propertyKey)
 
-      let attributeValue: any | undefined | null
+      let attributeValue: Attribute | undefined | null
 
       // TODO concept maybe make this configurable how to map undefined & null values
       if (propertyValue === undefined || propertyValue === null) {
@@ -105,7 +105,7 @@ export class Mapper {
         } else if (attributeValue === null) {
           // empty values (string, set, list) will be ignored too
         } else {
-          mapped[propertyMetadata ? propertyMetadata.nameDb : <string>propertyKey] = attributeValue
+          ;(<any>mapped)[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
         }
       }
     })
