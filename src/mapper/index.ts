@@ -1,3 +1,4 @@
+export * from './type/attribute.type'
 export * from './type/attribute-value-type.type'
 export * from './type/attribute-type.type'
 export * from './mapper'
