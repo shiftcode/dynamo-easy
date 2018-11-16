@@ -1,21 +1,20 @@
-import { PutItemOutput, ReturnConsumedCapacity, ReturnItemCollectionMetrics } from 'aws-sdk/clients/dynamodb'
+import { PutItemOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Mapper } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
-import { and } from '../../expression/logical-operator/and.function'
 import { attribute } from '../../expression/logical-operator/attribute.function'
-import { ParamUtil } from '../../expression/param-util'
-import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { RequestConditionFunction } from '../../expression/type/request-condition-function'
-import { BaseRequest } from '../base.request'
+import { WriteRequest } from '../write.request'
 
-export class PutRequest<T> extends BaseRequest<T, any> {
+export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, item: T) {
     super(dynamoRx, modelClazz, tableName)
     this.params.Item = Mapper.toDb(item, this.modelClazz)
+  }
+
+  protected getInstance(): PutRequest<T> {
+    return this
   }
 
   /**
@@ -33,38 +32,9 @@ export class PutRequest<T> extends BaseRequest<T, any> {
         conditionDefFns.push(attribute<T>(sortKey).attributeNotExists())
       }
 
-      this.where(...conditionDefFns)
+      this.onlyIf(...conditionDefFns)
     }
 
-    return this
-  }
-
-  returnConsumedCapacity(level: ReturnConsumedCapacity): PutRequest<T> {
-    this.params.ReturnConsumedCapacity = level
-    return this
-  }
-
-  returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): PutRequest<T> {
-    this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return this
-  }
-
-  /*
-   * The ReturnValues parameter is used by several DynamoDB operations,
-   * however, PutItem does not recognize any values other than NONE or ALL_OLD.
-   */
-  returnValues(returnValues: 'NONE' | 'ALL_OLD'): PutRequest<T> {
-    this.params.ReturnValues = returnValues
-    return this
-  }
-
-  whereAttribute(attributePath: keyof T): RequestConditionFunction<PutRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
-  }
-
-  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): PutRequest<T> {
-    const condition = and(...conditionDefFns)(undefined, this.metaData)
-    ParamUtil.addExpression('ConditionExpression', condition, this.params)
     return this
   }
 

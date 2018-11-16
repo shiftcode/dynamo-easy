@@ -388,7 +388,29 @@ describe('update request', () => {
       })
     })
 
-    xit('with where clause', () => {
+    it('with where clause', () => {
+      const now = moment()
+
+      const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
+      request
+        .operations(update<UpdateModel>('active').set(true), update<UpdateModel>('name').set('newName'))
+        .onlyIf(not(attribute('topics').contains('otherTopic')))
+
+      expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name')
+      expect(request.params.ExpressionAttributeNames).toEqual({
+        '#active': 'isActive',
+        '#name': 'name',
+        '#topics': 'topics',
+      })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':active': { BOOL: true },
+        ':name': { S: 'newName' },
+        ':topics': { S: 'otherTopic' },
+      })
+      expect(request.params.ConditionExpression).toBe('(NOT contains (#topics, :topics))')
+    })
+
+    xit('with name conflicting where clause', () => {
       const now = moment()
 
       const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
@@ -398,8 +420,8 @@ describe('update request', () => {
           update<UpdateModel>('name').set('newName'),
           update<UpdateModel>('topics').add('myTopic')
         )
-        .where(not(attribute('topics').contains('otherTopic')))
-      // whereAttribute('topics').notContains('otherTopic')
+        .onlyIf(not(attribute('topics').contains('otherTopic')))
+      // .onlyIfAttribute('topics').notContains('otherTopic')
 
       expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name ADD #topics :topics')
       expect(request.params.ExpressionAttributeNames).toEqual({
@@ -426,7 +448,7 @@ describe('update request', () => {
           update2(Order, 'types').add([FormType.INVOICE]),
           update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)])
         )
-        .where(attribute<Order>('types').attributeExists(), attribute<Order>('formIds').attributeExists())
+        .onlyIf(attribute<Order>('types').attributeExists(), attribute<Order>('formIds').attributeExists())
 
       expect(request.params.UpdateExpression).toBe('ADD #types :types SET #formIds = list_append(#formIds, :formIds)')
       expect(request.params.ExpressionAttributeNames).toEqual({
