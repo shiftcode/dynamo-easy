@@ -1,5 +1,6 @@
 import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
+import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 
 @Model()
@@ -8,6 +9,7 @@ export class Employee {
 
   age: number
 
+  @Date()
   createdAt: moment.Moment | null
 
   @SortedSet()

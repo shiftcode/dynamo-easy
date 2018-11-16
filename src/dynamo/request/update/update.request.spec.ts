@@ -1,11 +1,8 @@
 import * as moment from 'moment'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { FormId } from '../../../../test/models/real-world/form-id.model'
-import { FormType, Order } from '../../../../test/models/real-world/order.model'
-import { Address, UpdateModel } from '../../../../test/models/update.model'
-import { not, update2, update3 } from '../../expression'
-import { attribute } from '../../expression/logical-operator/attribute.function'
-import { update } from '../../expression/logical-operator/update.function'
+import { getTableName } from '../../../../test/helper'
+import { Address, UpdateModel } from '../../../../test/models'
+import { FormId, FormType, Order } from '../../../../test/models/real-world'
+import { attribute, not, update, update2 } from '../../expression'
 import { UpdateRequest } from './update.request'
 
 describe('update request', () => {
@@ -113,25 +110,23 @@ describe('update request', () => {
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
-        request.operations(update<UpdateModel>('addresses').appendToList(newAddress))
+        request.operations(update<UpdateModel>('addresses').appendToList([newAddress]))
 
         expect(request.params.UpdateExpression).toBe('SET #addresses = list_append(#addresses, :addresses)')
         expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
         expect(request.params.ExpressionAttributeValues).toEqual({
-          ':numberValues': {
+          ':addresses': {
             L: [
               {
-                ':addresses': {
-                  M: {
-                    street: {
-                      S: 'The street',
-                    },
-                    place: {
-                      S: 'London',
-                    },
-                    zip: {
-                      N: '15241',
-                    },
+                M: {
+                  street: {
+                    S: 'The street',
+                  },
+                  place: {
+                    S: 'London',
+                  },
+                  zip: {
+                    N: '15241',
                   },
                 },
               },
@@ -145,23 +140,27 @@ describe('update request', () => {
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
-        request.operations(update<UpdateModel>('addresses').appendToList(newAddress, 'END'))
+        request.operations(update<UpdateModel>('addresses').appendToList([newAddress], 'END'))
 
         expect(request.params.UpdateExpression).toBe('SET #addresses = list_append(#addresses, :addresses)')
         expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
         expect(request.params.ExpressionAttributeValues).toEqual({
           ':addresses': {
-            M: {
-              street: {
-                S: 'The street',
+            L: [
+              {
+                M: {
+                  street: {
+                    S: 'The street',
+                  },
+                  place: {
+                    S: 'London',
+                  },
+                  zip: {
+                    N: '15241',
+                  },
+                },
               },
-              place: {
-                S: 'London',
-              },
-              zip: {
-                N: '15241',
-              },
-            },
+            ],
           },
         })
       })
@@ -171,23 +170,27 @@ describe('update request', () => {
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
-        request.operations(update<UpdateModel>('addresses').appendToList(newAddress, 'START'))
+        request.operations(update<UpdateModel>('addresses').appendToList([newAddress], 'START'))
 
         expect(request.params.UpdateExpression).toBe('SET #addresses = list_append(:addresses, #addresses)')
         expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
         expect(request.params.ExpressionAttributeValues).toEqual({
           ':addresses': {
-            M: {
-              street: {
-                S: 'The street',
+            L: [
+              {
+                M: {
+                  street: {
+                    S: 'The street',
+                  },
+                  place: {
+                    S: 'London',
+                  },
+                  zip: {
+                    N: '15241',
+                  },
+                },
               },
-              place: {
-                S: 'London',
-              },
-              zip: {
-                N: '15241',
-              },
-            },
+            ],
           },
         })
       })
@@ -385,7 +388,7 @@ describe('update request', () => {
       })
     })
 
-    it('with where clause', () => {
+    xit('with where clause', () => {
       const now = moment()
 
       const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
@@ -408,16 +411,13 @@ describe('update request', () => {
         ':active': { BOOL: true },
         ':name': { S: 'newName' },
         ':topics': { SS: ['myTopic'] },
+        ':topics2': { S: 'otherTopic' },
       })
-      expect(request.params.ConditionExpression).toEqual({
-        '#active': 'isActive',
-        '#name': 'name',
-        '#topics': 'topics',
-      })
+      expect(request.params.ConditionExpression).toBe('(NOT contains(#topics, :topics2))')
     })
   })
 
-  fdescribe('real world scenario', () => {
+  describe('real world scenario', () => {
     it('should create correct update statement', () => {
       const request = new UpdateRequest(<any>null, Order, getTableName(Order), 'orderId')
 

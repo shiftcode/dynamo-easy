@@ -15,6 +15,7 @@ export class ComplexModel {
   id: string
 
   @SortKey()
+  @Date()
   creationDate: moment.Moment
 
   @Date()

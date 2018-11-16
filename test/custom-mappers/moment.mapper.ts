@@ -1,6 +1,6 @@
 import * as moment from 'moment'
-import { StringAttribute } from '../type/attribute.type'
-import { MapperForType } from './base.mapper'
+import { MapperForType } from '../../src/mapper/for-type/base.mapper'
+import { StringAttribute } from '../../src/mapper/type/attribute.type'
 
 export class MomentMapper implements MapperForType<moment.Moment, StringAttribute> {
   fromDb(value: StringAttribute): moment.Moment {
@@ -8,7 +8,6 @@ export class MomentMapper implements MapperForType<moment.Moment, StringAttribut
     if (!parsed.isValid()) {
       throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
     }
-
     return parsed
   }
 

@@ -119,10 +119,7 @@
   "peerDependencies": {
     "aws-sdk": "^2.286.1",
     "lodash": "^4.17.10",
-    "moment": "^2.22.2",
     "rxjs": "^6.0.0",
     "reflect-metadata": "^0.1.12"
-  },
-  "dependencies": {
   }
 }

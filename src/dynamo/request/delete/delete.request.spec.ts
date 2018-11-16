@@ -1,7 +1,6 @@
 import * as moment from 'moment'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { ComplexModel } from '../../../../test/models/complex.model'
-import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'
+import { getTableName } from '../../../../test/helper'
+import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
@@ -39,8 +38,8 @@ describe('delete request', () => {
   })
 
   it('should throw for no sort key value', () => {
-    expect(() => {
-      const request = new DeleteRequest(<any>null, ComplexModel, getTableName(ComplexModel), 'partitionValue')
-    }).toThrowError()
+    expect(
+      () => new DeleteRequest(<any>null, ComplexModel, getTableName(ComplexModel), 'partitionValue')
+    ).toThrowError()
   })
 })

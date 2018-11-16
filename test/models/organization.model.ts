@@ -18,6 +18,7 @@ export class Gift {
 
 @Model()
 export class Birthday {
+  @Date()
   date: moment.Moment
 
   @TypedArray(Gift)
@@ -53,6 +54,7 @@ export class Organization {
   name: string
 
   @SortKey()
+  @Date()
   createdAtDate: moment.Moment
 
   @Date()

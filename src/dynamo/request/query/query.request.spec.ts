@@ -1,15 +1,16 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import * as moment from 'moment'
 import { Observable, of } from 'rxjs'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { ComplexModel } from '../../../../test/models/complex.model'
+import { getTableName } from '../../../../test/helper'
 import {
+  ComplexModel,
   CustomId,
+  INDEX_ACTIVE_CREATED_AT,
+  ModelWithABunchOfIndexes,
   ModelWithCustomMapperForSortKeyModel,
-} from '../../../../test/models/model-with-custom-mapper-for-sort-key.model'
-import { INDEX_ACTIVE_CREATED_AT, ModelWithABunchOfIndexes } from '../../../../test/models/model-with-indexes.model'
+} from '../../../../test/models'
 import { DynamoRx } from '../../dynamo-rx'
-import { attribute } from '../../expression/logical-operator/attribute.function'
+import { attribute } from '../../expression'
 import { QueryRequest } from './query.request'
 
 export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{

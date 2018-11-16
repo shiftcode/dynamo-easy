@@ -11,7 +11,9 @@ import { NumberAttribute } from '../../src/mapper/type/attribute.type'
 export class CustomId {
   private static MULTIPLIER = Math.pow(10, 5)
   private static FMT_DATE_NUM = 'YYYYMMDD'
+
   date: moment.Moment
+
   id: number
 
   static parse(value: number): CustomId {

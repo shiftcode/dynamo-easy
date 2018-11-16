@@ -5,9 +5,7 @@ import { ModelConstructor } from '../model/model-constructor'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
-import { DateMapper } from './for-type/date.mapper'
 import { EnumMapper } from './for-type/enum.mapper'
-import { MomentMapper } from './for-type/moment.mapper'
 import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
@@ -16,7 +14,6 @@ import { AttributeValueType } from './type/attribute-value-type.type'
 import { Attribute, Attributes } from './type/attribute.type'
 import { Binary } from './type/binary.type'
 import { EnumType } from './type/enum.type'
-import { MomentType } from './type/moment.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 import { Util } from './util'
@@ -248,61 +245,53 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
   }
 
   static forType(type: AttributeValueType): MapperForType<any, Attribute> {
-    // FIXME HIGH review this, we now use toString to compare because we had issues with ng client for moment when
     // using a GSI on creationDate (MomentType) was a different MomentType than for lastUpdatedDate
-    if (!Mapper.mapperForType.has(type.toString())) {
+    if (!Mapper.mapperForType.has(type)) {
       let mapperForType: MapperForType<any, Attribute>
-      switch (type.toString()) {
-        case String.toString():
+      switch (type) {
+        case String:
           mapperForType = new StringMapper()
           break
-        case Number.toString():
+        case Number:
           mapperForType = new NumberMapper()
           break
-        case Boolean.toString():
+        case Boolean:
           mapperForType = new BooleanMapper()
           break
-        case MomentType.toString():
-          mapperForType = new MomentMapper()
-          break
-        case Date.toString():
-          mapperForType = new DateMapper()
-          break
-        case EnumType.toString():
+        case EnumType:
           mapperForType = new EnumMapper()
           break
-        case Map.toString():
+        case Map:
           // Maps support complex types as keys, we only support String & Number as Keys, otherwise a .toString() method should be implemented,
           // so we now how to save a  key
           // mapperForType = new MapMapper()
           throw new Error('Map is not supported to be mapped for now')
-        case Array.toString():
+        case Array:
           mapperForType = new CollectionMapper()
           break
-        case Set.toString():
+        case Set:
           mapperForType = new CollectionMapper()
           break
-        case Object.toString():
+        case Object:
           mapperForType = new ObjectMapper()
           break
-        case NullType.toString():
+        case NullType:
           mapperForType = new NullMapper()
           break
-        case Binary.toString():
+        case Binary:
           // TODO LOW:BINARY add binary mapper
           throw new Error('no mapper for binary type implemented yet')
-        case UndefinedType.toString():
+        case UndefinedType:
           mapperForType = new ObjectMapper()
           break
         default:
           throw new Error('no mapper defined for type ' + JSON.stringify(type))
-        // mapperForType = new ObjectMapper()
       }
 
-      this.mapperForType.set(type.toString(), mapperForType)
+      this.mapperForType.set(type, mapperForType)
     }
 
-    return this.mapperForType.get(type.toString())!
+    return this.mapperForType.get(type)!
   }
 
   static getPropertyValue(item: any, propertyKey: PropertyKey): any {
