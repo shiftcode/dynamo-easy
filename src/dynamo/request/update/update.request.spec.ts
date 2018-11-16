@@ -410,7 +410,7 @@ describe('update request', () => {
       expect(request.params.ConditionExpression).toBe('(NOT contains (#topics, :topics))')
     })
 
-    xit('with name conflicting where clause', () => {
+    it('with name conflicting where clause', () => {
       const now = moment()
 
       const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
@@ -433,9 +433,9 @@ describe('update request', () => {
         ':active': { BOOL: true },
         ':name': { S: 'newName' },
         ':topics': { SS: ['myTopic'] },
-        ':topics2': { S: 'otherTopic' },
+        ':topics_2': { S: 'otherTopic' },
       })
-      expect(request.params.ConditionExpression).toBe('(NOT contains(#topics, :topics2))')
+      expect(request.params.ConditionExpression).toBe('(NOT contains (#topics, :topics_2))')
     })
   })
 

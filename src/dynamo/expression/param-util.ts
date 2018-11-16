@@ -6,6 +6,7 @@ import {
   UpdateItemInput,
 } from 'aws-sdk/clients/dynamodb'
 import { isEmpty, isString } from 'lodash'
+import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type/expression.type'
 
 export class ParamUtil {
@@ -13,20 +14,21 @@ export class ParamUtil {
     ParamUtil.addExpression('UpdateExpression', updateExpression, params)
   }
 
-  // FIXME: name conflicts are not resolved yet (eg. when condition uses same property as update)
   static addExpression(
     expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression' | 'UpdateExpression',
     condition: Expression,
     params: QueryInput | ScanInput | UpdateItemInput
   ) {
+    const nameSafeCondition = resolveAttributeValueNameConflicts(condition, params)
+
     const expressionAttributeNames = <ExpressionAttributeNameMap>{
-      ...condition.attributeNames,
       ...params.ExpressionAttributeNames,
+      ...nameSafeCondition.attributeNames,
     }
 
     const expressionAttributeValues = <ExpressionAttributeValueMap>{
-      ...condition.attributeValues,
       ...params.ExpressionAttributeValues,
+      ...nameSafeCondition.attributeValues,
     }
 
     if (!isEmpty(expressionAttributeNames)) {
@@ -48,10 +50,10 @@ export class ParamUtil {
           }
           break
         default:
-          ;(<any>params)[expressionType] = `${expression} AND ${condition.statement}`
+          ;(<any>params)[expressionType] = `${expression} AND ${nameSafeCondition.statement}`
       }
     } else {
-      ;(<any>params)[expressionType] = condition.statement
+      ;(<any>params)[expressionType] = nameSafeCondition.statement
     }
   }
 }
