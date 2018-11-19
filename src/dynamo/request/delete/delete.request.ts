@@ -48,10 +48,6 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteIt
     this.params.Key = keyAttributeMap
   }
 
-  protected getInstance(): DeleteRequest<T> {
-    return this
-  }
-
   execFullResponse(): Observable<DeleteItemOutput> {
     return this.dynamoRx.deleteItem(this.params)
   }

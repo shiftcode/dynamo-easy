@@ -56,10 +56,6 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
     this.params.Key = keyAttributeMap
   }
 
-  protected getInstance(): UpdateRequest<T> {
-    return this
-  }
-
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
     if (updateDefFns && updateDefFns.length) {
       const sortedByActionKeyWord: SortedUpdateExpressions = updateDefFns

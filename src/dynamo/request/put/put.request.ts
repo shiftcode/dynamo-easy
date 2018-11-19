@@ -13,10 +13,6 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
     this.params.Item = Mapper.toDb(item, this.modelClazz)
   }
 
-  protected getInstance(): PutRequest<T> {
-    return this
-  }
-
   /**
    * Adds a condition expression to the request, which makes sure the item will only be saved if the id does not exist
    * @returns {PutRequest<T>}

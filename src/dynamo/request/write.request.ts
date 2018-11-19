@@ -23,23 +23,21 @@ export abstract class WriteRequest<
     super(dynamoRx, modelClazz, tableName)
   }
 
-  protected abstract getInstance(): R
-
   returnConsumedCapacity(level: ReturnConsumedCapacity): R {
     this.params.ReturnConsumedCapacity = level
-    return this.getInstance()
+    return <R>(<any>this)
   }
 
   returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): R {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return this.getInstance()
+    return <R>(<any>this)
   }
 
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
     return RequestExpressionBuilder.addCondition(
       'ConditionExpression',
       <string>attributePath,
-      this.getInstance(),
+      <R>(<any>this),
       this.metaData
     )
   }
@@ -50,7 +48,7 @@ export abstract class WriteRequest<
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
     const condition = and(...conditionDefFns)(undefined, this.metaData)
     ParamUtil.addExpression('ConditionExpression', condition, this.params)
-    return this.getInstance()
+    return <R>(<any>this)
   }
 
   /*
@@ -59,6 +57,6 @@ export abstract class WriteRequest<
      */
   returnValues(returnValues: 'NONE' | 'ALL_OLD'): R {
     this.params.ReturnValues = returnValues
-    return this.getInstance()
+    return <R>(<any>this)
   }
 }
