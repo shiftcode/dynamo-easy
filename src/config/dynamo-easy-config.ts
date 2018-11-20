@@ -3,7 +3,6 @@ import { Config } from './config'
 export class DynamoEasyConfig {
   static config: Config = {
     dateType: 'moment',
-    debug: true,
     logReceiver: () => {},
   }
 
