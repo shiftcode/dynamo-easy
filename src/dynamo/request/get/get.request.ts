@@ -1,7 +1,8 @@
 import { ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
+import { createLogger, Logger } from '../../../logger/logger'
 import { Mapper } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -11,6 +12,8 @@ import { BaseRequest } from '../base.request'
 import { GetResponse } from './get.response'
 
 export class GetRequest<T> extends BaseRequest<T, any> {
+  private readonly logger: Logger
+
   constructor(
     dynamoRx: DynamoRx,
     modelClazz: ModelConstructor<T>,
@@ -19,6 +22,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     sortKey?: any
   ) {
     super(dynamoRx, modelClazz, tableName)
+    this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
@@ -71,7 +75,9 @@ export class GetRequest<T> extends BaseRequest<T, any> {
   }
 
   execFullResponse(): Observable<GetResponse<T>> {
+    this.logger.debug('request', this.params)
     return this.dynamoRx.getItem(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
       map(getItemResponse => {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
 
@@ -82,19 +88,23 @@ export class GetRequest<T> extends BaseRequest<T, any> {
         }
 
         return response
-      })
+      }),
+      tap(response => this.logger.debug('mapped item', response.Item))
     )
   }
 
   exec(): Observable<T | null> {
+    this.logger.debug('request', this.params)
     return this.dynamoRx.getItem(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
       map(response => {
         if (response.Item) {
           return Mapper.fromDb(<Attributes>response.Item, this.modelClazz)
         } else {
           return null
         }
-      })
+      }),
+      tap(item => this.logger.debug('mapped item', item))
     )
   }
 }

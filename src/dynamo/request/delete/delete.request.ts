@@ -5,7 +5,8 @@ import {
   ReturnItemCollectionMetrics,
 } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
+import { createLogger, Logger } from '../../../logger/logger'
 import { Mapper } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -18,6 +19,8 @@ import { RequestConditionFunction } from '../../expression/type/request-conditio
 import { BaseRequest } from '../base.request'
 
 export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
+  private readonly logger: Logger
+
   constructor(
     dynamoRx: DynamoRx,
     modelClazz: ModelConstructor<T>,
@@ -26,6 +29,7 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
     sortKey?: any
   ) {
     super(dynamoRx, modelClazz, tableName)
+    this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
@@ -79,20 +83,21 @@ export class DeleteRequest<T> extends BaseRequest<T, DeleteItemInput> {
   }
 
   /*
-     * The ReturnValues parameter is used by several DynamoDB operations; however,
-     * DeleteItem does not recognize any values other than NONE or ALL_OLD.
-     */
+   * The ReturnValues parameter is used by several DynamoDB operations; however,
+   * DeleteItem does not recognize any values other than NONE or ALL_OLD.
+   */
   returnValues(returnValues: 'NONE' | 'ALL_OLD'): DeleteRequest<T> {
     this.params.ReturnValues = returnValues
     return this
   }
 
   execFullResponse(): Observable<DeleteItemOutput> {
-    return this.dynamoRx.deleteItem(this.params)
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.deleteItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.deleteItem(this.params).pipe(
+    return this.execFullResponse().pipe(
       map(response => {
         return
       })
