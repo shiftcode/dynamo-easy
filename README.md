@@ -289,8 +289,8 @@ We use 2 git hooks:
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") |
-| :---: |
+| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") | [<img src="https://avatars2.githubusercontent.com/u/8321523?s=460&v=4" width="100px;"/><br /><sub>Michael Lieberherr</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Tests") | [<img src="https://avatars3.githubusercontent.com/u/37636934?s=460&v=4" width="100px;"/><br /><sub>Simon Mumenthaler</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Code") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Tests") |
+| :---: | :---:| :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
