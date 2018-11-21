@@ -1,4 +1,3 @@
-import * as moment from 'moment'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
@@ -11,7 +10,7 @@ export class SimpleWithCompositePartitionKeyModel {
 
   @SortKey()
   @Date()
-  creationDate: moment.Moment
+  creationDate: Date
 
   age: number
 }

@@ -1,11 +1,10 @@
-import * as moment from 'moment'
 import { getTableName } from '../../../../test/helper'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
   it('should create request with key (composite) expression', () => {
-    const now = moment()
+    const now = new Date()
     const request = new DeleteRequest(<any>null, ComplexModel, getTableName(ComplexModel), 'partitionValue', now)
     const key = request.params.Key
     expect(key).toBeDefined()
@@ -15,10 +14,7 @@ describe('delete request', () => {
     expect(key['id']).toEqual({ S: 'partitionValue' })
     expect(key['creationDate']).toBeDefined()
     expect(key['creationDate']).toEqual({
-      S: now
-        .clone()
-        .utc()
-        .format(),
+      S: now.toISOString(),
     })
   })
 

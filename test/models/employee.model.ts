@@ -1,4 +1,3 @@
-import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
@@ -10,12 +9,12 @@ export class Employee {
   age: number
 
   @Date()
-  createdAt: moment.Moment | null
+  createdAt: Date | null
 
   @SortedSet()
   sortedSet: Set<string>
 
-  constructor(name: string, age: number, createdAt: moment.Moment | null, sortedListValues: any[] | null) {
+  constructor(name: string, age: number, createdAt: Date | null, sortedListValues: any[] | null) {
     this.name = name
     this.age = age
     this.createdAt = createdAt

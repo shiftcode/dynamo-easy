@@ -15,7 +15,7 @@ class ModelWithDate {
 }
 
 describe('Date decorators should allow to use a different date mapper', () => {
-  it('should define the MomentMapper in metadata', () => {
+  it('should define the DateToNumberMapper in metadata', () => {
     const metaData: ModelMetadata<ModelWithDate> = MetadataHelper.forModel(ModelWithDate)
 
     expect(metaData).toBeDefined()

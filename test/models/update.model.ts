@@ -1,4 +1,3 @@
-import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
@@ -26,10 +25,10 @@ export class UpdateModel {
   id: string
 
   @Date()
-  creationDate: moment.Moment
+  creationDate: Date
 
   @Date()
-  lastUpdated: moment.Moment
+  lastUpdated: Date
 
   name: string
 

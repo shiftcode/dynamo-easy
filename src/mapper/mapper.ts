@@ -245,7 +245,6 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
   }
 
   static forType(type: AttributeValueType): MapperForType<any, Attribute> {
-    // using a GSI on creationDate (MomentType) was a different MomentType than for lastUpdatedDate
     if (!Mapper.mapperForType.has(type)) {
       let mapperForType: MapperForType<any, Attribute>
       switch (type) {

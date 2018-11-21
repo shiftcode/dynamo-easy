@@ -1,4 +1,3 @@
-import * as moment from 'moment'
 import { getTableName } from '../../../../test/helper'
 import { Address, UpdateModel } from '../../../../test/models'
 import { FormId, FormType, Order } from '../../../../test/models/real-world'
@@ -9,7 +8,7 @@ describe('update request', () => {
   describe('update expression', () => {
     describe('single operation', () => {
       it('incrementBy', () => {
-        const now = moment()
+        const now = new Date()
 
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
         request.operations(update<UpdateModel>('counter').incrementBy(5))
@@ -20,7 +19,7 @@ describe('update request', () => {
       })
 
       it('decrementBy', () => {
-        const now = moment()
+        const now = new Date()
 
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
         request.operations(update<UpdateModel>('counter').decrementBy(5))
@@ -31,7 +30,7 @@ describe('update request', () => {
       })
 
       it('set', () => {
-        const now = moment()
+        const now = new Date()
 
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
@@ -41,16 +40,13 @@ describe('update request', () => {
         expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
         expect(request.params.ExpressionAttributeValues).toEqual({
           ':lastUpdated': {
-            S: now
-              .clone()
-              .utc()
-              .format(),
+            S: now.toISOString(),
           },
         })
       })
 
       it('set (nested map)', () => {
-        const now = moment()
+        const now = new Date()
 
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
@@ -66,7 +62,7 @@ describe('update request', () => {
       })
 
       it('set (list)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update('addresses[1]').set({ street: 'Bond Street', place: 'London', zip: 25650 }))
@@ -91,7 +87,7 @@ describe('update request', () => {
       })
 
       it('append to list simple (default position)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('numberValues').appendToList([5]))
@@ -106,7 +102,7 @@ describe('update request', () => {
       })
 
       it('append to list (default position)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
@@ -136,7 +132,7 @@ describe('update request', () => {
       })
 
       it('append to list (position = END)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
@@ -166,7 +162,7 @@ describe('update request', () => {
       })
 
       it('append to list (position = START)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
@@ -196,7 +192,7 @@ describe('update request', () => {
       })
 
       it('remove', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('counter').remove(), update<UpdateModel>('name').remove())
@@ -207,7 +203,7 @@ describe('update request', () => {
       })
 
       it('remove from list at (single)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('addresses').removeFromListAt(2))
@@ -218,7 +214,7 @@ describe('update request', () => {
       })
 
       it('remove from list at (many)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('addresses').removeFromListAt(2, 5, 6))
@@ -229,7 +225,7 @@ describe('update request', () => {
       })
 
       it('add (multiple arr)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').add(['newTopic', 'newTopic2']))
@@ -244,7 +240,7 @@ describe('update request', () => {
       })
 
       it('add (multiple set)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').add(new Set(['newTopic', 'newTopic2'])))
@@ -259,7 +255,7 @@ describe('update request', () => {
       })
 
       it('add (multiple vararg)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').add('newTopic', 'newTopic2'))
@@ -274,7 +270,7 @@ describe('update request', () => {
       })
 
       it('add (single)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').add('newTopic'))
@@ -289,7 +285,7 @@ describe('update request', () => {
       })
 
       it('remove from set (single)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').removeFromSet('newTopic'))
@@ -304,7 +300,7 @@ describe('update request', () => {
       })
 
       it('remove from set (multiple vararg)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').removeFromSet('newTopic', 'newTopic2'))
@@ -319,7 +315,7 @@ describe('update request', () => {
       })
 
       it('remove from set (multiple arr)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').removeFromSet(['newTopic', 'newTopic2']))
@@ -334,7 +330,7 @@ describe('update request', () => {
       })
 
       it('remove from set (multiple set)', () => {
-        const now = moment()
+        const now = new Date()
         const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
 
         request.operations(update<UpdateModel>('topics').removeFromSet(new Set(['newTopic', 'newTopic2'])))
@@ -352,7 +348,7 @@ describe('update request', () => {
 
   describe('multiple operations', () => {
     it('one type (SET)', () => {
-      const now = moment()
+      const now = new Date()
 
       const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
       request.operations(update<UpdateModel>('active').set(true), update<UpdateModel>('name').set('newName'))
@@ -366,7 +362,7 @@ describe('update request', () => {
     })
 
     it('mixed types (SET, ADD)', () => {
-      const now = moment()
+      const now = new Date()
 
       const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
       request.operations(
@@ -389,7 +385,7 @@ describe('update request', () => {
     })
 
     xit('with where clause', () => {
-      const now = moment()
+      const now = new Date()
 
       const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
       request
