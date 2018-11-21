@@ -1,4 +1,3 @@
-import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
 import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
@@ -18,12 +17,13 @@ export class Gift {
 
 @Model()
 export class Birthday {
-  date: moment.Moment
+  @Date()
+  date: Date
 
   @TypedArray(Gift)
   presents: Gift[]
 
-  constructor(date: moment.Moment, ...gifts: string[]) {
+  constructor(date: Date, ...gifts: string[]) {
     this.date = date
     const giftArr: Gift[] = []
     gifts.forEach(giftDescription => giftArr.push({ description: giftDescription }))
@@ -53,10 +53,11 @@ export class Organization {
   name: string
 
   @SortKey()
-  createdAtDate: moment.Moment
+  @Date()
+  createdAtDate: Date
 
   @Date()
-  lastUpdated: moment.Moment
+  lastUpdated: Date
 
   // Boolean
   active: boolean

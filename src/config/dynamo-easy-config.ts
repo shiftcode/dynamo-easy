@@ -1,9 +1,17 @@
+import { DateToStringMapper } from '../mapper/custom'
 import { Config } from './config'
 
+/**
+ * to update the config you must do it before importing any model, basically before anything else.
+ * the config cannot be changed afterwards
+ */
 export class DynamoEasyConfig {
-  static config: Config = { dateType: 'moment', debug: true }
+  static config: Config = {
+    dateMapper: DateToStringMapper,
+    debug: true,
+  }
 
-  static updateConfig(config: Config): void {
+  static updateConfig(config: Partial<Config>): void {
     Object.assign(DynamoEasyConfig.config, config)
   }
 

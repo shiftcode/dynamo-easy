@@ -1,5 +1,5 @@
-import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator'
+import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Property } from '../../src/decorator/impl/property/property.decorator'
@@ -24,9 +24,11 @@ export class UpdateModel {
   @PartitionKey()
   id: string
 
-  creationDate: moment.Moment
+  @Date()
+  creationDate: Date
 
-  lastUpdated: moment.Moment
+  @Date()
+  lastUpdated: Date
 
   name: string
 

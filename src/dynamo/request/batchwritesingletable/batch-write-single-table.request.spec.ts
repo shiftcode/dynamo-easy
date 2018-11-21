@@ -1,8 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import * as moment from 'moment'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { Organization } from '../../../../test/models/organization.model'
+import { getTableName } from '../../../../test/helper'
+import { Organization } from '../../../../test/models'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../../default-session-validity-ensurer.const'
 import { DynamoRx } from '../../dynamo-rx'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
@@ -20,7 +19,7 @@ describe('batch write single table request', () => {
   beforeEach(() => {
     item = <any>{
       id: 'myId',
-      createdAtDate: moment(),
+      createdAtDate: new Date(),
       name: 'myOrg',
     }
     nextSpyFn = jest.fn().mockImplementation(() => ({ value: 0 }))
@@ -47,7 +46,7 @@ describe('batch write single table request', () => {
               DeleteRequest: {
                 Key: {
                   id: { S: 'myId' },
-                  createdAtDate: { S: item.createdAtDate.utc().format() },
+                  createdAtDate: { S: item.createdAtDate.toISOString() },
                 },
               },
             },
@@ -69,7 +68,7 @@ describe('batch write single table request', () => {
               PutRequest: {
                 Item: {
                   id: { S: 'myId' },
-                  createdAtDate: { S: item.createdAtDate.utc().format() },
+                  createdAtDate: { S: item.createdAtDate.toISOString() },
                   name: { S: 'myOrg' },
                 },
               },
@@ -105,7 +104,7 @@ describe('batch write single table request', () => {
               PutRequest: {
                 Item: {
                   id: { S: 'myId' },
-                  createdAtDate: { S: item.createdAtDate.utc().format() },
+                  createdAtDate: { S: item.createdAtDate.toISOString() },
                   name: { S: 'myOrg' },
                 },
               },

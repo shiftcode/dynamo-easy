@@ -60,10 +60,19 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     this.params.Key = keyAttributeMap
   }
 
+  /**
+   * todo: rename to something like ifAttribute
+   * @param attributePath
+   */
   whereAttribute(attributePath: keyof T): RequestConditionFunction<UpdateRequest<T>> {
     return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
   }
 
+  /**
+   * todo: rename. 'where' is technically wrong, it should be something like 'if' or 'when'
+   * todo --> same for delete.where and put.where
+   * @param conditionDefFns
+   */
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {
     const condition = and(...conditionDefFns)(undefined, this.metaData)
     ParamUtil.addExpression('ConditionExpression', condition, this.params)

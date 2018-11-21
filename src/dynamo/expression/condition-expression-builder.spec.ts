@@ -1,9 +1,7 @@
 import { has } from 'lodash'
-import * as moment from 'moment'
-import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
-import { Model } from '../../decorator/impl/model/model.decorator'
-import { Property } from '../../decorator/impl/property/property.decorator'
-import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
+import { ComplexModel } from '../../../test/models'
+import { Model, PartitionKey, Property } from '../../decorator/impl'
+import { MetadataHelper } from '../../decorator/metadata'
 import { ConditionExpressionBuilder } from './condition-expression-builder'
 
 @Model()
@@ -245,7 +243,7 @@ describe('expressions', () => {
       expect(condition.attributeValues[':textProp']).toEqual({ S: 'te' })
     })
 
-    xit('contains', () => {
+    it('contains', () => {
       // property('myCollection').contains(2)
       const condition = ConditionExpressionBuilder.buildFilterExpression(
         'myCollection',
@@ -262,7 +260,7 @@ describe('expressions', () => {
 
       expect(condition.attributeValues).toBeDefined()
       expect(Object.keys(condition.attributeValues)[0]).toBe(':myCollection')
-      expect(condition.attributeValues[':myCollection']).toEqual({ S: '2' })
+      expect(condition.attributeValues[':myCollection']).toEqual({ N: '2' })
     })
 
     it('in', () => {
@@ -306,16 +304,16 @@ describe('expressions', () => {
       expect(condition.attributeValues[':counter_2']).toEqual({ N: '5' })
     })
 
-    it('between (moment dates)', () => {
-      const date1 = moment('2017-03-17T20:00:00.000Z')
-      const date2 = moment('2017-05-07T20:00:00.000Z')
+    it('between (custom mapper)', () => {
+      const date1 = new Date('2017-03-17T20:00:00.000Z')
+      const date2 = new Date('2017-05-07T20:00:00.000Z')
       // property('creationDate').between(date1, date2)
       const condition = ConditionExpressionBuilder.buildFilterExpression(
         'creationDate',
         'BETWEEN',
         [date1, date2],
         undefined,
-        undefined
+        MetadataHelper.get(ComplexModel)
       )
 
       expect(condition.statement).toBe('#creationDate BETWEEN :creationDate AND :creationDate_2')
@@ -328,59 +326,37 @@ describe('expressions', () => {
       expect(condition.attributeValues).toBeDefined()
       expect(Object.keys(condition.attributeValues).length).toBe(2)
       expect(has(condition.attributeValues, ':creationDate')).toBeTruthy()
-      expect(condition.attributeValues[':creationDate']).toEqual({
-        S: date1
-          .clone()
-          .utc()
-          .format(),
-      })
+      expect(condition.attributeValues[':creationDate']).toEqual({ S: date1.toISOString() })
       expect(has(condition.attributeValues, ':creationDate_2')).toBeTruthy()
-      expect(condition.attributeValues[':creationDate_2']).toEqual({
-        S: date2
-          .clone()
-          .utc()
-          .format(),
-      })
+      expect(condition.attributeValues[':creationDate_2']).toEqual({ S: date2.toISOString() })
     })
 
     it('should throw error for wrong value arity', () => {
-      expect(() => {
-        const condition = ConditionExpressionBuilder.buildFilterExpression(
-          'age',
-          'attribute_type',
-          [],
-          undefined,
-          undefined
-        )
-      }).toThrowError(
+      expect(() =>
+        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [], undefined, undefined)
+      ).toThrowError(
         'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
       )
     })
 
     it('should throw error for wrong value arity', () => {
-      expect(() => {
-        const condition = ConditionExpressionBuilder.buildFilterExpression(
-          'age',
-          'attribute_type',
-          [undefined],
-          undefined,
-          undefined
-        )
-      }).toThrowError(
+      expect(() =>
+        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined)
+      ).toThrowError(
         'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
       )
     })
 
     it('should throw error for wrong value type', () => {
-      expect(() => {
-        const condition = ConditionExpressionBuilder.buildFilterExpression(
+      expect(() =>
+        ConditionExpressionBuilder.buildFilterExpression(
           'age',
           'IN',
           ['myValue', 'mySecondValue'],
           undefined,
           undefined
         )
-      }).toThrowError(
+      ).toThrowError(
         'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
       )
     })

@@ -1,12 +1,9 @@
 import { isNumber, isString } from 'lodash'
-import { isMoment } from 'moment'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
-import { Attribute, StringAttribute } from './type/attribute.type'
+import { Attribute } from './type/attribute.type'
 import { Binary } from './type/binary.type'
-import { MomentType } from './type/moment.type'
 import { NullType } from './type/null.type'
-import { TypesByConvention } from './type/types-by-convention.type'
 import { UndefinedType } from './type/undefined.type'
 
 const BUFFER_TYPES = [
@@ -27,13 +24,6 @@ const BUFFER_TYPES = [
 ]
 
 export class Util {
-  static REGEX_CONVENTIONS: { [key in TypesByConvention]: RegExp } = {
-    date: /^(?:date|[\w]+(?:Date|At)(?:[A-Z]{1}[\w]+)?)$/,
-  }
-
-  // tslint:disable-next-line:max-line-length
-  static DATE_TIME_ISO8601 = /^(?:[1-9]\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d(?:Z|[+-][01]\d:[0-5]\d)$/
-
   /**
    * Detects the dynamodb type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
    * Collections of type array where all the values are either String | Number | Binary will be mapped to the corresponding S(et)
@@ -91,17 +81,6 @@ export class Util {
     } else {
       throw new Error('given collection was no array or Set -> type could not be detected')
     }
-  }
-
-  static typeByConvention(propertyKey: string): TypesByConvention | undefined {
-    let type: TypesByConvention | undefined
-    Object.keys(Util.REGEX_CONVENTIONS).forEach(key => {
-      if (Util.REGEX_CONVENTIONS[<TypesByConvention>key].test(propertyKey)) {
-        type = <TypesByConvention>key
-      }
-    })
-
-    return type
   }
 
   static isCollection(value: any): boolean {
@@ -163,10 +142,6 @@ export class Util {
         return Set
       } else if (data instanceof Map) {
         return Map
-      } else if (data instanceof Date) {
-        return Date
-      } else if (isMoment(data)) {
-        return MomentType
       } else if (Util.isBinary(data)) {
         return Binary
       } else {
@@ -197,11 +172,7 @@ export class Util {
       const dynamoType: AttributeType = <AttributeType>Object.keys(attributeValue)[0]
       switch (dynamoType) {
         case 'S':
-          if (Util.DATE_TIME_ISO8601.test((<StringAttribute>attributeValue).S)) {
-            return MomentType
-          } else {
-            return String
-          }
+          return String
         case 'N':
           return Number
         case 'B':

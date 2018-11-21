@@ -1,6 +1,6 @@
-import { getTableName } from '../../../test/helper/get-table-name.function'
-import { Organization } from '../../../test/models/organization.model'
-import { QueryRequest } from '../request/query/query.request'
+import { getTableName } from '../../../test/helper'
+import { Organization } from '../../../test/models'
+import { QueryRequest } from '../request'
 import { DYNAMO_RX_MOCK } from '../request/query/query.request.spec'
 import { RequestExpressionBuilder } from './request-expression-builder'
 

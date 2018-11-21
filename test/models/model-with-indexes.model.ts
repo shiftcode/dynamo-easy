@@ -1,5 +1,5 @@
 // tslint:disable:max-classes-per-file
-import * as moment from 'moment'
+import { Date } from '../../src/decorator/impl/date/date.decorator'
 import { GSIPartitionKey } from '../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { GSISortKey } from '../../src/decorator/impl/index/gsi-sort-key.decorator'
 import { LSISortKey } from '../../src/decorator/impl/index/lsi-sort-key.decorator'
@@ -14,7 +14,8 @@ export class ModelWithGSI {
   @PartitionKey()
   id: string
 
-  createdAt: moment.Moment
+  @Date()
+  createdAt: Date
 
   @GSIPartitionKey(INDEX_ACTIVE)
   active: boolean
@@ -25,7 +26,8 @@ export class ModelWithLSI {
   @PartitionKey()
   id: string
 
-  createdAt: moment.Moment
+  @Date()
+  createdAt: Date
 
   @LSISortKey(INDEX_ACTIVE)
   active: boolean
@@ -42,7 +44,8 @@ export class ModelWithABunchOfIndexes {
 
   @SortKey()
   @GSISortKey(INDEX_ACTIVE_CREATED_AT)
-  createdAt: moment.Moment
+  @Date()
+  createdAt: Date
 
   @GSIPartitionKey(INDEX_ACTIVE_CREATED_AT)
   active: boolean

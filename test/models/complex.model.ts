@@ -1,4 +1,3 @@
-import * as moment from 'moment'
 import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
 import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
@@ -15,10 +14,11 @@ export class ComplexModel {
   id: string
 
   @SortKey()
-  creationDate: moment.Moment
+  @Date()
+  creationDate: Date
 
   @Date()
-  lastUpdated: moment.Moment
+  lastUpdated: Date
 
   @Property({ name: 'isActive' })
   active: boolean

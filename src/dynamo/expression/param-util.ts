@@ -13,6 +13,7 @@ export class ParamUtil {
     ParamUtil.addExpression('UpdateExpression', updateExpression, params)
   }
 
+  // FIXME: name conflicts are not resolved yet (eg. when condition uses same property as update)
   static addExpression(
     expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression' | 'UpdateExpression',
     condition: Expression,
