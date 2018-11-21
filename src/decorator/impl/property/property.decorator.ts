@@ -1,9 +1,6 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
-import { DynamoEasyConfig } from '../../../config/dynamo-easy-config'
 import { AttributeValueType } from '../../../mapper/type/attribute-value-type.type'
 import { Attribute } from '../../../mapper/type/attribute.type'
-import { MomentType } from '../../../mapper/type/moment.type'
-import { Util } from '../../../mapper/util'
 import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
 import { getMetadataType } from '../../util'
 import { IndexType } from '../index/index-type.enum'
@@ -11,7 +8,7 @@ import { PropertyData } from './property-data.model'
 
 export const KEY_PROPERTY = 'sc-reflect:property'
 
-export type AttributeModelTypes = string | number | boolean | Date | MomentType | Set<any> | any[]
+export type AttributeModelTypes = string | number | boolean | Set<any> | any[]
 
 export interface IndexData {
   name: string
@@ -106,30 +103,8 @@ function createNewProperty(
   target: any,
   propertyKey: string
 ): PropertyMetadata<any> {
-  let propertyType: AttributeValueType = getMetadataType(target, propertyKey)
-  let customType = isCustomType(propertyType)
-
-  const typeByConvention = Util.typeByConvention(propertyKey)
-  if (typeByConvention) {
-    customType = true
-
-    if (DynamoEasyConfig.config) {
-      switch (typeByConvention) {
-        case 'date':
-          switch (DynamoEasyConfig.config.dateType) {
-            case 'default':
-              propertyType = Date
-              break
-            case 'moment':
-              propertyType = MomentType
-              break
-            default:
-              throw new Error(`Unsupported date type on model metadata <${DynamoEasyConfig.config.dateType}>`)
-          }
-          break
-      }
-    }
-  }
+  const propertyType: AttributeValueType = getMetadataType(target, propertyKey)
+  const customType = isCustomType(propertyType)
 
   const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
     type: propertyType,
@@ -152,6 +127,6 @@ function createNewProperty(
  * TODO LOW:BINARY make sure to implement the context dependant details of Binary (Buffer vs. Uint8Array)
  * @returns {boolean} true if the type cannot be mapped by dynamo document client
  */
-function isCustomType(type: AttributeModelTypes): boolean {
+function isCustomType(type: AttributeValueType): boolean {
   return <any>type !== String && <any>type !== Number && <any>type !== Boolean && <any>type !== Uint8Array
 }

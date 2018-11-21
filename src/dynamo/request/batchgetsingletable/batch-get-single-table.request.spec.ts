@@ -1,6 +1,5 @@
-import * as moment from 'moment'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { Organization } from '../../../../test/models/organization.model'
+import { getTableName } from '../../../../test/helper'
+import { Organization } from '../../../../test/models'
 import { BatchGetSingleTableRequest } from './batch-get-single-table.request'
 
 describe('batch get', () => {
@@ -17,8 +16,7 @@ describe('batch get', () => {
     })
 
     it('composite primary key', () => {
-      const now = moment()
-      const keys = [{ partitionKey: 'myId', sortKey: now }]
+      const keys = [{ partitionKey: 'myId', sortKey: 23 }]
       const request = new BatchGetSingleTableRequest<any>(<any>null, Organization, getTableName(Organization), keys)
 
       expect(request.params.RequestItems).toBeDefined()
@@ -27,12 +25,7 @@ describe('batch get', () => {
           Keys: [
             {
               id: { S: 'myId' },
-              createdAtDate: {
-                S: now
-                  .clone()
-                  .utc()
-                  .format(),
-              },
+              createdAtDate: { N: '23' },
             },
           ],
         },

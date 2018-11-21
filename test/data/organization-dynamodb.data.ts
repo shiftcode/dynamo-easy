@@ -1,24 +1,17 @@
-import * as moment from 'moment'
 import { Attributes } from '../../src/mapper/type/attribute.type'
 
-export const organization1CreatedAt: moment.Moment = moment('2017-05-15', 'YYYY-MM-DD')
-export const organization1LastUpdated: moment.Moment = moment('2017-07-25', 'YYYY-MM-DD')
-export const organization1Employee1CreatedAt: moment.Moment = moment('2015-02-15', 'YYYY-MM-DD')
-export const organization1Employee2CreatedAt: moment.Moment = moment('2015-07-03', 'YYYY-MM-DD')
+export const organization1CreatedAt = new Date('2017-05-15')
+export const organization1LastUpdated = new Date('2017-07-25')
+export const organization1Employee1CreatedAt = new Date('2015-02-15')
+export const organization1Employee2CreatedAt = new Date('2015-07-03')
 
 export const organizationFromDb: Attributes = <any>{
   id: { S: 'myId' },
   createdAtDate: {
-    S: organization1CreatedAt
-      .clone()
-      .utc()
-      .format(moment.defaultFormat),
+    S: organization1CreatedAt.toISOString(),
   },
   lastUpdated: {
-    S: organization1LastUpdated
-      .clone()
-      .utc()
-      .format(moment.defaultFormat),
+    S: organization1LastUpdated.toISOString(),
   },
   active: { BOOL: true },
   count: { N: '52' },
@@ -29,10 +22,7 @@ export const organizationFromDb: Attributes = <any>{
           name: { S: 'max' },
           age: { N: '50' },
           createdAt: {
-            S: organization1Employee1CreatedAt
-              .clone()
-              .utc()
-              .format(moment.defaultFormat),
+            S: organization1Employee1CreatedAt.toISOString(),
           },
           sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },
@@ -42,10 +32,7 @@ export const organizationFromDb: Attributes = <any>{
           name: { S: 'anna' },
           age: { N: '27' },
           createdAt: {
-            S: organization1Employee2CreatedAt
-              .clone()
-              .utc()
-              .format(moment.defaultFormat),
+            S: organization1Employee2CreatedAt.toISOString(),
           },
           sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },

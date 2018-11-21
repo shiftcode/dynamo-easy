@@ -1,7 +1,7 @@
+import { MapperForType } from '../for-type/base.mapper'
 import { NumberAttribute } from '../type/attribute.type'
-import { MapperForType } from './base.mapper'
 
-export class DateMapper implements MapperForType<Date, NumberAttribute> {
+export class DateToNumberMapper implements MapperForType<Date, NumberAttribute> {
   fromDb(attributeValue: NumberAttribute): Date {
     if (attributeValue.N) {
       return new Date(parseInt(attributeValue.N, 10))

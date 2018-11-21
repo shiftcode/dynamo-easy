@@ -1,7 +1,8 @@
 import { LogReceiver } from '../logger/log-receiver.type'
-import { DateTypes } from './date-types.type'
+import { MapperForType } from '../mapper'
+import { ModelConstructor } from '../model'
 
 export interface Config {
-  dateType: DateTypes
   logReceiver: LogReceiver
+  dateMapper: ModelConstructor<MapperForType<any, any>>
 }

@@ -1,4 +1,4 @@
-import * as moment from 'moment'
+import { Date } from '../../../src/decorator/impl/date/date.decorator'
 import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
 import { PartitionKey } from '../../../src/decorator/impl/key/partition-key.decorator'
 import { Model } from '../../../src/decorator/impl/model/model.decorator'
@@ -11,6 +11,9 @@ export class BaseForm {
   id: string
 
   @GSIPartitionKey(INDEX_CREATION_DATE)
-  creationDate: moment.Moment
-  lastSavedDate: moment.Moment
+  @Date()
+  creationDate: Date
+
+  @Date()
+  lastSavedDate: Date
 }

@@ -21,6 +21,7 @@ export class BatchGetSingleTableRequest<T> {
 
   private _metadata: Metadata<T>
 
+  // todo: make use of Mapper.toKey<T>(item: T, modelConstructor: ModelConstructor<T>)
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: any[]) {
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
     this.dynamoRx = dynamoRx

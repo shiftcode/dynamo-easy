@@ -27,6 +27,7 @@ module.exports = {
     }
   },
   setupFiles: [
-    "reflect-metadata"
+    "reflect-metadata",
+    './test/jest-setup.ts'
   ]
-}
+};

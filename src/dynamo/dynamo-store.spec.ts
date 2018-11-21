@@ -1,4 +1,4 @@
-import { Model } from '../decorator/impl/model/model.decorator'
+import { Model } from '../decorator/impl'
 import { DynamoStore } from './dynamo-store'
 
 // tslint:disable-next-line:max-classes-per-file

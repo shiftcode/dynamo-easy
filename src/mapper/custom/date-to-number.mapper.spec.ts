@@ -1,11 +1,11 @@
 import { AttributeValue } from 'aws-sdk/clients/dynamodb'
-import { DateMapper } from './date.mapper'
+import { DateToNumberMapper } from './date-to-number.mapper'
 
 describe('date mapper', () => {
-  let dateMapper: DateMapper
+  let dateMapper: DateToNumberMapper
 
   beforeEach(() => {
-    dateMapper = new DateMapper()
+    dateMapper = new DateToNumberMapper()
   })
 
   describe('to db', () => {

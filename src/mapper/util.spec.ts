@@ -1,22 +1,9 @@
-import * as moment from 'moment'
-import { Employee } from '../../test/models/employee.model'
-import { MomentType } from './type/moment.type'
+import { Employee } from '../../test/models'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 import { Util } from './util'
 
 describe('Util', () => {
-  describe('matches convention', () => {
-    it('date', () => {
-      ;['date', 'createdAt', 'lastUpdatedDate', 'myDateAndMore'].forEach(propertyName => {
-        expect(Util.typeByConvention(propertyName)).toBe('date')
-      })
-      ;['Date', 'at', 'name'].forEach(propertyName => {
-        expect(Util.typeByConvention(propertyName)).toBeUndefined()
-      })
-    })
-  })
-
   describe('is set', () => {
     it('Set instance', () => {
       const set: Set<string> = new Set(['foo', 'bar'])
@@ -113,14 +100,6 @@ describe('Util', () => {
       expect(Util.typeName(Map)).toBe('Map')
     })
 
-    it('Moment', () => {
-      expect(Util.typeName(MomentType)).toBe('MomentType')
-    })
-
-    it('Date', () => {
-      expect(Util.typeName(Date)).toBe('Date')
-    })
-
     it('Object', () => {
       expect(Util.typeName({})).toBe('[object Object]')
     })
@@ -161,15 +140,6 @@ describe('Util', () => {
 
     it('boolean', () => {
       expect(Util.typeOf(true)).toBe(Boolean)
-    })
-
-    it('date', () => {
-      expect(Util.typeOf(new Date())).toBe(Date)
-    })
-
-    it('moment', () => {
-      const m: moment.Moment = moment()
-      expect(Util.typeOf(m)).toBe(MomentType)
     })
 
     it('array', () => {
@@ -219,18 +189,6 @@ describe('Util', () => {
 
     it('boolean', () => {
       expect(Util.typeOfFromDb({ BOOL: true })).toBe(Boolean)
-    })
-
-    it('moment', () => {
-      const m: moment.Moment = moment()
-      expect(
-        Util.typeOfFromDb({
-          S: m
-            .clone()
-            .utc()
-            .format(),
-        })
-      ).toBe(MomentType)
     })
 
     it('array', () => {
