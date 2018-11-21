@@ -1,6 +1,7 @@
 import { DeleteItemInput, DeleteItemOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
+import { createLogger, Logger } from '../../../logger/logger'
 import { Mapper } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -8,6 +9,8 @@ import { DynamoRx } from '../../dynamo-rx'
 import { WriteRequest } from '../write.request'
 
 export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteItemInput> {
+  private readonly logger: Logger
+
   constructor(
     dynamoRx: DynamoRx,
     modelClazz: ModelConstructor<T>,
@@ -16,6 +19,7 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteIt
     sortKey?: any
   ) {
     super(dynamoRx, modelClazz, tableName)
+    this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
@@ -49,11 +53,12 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteIt
   }
 
   execFullResponse(): Observable<DeleteItemOutput> {
-    return this.dynamoRx.deleteItem(this.params)
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.deleteItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.deleteItem(this.params).pipe(
+    return this.execFullResponse().pipe(
       map(response => {
         return
       })

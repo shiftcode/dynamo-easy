@@ -1,9 +1,10 @@
 import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject } from 'lodash'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
+import { createLogger, Logger } from '../../../logger/logger'
 import { Mapper } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -12,6 +13,7 @@ import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
 // TODO add support for indexes
 export class BatchGetSingleTableRequest<T> {
+  private readonly logger: Logger
   readonly dynamoRx: DynamoRx
   readonly params: BatchGetItemInput
   readonly modelClazz: ModelConstructor<T>
@@ -21,6 +23,7 @@ export class BatchGetSingleTableRequest<T> {
 
   // todo: make use of Mapper.toKey<T>(item: T, modelConstructor: ModelConstructor<T>)
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: any[]) {
+    this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
     this.dynamoRx = dynamoRx
 
     if (modelClazz === null || modelClazz === undefined) {
@@ -46,7 +49,9 @@ export class BatchGetSingleTableRequest<T> {
   }
 
   execFullResponse(): Observable<BatchGetSingleTableResponse<T>> {
+    this.logger.debug('request', this.params)
     return this.dynamoRx.batchGetItems(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
       map(response => {
         let items: T[]
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
@@ -63,12 +68,15 @@ export class BatchGetSingleTableRequest<T> {
           UnprocessedKeys: response.UnprocessedKeys,
           ConsumedCapacity: response.ConsumedCapacity,
         }
-      })
+      }),
+      tap(response => this.logger.debug('mapped items', response.Items))
     )
   }
 
   exec(): Observable<T[]> {
+    this.logger.debug('request', this.params)
     return this.dynamoRx.batchGetItems(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
       map(response => {
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
           return response.Responses![this.tableName].map(attributeMap =>
@@ -77,7 +85,8 @@ export class BatchGetSingleTableRequest<T> {
         } else {
           return []
         }
-      })
+      }),
+      tap(items => this.logger.debug('mapped items', items))
     )
   }
 

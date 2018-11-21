@@ -1,5 +1,4 @@
 import { PutItemInput } from 'aws-sdk/clients/dynamodb'
-import * as moment from 'moment'
 import { getTableName } from '../../../../test/helper'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { PutRequest } from './put.request'
@@ -38,7 +37,7 @@ describe('put request', () => {
     })
 
     it('composite partition key', () => {
-      const now = moment()
+      const now = new Date()
       const item: SimpleWithCompositePartitionKeyModel = { id: 'myId', creationDate: now, age: 45 }
       const request = new PutRequest(
         <any>null,

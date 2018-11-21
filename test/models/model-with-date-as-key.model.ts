@@ -1,44 +1,43 @@
 // tslint:disable:max-classes-per-file
-import * as moment from 'moment'
 import { GSIPartitionKey, Model, PartitionKey, SortKey } from '../../src/decorator'
 import { Date } from '../../src/decorator/impl/date/date.decorator'
 
 @Model()
-export class ModelWithMomentAsHashKey {
+export class ModelWithDateAsHashKey {
   @PartitionKey()
   @Date()
-  startDate: moment.Moment
+  startDate: Date
 
-  constructor(startDate: moment.Moment) {
+  constructor(startDate: Date) {
     this.startDate = startDate
   }
 }
 
 @Model()
-export class ModelWithMomentAsRangeKey {
+export class ModelWithDateAsRangeKey {
   @PartitionKey()
   id: number
 
   @SortKey()
   @Date()
-  creationDate: moment.Moment
+  creationDate: Date
 
-  constructor(id: number, creationDate: moment.Moment) {
+  constructor(id: number, creationDate: Date) {
     this.id = id
     this.creationDate = creationDate
   }
 }
 
 @Model()
-export class ModelWithMomentAsIndexHashKey {
+export class ModelWithDateAsIndexHashKey {
   @PartitionKey()
   id: number
 
   @GSIPartitionKey('anyGSI')
   @Date()
-  creationDate: moment.Moment
+  creationDate: Date
 
-  constructor(id: number, creationDate: moment.Moment) {
+  constructor(id: number, creationDate: Date) {
     this.id = id
     this.creationDate = creationDate
   }

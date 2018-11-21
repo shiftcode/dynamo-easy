@@ -1,11 +1,12 @@
 # Dynamo-Easy
-[![Travis](https://img.shields.io/travis/shiftcode/dynamo-easy.svg)](https://travis-ci.org/shiftcode/dynamo-easy)
+[![Travis](https://img.shields.io/travis/com/shiftcode/dynamo-easy.svg)](https://travis-ci.com/shiftcode/dynamo-easy)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![latest-release](https://img.shields.io/npm/v/@shiftcoders/dynamo-easy/latest.svg)]()
 [![Coverage Status](https://coveralls.io/repos/github/shiftcode/dynamo-easy/badge.svg?branch=master)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![Dev Dependencies](https://img.shields.io/david/expressjs/express.svg)](https://david-dm.org/michaelwittwer/dynamo-easy?type=dev)
 [![Greenkeeper badge](https://badges.greenkeeper.io/alexjoverm/typescript-library-starter.svg)](https://greenkeeper.io/)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg)](#contributors)
 
 This is the documentation for the new version of dynamo-easy released as a scoped package using the namespace 
 @shiftcoders (@shiftcoders/dynamo-easy). If you still want to use the 0.0.x version you can 
@@ -21,7 +22,7 @@ Checkout the full technical api documentation [here](https://shiftcode.github.io
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
-```
+```typescript
 @Model()
 class Person{
   @PartitionKeyUUID() 
@@ -108,7 +109,6 @@ Simple Type (no decorators required to work)
 - Boolean
 - Null
 - Array
-- Date (we only support MomentJS)
 
 Complex Types (properties with these types need some decorators to work properly)
 - Set<simpleType | complexType>
@@ -149,10 +149,40 @@ When one of the following decorators is present, the value is always mapped to a
 - @TypedArray()
 
 ## Date
-Right now we only support [MomentJS](http://momentjs.com/) Dates.
+We only support the native Date type and you need to explicitly mark a property to be a Date by using the @Date() decorator\
+(which is basically just syntactic sugar for @CustomMapper(TheDateMapper)).\
+If you want to use a different type for the @Date decorator (eg. Moment) you need to define a custom mapper and provide it to the dynamo easy config like this:\
+`DynamoEasyConfig.updateConfig({ dateMapper: MomentMapper })`\
+-> Update the config before importing any models!
 
-If you want to explicitly mark a property to be a Date use the @Date() decorator. If we find a moment value we automatically map it to a String (using ISO-8601 format).
-When coming from db we do a regex test for ISO-8601 format and map it back to a moment object.
+
+A mapper for moment dates could look like this:
+```typescript
+import * as moment from 'moment'
+import { MapperForType, StringAttribute } from '@shiftcoders/dynamo-easy'
+
+export class MomentMapper implements MapperForType<moment.Moment, StringAttribute> {
+
+  fromDb(value: StringAttribute): moment.Moment {
+    const parsed: moment.Moment = moment(value.S, moment.ISO_8601)
+    if (!parsed.isValid()) {
+      throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
+    }
+    return parsed
+  }
+
+  toDb(value: moment.Moment): StringAttribute {
+    if (!moment.isMoment(value)) {
+      throw new Error(`the value ${value} is not of type moment`)
+    }
+    if (!value.isValid()) {
+      throw new Error(`cannot map property value ${value}, because it is not a valid moment date`)
+    }
+    return { S: value.clone().utc().format() }
+  }
+}
+```
+
 
 ## Enum
 Enum values are persisted as Numbers (index of enum).
@@ -208,7 +238,7 @@ By default we create a substitution placeholder for all the attributes, just to 
 
 attributename: age
 
-```
+```typescript
 expression: '#age = :age' 
 attributeExpressionNames: {'#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
@@ -217,8 +247,8 @@ attributeExpressionValues: {':age': {N: '10'}}
 this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
 nested attribute: person.age
 
-```
-attributeExpressionNames: {'#person':'person', '#age': 'age'}
+```typescript
+attributeExpressionNames: {'#person': 'person', '#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
 expression: '#person.#age = :age'
 ```
@@ -239,7 +269,7 @@ There are two scenarios for a batch get item request. One is requesting multiple
 tables.
 The first scenario is support using DynamoStore.batchGet() the second one must be implemented using the BatchGetItem class.
 
-```
+```typescript
 const request = new BatchRequest()
 
 // table with simple primary key
@@ -289,8 +319,8 @@ We use 2 git hooks:
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") |
-| :---: |
+| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") | [<img src="https://avatars2.githubusercontent.com/u/8321523?s=460&v=4" width="100px;"/><br /><sub>Michael Lieberherr</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Tests") | [<img src="https://avatars3.githubusercontent.com/u/37636934?s=460&v=4" width="100px;"/><br /><sub>Simon Mumenthaler</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Code") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Tests") |
+| :---: | :---:| :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!

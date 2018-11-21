@@ -1,5 +1,4 @@
 import { has } from 'lodash'
-import * as moment from 'moment'
 import { ComplexModel } from '../../../test/models'
 import { Model, PartitionKey, Property } from '../../decorator/impl'
 import { MetadataHelper } from '../../decorator/metadata'
@@ -306,8 +305,8 @@ describe('expressions', () => {
     })
 
     it('between (custom mapper)', () => {
-      const date1 = moment('2017-03-17T20:00:00.000Z')
-      const date2 = moment('2017-05-07T20:00:00.000Z')
+      const date1 = new Date('2017-03-17T20:00:00.000Z')
+      const date2 = new Date('2017-05-07T20:00:00.000Z')
       // property('creationDate').between(date1, date2)
       const condition = ConditionExpressionBuilder.buildFilterExpression(
         'creationDate',
@@ -327,19 +326,9 @@ describe('expressions', () => {
       expect(condition.attributeValues).toBeDefined()
       expect(Object.keys(condition.attributeValues).length).toBe(2)
       expect(has(condition.attributeValues, ':creationDate')).toBeTruthy()
-      expect(condition.attributeValues[':creationDate']).toEqual({
-        S: date1
-          .clone()
-          .utc()
-          .format(),
-      })
+      expect(condition.attributeValues[':creationDate']).toEqual({ S: date1.toISOString() })
       expect(has(condition.attributeValues, ':creationDate_2')).toBeTruthy()
-      expect(condition.attributeValues[':creationDate_2']).toEqual({
-        S: date2
-          .clone()
-          .utc()
-          .format(),
-      })
+      expect(condition.attributeValues[':creationDate_2']).toEqual({ S: date2.toISOString() })
     })
 
     it('should throw error for wrong value arity', () => {

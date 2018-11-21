@@ -1,5 +1,4 @@
 // tslint:disable:max-classes-per-file
-import * as moment from 'moment'
 
 import { Date } from '../../../src/decorator/impl/date/date.decorator'
 import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
@@ -107,7 +106,7 @@ export class BaseOrder {
 
   @GSISortKey('order_product_id_creation_date')
   @Date()
-  creationDate: moment.Moment
+  creationDate: Date
 
   @CustomMapper(FormIdsMapper)
   formIds: FormId[]

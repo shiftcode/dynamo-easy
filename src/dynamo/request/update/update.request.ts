@@ -1,7 +1,8 @@
 import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
 import { forEach } from 'lodash'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
+import { createLogger, Logger } from '../../../logger/logger'
 import { Mapper } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -16,6 +17,8 @@ import { WriteRequest } from '../write.request'
 export type SortedUpdateExpressions = { [key in UpdateActionKeyword]: UpdateExpression[] }
 
 export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
+  private readonly logger: Logger
+
   constructor(
     dynamoRx: DynamoRx,
     modelClazz: ModelConstructor<T>,
@@ -24,6 +27,7 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
     sortKey?: any
   ) {
     super(dynamoRx, modelClazz, tableName)
+    this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
@@ -104,11 +108,12 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
   }
 
   execFullResponse(): Observable<UpdateItemOutput> {
-    return this.dynamoRx.updateItem(this.params)
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.updateItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.updateItem(this.params).pipe(
+    return this.execFullResponse().pipe(
       map(response => {
         return
       })
