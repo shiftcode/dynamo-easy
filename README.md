@@ -21,7 +21,7 @@ Checkout the full technical api documentation [here](https://shiftcode.github.io
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
-```
+```typescript
 @Model()
 class Person{
   @PartitionKeyUUID() 
@@ -108,7 +108,6 @@ Simple Type (no decorators required to work)
 - Boolean
 - Null
 - Array
-- Date (we only support MomentJS)
 
 Complex Types (properties with these types need some decorators to work properly)
 - Set<simpleType | complexType>
@@ -149,10 +148,40 @@ When one of the following decorators is present, the value is always mapped to a
 - @TypedArray()
 
 ## Date
-Right now we only support [MomentJS](http://momentjs.com/) Dates.
+We only support the native Date type and you need to explicitly mark a property to be a Date by using the @Date() decorator\
+(which is basically just syntactic sugar for @CustomMapper(TheDateMapper)).\
+If you want to use a different type for the @Date decorator (eg. Moment) you need to define a custom mapper and provide it to the dynamo easy config like this:\
+`DynamoEasyConfig.updateConfig({ dateMapper: MomentMapper })`\
+-> Update the config before importing any models!
 
-If you want to explicitly mark a property to be a Date use the @Date() decorator. If we find a moment value we automatically map it to a String (using ISO-8601 format).
-When coming from db we do a regex test for ISO-8601 format and map it back to a moment object.
+
+A mapper for moment dates could look like this:
+```typescript
+import * as moment from 'moment'
+import { MapperForType, StringAttribute } from '@shiftcoders/dynamo-easy'
+
+export class MomentMapper implements MapperForType<moment.Moment, StringAttribute> {
+
+  fromDb(value: StringAttribute): moment.Moment {
+    const parsed: moment.Moment = moment(value.S, moment.ISO_8601)
+    if (!parsed.isValid()) {
+      throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
+    }
+    return parsed
+  }
+
+  toDb(value: moment.Moment): StringAttribute {
+    if (!moment.isMoment(value)) {
+      throw new Error(`the value ${value} is not of type moment`)
+    }
+    if (!value.isValid()) {
+      throw new Error(`cannot map property value ${value}, because it is not a valid moment date`)
+    }
+    return { S: value.clone().utc().format() }
+  }
+}
+```
+
 
 ## Enum
 Enum values are persisted as Numbers (index of enum).
@@ -208,7 +237,7 @@ By default we create a substitution placeholder for all the attributes, just to 
 
 attributename: age
 
-```
+```typescript
 expression: '#age = :age' 
 attributeExpressionNames: {'#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
@@ -217,8 +246,8 @@ attributeExpressionValues: {':age': {N: '10'}}
 this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
 nested attribute: person.age
 
-```
-attributeExpressionNames: {'#person':'person', '#age': 'age'}
+```typescript
+attributeExpressionNames: {'#person': 'person', '#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
 expression: '#person.#age = :age'
 ```
@@ -239,7 +268,7 @@ There are two scenarios for a batch get item request. One is requesting multiple
 tables.
 The first scenario is support using DynamoStore.batchGet() the second one must be implemented using the BatchGetItem class.
 
-```
+```typescript
 const request = new BatchRequest()
 
 // table with simple primary key
