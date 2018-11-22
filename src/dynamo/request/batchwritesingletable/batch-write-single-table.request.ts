@@ -1,16 +1,18 @@
 import { BatchWriteItemInput, BatchWriteItemOutput, WriteRequest, WriteRequests } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap, tap } from 'rxjs/operators'
-import { DynamoRx } from '../../../dynamo/dynamo-rx'
 import { randomExponentialBackoffTimer } from '../../../helper'
-import { createToKeyFn, toDb } from '../../../mapper'
-import { Attributes } from '../../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { createLogger, Logger } from '../../../logger/logger'
+import { Attributes, createToKeyFn, toDb } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
+import { DynamoRx } from '../../dynamo-rx'
 import { BatchWriteSingleTableResponse } from './batch-write-single-table.response'
 
 const MAX_BATCH_WRITE_ITEMS = 25
 
 export class BatchWriteSingleTableRequest<T> {
+  private readonly logger: Logger
+
   private get toKey(): (item: T) => Attributes {
     if (!this.keyFn) {
       this.keyFn = createToKeyFn(this.modelClazz)
@@ -25,6 +27,7 @@ export class BatchWriteSingleTableRequest<T> {
   readonly itemsToProcess: WriteRequests
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
+    this.logger = createLogger('dynamo.request.BatchWriteSingleTableRequest', modelClazz)
     this.dynamoRx = dynamoRx
 
     if (modelClazz === null || modelClazz === undefined) {
@@ -38,6 +41,7 @@ export class BatchWriteSingleTableRequest<T> {
 
   delete(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(...items.map<WriteRequest>(item => ({ DeleteRequest: { Key: this.toKey(item) } })))
+    this.logger.debug(`${items.length} items added for DeleteRequest`)
     return this
   }
 
@@ -45,6 +49,7 @@ export class BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(
       ...items.map<WriteRequest>(item => ({ PutRequest: { Item: toDb(item, this.modelClazz) } })),
     )
+    this.logger.debug(`${items.length} items added for PutRequest`)
     return this
   }
 
@@ -55,8 +60,10 @@ export class BatchWriteSingleTableRequest<T> {
         [this.tableName]: batch,
       },
     }
+    this.logger.debug('request', batchWriteItemInput)
 
     return this.dynamoRx.batchWriteItem(batchWriteItemInput).pipe(
+      tap(response => this.logger.debug('response', response)),
       tap((batchWriteManyResponse: BatchWriteItemOutput) => {
         if (batchWriteManyResponse.UnprocessedItems && batchWriteManyResponse.UnprocessedItems[this.tableName]) {
           this.itemsToProcess.unshift(...batchWriteManyResponse.UnprocessedItems[this.tableName])
@@ -69,6 +76,11 @@ export class BatchWriteSingleTableRequest<T> {
         ),
         consumedCapacity: batchWriteManyResponse.ConsumedCapacity,
       })),
+      tap(response => {
+        if (response.capacityExceeded) {
+          this.logger.info('capacity exceeded', response.consumedCapacity)
+        }
+      }),
     )
   }
 
@@ -78,6 +90,7 @@ export class BatchWriteSingleTableRequest<T> {
    * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
    */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = 1000): Observable<void> {
+    this.logger.debug('starting batchWriteItem')
     let rBoT = backoffTimer()
     let backoffTime = 0
     return this.execNextBatch().pipe(
@@ -86,9 +99,10 @@ export class BatchWriteSingleTableRequest<T> {
           rBoT = backoffTimer()
           backoffTime = 0
         } else {
-          backoffTime = rBoT.next().value
+          backoffTime = rBoT.next().value * throttleTimeSlot
+          this.logger.info(`wait ${backoffTime} ms until next request`, { backoffTime })
         }
-        return of(r).pipe(delay(backoffTime * throttleTimeSlot))
+        return of(r).pipe(delay(backoffTime))
       }),
       mergeMap((r: BatchWriteSingleTableResponse) => {
         if (r.remainingItems > 0) {

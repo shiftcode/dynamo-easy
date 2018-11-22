@@ -1,7 +1,7 @@
 import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
 import { Model, PartitionKey, Property } from '../../decorator/impl'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForClass } from '../../decorator/metadata'
 import { buildFilterExpression, deepFilter } from './condition-expression-builder'
 
 @Model()

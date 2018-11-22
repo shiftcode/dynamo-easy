@@ -1,24 +1,29 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
-import { metadataForClass } from '../decorator/metadata/metadata-helper'
-import { ModelConstructor } from '../model/model-constructor'
+import { tap } from 'rxjs/operators'
+import { metadataForClass } from '../decorator/metadata'
+import { createLogger, Logger } from '../logger/logger'
+import { ModelConstructor } from '../model'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from './default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
 import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoRx } from './dynamo-rx'
-import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
+import {
+  BatchGetSingleTableRequest,
+  DeleteRequest,
+  GetRequest,
+  PutRequest,
+  QueryRequest,
+  ScanRequest,
+  UpdateRequest,
+} from './request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
-import { DeleteRequest } from './request/delete/delete.request'
-import { GetRequest } from './request/get/get.request'
-import { PutRequest } from './request/put/put.request'
-import { QueryRequest } from './request/query/query.request'
 import { REGEX_TABLE_NAME } from './request/regex'
-import { ScanRequest } from './request/scan/scan.request'
-import { UpdateRequest } from './request/update/update.request'
 import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 import { TableNameResolver } from './table-name-resolver.type'
 
 export class DynamoStore<T> {
+  private readonly logger: Logger
   private readonly dynamoRx: DynamoRx
 
   readonly tableName: string
@@ -28,6 +33,7 @@ export class DynamoStore<T> {
     tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
     sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
   ) {
+    this.logger = createLogger('dynamo.DynamoStore', modelClazz)
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
     const tableName = tableNameResolver(metadataForClass(this.modelClazz).modelOptions.tableName)
     if (!REGEX_TABLE_NAME.test(tableName)) {
@@ -37,6 +43,7 @@ export class DynamoStore<T> {
     }
 
     this.tableName = tableName
+    this.logger.debug('instance created')
   }
 
   get dynamoDb(): DynamoDB {
@@ -86,7 +93,8 @@ export class DynamoStore<T> {
   }
 
   makeRequest<Z>(operation: DynamoApiOperations, params?: { [key: string]: any }): Observable<Z> {
-    return this.dynamoRx.makeRequest(operation, params)
+    this.logger.debug('request', params)
+    return this.dynamoRx.makeRequest(operation, params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   // Commented because not used at the moment

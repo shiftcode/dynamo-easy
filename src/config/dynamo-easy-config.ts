@@ -7,5 +7,6 @@ import { Config } from './config.type'
  */
 export const dynamoEasyConfig: Config = {
   dateMapper: DateToStringMapper,
-  debug: true,
+  // tslint:disable-next-line:no-empty
+  logReceiver: () => {},
 }

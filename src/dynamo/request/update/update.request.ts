@@ -1,25 +1,21 @@
-import { ReturnConsumedCapacity, ReturnItemCollectionMetrics, UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
+import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
 import { forEach } from 'lodash'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
-import { toDbOne } from '../../../mapper/mapper'
-import { Attributes } from '../../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { map, tap } from 'rxjs/operators'
+import { createLogger, Logger } from '../../../logger/logger'
+import { Attributes, toDbOne } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
-import { and } from '../../expression/logical-operator/and.function'
-import { addExpression, addUpdateExpression } from '../../expression/param-util'
-import { addCondition } from '../../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { Expression } from '../../expression/type/expression.type'
-import { RequestConditionFunction } from '../../expression/type/request-condition-function'
+import { addUpdateExpression } from '../../expression/param-util'
+import { Expression, UpdateExpression, UpdateExpressionDefinitionFunction } from '../../expression/type'
 import { UpdateActionKeyword } from '../../expression/type/update-action-keyword.type'
-import { UpdateExpressionDefinitionFunction } from '../../expression/type/update-expression-definition-function'
-import { UpdateExpression } from '../../expression/type/update-expression.type'
-import { BaseRequest } from '../base.request'
+import { WriteRequest } from '../write.request'
 
 export type SortedUpdateExpressions = { [key in UpdateActionKeyword]: UpdateExpression[] }
 
-export class UpdateRequest<T> extends BaseRequest<T, any> {
+export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
+  private readonly logger: Logger
+
   constructor(
     dynamoRx: DynamoRx,
     modelClazz: ModelConstructor<T>,
@@ -28,6 +24,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     sortKey?: any,
   ) {
     super(dynamoRx, modelClazz, tableName)
+    this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
 
     const hasSortKey: boolean = this.metaData.getSortKey() !== null
 
@@ -58,25 +55,6 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     }
 
     this.params.Key = keyAttributeMap
-  }
-
-  /**
-   * todo: rename to something like ifAttribute
-   * @param attributePath
-   */
-  whereAttribute(attributePath: keyof T): RequestConditionFunction<UpdateRequest<T>> {
-    return addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
-  }
-
-  /**
-   * todo: rename. 'where' is technically wrong, it should be something like 'if' or 'when'
-   * todo --> same for delete.where and put.where
-   * @param conditionDefFns
-   */
-  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {
-    const condition = and(...conditionDefFns)(undefined, this.metaData)
-    addExpression('ConditionExpression', condition, this.params)
-    return this
   }
 
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
@@ -126,31 +104,13 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     }
   }
 
-  returnConsumedCapacity(level: ReturnConsumedCapacity): UpdateRequest<T> {
-    this.params.ReturnConsumedCapacity = level
-    return this
-  }
-
-  returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): UpdateRequest<T> {
-    this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return this
-  }
-
-  /*
-   * The ReturnValues parameter is used by several DynamoDB operations; however,
-   * DeleteItem does not recognize any values other than NONE or ALL_OLD.
-   */
-  returnValues(returnValues: 'NONE' | 'ALL_OLD' | 'UPDATED_OLD' | 'ALL_NEW' | 'UPDATED_NEW'): UpdateRequest<T> {
-    this.params.ReturnValues = returnValues
-    return this
-  }
-
   execFullResponse(): Observable<UpdateItemOutput> {
-    return this.dynamoRx.updateItem(this.params)
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.updateItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.updateItem(this.params).pipe(
+    return this.execFullResponse().pipe(
       map(response => {
         return
       }),

@@ -1,23 +1,26 @@
 import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { fetchAll } from '../../../helper'
+import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
 import { and } from '../../expression'
 import { addExpression } from '../../expression/param-util'
 import { addCondition } from '../../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { RequestConditionFunction } from '../../expression/type/request-condition-function'
+import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../../expression/type'
 import { Pageable } from '../../paged'
 import { Request } from '../request.model'
 import { ScanResponse } from './scan.response'
 
 export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanResponse<T>>
   implements Pageable<T, ScanRequest<T>, ScanResponse<T>> {
+  private readonly logger: Logger
+
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     super(dynamoRx, modelClazz, tableName)
+    this.logger = createLogger('dynamo.request.ScanRequest', modelClazz)
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<ScanRequest<T>> {
@@ -33,7 +36,9 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
   execFullResponse(): Observable<ScanResponse<T>> {
     delete this.params.Select
 
+    this.logger.debug('request', this.params)
     return this.dynamoRx.scan(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
       map(queryResponse => {
         const response: ScanResponse<T> = <any>{ ...queryResponse }
         if (queryResponse.Items) {
@@ -41,38 +46,47 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
         }
         return response
       }),
+      tap(response => this.logger.debug('mapped items', response.Items)),
     )
   }
 
   execNoMap(): Observable<ScanOutput> {
-    return this.dynamoRx.scan(this.params)
+    this.logger.debug('request (noMap)', this.params)
+    return this.dynamoRx.scan(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   exec(): Observable<T[]> {
     delete this.params.Select
-
-    return this.dynamoRx
-      .scan(this.params)
-      .pipe(map(response => (response.Items || []).map(item => fromDb(<Attributes>item, this.modelClazz))))
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.scan(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
+      map(response => (response.Items || []).map(item => fromDb(<Attributes>item, this.modelClazz))),
+      tap(items => this.logger.debug('mapped items', items)),
+    )
   }
 
   execSingle(): Observable<T | null> {
     delete this.params.Select
-
-    return this.dynamoRx
-      .scan(this.params)
-      .pipe(
-        map(response =>
-          response.Items && response.Items.length ? fromDb(<Attributes>response.Items[0], this.modelClazz) : null,
-        ),
-      )
+    this.logger.debug('single request', this.params)
+    return this.dynamoRx.scan(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
+      map(response => {
+        return response.Items && response.Items.length ? fromDb(<Attributes>response.Items[0], this.modelClazz) : null
+      }),
+      tap(item => this.logger.debug('mapped item', item)),
+    )
   }
 
   execCount(): Observable<number> {
     const params = { ...this.params }
     params.Select = 'COUNT'
 
-    return this.dynamoRx.scan(params).pipe(map(response => response.Count || 0))
+    this.logger.debug('count request', params)
+    return this.dynamoRx.scan(params).pipe(
+      tap(response => this.logger.debug('response', response)),
+      map(response => response.Count || 0),
+      tap(count => this.logger.debug('count', count)),
+    )
   }
 
   /**

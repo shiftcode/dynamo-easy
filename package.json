@@ -89,15 +89,5 @@
     "lodash": "^4.17.10",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.0.0"
-  },
-  "engines": {
-    "node": ">=8.10.0"
-  },
-  "es2015": "./dist/_esm2015/dynamo-easy.js",
-  "greenkeeper": {
-    "ignore": [
-      "@types/node"
-    ]
-  },
-  "sideEffects": false
+  }
 }
