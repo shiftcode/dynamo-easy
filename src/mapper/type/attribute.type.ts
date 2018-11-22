@@ -11,7 +11,12 @@ export type Attribute =
   | NullAttribute
   | BooleanAttribute
 
-export type Attributes<T = any> = { [key in keyof T & string]: Attribute }
+export interface Attributes<T = {}> {
+  // todo
+  // basically correct, but typescript no longer sees Attributes<T> as indexed type
+  // [key in keyof T]: Attribute
+  [key: string]: Attribute
+}
 
 /**
  * An attribute of type String. For example:  "S": "Hello"

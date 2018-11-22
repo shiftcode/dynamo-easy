@@ -7,8 +7,8 @@ import {
   UpdateItemInput,
 } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
+import { metadataForClass } from '../../decorator/metadata'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
 
@@ -20,7 +20,7 @@ export abstract class BaseRequest<
   readonly params: I
   readonly modelClazz: ModelConstructor<T>
 
-  private _metadata: Metadata<T>
+  private metadata: Metadata<T>
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     this.dynamoRx = dynamoRx
@@ -36,11 +36,11 @@ export abstract class BaseRequest<
   }
 
   get metaData(): Metadata<T> {
-    if (!this._metadata) {
-      this._metadata = MetadataHelper.get(this.modelClazz)
+    if (!this.metadata) {
+      this.metadata = metadataForClass(this.modelClazz)
     }
 
-    return this._metadata
+    return this.metadata
   }
 
   abstract execFullResponse(): Observable<any>

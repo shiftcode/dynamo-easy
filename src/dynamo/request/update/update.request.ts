@@ -2,13 +2,13 @@ import { ReturnConsumedCapacity, ReturnItemCollectionMetrics, UpdateItemOutput }
 import { forEach } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { Mapper } from '../../../mapper/mapper'
+import { toDbOne } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
 import { and } from '../../expression/logical-operator/and.function'
-import { ParamUtil } from '../../expression/param-util'
-import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
+import { addExpression, addUpdateExpression } from '../../expression/param-util'
+import { addCondition } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
 import { Expression } from '../../expression/type/expression.type'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
@@ -25,7 +25,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     modelClazz: ModelConstructor<T>,
     tableName: string,
     partitionKey: any,
-    sortKey?: any
+    sortKey?: any,
   ) {
     super(dynamoRx, modelClazz, tableName)
 
@@ -38,7 +38,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     const keyAttributeMap: Attributes = {}
 
     // partition key
-    const partitionKeyValue = Mapper.toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
+    const partitionKeyValue = toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
 
     if (partitionKeyValue === null) {
       throw new Error('please provide an acutal value for partition key, got null')
@@ -48,13 +48,13 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
 
     // sort key
     if (hasSortKey) {
-      const sortKeyValue = Mapper.toDbOne(sortKey!, this.metaData.forProperty(this.metaData.getSortKey()!))
+      const sortKeyValue = toDbOne(sortKey, this.metaData.forProperty(<keyof T>this.metaData.getSortKey()))
 
       if (sortKeyValue === null) {
         throw new Error('please provide an actual value for sort key, got null')
       }
 
-      keyAttributeMap[<string>this.metaData.getSortKey()!] = sortKeyValue
+      keyAttributeMap[<string>this.metaData.getSortKey()] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap
@@ -65,7 +65,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
    * @param attributePath
    */
   whereAttribute(attributePath: keyof T): RequestConditionFunction<UpdateRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
+    return addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
   }
 
   /**
@@ -75,7 +75,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
    */
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): UpdateRequest<T> {
     const condition = and(...conditionDefFns)(undefined, this.metaData)
-    ParamUtil.addExpression('ConditionExpression', condition, this.params)
+    addExpression('ConditionExpression', condition, this.params)
     return this
   }
 
@@ -94,7 +94,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
             result[expr.type].push(expr)
             return result
           },
-          <SortedUpdateExpressions>{}
+          <SortedUpdateExpressions>{},
         )
 
       const actionStatements: string[] = []
@@ -119,7 +119,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
         attributeNames,
       }
 
-      ParamUtil.addUpdateExpression(expression, this.params)
+      addUpdateExpression(expression, this.params)
       return this
     } else {
       throw new Error('at least one update operation must be defined')
@@ -153,7 +153,7 @@ export class UpdateRequest<T> extends BaseRequest<T, any> {
     return this.dynamoRx.updateItem(this.params).pipe(
       map(response => {
         return
-      })
+      }),
     )
   }
 }

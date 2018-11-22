@@ -1,3 +1,5 @@
+// tslint:disable:no-non-null-assertion
+
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { getTableName } from '../../../../test/helper'
@@ -93,7 +95,7 @@ describe('query request', () => {
     const request = new QueryRequest(
       <any>null,
       ModelWithCustomMapperForSortKeyModel,
-      getTableName(ModelWithCustomMapperForSortKeyModel)
+      getTableName(ModelWithCustomMapperForSortKeyModel),
     )
 
     request.whereSortKey().between(new CustomId(new Date('2018-01-01'), 0), new CustomId(new Date('2018-12-31'), 99999))
@@ -107,15 +109,14 @@ describe('query request', () => {
     })
   })
 
-  describe('calls endpoint with correct params', () => {
-    const dynamoRx: DynamoRx = DYNAMO_RX_MOCK as DynamoRx
-    let querySpy
-
-    let request: QueryRequest<ComplexModel>
-
-    beforeEach(() => {
-      request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
-      querySpy = spyOn(dynamoRx, 'query').and.callThrough()
-    })
-  })
+  // describe('calls endpoint with correct params', () => {
+  //   const dynamoRx: DynamoRx = DYNAMO_RX_MOCK as DynamoRx
+  //   let querySpy: jasmine.Spy
+  //   let request: QueryRequest<ComplexModel>
+  //
+  //   beforeEach(() => {
+  //     request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+  //     querySpy = spyOn(dynamoRx, 'query').and.callThrough()
+  //   })
+  // })
 })

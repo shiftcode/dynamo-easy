@@ -4,7 +4,7 @@ import { ModelConstructor } from '../../../model/model-constructor'
 import { initOrUpdateProperty } from '../property/property.decorator'
 
 export function CustomMapper<T extends Attribute>(
-  mapperClazz: ModelConstructor<MapperForType<any, T>>
+  mapperClazz: ModelConstructor<MapperForType<any, T>>,
 ): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {

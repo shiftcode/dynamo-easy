@@ -2,7 +2,7 @@ import { ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { Mapper } from '../../../mapper/mapper'
+import { fromDb, toDbOne } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -16,7 +16,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     modelClazz: ModelConstructor<T>,
     tableName: string,
     partitionKey: any,
-    sortKey?: any
+    sortKey?: any,
   ) {
     super(dynamoRx, modelClazz, tableName)
 
@@ -29,7 +29,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     const keyAttributeMap: Attributes = {}
 
     // partition key
-    const partitionKeyValue = Mapper.toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
+    const partitionKeyValue = toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
 
     if (partitionKeyValue === null) {
       throw new Error('please provide an acutal value for partition key, got null')
@@ -39,13 +39,13 @@ export class GetRequest<T> extends BaseRequest<T, any> {
 
     // sort key
     if (hasSortKey) {
-      const sortKeyValue = Mapper.toDbOne(sortKey!, this.metaData.forProperty(this.metaData.getSortKey()!))
+      const sortKeyValue = toDbOne(sortKey, this.metaData.forProperty(<keyof T>this.metaData.getSortKey()))
 
       if (sortKeyValue === null) {
         throw new Error('please provide an actual value for sort key, got null')
       }
 
-      keyAttributeMap[<string>this.metaData.getSortKey()!] = sortKeyValue
+      keyAttributeMap[<string>this.metaData.getSortKey()] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap
@@ -62,7 +62,8 @@ export class GetRequest<T> extends BaseRequest<T, any> {
   }
 
   projectionExpression(...attributesToGet: string[]): GetRequest<T> {
-    const resolved = attributesToGet.map(attr => resolveAttributeNames(attr))
+    // tslint:disable-next-line:no-unnecessary-callback-wrapper
+    const resolved = attributesToGet.map(a => resolveAttributeNames(a))
     this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
     objValues(resolved).forEach(r => {
       this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
@@ -76,13 +77,13 @@ export class GetRequest<T> extends BaseRequest<T, any> {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
 
         if (getItemResponse.Item) {
-          response.Item = Mapper.fromDb(<Attributes>getItemResponse.Item, this.modelClazz)
+          response.Item = fromDb(<Attributes>getItemResponse.Item, this.modelClazz)
         } else {
           response.Item = null
         }
 
         return response
-      })
+      }),
     )
   }
 
@@ -90,11 +91,11 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     return this.dynamoRx.getItem(this.params).pipe(
       map(response => {
         if (response.Item) {
-          return Mapper.fromDb(<Attributes>response.Item, this.modelClazz)
+          return fromDb(<Attributes>response.Item, this.modelClazz)
         } else {
           return null
         }
-      })
+      }),
     )
   }
 }

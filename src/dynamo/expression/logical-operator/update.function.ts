@@ -1,22 +1,22 @@
 import { ModelConstructor } from '../../../model'
-import { RequestExpressionBuilder } from '../request-expression-builder'
+import { updateDefinitionFunction } from '../request-expression-builder'
 import {
   UpdateExpressionDefinitionChain,
   UpdateExpressionDefinitionChainTyped,
 } from '../type/update-expression-definition-chain'
 
 /**
- * Use this method when accesing a top level attribute of a model
+ * Use this method when accessing a top level attribute of a model
  */
 export function update2<T, K extends keyof T>(
   modelConstructor: ModelConstructor<T>,
-  attributePath: K
+  attributePath: K,
 ): UpdateExpressionDefinitionChainTyped<T, K> {
-  return RequestExpressionBuilder.updateDefinitionFunction<T, K>(attributePath)
+  return updateDefinitionFunction<T, K>(attributePath)
 }
 
 /**
- * Use this method when accesing a top level attribute of a model
+ * Use this method when accessing a top level attribute of a model
  */
 export function update<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
 
@@ -26,5 +26,5 @@ export function update<T>(attributePath: keyof T): UpdateExpressionDefinitionCha
 export function update(attributePath: string): UpdateExpressionDefinitionChain
 
 export function update<T>(attributePath: keyof T): UpdateExpressionDefinitionChain {
-  return RequestExpressionBuilder.updateDefinitionFunction<T>(attributePath)
+  return updateDefinitionFunction<T>(attributePath)
 }

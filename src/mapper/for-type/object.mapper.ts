@@ -1,25 +1,23 @@
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
-import { Mapper } from '../mapper'
+import { fromDb, toDb } from '../mapper'
 import { MapAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 export class ObjectMapper<T> implements MapperForType<any, MapAttribute> {
-  constructor() {}
-
   fromDb(val: MapAttribute, propertyMetadata?: PropertyMetadata<any, MapAttribute>): any {
     if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom) {
-      return Mapper.fromDb(val.M, propertyMetadata.typeInfo.type)
+      return fromDb(val.M, propertyMetadata.typeInfo.type)
     } else {
-      return Mapper.fromDb(val.M)
+      return fromDb(val.M)
     }
   }
 
   toDb(modelValue: any, propertyMetadata?: PropertyMetadata<any, MapAttribute>): MapAttribute {
     let value: any
     if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom) {
-      value = Mapper.toDb(modelValue, propertyMetadata.typeInfo.type)
+      value = toDb(modelValue, propertyMetadata.typeInfo.type)
     } else {
-      value = Mapper.toDb(modelValue)
+      value = toDb(modelValue)
     }
 
     return { M: value }

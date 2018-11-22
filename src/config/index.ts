@@ -1,2 +1,4 @@
-export * from './config'
-export * from './dynamo-easy-config'
+export * from './config.type'
+export * from './update-config.function'
+
+// do not export dynamo-easy-config.ts

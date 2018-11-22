@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap, tap } from 'rxjs/operators'
 import { DynamoRx } from '../../../dynamo/dynamo-rx'
 import { randomExponentialBackoffTimer } from '../../../helper'
-import { Mapper } from '../../../mapper'
+import { createToKeyFn, toDb } from '../../../mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { BatchWriteSingleTableResponse } from './batch-write-single-table.response'
@@ -12,18 +12,17 @@ const MAX_BATCH_WRITE_ITEMS = 25
 
 export class BatchWriteSingleTableRequest<T> {
   private get toKey(): (item: T) => Attributes {
-    if (!this._keyFn) {
-      this._keyFn = Mapper.createToKeyFn(this.modelClazz)
+    if (!this.keyFn) {
+      this.keyFn = createToKeyFn(this.modelClazz)
     }
-    return this._keyFn
+    return this.keyFn
   }
+  private keyFn: any
 
   readonly dynamoRx: DynamoRx
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
   readonly itemsToProcess: WriteRequests
-
-  private _keyFn: any
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     this.dynamoRx = dynamoRx
@@ -44,7 +43,7 @@ export class BatchWriteSingleTableRequest<T> {
 
   put(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(
-      ...items.map<WriteRequest>(item => ({ PutRequest: { Item: Mapper.toDb(item, this.modelClazz) } }))
+      ...items.map<WriteRequest>(item => ({ PutRequest: { Item: toDb(item, this.modelClazz) } })),
     )
     return this
   }
@@ -69,7 +68,7 @@ export class BatchWriteSingleTableRequest<T> {
           batchWriteManyResponse.UnprocessedItems && batchWriteManyResponse.UnprocessedItems[this.tableName]
         ),
         consumedCapacity: batchWriteManyResponse.ConsumedCapacity,
-      }))
+      })),
     )
   }
 
@@ -97,7 +96,7 @@ export class BatchWriteSingleTableRequest<T> {
         } else {
           return of()
         }
-      })
+      }),
     )
   }
 }

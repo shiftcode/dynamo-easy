@@ -217,7 +217,7 @@ function sessionValidityEnsurer(): Observable<boolean> {
           this.logger.debug('withValidSession :: cognitoService.isLoggedIn() -> we have a valid session -> proceed')
           return Observable.of(true)
         } else {
-          this.logger.debug('withValidSession :: cognitoService.isLoggedIn() -> user is not logged in or token expired, try to get a new session')
+          this.logger.debug(metadata)
           return this.getUser()
             .catch((err, caught): Observable<boolean> => {
               this.logger.error('withValidSession :: there was an error when refreshing the session', err)

@@ -1,3 +1,5 @@
+// tslint:disable:no-non-null-assertion
+
 import { FormType } from './order.model'
 
 export class FormId {

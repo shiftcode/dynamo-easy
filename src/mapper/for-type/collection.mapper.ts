@@ -1,6 +1,6 @@
 import { hasGenericType, PropertyMetadata } from '../../decorator'
 import { notNull } from '../../helper'
-import { Mapper } from '../mapper'
+import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'
 import { AttributeType } from '../type/attribute-type.type'
 import {
   BinarySetAttribute,
@@ -10,7 +10,7 @@ import {
   NumberSetAttribute,
   StringSetAttribute,
 } from '../type/attribute.type'
-import { Util } from '../util'
+import { detectCollectionType, isBufferType, isSet } from '../util'
 import { MapperForType } from './base.mapper'
 
 type CollectionAttributeTypes =
@@ -23,7 +23,7 @@ type CollectionAttributeTypes =
 export class CollectionMapper implements MapperForType<any[] | Set<any>, CollectionAttributeTypes> {
   fromDb(
     attributeValue: CollectionAttributeTypes,
-    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>
+    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>,
   ): any[] | Set<any> {
     const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
 
@@ -33,7 +33,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
     }
 
     if ('NS' in attributeValue) {
-      const arr: number[] = attributeValue.NS.map(item => parseFloat(item))
+      const arr: number[] = attributeValue.NS.map(parseFloat)
       return explicitType && explicitType === Array ? arr : new Set(arr)
     }
 
@@ -45,11 +45,10 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
     if ('L' in attributeValue) {
       let arr: any[]
       if (hasGenericType(propertyMetadata)) {
-        arr = attributeValue.L.map(item =>
-          Mapper.fromDb((<MapAttribute>item).M, propertyMetadata!.typeInfo!.genericType)
-        )
+        arr = attributeValue.L.map(item => fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType))
       } else {
-        arr = attributeValue.L.map(value => Mapper.fromDbOne(value))
+        // tslint:disable-next-line:no-unnecessary-callback-wrapper
+        arr = attributeValue.L.map(v => fromDbOne(v))
       }
       return explicitType && explicitType === Set ? new Set(arr) : arr
     }
@@ -59,9 +58,9 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
 
   toDb(
     propertyValue: any[] | Set<any>,
-    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>
+    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>,
   ): CollectionAttributeTypes | null {
-    if (Array.isArray(propertyValue) || Util.isSet(propertyValue)) {
+    if (Array.isArray(propertyValue) || isSet(propertyValue)) {
       let collectionType: AttributeType
       if (propertyMetadata) {
         const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
@@ -80,10 +79,10 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
               } else {
                 if (hasGenericType(propertyMetadata)) {
                   // generic type of Set is defined, so decide based on the generic type which db set type should be used
-                  if (Util.isBufferType(propertyMetadata.typeInfo!.genericType)) {
+                  if (isBufferType(propertyMetadata.typeInfo.genericType)) {
                     collectionType = 'BS'
                   } else {
-                    switch (propertyMetadata.typeInfo!.genericType) {
+                    switch (propertyMetadata.typeInfo.genericType) {
                       case String:
                         collectionType = 'SS'
                         break
@@ -97,7 +96,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
                   }
                 } else {
                   // auto detect based on set item values
-                  collectionType = Util.detectCollectionType(propertyValue)
+                  collectionType = detectCollectionType(propertyValue)
                 }
               }
             }
@@ -107,11 +106,11 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
         }
       } else {
         // auto detect based on set item values
-        collectionType = Util.detectCollectionType(propertyValue)
+        collectionType = detectCollectionType(propertyValue)
       }
 
       // convert to array if we deal with a set
-      if (Util.isSet(propertyValue)) {
+      if (isSet(propertyValue)) {
         propertyValue = Array.from(propertyValue)
       }
 
@@ -130,12 +129,15 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
             if (hasGenericType(propertyMetadata)) {
               return {
                 L: propertyValue.map(value => ({
-                  M: Mapper.toDb(value, propertyMetadata!.typeInfo!.genericType),
+                  M: toDb(value, propertyMetadata.typeInfo.genericType),
                 })),
               }
             } else {
               return {
-                L: propertyValue.map(value => Mapper.toDbOne(value)).filter(notNull),
+                L: propertyValue
+                  // tslint:disable-next-line:no-unnecessary-callback-wrapper
+                  .map(v => toDbOne(v))
+                  .filter(notNull),
               }
             }
           default:

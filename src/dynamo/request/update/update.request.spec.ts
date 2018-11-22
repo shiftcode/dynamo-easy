@@ -368,7 +368,7 @@ describe('update request', () => {
       request.operations(
         update<UpdateModel>('active').set(true),
         update<UpdateModel>('name').set('newName'),
-        update<UpdateModel>('topics').add('myTopic')
+        update<UpdateModel>('topics').add('myTopic'),
       )
 
       expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name ADD #topics :topics')
@@ -392,7 +392,7 @@ describe('update request', () => {
         .operations(
           update<UpdateModel>('active').set(true),
           update<UpdateModel>('name').set('newName'),
-          update<UpdateModel>('topics').add('myTopic')
+          update<UpdateModel>('topics').add('myTopic'),
         )
         .where(not(attribute('topics').contains('otherTopic')))
       // whereAttribute('topics').notContains('otherTopic')
@@ -420,7 +420,7 @@ describe('update request', () => {
       request
         .operations(
           update2(Order, 'types').add([FormType.INVOICE]),
-          update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)])
+          update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)]),
         )
         .where(attribute<Order>('types').attributeExists(), attribute<Order>('formIds').attributeExists())
 

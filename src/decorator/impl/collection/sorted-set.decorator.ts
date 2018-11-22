@@ -10,7 +10,7 @@ import { initOrUpdateProperty } from '../property/property.decorator'
 export function SortedSet(modelClass?: ModelConstructor<any>): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-      const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
+      const typeInfo: TypeInfo = {
         type: Set,
         isCustom: true,
       }

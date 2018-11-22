@@ -2,9 +2,9 @@ import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { metadataForClass } from '../../../decorator/metadata'
 import { Metadata } from '../../../decorator/metadata/metadata'
-import { MetadataHelper } from '../../../decorator/metadata/metadata-helper'
-import { Mapper } from '../../../mapper/mapper'
+import { fromDb, toDbOne } from '../../../mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoRx } from '../../dynamo-rx'
@@ -17,9 +17,9 @@ export class BatchGetSingleTableRequest<T> {
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
 
-  private _metadata: Metadata<T>
+  private metadata: Metadata<T>
 
-  // todo: make use of Mapper.toKey<T>(item: T, modelConstructor: ModelConstructor<T>)
+  // todo: make use of toKey<T>(item: T, modelConstructor: ModelConstructor<T>)
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: any[]) {
     this.dynamoRx = dynamoRx
 
@@ -38,11 +38,11 @@ export class BatchGetSingleTableRequest<T> {
   }
 
   get metaData(): Metadata<T> {
-    if (!this._metadata) {
-      this._metadata = MetadataHelper.get(this.modelClazz)
+    if (!this.metadata) {
+      this.metadata = metadataForClass(this.modelClazz)
     }
 
-    return this._metadata
+    return this.metadata
   }
 
   execFullResponse(): Observable<BatchGetSingleTableResponse<T>> {
@@ -50,8 +50,8 @@ export class BatchGetSingleTableRequest<T> {
       map(response => {
         let items: T[]
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          const mapped: T[] = response.Responses![this.tableName].map(attributeMap =>
-            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
+          const mapped: T[] = response.Responses[this.tableName].map(attributeMap =>
+            fromDb(<Attributes>attributeMap, this.modelClazz),
           )
           items = mapped
         } else {
@@ -63,7 +63,7 @@ export class BatchGetSingleTableRequest<T> {
           UnprocessedKeys: response.UnprocessedKeys,
           ConsumedCapacity: response.ConsumedCapacity,
         }
-      })
+      }),
     )
   }
 
@@ -71,13 +71,13 @@ export class BatchGetSingleTableRequest<T> {
     return this.dynamoRx.batchGetItems(this.params).pipe(
       map(response => {
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          return response.Responses![this.tableName].map(attributeMap =>
-            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
+          return response.Responses[this.tableName].map(attributeMap =>
+            fromDb(<Attributes>attributeMap, this.modelClazz),
           )
         } else {
           return []
         }
-      })
+      }),
     )
   }
 
@@ -91,22 +91,22 @@ export class BatchGetSingleTableRequest<T> {
         // got a composite primary key
 
         // partition key
-        const mappedPartitionKey = Mapper.toDbOne(key.partitionKey)
+        const mappedPartitionKey = toDbOne(key.partitionKey)
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
         idOb[<string>this.metaData.getPartitionKey()] = mappedPartitionKey
 
         // sort key
-        const mappedSortKey = Mapper.toDbOne(key.sortKey)
+        const mappedSortKey = toDbOne(key.sortKey)
         if (mappedSortKey === null) {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[<string>this.metaData.getSortKey()!] = mappedSortKey
+        idOb[<string>this.metaData.getSortKey()] = mappedSortKey
       } else {
         // got a simple primary key
-        const value = Mapper.toDbOne(key)
+        const value = toDbOne(key)
         if (value === null) {
           throw Error('please provide an actual value for partition key')
         }

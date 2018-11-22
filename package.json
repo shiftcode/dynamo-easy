@@ -3,59 +3,44 @@
   "version": "2.0.0",
   "description": "Use the power of typescript to define your object mapping when using dynamodb. This library also provides a fluent api for easy interaction with dynamodb.",
   "keywords": [
+    "api",
     "aws",
     "dynamo",
     "dynamodb",
-    "api",
+    "fluent-api",
     "mapper",
     "orm",
     "typescript",
-    "typescript-decorators",
-    "fluent-api"
+    "typescript-decorators"
   ],
-  "main": "./dist/dynamo-easy.js",
-  "module": "./dist/_esm5/dynamo-easy.js",
-  "es2015": "./dist/_esm2015/dynamo-easy.js",
-  "typings": "./dist/_types/dynamo-easy.d.ts",
-  "files": [
-    "dist"
-  ],
-  "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
   "repository": {
     "type": "git",
     "url": "https://github.com/shiftcode/dynamo-easy"
   },
   "license": "MIT",
-  "engines": {
-    "node": ">=8.10.0"
-  },
-  "sideEffects": false,
+  "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/dynamo-easy.js",
+  "module": "./dist/_esm5/dynamo-easy.js",
+  "typings": "./dist/_types/dynamo-easy.d.ts",
   "scripts": {
-    "lint": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts' && tslint --fix -t codeFrame '{src,test}/**/*.ts'",
     "prebuild": "rimraf dist",
     "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
     "build:docs": "typedoc --out dist/docs --target es6 --theme minimal",
-    "build:deprecated:old": "tsc && rollup -c && rimraf compiled && typedoc --out dist/docs --target es6 --theme minimal sr",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:prod": "npm run test -- --coverage --no-cache",
-    "deploy-docs": "ts-node tools/gh-pages-publish",
-    "report-coverage": "cat ./coverage/lcov.info | coveralls",
-    "commit": "git-cz",
-    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-    "prettier:all": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'",
     "precommit": "lint-staged",
+    "commit": "git-cz",
+    "commitmsg": "validate-commit-msg",
+    "deploy-docs": "ts-node tools/gh-pages-publish",
+    "lint": "npm run prettier && tslint --project tsconfig.json -t codeFrame --fix",
     "prepush": "npm run test:prod && npm run build",
-    "commitmsg": "validate-commit-msg"
-  },
-  "lint-staged": {
-    "linters": {
-      "{src,test}/**/*.ts": [
-        "prettier --write --config ./.prettierrc.yml",
-        "tslint --fix -t codeFrame",
-        "git add"
-      ]
-    }
+    "report-coverage": "cat ./coverage/lcov.info | coveralls",
+    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "test": "jest",
+    "test:prod": "npm run test -- --coverage --no-cache",
+    "test:watch": "jest --watch",
+    "prettier": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'"
   },
   "config": {
     "commitizen": {
@@ -66,16 +51,7 @@
       "helpMessage": "Use \"npm run commit\" instead, we use conventional-changelog format :) (https://github.com/commitizen/cz-cli)"
     }
   },
-  "greenkeeper": {
-    "ignore": [
-      "@types/node"
-    ]
-  },
-  "publishConfig": {
-    "tag": "alpha"
-  },
   "devDependencies": {
-    "@types/debug": "^0.0.31",
     "@types/jest": "^23.3.1",
     "@types/lodash": "^4.14.116",
     "@types/node": "^8.0.26",
@@ -88,37 +64,40 @@
     "cross-env": "^5.0.5",
     "cz-conventional-changelog": "^2.0.0",
     "greenkeeper-lockfile": "^1.15.1",
-    "husky": "^1.0.0",
-    "jest": "^23.5.0",
-    "lint-staged": "^7.2.0",
-    "lodash": "^4.17.10",
+    "husky": "^1.2.0",
+    "jest": "^23.6.0",
+    "lint-staged": "^7.2.2",
+    "lodash": "^4.17.11",
     "lodash.camelcase": "^4.3.0",
-    "prettier": "^1.14.0",
-    "prompt": "^1.0.0",
-    "replace-in-file": "^3.4.0",
-    "rimraf": "^2.6.1",
-    "rollup": "^0.65.0",
-    "rollup-plugin-commonjs": "^9.1.5",
-    "rollup-plugin-json": "^3.0.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "rxjs": "^6.2.2",
-    "semantic-release": "^15.9.6",
-    "ts-jest": "^23.1.3",
-    "ts-loader": "^4.4.2",
-    "ts-node": "^7.0.0",
-    "tsc-watch": "^1.0.26",
+    "prettier": "^1.15.2",
+    "rimraf": "^2.6.2",
+    "rxjs": "^6.3.3",
+    "semantic-release": "^15.12.0",
+    "sort-package-json": "^1.16.0",
+    "ts-jest": "^23.10.4",
+    "ts-loader": "^5.3.0",
+    "ts-node": "^7.0.1",
+    "tsc-watch": "^1.0.30",
     "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.14.0",
+    "tslint-config-prettier": "^1.16.0",
     "typedoc": "^0.13.0",
-    "typescript": "^2.9.2",
+    "typescript": "^3.1.6",
     "validate-commit-msg": "^2.14.0"
   },
   "peerDependencies": {
     "aws-sdk": "^2.286.1",
     "lodash": "^4.17.10",
-    "rxjs": "^6.0.0",
-    "reflect-metadata": "^0.1.12"
-  }
+    "reflect-metadata": "^0.1.12",
+    "rxjs": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "es2015": "./dist/_esm2015/dynamo-easy.js",
+  "greenkeeper": {
+    "ignore": [
+      "@types/node"
+    ]
+  },
+  "sideEffects": false
 }

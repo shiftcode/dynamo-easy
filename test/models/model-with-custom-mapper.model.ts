@@ -1,4 +1,6 @@
 // tslint:disable:max-classes-per-file
+// tslint:disable:no-non-null-assertion
+
 import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
 import { CustomMapper } from '../../src/decorator/impl/mapper/custom-mapper.decorator'
 import { Model } from '../../src/decorator/impl/model/model.decorator'

@@ -2,13 +2,12 @@ import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { fetchAll } from '../../../helper'
-import { Mapper } from '../../../mapper/mapper'
-import { Attributes } from '../../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { Attributes, fromDb } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
-import { and } from '../../expression/logical-operator/and.function'
-import { ParamUtil } from '../../expression/param-util'
-import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
+import { and } from '../../expression'
+import { addExpression } from '../../expression/param-util'
+import { addCondition, addSortKeyCondition } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
 import { RequestConditionFunction } from '../../expression/type/request-condition-function'
 import { RequestSortKeyConditionFunction } from '../../expression/type/sort-key-condition-function'
@@ -38,9 +37,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
       partitionKey = <string>this.metaData.getPartitionKey()
     }
 
-    return RequestExpressionBuilder.addSortKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData).equals(
-      partitionKeyValue
-    )
+    return addSortKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData).equals(partitionKeyValue)
   }
 
   /**
@@ -68,18 +65,18 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
       throw new Error('There was no sort key defined for current schema')
     }
 
-    return RequestExpressionBuilder.addSortKeyCondition(sortKey, this, this.metaData)
+    return addSortKeyCondition(sortKey, this, this.metaData)
   }
 
   // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
   // update2.function)
   whereAttribute(attributePath: keyof T): RequestConditionFunction<QueryRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', <string>attributePath, this, this.metaData)
+    return addCondition('FilterExpression', <string>attributePath, this, this.metaData)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {
     const condition = and(...conditionDefFns)(undefined, this.metaData)
-    ParamUtil.addExpression('FilterExpression', condition, this.params)
+    addExpression('FilterExpression', condition, this.params)
     return this
   }
 
@@ -97,24 +94,24 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     const params = { ...this.params }
     params.Select = 'COUNT'
 
-    return this.dynamoRx.query(params).pipe(map(response => response.Count!))
+    return this.dynamoRx.query(params).pipe(map(response => response.Count || 0))
   }
 
   execFullResponse(): Observable<QueryResponse<T>> {
     return this.dynamoRx.query(this.params).pipe(
       map(queryResponse => {
         const response: QueryResponse<T> = <any>{ ...queryResponse }
-        response.Items = queryResponse.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))
+        response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes>item, this.modelClazz))
 
         return response
-      })
+      }),
     )
   }
 
   exec(): Observable<T[]> {
     return this.dynamoRx
       .query(this.params)
-      .pipe(map(response => response.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))))
+      .pipe(map(response => (response.Items || []).map(item => fromDb(<Attributes>item, this.modelClazz))))
   }
 
   execNoMap(): Observable<QueryOutput> {
@@ -124,15 +121,13 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   execSingle(): Observable<T | null> {
     this.limit(1)
 
-    return this.dynamoRx.query(this.params).pipe(
-      map(response => {
-        if (response.Count) {
-          return Mapper.fromDb(<Attributes>response.Items![0], this.modelClazz)
-        } else {
-          return null
-        }
-      })
-    )
+    return this.dynamoRx
+      .query(this.params)
+      .pipe(
+        map(response =>
+          response.Items && response.Items.length ? fromDb(<Attributes>response.Items[0], this.modelClazz) : null,
+        ),
+      )
   }
 
   /**

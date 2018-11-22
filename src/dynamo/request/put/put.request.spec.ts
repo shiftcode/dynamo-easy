@@ -10,7 +10,7 @@ describe('put request', () => {
       <any>null,
       SimpleWithPartitionKeyModel,
       getTableName(SimpleWithPartitionKeyModel),
-      item
+      item,
     )
     const params: PutItemInput = request.params
 
@@ -26,7 +26,7 @@ describe('put request', () => {
         <any>null,
         SimpleWithPartitionKeyModel,
         getTableName(SimpleWithPartitionKeyModel),
-        item
+        item,
       )
       request.ifNotExists()
 
@@ -43,7 +43,7 @@ describe('put request', () => {
         <any>null,
         SimpleWithCompositePartitionKeyModel,
         getTableName(SimpleWithCompositePartitionKeyModel),
-        item
+        item,
       )
       request.ifNotExists()
 
@@ -59,7 +59,7 @@ describe('put request', () => {
         <any>null,
         SimpleWithPartitionKeyModel,
         getTableName(SimpleWithPartitionKeyModel),
-        item
+        item,
       )
       request.ifNotExists(25 + 20 === 40)
 

@@ -1,3 +1,5 @@
+// tslint:disable:no-non-null-assertion
+// tslint:disable:no-string-literal
 import { AttributeMap, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
 import {
   organization1CreatedAt,
@@ -23,7 +25,7 @@ import {
   Type,
 } from '../../test/models'
 import { PropertyMetadata } from '../decorator'
-import { Mapper } from './mapper'
+import { fromDb, fromDbOne, toDb, toDbOne } from './mapper'
 import {
   Attribute,
   Attributes,
@@ -41,104 +43,104 @@ describe('Mapper', () => {
   describe('should map single values', () => {
     describe('to db', () => {
       it('string', () => {
-        const attrValue = <StringAttribute>Mapper.toDbOne('foo')!
+        const attrValue = <StringAttribute>toDbOne('foo')!
         expect(attrValue).toBeDefined()
-        expect(attrValue!.S).toBeDefined()
-        expect(attrValue!.S).toBe('foo')
+        expect(attrValue.S).toBeDefined()
+        expect(attrValue.S).toBe('foo')
       })
 
       it('string (empty)', () => {
-        const attrValue = <StringAttribute>Mapper.toDbOne('')!
+        const attrValue = <StringAttribute>toDbOne('')!
         expect(attrValue).toBe(null)
       })
 
       it('number', () => {
-        const attrValue = <NumberAttribute>Mapper.toDbOne(3)!
+        const attrValue = <NumberAttribute>toDbOne(3)!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('N')
-        expect(attrValue!.N).toBe('3')
+        expect(keyOf(attrValue)).toBe('N')
+        expect(attrValue.N).toBe('3')
       })
 
       it('boolean', () => {
-        const attrValue = <BooleanAttribute>Mapper.toDbOne(false)!
+        const attrValue = <BooleanAttribute>toDbOne(false)!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('BOOL')
-        expect(attrValue!.BOOL).toBe(false)
+        expect(keyOf(attrValue)).toBe('BOOL')
+        expect(attrValue.BOOL).toBe(false)
       })
 
       it('null', () => {
-        const attrValue = <NullAttribute>Mapper.toDbOne(null)!
+        const attrValue = <NullAttribute>toDbOne(null)!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('NULL')
-        expect(attrValue!.NULL).toBe(true)
+        expect(keyOf(attrValue)).toBe('NULL')
+        expect(attrValue.NULL).toBe(true)
       })
 
       it('enum (no enum decorator)', () => {
-        const attrValue = <NumberAttribute>Mapper.toDbOne(Type.FirstType)!
+        const attrValue = <NumberAttribute>toDbOne(Type.FirstType)!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('N')
-        expect(attrValue!.N).toBe('0')
+        expect(keyOf(attrValue)).toBe('N')
+        expect(attrValue.N).toBe('0')
       })
 
       it('enum (propertyMetadata -> no enum decorator)', () => {
-        const attrValue: Attribute = <MapAttribute>Mapper.toDbOne(Type.FirstType, <any>{
+        const attrValue: Attribute = <MapAttribute>toDbOne(Type.FirstType, <any>{
           typeInfo: { type: Object, isCustom: true },
         })!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('M')
-        expect(attrValue!.M).toEqual({})
+        expect(keyOf(attrValue)).toBe('M')
+        expect(attrValue.M).toEqual({})
       })
 
       it('enum (with decorator)', () => {
-        const attrValue = <NumberAttribute>Mapper.toDbOne(Type.FirstType, <any>{
+        const attrValue = <NumberAttribute>toDbOne(Type.FirstType, <any>{
           typeInfo: { type: EnumType, isCustom: true },
         })!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('N')
-        expect(attrValue!.N).toBe('0')
+        expect(keyOf(attrValue)).toBe('N')
+        expect(attrValue.N).toBe('0')
       })
 
       it('array -> SS (homogen, no duplicates)', () => {
-        const attrValue = <StringSetAttribute>Mapper.toDbOne(['foo', 'bar'])!
+        const attrValue = <StringSetAttribute>toDbOne(['foo', 'bar'])!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('SS')
-        expect(attrValue!.SS![0]).toBe('foo')
-        expect(attrValue!.SS![1]).toBe('bar')
+        expect(keyOf(attrValue)).toBe('SS')
+        expect(attrValue.SS[0]).toBe('foo')
+        expect(attrValue.SS[1]).toBe('bar')
       })
 
       it('array -> L (homogen, no duplicates, explicit type)', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
           typeInfo: { type: Array, isCustom: true },
         }
-        const attrValue = <ListAttribute>Mapper.toDbOne(['foo', 'bar'], <any>propertyMetadata)!
+        const attrValue = <ListAttribute>toDbOne(['foo', 'bar'], <any>propertyMetadata)!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('L')
+        expect(keyOf(attrValue)).toBe('L')
 
-        expect(keyOf(attrValue!.L![0])).toBe('S')
-        expect((<StringAttribute>attrValue!.L![0]).S).toBe('foo')
+        expect(keyOf(attrValue.L[0])).toBe('S')
+        expect((<StringAttribute>attrValue.L[0]).S).toBe('foo')
 
-        expect(keyOf(attrValue!.L![1])).toBe('S')
-        expect((<StringAttribute>attrValue!.L![1]).S).toBe('bar')
+        expect(keyOf(attrValue.L[1])).toBe('S')
+        expect((<StringAttribute>attrValue.L[1]).S).toBe('bar')
       })
 
       it('array -> L (heterogen, no duplicates)', () => {
-        const attrValue = <ListAttribute>Mapper.toDbOne(['foo', 56, true])!
+        const attrValue = <ListAttribute>toDbOne(['foo', 56, true])!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
         expect(attrValue.L).toBeDefined()
-        expect(attrValue.L!.length).toBe(3)
+        expect(attrValue.L.length).toBe(3)
 
-        const foo = <StringAttribute>attrValue.L![0]
+        const foo = <StringAttribute>attrValue.L[0]
         expect(foo).toBeDefined()
         expect(keyOf(foo)).toBe('S')
         expect(foo.S).toBe('foo')
 
-        const no = <NumberAttribute>attrValue.L![1]
+        const no = <NumberAttribute>attrValue.L[1]
         expect(no).toBeDefined()
         expect(keyOf(no)).toBe('N')
         expect(no.N).toBe('56')
 
-        const bool = <BooleanAttribute>attrValue.L![2]
+        const bool = <BooleanAttribute>attrValue.L[2]
         expect(bool).toBeDefined()
         expect(keyOf(bool)).toBe('BOOL')
         expect(bool.BOOL).toBe(true)
@@ -146,139 +148,139 @@ describe('Mapper', () => {
 
       it('array -> L (homogen, complex type)', () => {
         const attrValue = <ListAttribute>(
-          Mapper.toDbOne([{ name: 'max', age: 25, sortedSet: null }, { name: 'anna', age: 65, sortedSet: null }])!
+          toDbOne([{ name: 'max', age: 25, sortedSet: null }, { name: 'anna', age: 65, sortedSet: null }])!
         )
 
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
 
-        const employee1 = <MapAttribute>attrValue.L![0]
+        const employee1 = <MapAttribute>attrValue.L[0]
         expect(employee1).toBeDefined()
         expect(keyOf(employee1)).toBe('M')
-        expect(Object.keys(employee1.M!).length).toBe(2)
-        expect(employee1.M!['name']).toBeDefined()
-        expect(keyOf(employee1.M!['name'])).toBe('S')
-        expect((<StringAttribute>employee1.M!['name']).S).toBe('max')
+        expect(Object.keys(employee1.M).length).toBe(2)
+        expect(employee1.M.name).toBeDefined()
+        expect(keyOf(employee1.M.name)).toBe('S')
+        expect((<StringAttribute>employee1.M.name).S).toBe('max')
 
-        expect(employee1.M!['age']).toBeDefined()
-        expect(keyOf(employee1.M!['age'])).toBe('N')
-        expect((<NumberAttribute>employee1.M!['age']).N).toBe('25')
+        expect(employee1.M.age).toBeDefined()
+        expect(keyOf(employee1.M.age)).toBe('N')
+        expect((<NumberAttribute>employee1.M.age).N).toBe('25')
       })
 
       it('set', () => {
-        const attrValue = <ListAttribute>Mapper.toDbOne(new Set(['foo', 'bar', 25]))!
+        const attrValue = <ListAttribute>toDbOne(new Set(['foo', 'bar', 25]))!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
-        expect(attrValue.L![0]).toEqual({ S: 'foo' })
-        expect(attrValue.L![1]).toEqual({ S: 'bar' })
-        expect(attrValue.L![2]).toEqual({ N: '25' })
+        expect(attrValue.L[0]).toEqual({ S: 'foo' })
+        expect(attrValue.L[1]).toEqual({ S: 'bar' })
+        expect(attrValue.L[2]).toEqual({ N: '25' })
       })
 
       it('set (empty)', () => {
-        const attrValue = <NullAttribute>Mapper.toDbOne(new Set())!
+        const attrValue = <NullAttribute>toDbOne(new Set())!
         expect(attrValue).toBe(null)
       })
 
       it('set of objects', () => {
-        const attrValue = <ListAttribute>Mapper.toDbOne(new Set([{ name: 'foo', age: 56 }, { name: 'anna', age: 26 }]))!
+        const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 56 }, { name: 'anna', age: 26 }]))!
 
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
-        expect(attrValue.L!.length).toBe(2)
-        expect((<MapAttribute>attrValue.L![0]).M).toBeDefined()
-        expect((<MapAttribute>attrValue.L![0]).M['name']).toBeDefined()
-        expect(keyOf((<MapAttribute>attrValue.L![0]).M['name'])).toBe('S')
-        expect((<StringAttribute>(<MapAttribute>attrValue.L![0]).M['name']).S).toBe('foo')
+        expect(attrValue.L.length).toBe(2)
+        expect((<MapAttribute>attrValue.L[0]).M).toBeDefined()
+        expect((<MapAttribute>attrValue.L[0]).M.name).toBeDefined()
+        expect(keyOf((<MapAttribute>attrValue.L[0]).M.name)).toBe('S')
+        expect((<StringAttribute>(<MapAttribute>attrValue.L[0]).M.name).S).toBe('foo')
       })
 
       it('simple object', () => {
-        const attrValue = <MapAttribute>Mapper.toDbOne({ name: 'foo', age: 56 })!
+        const attrValue = <MapAttribute>toDbOne({ name: 'foo', age: 56 })!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('M')
 
         // name
-        expect(attrValue.M!['name']).toBeDefined()
-        expect(keyOf(attrValue.M!['name'])).toBe('S')
-        expect((<StringAttribute>attrValue.M!['name']).S).toBe('foo')
+        expect(attrValue.M.name).toBeDefined()
+        expect(keyOf(attrValue.M.name)).toBe('S')
+        expect((<StringAttribute>attrValue.M.name).S).toBe('foo')
 
         // age
-        expect(attrValue.M!['age']).toBeDefined()
-        expect(keyOf(attrValue.M!['age'])).toBe('N')
-        expect((<NumberAttribute>attrValue.M!['age']).N).toBe('56')
+        expect(attrValue.M.age).toBeDefined()
+        expect(keyOf(attrValue.M.age)).toBe('N')
+        expect((<NumberAttribute>attrValue.M.age).N).toBe('56')
       })
 
       it('complex object', () => {
-        const attrValue = <MapAttribute>Mapper.toDbOne({
+        const attrValue = <MapAttribute>toDbOne({
           name: 'Max',
           age: 35,
           children: [{ name: 'Anna', age: 5 }, { name: 'Hans', age: 7 }],
         })!
         expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue!)).toBe('M')
+        expect(keyOf(attrValue)).toBe('M')
 
         // name
-        expect(attrValue!.M!['name']).toBeDefined()
-        expect(keyOf(attrValue!.M!['name'])).toBe('S')
-        expect((<StringAttribute>attrValue!.M!['name']).S).toBe('Max')
+        expect(attrValue.M.name).toBeDefined()
+        expect(keyOf(attrValue.M.name)).toBe('S')
+        expect((<StringAttribute>attrValue.M.name).S).toBe('Max')
 
         // age
-        expect(attrValue!.M!['age']).toBeDefined()
-        expect(keyOf(attrValue!.M!['age'])).toBe('N')
-        expect((<NumberAttribute>attrValue!.M!['age']).N).toBe('35')
+        expect(attrValue.M.age).toBeDefined()
+        expect(keyOf(attrValue.M.age)).toBe('N')
+        expect((<NumberAttribute>attrValue.M.age).N).toBe('35')
 
         // children
-        expect(attrValue!.M!['children']).toBeDefined()
-        expect(keyOf(attrValue!.M!['children'])).toBe('L')
-        expect((<ListAttribute>attrValue.M!['children']).L.length).toBe(2)
-        expect(keyOf((<ListAttribute>attrValue.M!['children']).L[0])).toBe('M')
-        expect(keyOf((<ListAttribute>attrValue.M!['children']).L[1])).toBe('M')
+        expect(attrValue.M.children).toBeDefined()
+        expect(keyOf(attrValue.M.children)).toBe('L')
+        expect((<ListAttribute>attrValue.M.children).L.length).toBe(2)
+        expect(keyOf((<ListAttribute>attrValue.M.children).L[0])).toBe('M')
+        expect(keyOf((<ListAttribute>attrValue.M.children).L[1])).toBe('M')
 
-        const firstChild = <MapAttribute>(<ListAttribute>attrValue.M!['children']).L[0]
+        const firstChild = <MapAttribute>(<ListAttribute>attrValue.M.children).L[0]
         // first child
-        expect(firstChild.M['name']).toBeDefined()
-        expect(keyOf(firstChild.M['name'])).toBe('S')
-        expect((<StringAttribute>firstChild.M['name']).S).toBe('Anna')
+        expect(firstChild.M.name).toBeDefined()
+        expect(keyOf(firstChild.M.name)).toBe('S')
+        expect((<StringAttribute>firstChild.M.name).S).toBe('Anna')
 
-        expect(firstChild.M['age']).toBeDefined()
-        expect(keyOf(firstChild.M['age'])).toBe('N')
-        expect((<NumberAttribute>firstChild.M['age']).N).toBe('5')
+        expect(firstChild.M.age).toBeDefined()
+        expect(keyOf(firstChild.M.age)).toBe('N')
+        expect((<NumberAttribute>firstChild.M.age).N).toBe('5')
 
-        const secondChild = <MapAttribute>(<ListAttribute>attrValue.M!['children']).L[1]
+        const secondChild = <MapAttribute>(<ListAttribute>attrValue.M.children).L[1]
         // second child
-        expect(secondChild.M['name']).toBeDefined()
-        expect(keyOf(secondChild.M['name'])).toBe('S')
-        expect((<StringAttribute>secondChild.M['name']).S).toBe('Hans')
+        expect(secondChild.M.name).toBeDefined()
+        expect(keyOf(secondChild.M.name)).toBe('S')
+        expect((<StringAttribute>secondChild.M.name).S).toBe('Hans')
 
-        expect(secondChild.M['age']).toBeDefined()
-        expect(keyOf(secondChild.M['age'])).toBe('N')
-        expect((<NumberAttribute>secondChild.M['age']).N).toBe('7')
+        expect(secondChild.M.age).toBeDefined()
+        expect(keyOf(secondChild.M.age)).toBe('N')
+        expect((<NumberAttribute>secondChild.M.age).N).toBe('7')
       })
     })
 
     describe('from db', () => {
       it('S -> String', () => {
         const attrValue = { S: 'foo' }
-        expect(Mapper.fromDbOne(attrValue)).toBe('foo')
+        expect(fromDbOne(attrValue)).toBe('foo')
       })
 
       it('N -> Number', () => {
         const attrValue = { N: '56' }
-        expect(Mapper.fromDbOne(attrValue)).toBe(56)
+        expect(fromDbOne(attrValue)).toBe(56)
       })
 
       it('BOOL -> Boolean', () => {
         const attrValue = { BOOL: true }
-        expect(Mapper.fromDbOne(attrValue)).toBe(true)
+        expect(fromDbOne(attrValue)).toBe(true)
       })
 
       it('NULL -> null', () => {
         const attrValue = { NULL: true }
-        expect(Mapper.fromDbOne(attrValue)).toBe(null)
+        expect(fromDbOne(attrValue)).toBe(null)
       })
 
       it('SS -> set', () => {
         const attrValue = { SS: ['foo', 'bar'] }
-        const set: Set<string> = Mapper.fromDbOne(attrValue)
+        const set: Set<string> = fromDbOne(attrValue)
         // noinspection SuspiciousInstanceOfGuard
         expect(set instanceof Set).toBeTruthy()
         expect(set.size).toBe(2)
@@ -291,7 +293,7 @@ describe('Mapper', () => {
           typeInfo: { type: Array, isCustom: true },
         }
         const attrValue = { SS: ['foo', 'bar'] }
-        const arr = Mapper.fromDbOne<string[]>(attrValue, <any>propertyMetadata)
+        const arr = fromDbOne<string[]>(attrValue, <any>propertyMetadata)
         expect(Array.isArray(arr)).toBeTruthy()
         expect(arr.length).toBe(2)
         expect(arr[0]).toBe('foo')
@@ -300,7 +302,7 @@ describe('Mapper', () => {
 
       it('NS -> set', () => {
         const attrValue = { NS: ['45', '2'] }
-        const set = Mapper.fromDbOne<Set<number>>(attrValue)
+        const set = fromDbOne<Set<number>>(attrValue)
         // noinspection SuspiciousInstanceOfGuard
         expect(set instanceof Set).toBeTruthy()
         expect(set.size).toBe(2)
@@ -313,7 +315,7 @@ describe('Mapper', () => {
           typeInfo: { type: Array, isCustom: true },
         }
         const attrValue = { NS: ['45', '2'] }
-        const arr = Mapper.fromDbOne<number[]>(attrValue, <any>propertyMetadata)
+        const arr = fromDbOne<number[]>(attrValue, <any>propertyMetadata)
         expect(Array.isArray(arr)).toBeTruthy()
         expect(arr.length).toBe(2)
         expect(arr[0]).toBe(45)
@@ -322,7 +324,7 @@ describe('Mapper', () => {
 
       it('L -> array', () => {
         const attrValue = { L: [{ S: 'foo' }, { N: '45' }, { BOOL: true }] }
-        const arr: any[] = Mapper.fromDbOne<any[]>(attrValue)
+        const arr: any[] = fromDbOne<any[]>(attrValue)
         expect(Array.isArray(arr)).toBeTruthy()
         expect(arr.length).toBe(3)
         expect(arr[0]).toBe('foo')
@@ -335,7 +337,7 @@ describe('Mapper', () => {
           typeInfo: { type: Set, isCustom: true },
         }
         const attrValue = { L: [{ S: 'foo' }, { N: '45' }, { BOOL: true }] }
-        const set = Mapper.fromDbOne<Set<any>>(attrValue, <any>propertyMetadata)
+        const set = fromDbOne<Set<any>>(attrValue, <any>propertyMetadata)
         // noinspection SuspiciousInstanceOfGuard
         expect(set instanceof Set).toBeTruthy()
         expect(set.size).toBe(3)
@@ -353,7 +355,7 @@ describe('Mapper', () => {
             siblings: { SS: ['hans', 'andi', 'dora'] },
           },
         }
-        const obj = Mapper.fromDbOne<any>(attrValue)
+        const obj = fromDbOne<any>(attrValue)
 
         expect(obj.name).toBe('name')
         expect(obj.age).toBe(56)
@@ -418,7 +420,7 @@ describe('Mapper', () => {
           organization.events = events
           organization.transient = 'the value which is marked as transient'
 
-          organizationAttrMap = Mapper.toDb(organization, Organization)
+          organizationAttrMap = toDb(organization, Organization)
         })
 
         describe('creates correct attribute map', () => {
@@ -539,22 +541,22 @@ describe('Mapper', () => {
             expect(keyOf(birthday1['date'])).toBe('S')
             expect((<StringAttribute>birthday1['date']).S).toBe(birthday1Date.toISOString())
 
-            expect(birthday1['presents']).toBeDefined()
-            expect(keyOf(birthday1['presents'])).toBe('L')
-            expect((<ListAttribute>birthday1['presents']).L.length).toBe(2)
-            expect(keyOf((<ListAttribute>birthday1['presents']).L[0])).toBe('M')
+            expect(birthday1.presents).toBeDefined()
+            expect(keyOf(birthday1.presents)).toBe('L')
+            expect((<ListAttribute>birthday1.presents).L.length).toBe(2)
+            expect(keyOf((<ListAttribute>birthday1.presents).L[0])).toBe('M')
 
-            expect(keyOf((<ListAttribute>birthday1['presents']).L[0])).toBe('M')
+            expect(keyOf((<ListAttribute>birthday1.presents).L[0])).toBe('M')
 
-            const birthday1gift1 = (<MapAttribute>(<ListAttribute>birthday1['presents']).L[0]).M
-            expect(birthday1gift1['description']).toBeDefined()
-            expect(keyOf(birthday1gift1['description'])).toBe('S')
-            expect((<StringAttribute>birthday1gift1['description']).S).toBe('ticket to rome')
+            const birthday1gift1 = (<MapAttribute>(<ListAttribute>birthday1.presents).L[0]).M
+            expect(birthday1gift1.description).toBeDefined()
+            expect(keyOf(birthday1gift1.description)).toBe('S')
+            expect((<StringAttribute>birthday1gift1.description).S).toBe('ticket to rome')
 
-            const birthday1gift2 = (<MapAttribute>(<ListAttribute>birthday1['presents']).L[1]).M
-            expect(birthday1gift2['description']).toBeDefined()
-            expect(keyOf(birthday1gift2['description'])).toBe('S')
-            expect((<StringAttribute>birthday1gift2['description']).S).toBe('camper van')
+            const birthday1gift2 = (<MapAttribute>(<ListAttribute>birthday1.presents).L[1]).M
+            expect(birthday1gift2.description).toBeDefined()
+            expect(keyOf(birthday1gift2.description)).toBe('S')
+            expect((<StringAttribute>birthday1gift2.description).S).toBe('camper van')
 
             // birthday 2
             const birthday2 = (<MapAttribute>birthdays[1]).M
@@ -562,22 +564,22 @@ describe('Mapper', () => {
             expect(keyOf(birthday2['date'])).toBe('S')
             expect((<StringAttribute>birthday2['date']).S).toBe(birthday2Date.toISOString())
 
-            expect(birthday2['presents']).toBeDefined()
-            expect(keyOf(birthday2['presents'])).toBe('L')
-            expect((<ListAttribute>birthday2['presents']).L.length).toBe(2)
-            expect(keyOf((<ListAttribute>birthday2['presents']).L[0])).toBe('M')
+            expect(birthday2.presents).toBeDefined()
+            expect(keyOf(birthday2.presents)).toBe('L')
+            expect((<ListAttribute>birthday2.presents).L.length).toBe(2)
+            expect(keyOf((<ListAttribute>birthday2.presents).L[0])).toBe('M')
 
-            expect(keyOf((<ListAttribute>birthday2['presents']).L[0])).toBe('M')
+            expect(keyOf((<ListAttribute>birthday2.presents).L[0])).toBe('M')
 
-            const birthday2gift1 = (<MapAttribute>(<ListAttribute>birthday2['presents']).L[0]).M
-            expect(birthday2gift1['description']).toBeDefined()
-            expect(keyOf(birthday2gift1['description'])).toBe('S')
-            expect((<StringAttribute>birthday2gift1['description']).S).toBe('car')
+            const birthday2gift1 = (<MapAttribute>(<ListAttribute>birthday2.presents).L[0]).M
+            expect(birthday2gift1.description).toBeDefined()
+            expect(keyOf(birthday2gift1.description)).toBe('S')
+            expect((<StringAttribute>birthday2gift1.description).S).toBe('car')
 
-            const birthday2gift2 = (<MapAttribute>(<ListAttribute>birthday2['presents']).L[1]).M
-            expect(birthday2gift2['description']).toBeDefined()
-            expect(keyOf(birthday2gift2['description'])).toBe('S')
-            expect((<StringAttribute>birthday2gift2['description']).S).toBe('gin')
+            const birthday2gift2 = (<MapAttribute>(<ListAttribute>birthday2.presents).L[1]).M
+            expect(birthday2gift2.description).toBeDefined()
+            expect(keyOf(birthday2gift2.description)).toBe('S')
+            expect((<StringAttribute>birthday2gift2.description).S).toBe('gin')
           })
 
           it('awards', () => {
@@ -602,13 +604,13 @@ describe('Mapper', () => {
             const a = <MapAttribute>events[0]
 
             expect(keyOf(a)).toBe('M')
-            expect(a.M['name']).toBeDefined()
-            expect(keyOf(a.M['name'])).toBe('S')
-            expect((<StringAttribute>a.M['name']).S).toBe('shift the web')
+            expect(a.M.name).toBeDefined()
+            expect(keyOf(a.M.name)).toBe('S')
+            expect((<StringAttribute>a.M.name).S).toBe('shift the web')
 
-            expect(a.M['participantCount']).toBeDefined()
-            expect(keyOf(a.M['participantCount'])).toBe('N')
-            expect((<NumberAttribute>a.M['participantCount']).N).toBe('1520')
+            expect(a.M.participantCount).toBeDefined()
+            expect(keyOf(a.M.participantCount)).toBe('N')
+            expect((<NumberAttribute>a.M.participantCount).N).toBe('1520')
           })
 
           it('transient', () => {
@@ -617,7 +619,7 @@ describe('Mapper', () => {
 
           // an empty set is not a valid attribute value to be persisted either NULL:true or
           it('emptySet', () => {
-            expect(organizationAttrMap['emptySet']).toEqual({ NULL: true })
+            expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
           })
         })
       })
@@ -626,22 +628,22 @@ describe('Mapper', () => {
         it('should map using the custom mapper', () => {
           const model = new ModelWithCustomMapperModel()
           model.id = new Id(20, 2017)
-          const toDb: Attributes = Mapper.toDb(model, ModelWithCustomMapperModel)
+          const toDbVal: Attributes = toDb(model, ModelWithCustomMapperModel)
 
-          expect(toDb.id).toBeDefined()
-          expect(keyOf(toDb.id)).toBe('S')
-          expect((<StringAttribute>toDb.id).S).toBe('00202017')
+          expect(toDbVal.id).toBeDefined()
+          expect(keyOf(toDbVal.id)).toBe('S')
+          expect((<StringAttribute>toDbVal.id).S).toBe('00202017')
         })
       })
 
       describe('model with autogenerated id', () => {
         it('should create an uuid', () => {
-          const toDb: Attributes = Mapper.toDb(new ModelWithAutogeneratedId(), ModelWithAutogeneratedId)
-          expect(toDb.id).toBeDefined()
-          expect(keyOf(toDb.id)).toBe('S')
+          const toDbVal: Attributes = toDb(new ModelWithAutogeneratedId(), ModelWithAutogeneratedId)
+          expect(toDbVal.id).toBeDefined()
+          expect(keyOf(toDbVal.id)).toBe('S')
           // https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid
-          expect((<StringAttribute>toDb.id).S).toMatch(
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+          expect((<StringAttribute>toDbVal.id).S).toMatch(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
           )
         })
       })
@@ -649,51 +651,51 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDb: AttributeMap = Mapper.toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
-          expect(toDb.startDate.S).toBeDefined()
-          expect(toDb.startDate.S).toEqual(now.toISOString())
+          const toDbVal: AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          expect(toDbVal.startDate.S).toBeDefined()
+          expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })
         it('should accept date as HASH or RANGE key on GSI', () => {
           const now = new Date()
-          const toDb: AttributeMap = Mapper.toDb(new ModelWithDateAsIndexHashKey(0, now), ModelWithDateAsIndexHashKey)
-          expect(toDb.creationDate.S).toBeDefined()
-          expect(toDb.creationDate.S).toEqual(now.toISOString())
+          const toDbVal: AttributeMap = toDb(new ModelWithDateAsIndexHashKey(0, now), ModelWithDateAsIndexHashKey)
+          expect(toDbVal.creationDate.S).toBeDefined()
+          expect(toDbVal.creationDate.S).toEqual(now.toISOString())
         })
         it('should throw error when no custom mapper was defined', () => {
           expect(() => {
-            Mapper.toDb(new ModelWithoutCustomMapper('key', 'value', 'otherValue'), ModelWithoutCustomMapper)
+            toDb(new ModelWithoutCustomMapper('key', 'value', 'otherValue'), ModelWithoutCustomMapper)
           }).toThrow()
 
           expect(() => {
-            Mapper.toDb(new ModelWithoutCustomMapperOnIndex('id', 'key', 'value'), ModelWithoutCustomMapperOnIndex)
+            toDb(new ModelWithoutCustomMapperOnIndex('id', 'key', 'value'), ModelWithoutCustomMapperOnIndex)
           }).toThrow()
         })
       })
 
       // FIXME TEST fix this test
       xdescribe('model with complex property values (decorators)', () => {
-        let toDb: Attributes
+        let toDbVal: Attributes
 
         beforeEach(() => {
-          toDb = Mapper.toDb(new Product(), Product)
+          toDbVal = toDb(new Product(), Product)
         })
 
         it('nested value', () => {
-          expect(toDb.nestedValue).toBeDefined()
-          expect((<MapAttribute>toDb.nestedValue).M).toBeDefined()
-          expect(Object.keys((<MapAttribute>toDb.nestedValue).M).length).toBe(1)
-          expect((<MapAttribute>toDb.nestedValue).M['sortedSet']).toBeDefined()
-          expect(keyOf((<MapAttribute>toDb.nestedValue).M['sortedSet'])).toBe('L')
+          expect(toDbVal.nestedValue).toBeDefined()
+          expect((<MapAttribute>toDbVal.nestedValue).M).toBeDefined()
+          expect(Object.keys((<MapAttribute>toDbVal.nestedValue).M).length).toBe(1)
+          expect((<MapAttribute>toDbVal.nestedValue).M.sortedSet).toBeDefined()
+          expect(keyOf((<MapAttribute>toDbVal.nestedValue).M.sortedSet)).toBe('L')
         })
 
         it('list', () => {
-          expect(toDb.list).toBeDefined()
-          expect(keyOf(toDb.list)).toBe('L')
-          expect((<ListAttribute>toDb.list).L.length).toBe(1)
-          expect(keyOf((<ListAttribute>toDb.list).L[0])).toBe('M')
+          expect(toDbVal.list).toBeDefined()
+          expect(keyOf(toDbVal.list)).toBe('L')
+          expect((<ListAttribute>toDbVal.list).L.length).toBe(1)
+          expect(keyOf((<ListAttribute>toDbVal.list).L[0])).toBe('M')
           // expect(Object.keys(toDb.list.L[0].M).length).toBe(1);
-          expect((<MapAttribute>(<ListAttribute>toDb.list).L[0]).M.collection).toBeDefined()
-          expect(keyOf((<MapAttribute>(<ListAttribute>toDb.list).L[0]).M.collection)).toBe('L')
+          expect((<MapAttribute>(<ListAttribute>toDbVal.list).L[0]).M.collection).toBeDefined()
+          expect(keyOf((<MapAttribute>(<ListAttribute>toDbVal.list).L[0]).M.collection)).toBe('L')
         })
       })
     })
@@ -704,7 +706,7 @@ describe('Mapper', () => {
         let product: Product
 
         beforeEach(() => {
-          product = Mapper.fromDb(productFromDb, Product)
+          product = fromDb(productFromDb, Product)
         })
 
         it('nested value', () => {
@@ -720,7 +722,7 @@ describe('Mapper', () => {
         let organization: Organization
 
         beforeEach(() => {
-          organization = Mapper.fromDb(organizationFromDb, Organization)
+          organization = fromDb(organizationFromDb, Organization)
         })
 
         it('id', () => {
@@ -752,7 +754,7 @@ describe('Mapper', () => {
           expect(organization.employees[0].createdAt instanceof Date).toBeTruthy()
           expect(isNaN(<any>organization.employees[0].createdAt)).toBeFalsy()
           expect((<Date>organization.employees[0].createdAt).toISOString()).toEqual(
-            organization1Employee1CreatedAt.toISOString()
+            organization1Employee1CreatedAt.toISOString(),
           )
 
           // set is mapped to set but would expect list, should not work without extra @Sorted() decorator

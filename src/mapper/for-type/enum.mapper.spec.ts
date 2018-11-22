@@ -28,7 +28,7 @@ describe('enum mapper', () => {
     })
 
     it('should work', () => {
-      const attributeValue = <NumberAttribute>mapper.toDb(Tags.ONE, propertyMetadata)
+      const attributeValue = mapper.toDb(Tags.ONE, propertyMetadata)
       expect(attributeValue).toEqual({ N: '0' })
     })
 

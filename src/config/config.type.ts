@@ -1,4 +1,4 @@
-import { MapperForType } from '../mapper/for-type/base.mapper'
+import { MapperForType } from '../mapper'
 import { ModelConstructor } from '../model'
 
 export interface Config {

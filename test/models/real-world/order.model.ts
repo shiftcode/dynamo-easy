@@ -78,7 +78,7 @@ export class OrderId {
   }
 
   static fromDb(dbValue: StringAttribute): OrderId {
-    return OrderId.parse(dbValue['S'])
+    return OrderId.parse(dbValue.S)
   }
 
   constructor(counter: number, year: number) {
@@ -113,7 +113,7 @@ export class BaseOrder {
 
   // FIXME DE check if persisted
   // internal use for UI only, should not be persisted
-  _isNew?: boolean
+  isNew?: boolean
 }
 
 @Model()

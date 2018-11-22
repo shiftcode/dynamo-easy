@@ -1,4 +1,5 @@
 // tslint:disable:max-classes-per-file
+// tslint:disable:no-non-null-assertion
 import { PropertyMetadata } from '../../../src/decorator'
 import { MapperForType } from '../../../src/mapper'
 import { ListAttribute, StringAttribute } from '../../../src/mapper/type/attribute.type'
@@ -19,7 +20,7 @@ type AttributeStringOrListValue = StringAttribute | ListAttribute
 export class FormIdsMapper implements MapperForType<FormId[] | FormId, AttributeStringOrListValue> {
   fromDb(attributeValue: AttributeStringOrListValue, propertyMetadata?: PropertyMetadata<FormId[]>): FormId[] | FormId {
     if ('L' in attributeValue) {
-      return attributeValue.L.map(formIdDb => FormId.parse(formIdDb.S!))
+      return attributeValue.L.map(formIdDb => FormId.parse((<StringAttribute>formIdDb).S))
     } else if ('S' in attributeValue) {
       return FormId.parse(attributeValue.S)
     } else {
@@ -29,12 +30,12 @@ export class FormIdsMapper implements MapperForType<FormId[] | FormId, Attribute
 
   toDb(
     propertyValue: FormId[] | FormId,
-    propertyMetadata?: PropertyMetadata<FormId[]>
+    propertyMetadata?: PropertyMetadata<FormId[]>,
   ): AttributeStringOrListValue | null {
     if (Array.isArray(propertyValue)) {
       return { L: propertyValue.map(a => ({ S: FormId.toString(a) })) }
     } else {
-      return { S: FormId.toString(<FormId>propertyValue) }
+      return { S: FormId.toString(propertyValue) }
     }
   }
 }

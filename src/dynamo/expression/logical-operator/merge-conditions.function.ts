@@ -6,7 +6,7 @@ import { Expression } from '../type/expression.type'
 
 export function mergeConditions(
   operator: 'AND' | 'OR',
-  conditionDefinitionFns: ConditionExpressionDefinitionFunction[]
+  conditionDefinitionFns: ConditionExpressionDefinitionFunction[],
 ): ConditionExpressionDefinitionFunction {
   return (expressionAttributeValues: string[] | undefined, metadata: Metadata<any> | undefined): Expression => {
     const mergedCondition: Expression = {

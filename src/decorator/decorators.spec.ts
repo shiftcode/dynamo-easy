@@ -1,3 +1,4 @@
+// tslint:disable:no-non-null-assertion
 import { getMetaDataProperty } from '../../test/helper'
 import {
   ComplexModel,
@@ -17,12 +18,12 @@ import {
 } from '../../test/models'
 import { ExtendedFormModel, Form } from '../../test/models/real-world'
 import { EnumType } from '../mapper'
-import { Metadata, MetadataHelper, ModelMetadata } from './index'
+import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
 
 describe('Decorators should add correct metadata', () => {
   describe('CustomMapper() should allow to define a different Mapper', () => {
     it('should define the mapper in metadata', () => {
-      const metaData = MetadataHelper.forModel(ModelWithCustomMapperModel)
+      const metaData = metadataForModel(ModelWithCustomMapperModel)
 
       expect(metaData).toBeDefined()
       expect(metaData.clazz).toBe(ModelWithCustomMapperModel)
@@ -40,7 +41,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<SimpleModel>
 
     beforeEach(() => {
-      modelOptions = MetadataHelper.forModel(SimpleModel)
+      modelOptions = metadataForModel(SimpleModel)
     })
 
     it('with default table name', () => {
@@ -59,7 +60,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<CustomTableNameModel>
 
     beforeEach(() => {
-      modelOptions = MetadataHelper.forModel(CustomTableNameModel)
+      modelOptions = metadataForModel(CustomTableNameModel)
     })
 
     it('with custom table name', () => {
@@ -74,7 +75,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<ComplexModel>
 
     beforeEach(() => {
-      modelOptions = MetadataHelper.get(ComplexModel).modelOptions
+      modelOptions = metadataForClass(ComplexModel).modelOptions
     })
 
     it('with default model metadata', () => {
@@ -223,7 +224,7 @@ describe('Decorators should add correct metadata', () => {
       let metadata: Metadata<ModelWithGSI>
 
       beforeEach(() => {
-        metadata = MetadataHelper.get(ModelWithGSI)
+        metadata = metadataForClass(ModelWithGSI)
       })
 
       it('should add indexes on model', () => {
@@ -248,7 +249,7 @@ describe('Decorators should add correct metadata', () => {
       let metadata: Metadata<DifferentModel>
 
       beforeEach(() => {
-        metadata = MetadataHelper.get(DifferentModel)
+        metadata = metadataForClass(DifferentModel)
       })
 
       it('should add indexes on model', () => {
@@ -282,7 +283,7 @@ describe('Decorators should add correct metadata', () => {
       let metadata: Metadata<ModelWithABunchOfIndexes>
 
       beforeEach(() => {
-        metadata = MetadataHelper.get(ModelWithABunchOfIndexes)
+        metadata = metadataForClass(ModelWithABunchOfIndexes)
       })
 
       it('should add indexes on model', () => {
@@ -315,13 +316,17 @@ describe('Decorators should add correct metadata', () => {
     let metadata: Metadata<ModelWithEnum>
 
     beforeEach(() => {
-      metadata = MetadataHelper.get(ModelWithEnum)
+      metadata = metadataForClass(ModelWithEnum)
     })
 
     it('should add enum type to property', () => {
       const enumPropertyMetadata = metadata.forProperty('type')!
       expect(enumPropertyMetadata.typeInfo).toBeDefined()
-      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Object, isCustom: true })
+      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number, isCustom: false })
+
+      const strEnumPropertyMetadata = metadata.forProperty('strType')!
+      expect(strEnumPropertyMetadata.typeInfo).toBeDefined()
+      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String, isCustom: false })
     })
   })
 
@@ -329,7 +334,7 @@ describe('Decorators should add correct metadata', () => {
     let metadata: Metadata<ModelWithEnumDeclared>
 
     beforeEach(() => {
-      metadata = MetadataHelper.get(ModelWithEnumDeclared)
+      metadata = metadataForClass(ModelWithEnumDeclared)
     })
 
     it('should add enum type to property', () => {
@@ -344,7 +349,7 @@ describe('Decorators should add correct metadata', () => {
     let metadata: Metadata<Form>
 
     beforeEach(() => {
-      metadata = MetadataHelper.get(Form)
+      metadata = metadataForClass(Form)
     })
 
     it('model metadata should be defined', () => {
@@ -359,7 +364,7 @@ describe('Decorators should add correct metadata', () => {
     let metadata: Metadata<ExtendedFormModel>
 
     beforeEach(() => {
-      metadata = MetadataHelper.get(Form)
+      metadata = metadataForClass(Form)
     })
 
     it('model metadata schould be defined', () => {

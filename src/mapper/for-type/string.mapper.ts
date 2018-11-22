@@ -2,8 +2,6 @@ import { StringAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 export class StringMapper implements MapperForType<string, StringAttribute> {
-  constructor() {}
-
   fromDb(attributeValue: StringAttribute): string {
     if (attributeValue.S) {
       return attributeValue.S

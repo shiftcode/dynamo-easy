@@ -1,8 +1,8 @@
 import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
 import { Model, PartitionKey, Property } from '../../decorator/impl'
-import { MetadataHelper } from '../../decorator/metadata'
-import { ConditionExpressionBuilder } from './condition-expression-builder'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { buildFilterExpression, deepFilter } from './condition-expression-builder'
 
 @Model()
 class MyModel {
@@ -30,18 +30,12 @@ describe('expressions', () => {
       new Set(arr),
     ]
 
-    const filteredObj = ConditionExpressionBuilder.deepFilter(obj, item => item !== undefined)
+    const filteredObj = deepFilter(obj, item => item !== undefined)
     expect(filteredObj).toEqual([{ street: 'street', zip: 1524 }, [{ age: 25 }], new Set([arr[0], arr[1]])])
   })
 
   it('use property metadata', () => {
-    const condition = ConditionExpressionBuilder.buildFilterExpression(
-      'prop',
-      '>',
-      [10],
-      undefined,
-      MetadataHelper.get(MyModel)
-    )
+    const condition = buildFilterExpression('prop', '>', [10], undefined, metadataForClass(MyModel))
     expect(condition.statement).toBe('#prop > :prop')
 
     expect(condition.attributeNames['#prop']).toBe('propDb')
@@ -49,7 +43,7 @@ describe('expressions', () => {
   })
 
   it('existing attributeValues', () => {
-    const condition = ConditionExpressionBuilder.buildFilterExpression('prop', '>', [10], [':prop'], undefined)
+    const condition = buildFilterExpression('prop', '>', [10], [':prop'], undefined)
     expect(condition.statement).toBe('#prop > :prop_2')
 
     expect(condition.attributeNames['#prop']).toBe('prop')
@@ -59,25 +53,13 @@ describe('expressions', () => {
   describe('operators', () => {
     it('simple', () => {
       // property('age').gt(10)
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'age',
-        '>',
-        [10],
-        undefined,
-        MetadataHelper.get(MyModel)
-      )
+      const condition = buildFilterExpression('age', '>', [10], undefined, metadataForClass(MyModel))
       expect(condition.statement).toBe('#age > :age')
     })
 
     it('equals', () => {
       // property('id').equals('equalsValue'))
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'id',
-        '=',
-        ['equalsValue'],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('id', '=', ['equalsValue'], undefined, undefined)
       expect(condition.statement).toBe('#id = :id')
 
       expect(condition.attributeNames).toBeDefined()
@@ -91,13 +73,7 @@ describe('expressions', () => {
 
     it('not equals', () => {
       // property('id').ne('notEqualsValue')
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'id',
-        '<>',
-        ['notEqualsValue'],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('id', '<>', ['notEqualsValue'], undefined, undefined)
       expect(condition.statement).toBe('#id <> :id')
 
       expect(condition.attributeNames).toBeDefined()
@@ -111,7 +87,7 @@ describe('expressions', () => {
 
     it('greater than', () => {
       // property('count').gt(5)
-      const condition = ConditionExpressionBuilder.buildFilterExpression('count', '>', [5], undefined, undefined)
+      const condition = buildFilterExpression('count', '>', [5], undefined, undefined)
       expect(condition.statement).toBe('#count > :count')
 
       expect(condition.attributeNames).toBeDefined()
@@ -125,7 +101,7 @@ describe('expressions', () => {
 
     it('greater than, equal', () => {
       // property('count').gte(10)
-      const condition = ConditionExpressionBuilder.buildFilterExpression('count', '>=', [10], undefined, undefined)
+      const condition = buildFilterExpression('count', '>=', [10], undefined, undefined)
       expect(condition.statement).toBe('#count >= :count')
 
       expect(condition.attributeNames).toBeDefined()
@@ -139,7 +115,7 @@ describe('expressions', () => {
 
     it('lower than', () => {
       // property('count').lt(100)
-      const condition = ConditionExpressionBuilder.buildFilterExpression('count', '<', [100], undefined, undefined)
+      const condition = buildFilterExpression('count', '<', [100], undefined, undefined)
       expect(condition.statement).toBe('#count < :count')
 
       expect(condition.attributeNames).toBeDefined()
@@ -153,7 +129,7 @@ describe('expressions', () => {
 
     it('lower than, equal', () => {
       // property('count').lte(100)
-      const condition = ConditionExpressionBuilder.buildFilterExpression('count', '<=', [100], undefined, undefined)
+      const condition = buildFilterExpression('count', '<=', [100], undefined, undefined)
       expect(condition.statement).toBe('#count <= :count')
 
       expect(condition.attributeNames).toBeDefined()
@@ -167,13 +143,7 @@ describe('expressions', () => {
 
     it('attribute exists', () => {
       // property('attr').notNull()
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'attr',
-        'attribute_exists',
-        [],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('attr', 'attribute_exists', [], undefined, undefined)
       expect(condition.statement).toBe('attribute_exists (#attr)')
 
       expect(condition.attributeNames).toBeDefined()
@@ -186,13 +156,7 @@ describe('expressions', () => {
 
     it('attribute not exists', () => {
       // property('attr').null()
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'attr',
-        'attribute_not_exists',
-        [],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('attr', 'attribute_not_exists', [], undefined, undefined)
       expect(condition.statement).toBe('attribute_not_exists (#attr)')
 
       expect(condition.attributeNames).toBeDefined()
@@ -205,13 +169,7 @@ describe('expressions', () => {
 
     it('attribute type', () => {
       // property('attr').type('S')
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'attr',
-        'attribute_type',
-        ['S'],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('attr', 'attribute_type', ['S'], undefined, undefined)
       expect(condition.statement).toBe('attribute_type (#attr, :attr)')
 
       expect(condition.attributeNames).toBeDefined()
@@ -225,13 +183,7 @@ describe('expressions', () => {
 
     it('begins with', () => {
       // property('textProp').beginsWith('te')
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'textProp',
-        'begins_with',
-        ['te'],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('textProp', 'begins_with', ['te'], undefined, undefined)
       expect(condition.statement).toBe('begins_with (#textProp, :textProp)')
 
       expect(condition.attributeNames).toBeDefined()
@@ -245,13 +197,7 @@ describe('expressions', () => {
 
     it('contains', () => {
       // property('myCollection').contains(2)
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'myCollection',
-        'contains',
-        [2],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('myCollection', 'contains', [2], undefined, undefined)
       expect(condition.statement).toBe('contains (#myCollection, :myCollection)')
 
       expect(condition.attributeNames).toBeDefined()
@@ -265,13 +211,7 @@ describe('expressions', () => {
 
     it('in', () => {
       // property('myCollection').in(['myCollection', 'myOtherValue'])
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'myCollection',
-        'IN',
-        [['myValue', 'myOtherValue']],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('myCollection', 'IN', [['myValue', 'myOtherValue']], undefined, undefined)
       expect(condition.statement).toBe('#myCollection IN (:myCollection_0, :myCollection_1)')
       expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
       expect(condition.attributeValues).toEqual({
@@ -282,13 +222,7 @@ describe('expressions', () => {
 
     it('between (numbers)', () => {
       // property('counter').between(2, 5)
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'counter',
-        'BETWEEN',
-        [2, 5],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('counter', 'BETWEEN', [2, 5], undefined, undefined)
       expect(condition.statement).toBe('#counter BETWEEN :counter AND :counter_2')
 
       expect(condition.attributeNames).toBeDefined()
@@ -308,12 +242,12 @@ describe('expressions', () => {
       const date1 = new Date('2017-03-17T20:00:00.000Z')
       const date2 = new Date('2017-05-07T20:00:00.000Z')
       // property('creationDate').between(date1, date2)
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
+      const condition = buildFilterExpression(
         'creationDate',
         'BETWEEN',
         [date1, date2],
         undefined,
-        MetadataHelper.get(ComplexModel)
+        metadataForClass(ComplexModel),
       )
 
       expect(condition.statement).toBe('#creationDate BETWEEN :creationDate AND :creationDate_2')
@@ -332,32 +266,20 @@ describe('expressions', () => {
     })
 
     it('should throw error for wrong value arity', () => {
-      expect(() =>
-        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [], undefined, undefined)
-      ).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
+      expect(() => buildFilterExpression('age', 'attribute_type', [], undefined, undefined)).toThrowError(
+        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
       )
     })
 
     it('should throw error for wrong value arity', () => {
-      expect(() =>
-        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined)
-      ).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
+      expect(() => buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined)).toThrowError(
+        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
       )
     })
 
     it('should throw error for wrong value type', () => {
-      expect(() =>
-        ConditionExpressionBuilder.buildFilterExpression(
-          'age',
-          'IN',
-          ['myValue', 'mySecondValue'],
-          undefined,
-          undefined
-        )
-      ).toThrowError(
-        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
+      expect(() => buildFilterExpression('age', 'IN', ['myValue', 'mySecondValue'], undefined, undefined)).toThrowError(
+        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)',
       )
     })
   })
@@ -365,7 +287,7 @@ describe('expressions', () => {
   describe('operator nested attributes', () => {
     it('list path', () => {
       // property('age').gt(10)
-      const condition = ConditionExpressionBuilder.buildFilterExpression('list[0]', '>', [10], undefined, undefined)
+      const condition = buildFilterExpression('list[0]', '>', [10], undefined, undefined)
 
       expect(condition.statement).toBe('#list[0] > :list_at_0')
       expect(condition.attributeNames).toEqual({ '#list': 'list' })
@@ -374,7 +296,7 @@ describe('expressions', () => {
 
     it('document (map) path', () => {
       // property('age').gt(10)
-      const condition = ConditionExpressionBuilder.buildFilterExpression('person.age', '>', [10], undefined, undefined)
+      const condition = buildFilterExpression('person.age', '>', [10], undefined, undefined)
 
       expect(condition.statement).toBe('#person.#age > :person__age')
       expect(condition.attributeNames).toEqual({ '#person': 'person', '#age': 'age' })
@@ -383,13 +305,7 @@ describe('expressions', () => {
 
     it('combined path', () => {
       // property('age').gt(10)
-      const condition = ConditionExpressionBuilder.buildFilterExpression(
-        'person.birthdays[5].year',
-        '=',
-        [2016],
-        undefined,
-        undefined
-      )
+      const condition = buildFilterExpression('person.birthdays[5].year', '=', [2016], undefined, undefined)
 
       expect(condition.statement).toBe('#person.#birthdays[5].#year = :person__birthdays_at_5__year')
       expect(condition.attributeNames).toEqual({ '#person': 'person', '#birthdays': 'birthdays', '#year': 'year' })

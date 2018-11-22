@@ -2,8 +2,8 @@ import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject, isString } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { MetadataHelper } from '../../decorator/metadata/metadata-helper'
-import { Mapper } from '../../mapper/mapper'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { fromDb, toDbOne } from '../../mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../default-session-validity-ensurer.const'
@@ -24,7 +24,7 @@ export class BatchGetRequest {
 
   constructor(
     private tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
+    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
   ) {
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
     this.params = <BatchGetItemInput>{
@@ -44,7 +44,7 @@ export class BatchGetRequest {
     }
     this.tables.set(tableName, modelClazz)
 
-    const metadata = MetadataHelper.get(modelClazz)
+    const metadata = metadataForClass(modelClazz)
     const attributeMaps: Attributes[] = []
 
     // loop over all the keys
@@ -53,7 +53,7 @@ export class BatchGetRequest {
 
       if (isString(key)) {
         // got a simple primary key
-        const value = Mapper.toDbOne(key)
+        const value = toDbOne(key)
         if (value === null) {
           throw Error('please provide an actual value for partition key')
         }
@@ -63,19 +63,19 @@ export class BatchGetRequest {
         // got a composite primary key
 
         // partition key
-        const mappedPartitionKey = Mapper.toDbOne(key.partitionKey)
+        const mappedPartitionKey = toDbOne(key.partitionKey)
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
         idOb[<string>metadata.getPartitionKey()] = mappedPartitionKey
 
         // sort key
-        const mappedSortKey = Mapper.toDbOne(key.sortKey)
+        const mappedSortKey = toDbOne(key.sortKey)
         if (mappedSortKey === null) {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[<string>metadata.getSortKey()!] = mappedSortKey
+        idOb[<string>metadata.getSortKey()] = mappedSortKey
       } else {
         throw new Error('a key must either be a string or a PrimaryKey')
       }
@@ -93,51 +93,41 @@ export class BatchGetRequest {
   execFullResponse(): Observable<BatchGetFullResponse> {
     return this.dynamoRx.batchGetItems(this.params).pipe(
       map(response => {
-        const r = <BatchGetFullResponse>{
+        let Responses: BatchGetResponse = {}
+        if (response.Responses && Object.keys(response.Responses).length) {
+          Responses = Object.entries(response.Responses).reduce((u: BatchGetResponse, [key, val]) => {
+            u[key] = val.map(attributes => fromDb(<Attributes>attributes, this.tables.get(key)))
+            return u
+          }, {})
+        }
+        return {
           ConsumedCapacity: response.ConsumedCapacity,
           UnprocessedKeys: response.UnprocessedKeys,
-          Responses: {},
+          Responses,
         }
-
-        if (response.Responses && Object.keys(response.Responses).length) {
-          Object.keys(response.Responses).forEach(tableName => {
-            const mapped = response.Responses![tableName].map(attributes =>
-              Mapper.fromDb(<Attributes>attributes, this.tables.get(tableName))
-            )
-            r.Responses![tableName] = mapped
-          })
-        }
-
-        return r
-      })
+      }),
     )
   }
 
   exec(): Observable<BatchGetResponse> {
     return this.dynamoRx.batchGetItems(this.params).pipe(
       map(response => {
-        const r = <BatchGetResponse>{}
         if (response.Responses && Object.keys(response.Responses).length) {
-          Object.keys(response.Responses).forEach(tableName => {
-            const mapped = response.Responses![tableName].map(attributeMap =>
-              Mapper.fromDb(<Attributes>attributeMap, this.tables.get(tableName))
-            )
-            r[tableName] = mapped
-          })
-
-          return r
-        } else {
-          return {}
+          return Object.entries(response.Responses).reduce((u: BatchGetResponse, [key, val]) => {
+            u[key] = val.map(attributeMap => fromDb(<Attributes>attributeMap, this.tables.get(key)))
+            return u
+          }, {})
         }
-      })
+        return {}
+      }),
     )
   }
 
   private getTableName(modelClazz: ModelConstructor<any>, tableNameResolver: TableNameResolver) {
-    const tableName = tableNameResolver(MetadataHelper.get(modelClazz).modelOptions.tableName)
+    const tableName = tableNameResolver(metadataForClass(modelClazz).modelOptions.tableName)
     if (!REGEX_TABLE_NAME.test(tableName)) {
       throw new Error(
-        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long'
+        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long',
       )
     }
 
