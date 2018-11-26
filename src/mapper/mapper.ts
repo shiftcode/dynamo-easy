@@ -1,7 +1,5 @@
-import { Metadata } from '../decorator/metadata/metadata'
-import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
-import { Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
-import { ModelConstructor } from '../model/model-constructor'
+import { Key, Metadata, metadataForClass, metadataForProperty, PropertyMetadata } from '../decorator/metadata'
+import { ModelConstructor } from '../model'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
@@ -109,7 +107,7 @@ export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<
       : null
   const type: AttributeValueType = explicitType || typeOf(propertyValue)
 
-  const mapper = propertyMetadata && propertyMetadata.mapper ? new propertyMetadata.mapper() : forType(type)
+  const mapper = propertyMetadata && propertyMetadata.mapper ? propertyMetadata.mapper() : forType(type)
 
   const attrValue: Attribute | null = explicitType
     ? mapper.toDb(propertyValue, propertyMetadata)
@@ -197,7 +195,7 @@ export function fromDb<T>(attributeMap: Attributes, modelClass?: ModelConstructo
          */
         if (propertyMetadata && propertyMetadata.mapper) {
           // custom mapper
-          modelValue = new propertyMetadata.mapper().fromDb(attributeValue, propertyMetadata)
+          modelValue = propertyMetadata.mapper().fromDb(attributeValue, propertyMetadata)
         } else {
           modelValue = fromDbOne(attributeValue, propertyMetadata)
         }
@@ -246,16 +244,16 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
   if (!mapper) {
     switch (type) {
       case String:
-        mapper = new StringMapper()
+        mapper = StringMapper
         break
       case Number:
-        mapper = new NumberMapper()
+        mapper = NumberMapper
         break
       case Boolean:
-        mapper = new BooleanMapper()
+        mapper = BooleanMapper
         break
       case EnumType:
-        mapper = new EnumMapper()
+        mapper = EnumMapper
         break
       case Map:
         // Maps support complex types as keys, we only support String & Number as Keys, otherwise a .toString() method should be implemented,
@@ -263,22 +261,22 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
         // mapperForType = new MapMapper()
         throw new Error('Map is not supported to be mapped for now')
       case Array:
-        mapper = new CollectionMapper()
+        mapper = CollectionMapper
         break
       case Set:
-        mapper = new CollectionMapper()
+        mapper = CollectionMapper
         break
       case Object:
-        mapper = new ObjectMapper()
+        mapper = ObjectMapper
         break
       case NullType:
-        mapper = new NullMapper()
+        mapper = NullMapper
         break
       case Binary:
         // TODO LOW:BINARY add binary mapper
         throw new Error('no mapper for binary type implemented yet')
       case UndefinedType:
-        mapper = new ObjectMapper()
+        mapper = ObjectMapper
         break
       default:
         throw new Error('no mapper defined for type ' + JSON.stringify(type))

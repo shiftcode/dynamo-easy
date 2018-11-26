@@ -83,6 +83,7 @@ export function initOrUpdateProperty(
   if (existingProperty) {
     // merge property options
     // console.log('merge into existing property', existingProperty, propertyMetadata);
+
     Object.assign<PropertyMetadata<any, Attribute>, Partial<PropertyMetadata<any, Attribute>>>(
       existingProperty,
       propertyMetadata,

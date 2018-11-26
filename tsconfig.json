@@ -64,7 +64,10 @@
     "skipLibCheck": true
   },
   "include": [
-    "./src/**/*",
-    "./test/**/*"
+    "src/**/*"
+  ],
+  "exclude": [
+    "test/**/*",
+    "**/*.spec.ts"
   ]
 }

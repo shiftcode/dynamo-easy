@@ -26,6 +26,7 @@ describe('Date decorators should allow to use a different date mapper', () => {
 
     expect(nameProp).toBeDefined()
     expect(nameProp!.name).toBe('aDate')
-    expect(nameProp!.mapper).toBe(DateToNumberMapper)
+    expect(nameProp!.mapper).toBeDefined()
+    expect(nameProp!.mapper!()).toBe(DateToNumberMapper)
   })
 })

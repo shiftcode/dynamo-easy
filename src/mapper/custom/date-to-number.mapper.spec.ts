@@ -1,25 +1,25 @@
-import { AttributeValue } from 'aws-sdk/clients/dynamodb'
+import { MapperForType } from '../for-type/base.mapper'
+import { NumberAttribute } from '../type/attribute.type'
 import { DateToNumberMapper } from './date-to-number.mapper'
 
 describe('date mapper', () => {
-  let dateMapper: DateToNumberMapper
+  let dateMapper: MapperForType<Date, NumberAttribute>
 
   beforeEach(() => {
-    dateMapper = new DateToNumberMapper()
+    dateMapper = DateToNumberMapper
   })
 
   describe('to db', () => {
     it('simple', () => {
       const now = new Date()
-      const toDb: AttributeValue = dateMapper.toDb(now)
+      const toDb = dateMapper.toDb(now)
 
+      expect(toDb).toBeDefined()
       expect(toDb).toEqual({ N: `${now.getTime()}` })
     })
 
     it('throws', () => {
-      expect(() => {
-        dateMapper.toDb(<any>'noDate')
-      }).toThrowError()
+      expect(() => dateMapper.toDb(<any>'noDate')).toThrowError()
     })
   })
 
@@ -27,14 +27,12 @@ describe('date mapper', () => {
     it('simple', () => {
       const now = new Date()
       const fromDb = dateMapper.fromDb({ N: `${now.getTime()}` })
-
+      expect(fromDb).toBeDefined()
       expect(fromDb).toEqual(now)
     })
 
     it('throws', () => {
-      expect(() => {
-        dateMapper.fromDb(<any>{ S: 'noDate' })
-      }).toThrowError()
+      expect(() => dateMapper.fromDb(<any>{ S: 'noDate' })).toThrowError()
     })
   })
 })

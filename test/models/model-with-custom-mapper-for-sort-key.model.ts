@@ -1,10 +1,7 @@
 // tslint:disable:max-classes-per-file
-import { PropertyMetadata, SortKey } from '../../src/decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { CustomMapper } from '../../src/decorator/impl/mapper/custom-mapper.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { MapperForType } from '../../src/mapper/for-type/base.mapper'
-import { NumberAttribute } from '../../src/mapper/type/attribute.type'
+import { SortKey } from '../../src/decorator'
+import { CustomMapper, Model, PartitionKey } from '../../src/decorator/impl'
+import { MapperForType, NumberAttribute } from '../../src/mapper'
 
 export class CustomId {
   private static MULTIPLIER_E = 5
@@ -37,14 +34,9 @@ export class CustomId {
   }
 }
 
-export class CustomIdMapper implements MapperForType<CustomId, NumberAttribute> {
-  fromDb(attributeValue: NumberAttribute, propertyMetadata?: PropertyMetadata<CustomId>): CustomId {
-    return CustomId.parse(attributeValue.N)
-  }
-
-  toDb(propertyValue: CustomId, propertyMetadata?: PropertyMetadata<CustomId>): NumberAttribute {
-    return { N: CustomId.unparse(propertyValue) }
-  }
+export const CustomIdMapper: MapperForType<CustomId, NumberAttribute> = {
+  fromDb: (attributeValue: NumberAttribute) => CustomId.parse(attributeValue.N),
+  toDb: (propertyValue: CustomId) => ({ N: CustomId.unparse(propertyValue) }),
 }
 
 @Model()

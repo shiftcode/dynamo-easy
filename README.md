@@ -120,7 +120,6 @@ Complex Types (properties with these types need some decorators to work properly
 | String        | S             |
 | Number        | N             |
 | Boolean       | BOOL          |
-| moment.Moment | S (ISO-8601 formatted) |
 | null          | NULL          |
 | Array         | L, (S,N,B)S   |
 | ES6 Set       | L, (S,N,B)S   |
@@ -152,7 +151,7 @@ When one of the following decorators is present, the value is always mapped to a
 We only support the native Date type and you need to explicitly mark a property to be a Date by using the @Date() decorator\
 (which is basically just syntactic sugar for @CustomMapper(TheDateMapper)).\
 If you want to use a different type for the @Date decorator (eg. Moment) you need to define a custom mapper and provide it to the dynamo easy config like this:\
-`DynamoEasyConfig.updateConfig({ dateMapper: MomentMapper })`\
+`updateDynamoEasyConfig({ dateMapper: MomentMapper })`\
 -> Update the config before importing any models!
 
 

@@ -3,19 +3,13 @@ import { ListAttribute, NumberSetAttribute, StringSetAttribute } from '../type/a
 import { CollectionMapper } from './collection.mapper'
 
 describe('collection mapper', () => {
-  let mapper: CollectionMapper
-
-  beforeEach(() => {
-    mapper = new CollectionMapper()
-  })
-
   describe('to db', () => {
     describe('no metadata', () => {
       /*
        * Arrays
        */
       it('arr (homogeneous string)', () => {
-        const attributeValue = <StringSetAttribute>mapper.toDb(['value1', 'value2', 'value3'])
+        const attributeValue = <StringSetAttribute>CollectionMapper.toDb(['value1', 'value2', 'value3'])
         expect(Object.keys(attributeValue)[0]).toBe('SS')
         expect(Array.isArray(attributeValue.SS)).toBeTruthy()
         expect(attributeValue.SS.length).toBe(3)
@@ -23,7 +17,7 @@ describe('collection mapper', () => {
       })
 
       it('arr (homogeneous number)', () => {
-        const attributeValue = <NumberSetAttribute>mapper.toDb([5, 10])
+        const attributeValue = <NumberSetAttribute>CollectionMapper.toDb([5, 10])
         expect(Object.keys(attributeValue)[0]).toBe('NS')
         expect(Array.isArray(attributeValue.NS)).toBeTruthy()
         expect(attributeValue.NS.length).toBe(2)
@@ -31,7 +25,7 @@ describe('collection mapper', () => {
       })
 
       it('arr (homogeneous objects)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb([{ name: 'name1' }, { name: 'name2' }])
+        const attributeValue = <ListAttribute>CollectionMapper.toDb([{ name: 'name1' }, { name: 'name2' }])
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
@@ -39,7 +33,7 @@ describe('collection mapper', () => {
       })
 
       it('arr (heterogeneous)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb(['value1', 10])
+        const attributeValue = <ListAttribute>CollectionMapper.toDb(['value1', 10])
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
@@ -50,7 +44,7 @@ describe('collection mapper', () => {
        * Set
        */
       it('set (homogeneous string)', () => {
-        const attributeValue = <StringSetAttribute>mapper.toDb(new Set(['value1', 'value2', 'value3']))
+        const attributeValue = <StringSetAttribute>CollectionMapper.toDb(new Set(['value1', 'value2', 'value3']))
         expect(Object.keys(attributeValue)[0]).toBe('SS')
         expect(Array.isArray(attributeValue.SS)).toBeTruthy()
         expect(attributeValue.SS.length).toBe(3)
@@ -58,7 +52,7 @@ describe('collection mapper', () => {
       })
 
       it('set (homogeneous number)', () => {
-        const attributeValue = <NumberSetAttribute>mapper.toDb(new Set([5, 10]))
+        const attributeValue = <NumberSetAttribute>CollectionMapper.toDb(new Set([5, 10]))
         expect(Object.keys(attributeValue)[0]).toBe('NS')
         expect(Array.isArray(attributeValue.NS)).toBeTruthy()
         expect(attributeValue.NS.length).toBe(2)
@@ -66,7 +60,7 @@ describe('collection mapper', () => {
       })
 
       it('set (homogeneous objects)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb(new Set([{ name: 'name1' }, { name: 'name2' }]))
+        const attributeValue = <ListAttribute>CollectionMapper.toDb(new Set([{ name: 'name1' }, { name: 'name2' }]))
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
@@ -74,7 +68,7 @@ describe('collection mapper', () => {
       })
 
       it('set (heterogeneous)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb(new Set(['value1', 10]))
+        const attributeValue = <ListAttribute>CollectionMapper.toDb(new Set(['value1', 10]))
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
@@ -91,7 +85,7 @@ describe('collection mapper', () => {
       }
 
       it('set (homogeneous, generic type is string)', () => {
-        const attributeValue = <StringSetAttribute>mapper.toDb(new Set(['value1', 'value2', 'value3']), <any>{
+        const attributeValue = <StringSetAttribute>CollectionMapper.toDb(new Set(['value1', 'value2', 'value3']), <any>{
           typeInfo: { type: Set, genericType: String },
         })
         expect(Object.keys(attributeValue)[0]).toBe('SS')
@@ -101,7 +95,7 @@ describe('collection mapper', () => {
       })
 
       it('sorted arr (homogeneous string)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb(['value1', 'value2', 'value3'], <any>metadata)
+        const attributeValue = <ListAttribute>CollectionMapper.toDb(['value1', 'value2', 'value3'], <any>metadata)
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(3)
@@ -109,7 +103,7 @@ describe('collection mapper', () => {
       })
 
       it('sorted arr (homogeneous number)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb([5, 10], <any>metadata)
+        const attributeValue = <ListAttribute>CollectionMapper.toDb([5, 10], <any>metadata)
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
@@ -117,7 +111,9 @@ describe('collection mapper', () => {
       })
 
       it('sorted set (homogeneous string)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb(new Set(['value1', 'value2', 'value3']), <any>metadata)
+        const attributeValue = <ListAttribute>(
+          CollectionMapper.toDb(new Set(['value1', 'value2', 'value3']), <any>metadata)
+        )
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(3)
@@ -125,7 +121,7 @@ describe('collection mapper', () => {
       })
 
       it('sorted set (homogeneous number)', () => {
-        const attributeValue = <ListAttribute>mapper.toDb([5, 10], <any>metadata)
+        const attributeValue = <ListAttribute>CollectionMapper.toDb([5, 10], <any>metadata)
         expect(Object.keys(attributeValue)[0]).toBe('L')
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
@@ -140,14 +136,14 @@ describe('collection mapper', () => {
        * S(et)
        */
       it('arr (homogeneous string)', () => {
-        const stringSet = <Set<string>>mapper.fromDb({ SS: ['value1', 'value2', 'value3'] })
+        const stringSet = <Set<string>>CollectionMapper.fromDb({ SS: ['value1', 'value2', 'value3'] })
         expect(stringSet instanceof Set).toBeTruthy()
         expect(stringSet.size).toBe(3)
         expect(typeof Array.from(stringSet)[0]).toBe('string')
       })
 
       it('arr (homogeneous number)', () => {
-        const numberSet = <Set<number>>mapper.fromDb({ NS: ['25', '10'] })
+        const numberSet = <Set<number>>CollectionMapper.fromDb({ NS: ['25', '10'] })
         expect(numberSet instanceof Set).toBeTruthy()
         expect(numberSet.size).toBe(2)
         expect(typeof Array.from(numberSet)[0]).toBe('number')

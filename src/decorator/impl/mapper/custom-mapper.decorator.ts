@@ -1,14 +1,10 @@
-import { MapperForType } from '../../../mapper/for-type/base.mapper'
-import { Attribute } from '../../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { MapperForType } from '../../../mapper'
 import { initOrUpdateProperty } from '../property/property.decorator'
 
-export function CustomMapper<T extends Attribute>(
-  mapperClazz: ModelConstructor<MapperForType<any, T>>,
-): PropertyDecorator {
+export function CustomMapper(customMapper: MapperForType<any, any>): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-      initOrUpdateProperty({ mapper: mapperClazz }, target, propertyKey)
+      initOrUpdateProperty({ mapper: () => customMapper }, target, propertyKey)
     }
   }
 }

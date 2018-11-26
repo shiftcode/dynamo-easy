@@ -4,7 +4,7 @@ import { initOrUpdateProperty } from '../property/property.decorator'
 export function Date(): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-      initOrUpdateProperty({ mapper: dynamoEasyConfig.dateMapper }, target, propertyKey)
+      initOrUpdateProperty({ mapper: () => dynamoEasyConfig.dateMapper }, target, propertyKey)
     }
   }
 }

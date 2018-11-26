@@ -33,7 +33,8 @@ describe('Decorators should add correct metadata', () => {
 
       expect(idMeta).toBeDefined()
       expect(idMeta!.name).toBe('id')
-      expect(idMeta!.mapper).toBe(IdMapper)
+      expect(idMeta!.mapper).toBeDefined()
+      expect(idMeta!.mapper!()).toBe(IdMapper)
     })
   })
 

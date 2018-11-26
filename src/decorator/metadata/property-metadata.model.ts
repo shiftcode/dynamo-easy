@@ -1,7 +1,6 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
-import { MapperForType } from '../../mapper/for-type/base.mapper'
-import { Attribute } from '../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../model/model-constructor'
+import { Attribute, MapperForType } from '../../mapper'
+import { ModelConstructor } from '../../model'
 
 export interface TypeInfo {
   type: ModelConstructor<any>
@@ -36,7 +35,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
    */
   isSortedCollection?: boolean
 
-  mapper?: ModelConstructor<MapperForType<any, R>>
+  mapper?: () => MapperForType<any, R>
 
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
   keyForGSI?: { [key: string]: KeyType }
