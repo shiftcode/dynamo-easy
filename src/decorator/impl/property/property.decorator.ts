@@ -75,27 +75,23 @@ export function initOrUpdateProperty(
   target: any,
   propertyKey: string,
 ): void {
+  // the new or updated property
+  let property: PropertyMetadata<any>
+
   // Update the attribute array
-
-  const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
-  const existingProperty = properties.find(property => property.name === propertyKey)
-
+  let properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
+  const existingProperty = properties.find(p => p.name === propertyKey)
   if (existingProperty) {
-    // merge property options
-    // console.log('merge into existing property', existingProperty, propertyMetadata);
-
-    Object.assign<PropertyMetadata<any, Attribute>, Partial<PropertyMetadata<any, Attribute>>>(
-      existingProperty,
-      propertyMetadata,
-    )
+    // create new property with merged options
+    property = { ...existingProperty, ...propertyMetadata }
+    // remove existing from array
+    properties = properties.filter(p => p !== existingProperty)
   } else {
     // add new options
-    const newProperty: PropertyMetadata<any> = createNewProperty(propertyMetadata, target, propertyKey)
-    // console.log('new property', newProperty);
-    properties.push(newProperty)
+    property = createNewProperty(propertyMetadata, target, propertyKey)
   }
 
-  Reflect.defineMetadata(KEY_PROPERTY, properties, target.constructor)
+  Reflect.defineMetadata(KEY_PROPERTY, [...properties, property], target.constructor)
 }
 
 function createNewProperty(

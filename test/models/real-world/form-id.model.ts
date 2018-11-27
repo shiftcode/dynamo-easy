@@ -1,7 +1,7 @@
 // tslint:disable:no-non-null-assertion
 
 import { ListAttribute, MapperForType, StringAttribute } from '../../../src/mapper'
-import { FormType } from './order.model'
+import { FormType } from './form-type.enum'
 
 export class FormId {
   static POSTFIX_MAX_LENGTH = 15
