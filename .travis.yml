@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - lts/*
 
-#cache: npm
+cache: npm
 #  directories:
 #  - $HOME/.npm
 #  - node_modules
@@ -27,8 +27,8 @@ notifications:
 before_script: npx greenkeeper-lockfile-update
 
 script:
-- npm run lint
-- npm run test:prod
+- npm run lint:ci
+- npm run test:ci
 - npm run build
 - npm run build:docs
 
