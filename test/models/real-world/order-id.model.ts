@@ -1,4 +1,4 @@
-import { MapperForType, StringAttribute } from '../../../src/mapper'
+import { MapperForType, StringAttribute } from '../../../src/dynamo-easy'
 
 export class OrderId {
   counter: number

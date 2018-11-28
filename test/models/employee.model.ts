@@ -1,6 +1,4 @@
-import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
-import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
+import { Date, Model, SortedSet } from '../../src/dynamo-easy'
 
 @Model()
 export class Employee {

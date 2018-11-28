@@ -1,5 +1,5 @@
-import { initOrUpdateIndex } from '../property/property.decorator'
 import { IndexType } from './index-type.enum'
+import { initOrUpdateIndex } from './util'
 
 /**
  * Marks a property as the sort key attribute of a local secondary index (the partition key must be same as in base table)

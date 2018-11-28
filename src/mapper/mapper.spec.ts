@@ -672,8 +672,7 @@ describe('Mapper', () => {
         })
       })
 
-      // FIXME TEST fix this test
-      xdescribe('model with complex property values (decorators)', () => {
+      describe('model with complex property values (decorators)', () => {
         let toDbVal: Attributes
 
         beforeEach(() => {
@@ -702,7 +701,7 @@ describe('Mapper', () => {
 
     describe('from db', () => {
       // FIXME TEST fix this test
-      xdescribe('model with complex property values (decorators)', () => {
+      describe('model with complex property values (decorators)', () => {
         let product: Product
 
         beforeEach(() => {

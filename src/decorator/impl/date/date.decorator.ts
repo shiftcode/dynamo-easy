@@ -1,5 +1,5 @@
 import { dynamoEasyConfig } from '../../../config/dynamo-easy-config'
-import { initOrUpdateProperty } from '../property/property.decorator'
+import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 
 export function Date(): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {

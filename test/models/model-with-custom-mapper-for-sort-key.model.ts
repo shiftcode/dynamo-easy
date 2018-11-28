@@ -1,7 +1,5 @@
 // tslint:disable:max-classes-per-file
-import { SortKey } from '../../src/decorator'
-import { CustomMapper, Model, PartitionKey } from '../../src/decorator/impl'
-import { MapperForType, NumberAttribute } from '../../src/mapper'
+import { CustomMapper, MapperForType, Model, NumberAttribute, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
 export class CustomId {
   private static MULTIPLIER_E = 5

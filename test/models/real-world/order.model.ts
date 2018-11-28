@@ -7,7 +7,7 @@ import {
   GSISortKey,
   Model,
   PartitionKey,
-} from '../../../src/decorator/impl'
+} from '../../../src/dynamo-easy'
 import { FormId, FormIdsMapper } from './form-id.model'
 import { FormType } from './form-type.enum'
 import { OrderId, OrderIdMapper } from './order-id.model'

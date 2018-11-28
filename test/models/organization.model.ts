@@ -1,12 +1,14 @@
-import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
-import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
-import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
-import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { Property } from '../../src/decorator/impl/property/property.decorator'
-import { Transient } from '../../src/decorator/impl/transient/transient.decorator'
+import {
+  Date,
+  Model,
+  PartitionKey,
+  Property,
+  SortedSet,
+  SortKey,
+  Transient,
+  TypedArray,
+  TypedSet,
+} from '../../src/dynamo-easy'
 import { Employee } from './employee.model'
 
 // tslint:disable:max-classes-per-file

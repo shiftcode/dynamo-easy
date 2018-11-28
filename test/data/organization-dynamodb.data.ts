@@ -1,4 +1,4 @@
-import { Attributes } from '../../src/mapper/type/attribute.type'
+import { Attributes } from '../../src/dynamo-easy'
 
 export const organization1CreatedAt = new Date('2017-05-15')
 export const organization1LastUpdated = new Date('2017-07-25')

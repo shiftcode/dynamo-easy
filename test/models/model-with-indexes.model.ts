@@ -1,12 +1,14 @@
 // tslint:disable:max-classes-per-file
-import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { GSIPartitionKey } from '../../src/decorator/impl/index/gsi-partition-key.decorator'
-import { GSISortKey } from '../../src/decorator/impl/index/gsi-sort-key.decorator'
-import { LSISortKey } from '../../src/decorator/impl/index/lsi-sort-key.decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { Property } from '../../src/decorator/impl/property/property.decorator'
+import {
+  Date,
+  GSIPartitionKey,
+  GSISortKey,
+  LSISortKey,
+  Model,
+  PartitionKey,
+  Property,
+  SortKey,
+} from '../../src/dynamo-easy'
 
 export const INDEX_ACTIVE = 'active-index'
 @Model()

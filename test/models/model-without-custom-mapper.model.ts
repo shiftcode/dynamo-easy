@@ -1,7 +1,5 @@
 // tslint:disable:max-classes-per-file
-import { GSIPartitionKey } from '../../src/decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
+import { GSIPartitionKey, Model, PartitionKey } from '../../src/dynamo-easy'
 
 @Model()
 export class ModelWithoutCustomMapper {

@@ -1,6 +1,6 @@
 import { ModelConstructor } from '../../model/model-constructor'
 import { SecondaryIndex } from '../impl/index/secondary-index'
-import { KEY_MODEL } from '../impl/model/model.decorator'
+import { KEY_MODEL } from '../impl/model/key-model.const'
 import { ModelMetadata } from './model-metadata.model'
 import { PropertyMetadata } from './property-metadata.model'
 

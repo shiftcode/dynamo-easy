@@ -1,4 +1,6 @@
-import { Key, Metadata, metadataForClass, metadataForProperty, PropertyMetadata } from '../decorator/metadata'
+import { Metadata } from '../decorator/metadata/metadata'
+import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
+import { Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
@@ -279,7 +281,8 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
         mapper = ObjectMapper
         break
       default:
-        throw new Error('no mapper defined for type ' + JSON.stringify(type))
+        mapper = ObjectMapper
+      // throw new Error('no mapper defined for type ' + JSON.stringify(type))
     }
     mapperForType.set(type, mapper)
   }

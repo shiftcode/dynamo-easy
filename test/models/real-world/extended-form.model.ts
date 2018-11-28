@@ -1,5 +1,4 @@
-import { Property } from '../../../src/decorator/impl'
-import { Model } from '../../../src/decorator/impl/model/model.decorator'
+import { Model, Property } from '../../../src/dynamo-easy'
 import { Form } from './form.model'
 
 @Model({ tableName: 'forms' })

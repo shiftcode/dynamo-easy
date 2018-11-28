@@ -1,6 +1,9 @@
+import { MapperForType } from '../../mapper/for-type/base.mapper'
+
+// def good
 import { KeyType } from 'aws-sdk/clients/dynamodb'
-import { Attribute, MapperForType } from '../../mapper'
-import { ModelConstructor } from '../../model'
+import { Attribute } from '../../mapper/type/attribute.type'
+import { ModelConstructor } from '../../model/model-constructor'
 
 export interface TypeInfo {
   type: ModelConstructor<any>

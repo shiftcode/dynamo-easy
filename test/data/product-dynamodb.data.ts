@@ -1,4 +1,4 @@
-import { Attributes } from '../../src/mapper/type/attribute.type'
+import { Attributes } from '../../src/dynamo-easy'
 
 export const productFromDb: Attributes = <any>{
   nestedValue: {

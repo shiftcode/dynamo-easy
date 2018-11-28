@@ -3,10 +3,9 @@ import { kebabCase } from 'lodash'
 import { ModelMetadata } from '../../metadata'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'
-import { KEY_PROPERTY } from '../property/property.decorator'
+import { KEY_PROPERTY } from '../property/key-property.const'
+import { KEY_MODEL } from './key-model.const'
 import { ModelData } from './model-data.model'
-
-export const KEY_MODEL = 'sc-reflect:model'
 
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types

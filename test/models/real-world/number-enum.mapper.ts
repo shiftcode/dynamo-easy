@@ -1,5 +1,4 @@
-import { MapperForType } from '../../../src/mapper'
-import { NumberSetAttribute } from '../../../src/mapper/type/attribute.type'
+import { MapperForType, NumberSetAttribute } from '../../../src/dynamo-easy'
 
 export const NumberEnumMapper: MapperForType<any, NumberSetAttribute> = {
   fromDb(attributeValue: NumberSetAttribute): any[] {

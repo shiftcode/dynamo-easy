@@ -1,8 +1,7 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-non-null-assertion
 
-import { CustomMapper, Model, PartitionKey } from '../../src/decorator/impl'
-import { MapperForType, StringAttribute } from '../../src/mapper'
+import { CustomMapper, MapperForType, Model, PartitionKey, StringAttribute } from '../../src/dynamo-easy'
 
 export class Id {
   counter: number

@@ -1,5 +1,5 @@
 import { EnumType } from '../../../mapper/type/enum.type'
-import { initOrUpdateProperty } from '../property/property.decorator'
+import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 
 export function Enum<T>(enumType?: T): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {

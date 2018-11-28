@@ -1,6 +1,5 @@
 // tslint:disable:max-classes-per-file
-import { GSIPartitionKey, Model, PartitionKey, SortKey } from '../../src/decorator'
-import { Date } from '../../src/decorator/impl/date/date.decorator'
+import { Date, GSIPartitionKey, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
 @Model()
 export class ModelWithDateAsHashKey {

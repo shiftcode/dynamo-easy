@@ -1,5 +1,5 @@
 import { MapperForType } from '../../../mapper'
-import { initOrUpdateProperty } from '../property/property.decorator'
+import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 
 export function CustomMapper(customMapper: MapperForType<any, any>): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
