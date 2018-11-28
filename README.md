@@ -8,12 +8,6 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg)](#contributors)
 
-This is the documentation for the new version of dynamo-easy released as a scoped package using the namespace 
-@shiftcoders (@shiftcoders/dynamo-easy). If you still want to use the 0.0.x version you can 
-by installing the old version `npm install dynamo-easy` (https://github
-.com/shiftcode/dynamo-easy/releases/tag/v0.10
-.1) 
-
 Abstracts away the complexity of the low level aws dynamosdk. Provides an easy to use fluent api to for requests and supports typescript decorators,
 to define some metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
 
@@ -22,6 +16,37 @@ Checkout the full technical api documentation [here](https://shiftcode.github.io
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
+
+## Metadata Reflection API
+
+> ⚠ The reflect-metadata polyfill should be imported only once in your entire application because the Reflect object is 
+mean to be a global singleton.
+
+Required always. Use reflect-metadata as polyfill.
+
+```
+npm install reflect-metadata --save
+```
+
+The type definitions for reflect-metadata are included in the npm package. 
+You need to add the following reference to the types field in your tsconfig.json:
+
+```
+"types": ["reflect-metadata"]
+```
+
+Finally, import reflect-metadata in some entry file in your application.
+
+```
+import "reflect-metadata"
+```
+
+Also make sure to install the other peer dependencies of @shiftcoders/dynamo-easy.
+
+## First Sample
+
+When all the setup work is done, define your first model and create a dynamo store to execute actions on the dynamoDB.
+
 ```typescript
 @Model()
 class Person{
@@ -56,8 +81,6 @@ dynamoStore.scan()
   })
 
 ```
-
-Want to use this library with Angular (>4) [checkout our angular-service](TODO).
 
 # Decorators
 Decorators are used to add some metadata to our model classes, relevant to our javascript-to-dynamo mapper.

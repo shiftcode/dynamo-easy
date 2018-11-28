@@ -3,6 +3,9 @@ linters:
     - prettier --write --config ./.prettierrc.yml
     - tslint --project ./tsconfig.json -t codeFrame --fix
     - git add
+  "(src/**/*.spec.ts,test/**/*.ts)":
+    - prettier --write --config ./.prettierrc.yml
+    - tslint --project ./tsconfig.jest.json -t codeFrame --fix
   "**/package.json":
     - sort-package-json
     - git add
