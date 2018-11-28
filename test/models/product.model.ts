@@ -4,12 +4,6 @@ import { NestedComplexModel } from './nested-complex.model'
 
 @Model()
 export class ProductNested {
-  /*
-   * introduce new decorators
-   */
-  // @SortedArray()
-  // @Set()
-  // @Date()
   @SortedSet()
   collection: Set<string>
 
@@ -25,11 +19,9 @@ export class ProductNested {
 
 @Model()
 export class Product {
-  // @CustomMapper(ObjectMapper) --> works great
   @Property()
   nestedValue: NestedComplexModel
 
-  // @Type(Array, ProductNested)
   @TypedArray(ProductNested)
   list: ProductNested[]
 

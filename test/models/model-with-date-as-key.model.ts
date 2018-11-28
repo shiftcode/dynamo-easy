@@ -1,10 +1,10 @@
 // tslint:disable:max-classes-per-file
-import { Date, GSIPartitionKey, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
+import { DateProperty, GSIPartitionKey, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
 @Model()
 export class ModelWithDateAsHashKey {
   @PartitionKey()
-  @Date()
+  @DateProperty()
   startDate: Date
 
   constructor(startDate: Date) {
@@ -18,7 +18,7 @@ export class ModelWithDateAsRangeKey {
   id: number
 
   @SortKey()
-  @Date()
+  @DateProperty()
   creationDate: Date
 
   constructor(id: number, creationDate: Date) {
@@ -33,7 +33,7 @@ export class ModelWithDateAsIndexHashKey {
   id: number
 
   @GSIPartitionKey('anyGSI')
-  @Date()
+  @DateProperty()
   creationDate: Date
 
   constructor(id: number, creationDate: Date) {

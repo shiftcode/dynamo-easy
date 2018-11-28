@@ -1,4 +1,4 @@
-import { Date, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
+import { DateProperty, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
 @Model()
 export class SimpleWithCompositePartitionKeyModel {
@@ -6,7 +6,7 @@ export class SimpleWithCompositePartitionKeyModel {
   id: string
 
   @SortKey()
-  @Date()
+  @DateProperty()
   creationDate: Date
 
   age: number

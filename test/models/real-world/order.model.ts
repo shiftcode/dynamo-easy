@@ -2,7 +2,7 @@
 
 import {
   CustomMapper,
-  Date as DateMapper,
+  DateProperty,
   GSIPartitionKey,
   GSISortKey,
   Model,
@@ -22,7 +22,7 @@ export class BaseOrder {
   productId: string
 
   @GSISortKey('order_product_id_creation_date')
-  @DateMapper()
+  @DateProperty()
   creationDate: Date
 
   @CustomMapper(FormIdsMapper)

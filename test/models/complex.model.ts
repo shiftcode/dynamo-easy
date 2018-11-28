@@ -1,4 +1,4 @@
-import { Date, Model, PartitionKey, Property, SortedSet, SortKey, Transient, TypedSet } from '../../src/dynamo-easy'
+import { DateProperty, Model, PartitionKey, Property, SortedSet, SortKey, Transient, TypedSet } from '../../src/dynamo-easy'
 import { NestedObject } from './nested-object.model'
 
 @Model({ tableName: 'complex_model' })
@@ -7,10 +7,10 @@ export class ComplexModel {
   id: string
 
   @SortKey()
-  @Date()
+  @DateProperty()
   creationDate: Date
 
-  @Date()
+  @DateProperty()
   lastUpdated: Date
 
   @Property({ name: 'isActive' })

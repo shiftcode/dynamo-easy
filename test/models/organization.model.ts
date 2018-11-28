@@ -1,5 +1,5 @@
 import {
-  Date,
+  DateProperty,
   Model,
   PartitionKey,
   Property,
@@ -19,7 +19,7 @@ export class Gift {
 
 @Model()
 export class Birthday {
-  @Date()
+  @DateProperty()
   date: Date
 
   @TypedArray(Gift)
@@ -58,10 +58,10 @@ export class Organization {
   name: string
 
   @SortKey()
-  @Date()
+  @DateProperty()
   createdAtDate: Date
 
-  @Date()
+  @DateProperty()
   lastUpdated: Date
 
   // Boolean
@@ -88,7 +88,7 @@ export class Organization {
   // simple type, mixed (no metadata required)
   randomDetails: any[]
 
-  // complex type (requries metadata)
+  // complex type (requires metadata)
   @TypedArray(Employee)
   employees: Employee[]
 

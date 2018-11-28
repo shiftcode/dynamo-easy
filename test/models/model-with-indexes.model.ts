@@ -1,22 +1,22 @@
 // tslint:disable:max-classes-per-file
 import {
-  Date,
+  DateProperty,
   GSIPartitionKey,
   GSISortKey,
   LSISortKey,
   Model,
-  PartitionKey,
-  Property,
+  PartitionKey, Property,
   SortKey,
 } from '../../src/dynamo-easy'
 
 export const INDEX_ACTIVE = 'active-index'
+
 @Model()
 export class ModelWithGSI {
   @PartitionKey()
   id: string
 
-  @Date()
+  @DateProperty()
   createdAt: Date
 
   @GSIPartitionKey(INDEX_ACTIVE)
@@ -28,7 +28,7 @@ export class ModelWithLSI {
   @PartitionKey()
   id: string
 
-  @Date()
+  @DateProperty()
   createdAt: Date
 
   @LSISortKey(INDEX_ACTIVE)
@@ -46,7 +46,7 @@ export class ModelWithABunchOfIndexes {
 
   @SortKey()
   @GSISortKey(INDEX_ACTIVE_CREATED_AT)
-  @Date()
+  @DateProperty()
   createdAt: Date
 
   @GSIPartitionKey(INDEX_ACTIVE_CREATED_AT)

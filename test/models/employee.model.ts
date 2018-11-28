@@ -1,4 +1,4 @@
-import { Date, Model, SortedSet } from '../../src/dynamo-easy'
+import { DateProperty, Model, SortedSet } from '../../src/dynamo-easy'
 
 @Model()
 export class Employee {
@@ -6,7 +6,7 @@ export class Employee {
 
   age: number
 
-  @Date()
+  @DateProperty()
   createdAt: Date | null
 
   @SortedSet()

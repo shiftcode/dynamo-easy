@@ -1,4 +1,4 @@
-import { Date, Model, PartitionKey, Property, SortedSet } from '../../src/dynamo-easy'
+import { DateProperty, Model, PartitionKey, Property, SortedSet } from '../../src/dynamo-easy'
 
 // tslint:disable-next-line:max-classes-per-file
 @Model()
@@ -20,10 +20,10 @@ export class UpdateModel {
   @PartitionKey()
   id: string
 
-  @Date()
+  @DateProperty()
   creationDate: Date
 
-  @Date()
+  @DateProperty()
   lastUpdated: Date
 
   name: string

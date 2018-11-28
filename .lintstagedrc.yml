@@ -1,5 +1,5 @@
 linters:
-  "{src,test}/**/*.ts":
+  "{src}/**/*.ts":
     - prettier --write --config ./.prettierrc.yml
     - tslint --project ./tsconfig.json -t codeFrame --fix
     - git add

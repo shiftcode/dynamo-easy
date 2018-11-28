@@ -1,4 +1,4 @@
-import { Date, GSIPartitionKey, Model, PartitionKey } from '../../../src/dynamo-easy'
+import { DateProperty, GSIPartitionKey, Model, PartitionKey } from '../../../src/dynamo-easy'
 
 export const INDEX_CREATION_DATE = 'index-creationDate'
 
@@ -8,9 +8,9 @@ export class BaseForm {
   id: string
 
   @GSIPartitionKey(INDEX_CREATION_DATE)
-  @Date()
+  @DateProperty()
   creationDate: Date
 
-  @Date()
+  @DateProperty()
   lastSavedDate: Date
 }
