@@ -27,7 +27,7 @@ export class UpdateExpressionBuilder {
     operation: UpdateActionDef,
     values: any[],
     existingValueNames: string[] | undefined,
-    metadata: Metadata<any> | undefined,
+    metadata: Metadata<any> | undefined
   ): UpdateExpression {
     // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
     // get rid of undefined values
@@ -66,7 +66,7 @@ export class UpdateExpressionBuilder {
       values,
       existingValueNames,
       propertyMetadata,
-      operation,
+      operation
     )
   }
 
@@ -78,7 +78,7 @@ export class UpdateExpressionBuilder {
     values: any[],
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined,
-    operator: UpdateActionDef,
+    operator: UpdateActionDef
   ): UpdateExpression {
     let statement: string
     switch (operator.action) {

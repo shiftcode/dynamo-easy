@@ -23,7 +23,7 @@ type CollectionAttributeTypes =
 export class CollectionMapper implements MapperForType<any[] | Set<any>, CollectionAttributeTypes> {
   fromDb(
     attributeValue: CollectionAttributeTypes,
-    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>,
+    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>
   ): any[] | Set<any> {
     const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
 
@@ -33,7 +33,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
     }
 
     if ('NS' in attributeValue) {
-      const arr: number[] = attributeValue.NS.map(parseFloat)
+      const arr: number[] = attributeValue.NS.map(item => parseFloat(item))
       return explicitType && explicitType === Array ? arr : new Set(arr)
     }
 
@@ -46,7 +46,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
       let arr: any[]
       if (hasGenericType(propertyMetadata)) {
         arr = attributeValue.L.map(item =>
-          Mapper.fromDb((<MapAttribute>item).M, propertyMetadata!.typeInfo!.genericType),
+          Mapper.fromDb((<MapAttribute>item).M, propertyMetadata!.typeInfo!.genericType)
         )
       } else {
         arr = attributeValue.L.map(value => Mapper.fromDbOne(value))
@@ -59,7 +59,7 @@ export class CollectionMapper implements MapperForType<any[] | Set<any>, Collect
 
   toDb(
     propertyValue: any[] | Set<any>,
-    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>,
+    propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>
   ): CollectionAttributeTypes | null {
     if (Array.isArray(propertyValue) || Util.isSet(propertyValue)) {
       let collectionType: AttributeType

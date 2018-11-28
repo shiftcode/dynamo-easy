@@ -33,7 +33,7 @@ export class RequestExpressionBuilder {
     expressionType: ExpressionType,
     attributePath: string,
     request: T,
-    metadata?: Metadata<any>,
+    metadata?: Metadata<any>
   ): RequestConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
@@ -43,7 +43,7 @@ export class RequestExpressionBuilder {
           request,
           metadata,
           operator,
-          ...values,
+          ...values
         )
       }
     }
@@ -54,7 +54,7 @@ export class RequestExpressionBuilder {
   static addSortKeyCondition<T extends BaseRequest<any, any>>(
     keyName: string,
     request: T,
-    metadata?: Metadata<any>,
+    metadata?: Metadata<any>
   ): RequestSortKeyConditionFunction<T> {
     const f = (operator: ConditionOperator) => {
       return (...values: any[]): T => {
@@ -64,7 +64,7 @@ export class RequestExpressionBuilder {
           request,
           metadata,
           operator,
-          ...values,
+          ...values
         )
       }
     }
@@ -90,7 +90,7 @@ export class RequestExpressionBuilder {
       operator,
       copy,
       existingValueKeys,
-      metadata,
+      metadata
     )
 
     ParamUtil.addExpression(expressionType, condition, request.params)
@@ -101,7 +101,7 @@ export class RequestExpressionBuilder {
     keyName: string,
     keyValue: any,
     request: T,
-    metadata?: Metadata<any>,
+    metadata?: Metadata<any>
   ): T {
     return RequestExpressionBuilder.addSortKeyCondition(keyName, request, metadata).equals(keyValue)
   }
@@ -135,7 +135,7 @@ export class RequestExpressionBuilder {
       return (...values: any[]): ConditionExpressionDefinitionFunction => {
         const copy = [...values]
         const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, Expression>(
-          ConditionExpressionBuilder.buildFilterExpression,
+          ConditionExpressionBuilder.buildFilterExpression
         )
         return <ConditionExpressionDefinitionFunction>curried(<string>attributePath, operator, copy)
       }
@@ -153,13 +153,13 @@ export class RequestExpressionBuilder {
    * parameters as another example
    */
   private static createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T {
-    return UPDATE_ACTION_DEFS.reduce(
+    return <T>UPDATE_ACTION_DEFS.reduce(
       (result: T, updateActionDef: UpdateActionDef) => {
         Reflect.set(<any>result, updateActionDef.action, impl(updateActionDef))
 
         return result
       },
-      <T>{},
+      <T>{}
     )
   }
 
@@ -178,7 +178,7 @@ export class RequestExpressionBuilder {
     const includedAlias: ConditionOperator[] =
       operators && operators.length ? operators : <ConditionOperator[]>Object.keys(OPERATOR_TO_ALIAS_MAP)
 
-    return includedAlias.reduce(
+    return <T>includedAlias.reduce(
       (result: T, operator: ConditionOperator) => {
         const alias: OperatorAlias | OperatorAlias[] = OPERATOR_TO_ALIAS_MAP[operator]
         if (Array.isArray(alias)) {
@@ -189,7 +189,7 @@ export class RequestExpressionBuilder {
 
         return result
       },
-      <T>{},
+      <T>{}
     )
   }
 }

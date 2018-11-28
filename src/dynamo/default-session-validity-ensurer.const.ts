@@ -10,5 +10,5 @@ export const DEFAULT_SESSION_VALIDITY_ENSURER: SessionValidityEnsurer = () =>
   of(null).pipe(
     map(() => {
       return
-    }),
+    })
   )

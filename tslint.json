@@ -1,0 +1,64 @@
+{
+  "extends": [
+    "tslint:latest",
+    "tslint-config-prettier"
+  ],
+  "rulesDirectory": [
+  ],
+  "rules": {
+    "no-implicit-dependencies": [
+      true,
+      "dev"
+    ],
+    "no-angle-bracket-type-assertion": false,
+    "no-submodule-imports": [
+      true,
+      "aws-sdk",
+      "rxjs/operators"
+    ],
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
+    ],
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "object-literal-sort-keys": false,
+    "member-access": [
+      true,
+      "no-public"
+    ],
+    "prefer-conditional-expression": false,
+    "member-ordering": [
+      true,
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "constructor",
+          "instance-method"
+        ]
+      }
+    ],
+    "no-object-literal-type-assertion": false,
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
+    "no-empty": false,
+    "no-string-literal": false,
+    "no-inferrable-types": [
+      true,
+      "ignore-params"
+    ]
+  }
+}

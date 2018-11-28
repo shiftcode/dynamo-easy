@@ -35,7 +35,7 @@ export class PagedDataSource<
     request$ = request$.pipe(
       tap(() => this.reset()),
       publishReplay(1),
-      refCount(),
+      refCount()
     )
 
     const count$: Observable<number> = request$.pipe(
@@ -44,10 +44,10 @@ export class PagedDataSource<
         request
           .limit(Request.INFINITE_LIMIT)
           .exclusiveStartKey(null)
-          .execCount(),
+          .execCount()
       ),
       tap(count => console.log('got count', count)),
-      share(),
+      share()
     )
 
     const data$: Observable<T[]> = combineLatest(request$, this.nextSubject).pipe(
@@ -55,7 +55,7 @@ export class PagedDataSource<
       map(values => values[0]),
       switchMap(request => this.fetchData(request)),
       tap(data => this.data.push(...data)),
-      share(),
+      share()
     )
 
     combineLatest(data$, count$)
@@ -68,7 +68,7 @@ export class PagedDataSource<
             hasMore: this.data.length < values[1],
           }
         }),
-        share(),
+        share()
       )
       .subscribe(meta => this.metaSubject.next(meta))
 
@@ -76,7 +76,7 @@ export class PagedDataSource<
       map(meta => {
         return meta.hasMore
       }),
-      share(),
+      share()
     )
 
     this.hasMore$ = hasMore$
@@ -155,7 +155,7 @@ export class PagedDataSource<
         finalize(() => {
           console.log('fetchData(): finally')
           this.loadingSubject.next(false)
-        }),
+        })
       )
   }
 }

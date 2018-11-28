@@ -40,7 +40,7 @@ describe('expressions', () => {
       '>',
       [10],
       undefined,
-      MetadataHelper.get(MyModel),
+      MetadataHelper.get(MyModel)
     )
     expect(condition.statement).toBe('#prop > :prop')
 
@@ -64,7 +64,7 @@ describe('expressions', () => {
         '>',
         [10],
         undefined,
-        MetadataHelper.get(MyModel),
+        MetadataHelper.get(MyModel)
       )
       expect(condition.statement).toBe('#age > :age')
     })
@@ -76,7 +76,7 @@ describe('expressions', () => {
         '=',
         ['equalsValue'],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('#id = :id')
 
@@ -96,7 +96,7 @@ describe('expressions', () => {
         '<>',
         ['notEqualsValue'],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('#id <> :id')
 
@@ -172,7 +172,7 @@ describe('expressions', () => {
         'attribute_exists',
         [],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('attribute_exists (#attr)')
 
@@ -191,7 +191,7 @@ describe('expressions', () => {
         'attribute_not_exists',
         [],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('attribute_not_exists (#attr)')
 
@@ -210,7 +210,7 @@ describe('expressions', () => {
         'attribute_type',
         ['S'],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('attribute_type (#attr, :attr)')
 
@@ -230,7 +230,7 @@ describe('expressions', () => {
         'begins_with',
         ['te'],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('begins_with (#textProp, :textProp)')
 
@@ -250,7 +250,7 @@ describe('expressions', () => {
         'contains',
         [2],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('contains (#myCollection, :myCollection)')
 
@@ -270,7 +270,7 @@ describe('expressions', () => {
         'IN',
         [['myValue', 'myOtherValue']],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('#myCollection IN (:myCollection_0, :myCollection_1)')
       expect(condition.attributeNames).toEqual({ '#myCollection': 'myCollection' })
@@ -287,7 +287,7 @@ describe('expressions', () => {
         'BETWEEN',
         [2, 5],
         undefined,
-        undefined,
+        undefined
       )
       expect(condition.statement).toBe('#counter BETWEEN :counter AND :counter_2')
 
@@ -313,7 +313,7 @@ describe('expressions', () => {
         'BETWEEN',
         [date1, date2],
         undefined,
-        MetadataHelper.get(ComplexModel),
+        MetadataHelper.get(ComplexModel)
       )
 
       expect(condition.statement).toBe('#creationDate BETWEEN :creationDate AND :creationDate_2')
@@ -333,17 +333,17 @@ describe('expressions', () => {
 
     it('should throw error for wrong value arity', () => {
       expect(() =>
-        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [], undefined, undefined),
+        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [], undefined, undefined)
       ).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
+        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
       )
     })
 
     it('should throw error for wrong value arity', () => {
       expect(() =>
-        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined),
+        ConditionExpressionBuilder.buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined)
       ).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
+        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator'
       )
     })
 
@@ -354,10 +354,10 @@ describe('expressions', () => {
           'IN',
           ['myValue', 'mySecondValue'],
           undefined,
-          undefined,
-        ),
+          undefined
+        )
       ).toThrowError(
-        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)',
+        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
       )
     })
   })
@@ -388,7 +388,7 @@ describe('expressions', () => {
         '=',
         [2016],
         undefined,
-        undefined,
+        undefined
       )
 
       expect(condition.statement).toBe('#person.#birthdays[5].#year = :person__birthdays_at_5__year')

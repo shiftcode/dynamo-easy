@@ -17,7 +17,7 @@ export class ParamUtil {
   static addExpression(
     expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression' | 'UpdateExpression',
     condition: Expression,
-    params: QueryInput | ScanInput | UpdateItemInput,
+    params: QueryInput | ScanInput | UpdateItemInput
   ) {
     const nameSafeCondition = resolveAttributeValueNameConflicts(condition, params)
 
@@ -45,7 +45,7 @@ export class ParamUtil {
         case 'UpdateExpression':
           if (expression !== '') {
             throw new Error(
-              'params.UpdateExpression is not empty, please use the UpdateRequest.operations() method to define all the update operations',
+              'params.UpdateExpression is not empty, please use the UpdateRequest.operations() method to define all the update operations'
             )
           }
           break

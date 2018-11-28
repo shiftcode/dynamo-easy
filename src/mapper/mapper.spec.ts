@@ -156,13 +156,13 @@ describe('Mapper', () => {
         expect(employee1).toBeDefined()
         expect(keyOf(employee1)).toBe('M')
         expect(Object.keys(employee1.M!).length).toBe(2)
-        expect(employee1.M!.name).toBeDefined()
-        expect(keyOf(employee1.M!.name)).toBe('S')
-        expect((<StringAttribute>employee1.M!.name).S).toBe('max')
+        expect(employee1.M!['name']).toBeDefined()
+        expect(keyOf(employee1.M!['name'])).toBe('S')
+        expect((<StringAttribute>employee1.M!['name']).S).toBe('max')
 
-        expect(employee1.M!.age).toBeDefined()
-        expect(keyOf(employee1.M!.age)).toBe('N')
-        expect((<NumberAttribute>employee1.M!.age).N).toBe('25')
+        expect(employee1.M!['age']).toBeDefined()
+        expect(keyOf(employee1.M!['age'])).toBe('N')
+        expect((<NumberAttribute>employee1.M!['age']).N).toBe('25')
       })
 
       it('set', () => {
@@ -186,9 +186,9 @@ describe('Mapper', () => {
         expect(keyOf(attrValue)).toBe('L')
         expect(attrValue.L!.length).toBe(2)
         expect((<MapAttribute>attrValue.L![0]).M).toBeDefined()
-        expect((<MapAttribute>attrValue.L![0]).M.name).toBeDefined()
-        expect(keyOf((<MapAttribute>attrValue.L![0]).M.name)).toBe('S')
-        expect((<StringAttribute>(<MapAttribute>attrValue.L![0]).M.name).S).toBe('foo')
+        expect((<MapAttribute>attrValue.L![0]).M['name']).toBeDefined()
+        expect(keyOf((<MapAttribute>attrValue.L![0]).M['name'])).toBe('S')
+        expect((<StringAttribute>(<MapAttribute>attrValue.L![0]).M['name']).S).toBe('foo')
       })
 
       it('simple object', () => {
@@ -197,14 +197,14 @@ describe('Mapper', () => {
         expect(keyOf(attrValue)).toBe('M')
 
         // name
-        expect(attrValue.M!.name).toBeDefined()
-        expect(keyOf(attrValue.M!.name)).toBe('S')
-        expect((<StringAttribute>attrValue.M!.name).S).toBe('foo')
+        expect(attrValue.M!['name']).toBeDefined()
+        expect(keyOf(attrValue.M!['name'])).toBe('S')
+        expect((<StringAttribute>attrValue.M!['name']).S).toBe('foo')
 
         // age
-        expect(attrValue.M!.age).toBeDefined()
-        expect(keyOf(attrValue.M!.age)).toBe('N')
-        expect((<NumberAttribute>attrValue.M!.age).N).toBe('56')
+        expect(attrValue.M!['age']).toBeDefined()
+        expect(keyOf(attrValue.M!['age'])).toBe('N')
+        expect((<NumberAttribute>attrValue.M!['age']).N).toBe('56')
       })
 
       it('complex object', () => {
@@ -217,41 +217,41 @@ describe('Mapper', () => {
         expect(keyOf(attrValue!)).toBe('M')
 
         // name
-        expect(attrValue!.M!.name).toBeDefined()
-        expect(keyOf(attrValue!.M!.name)).toBe('S')
-        expect((<StringAttribute>attrValue!.M!.name).S).toBe('Max')
+        expect(attrValue!.M!['name']).toBeDefined()
+        expect(keyOf(attrValue!.M!['name'])).toBe('S')
+        expect((<StringAttribute>attrValue!.M!['name']).S).toBe('Max')
 
         // age
-        expect(attrValue!.M!.age).toBeDefined()
-        expect(keyOf(attrValue!.M!.age)).toBe('N')
-        expect((<NumberAttribute>attrValue!.M!.age).N).toBe('35')
+        expect(attrValue!.M!['age']).toBeDefined()
+        expect(keyOf(attrValue!.M!['age'])).toBe('N')
+        expect((<NumberAttribute>attrValue!.M!['age']).N).toBe('35')
 
         // children
-        expect(attrValue!.M!.children).toBeDefined()
-        expect(keyOf(attrValue!.M!.children)).toBe('L')
-        expect((<ListAttribute>attrValue.M!.children).L.length).toBe(2)
-        expect(keyOf((<ListAttribute>attrValue.M!.children).L[0])).toBe('M')
-        expect(keyOf((<ListAttribute>attrValue.M!.children).L[1])).toBe('M')
+        expect(attrValue!.M!['children']).toBeDefined()
+        expect(keyOf(attrValue!.M!['children'])).toBe('L')
+        expect((<ListAttribute>attrValue.M!['children']).L.length).toBe(2)
+        expect(keyOf((<ListAttribute>attrValue.M!['children']).L[0])).toBe('M')
+        expect(keyOf((<ListAttribute>attrValue.M!['children']).L[1])).toBe('M')
 
-        const firstChild = <MapAttribute>(<ListAttribute>attrValue.M!.children).L[0]
+        const firstChild = <MapAttribute>(<ListAttribute>attrValue.M!['children']).L[0]
         // first child
-        expect(firstChild.M.name).toBeDefined()
-        expect(keyOf(firstChild.M.name)).toBe('S')
-        expect((<StringAttribute>firstChild.M.name).S).toBe('Anna')
+        expect(firstChild.M['name']).toBeDefined()
+        expect(keyOf(firstChild.M['name'])).toBe('S')
+        expect((<StringAttribute>firstChild.M['name']).S).toBe('Anna')
 
-        expect(firstChild.M.age).toBeDefined()
-        expect(keyOf(firstChild.M.age)).toBe('N')
-        expect((<NumberAttribute>firstChild.M.age).N).toBe('5')
+        expect(firstChild.M['age']).toBeDefined()
+        expect(keyOf(firstChild.M['age'])).toBe('N')
+        expect((<NumberAttribute>firstChild.M['age']).N).toBe('5')
 
-        const secondChild = <MapAttribute>(<ListAttribute>attrValue.M!.children).L[1]
+        const secondChild = <MapAttribute>(<ListAttribute>attrValue.M!['children']).L[1]
         // second child
-        expect(secondChild.M.name).toBeDefined()
-        expect(keyOf(secondChild.M.name)).toBe('S')
-        expect((<StringAttribute>secondChild.M.name).S).toBe('Hans')
+        expect(secondChild.M['name']).toBeDefined()
+        expect(keyOf(secondChild.M['name'])).toBe('S')
+        expect((<StringAttribute>secondChild.M['name']).S).toBe('Hans')
 
-        expect(secondChild.M.age).toBeDefined()
-        expect(keyOf(secondChild.M.age)).toBe('N')
-        expect((<NumberAttribute>secondChild.M.age).N).toBe('7')
+        expect(secondChild.M['age']).toBeDefined()
+        expect(keyOf(secondChild.M['age'])).toBe('N')
+        expect((<NumberAttribute>secondChild.M['age']).N).toBe('7')
       })
     })
 
@@ -491,27 +491,27 @@ describe('Mapper', () => {
 
             // test employee1
             const employee1 = (<MapAttribute>employeesL[0]).M
-            expect(employee1.name).toBeDefined()
-            expect((<StringAttribute>employee1.name).S).toBeDefined()
-            expect((<StringAttribute>employee1.name).S).toBe('max')
-            expect(employee1.age).toBeDefined()
-            expect((<NumberAttribute>employee1.age).N).toBeDefined()
-            expect((<NumberAttribute>employee1.age).N).toBe('50')
-            expect(employee1.createdAt).toBeDefined()
-            expect((<StringAttribute>employee1.createdAt).S).toBeDefined()
-            expect((<StringAttribute>employee1.createdAt).S).toBe(createdAtDateEmployee1.toISOString())
+            expect(employee1['name']).toBeDefined()
+            expect((<StringAttribute>employee1['name']).S).toBeDefined()
+            expect((<StringAttribute>employee1['name']).S).toBe('max')
+            expect(employee1['age']).toBeDefined()
+            expect((<NumberAttribute>employee1['age']).N).toBeDefined()
+            expect((<NumberAttribute>employee1['age']).N).toBe('50')
+            expect(employee1['createdAt']).toBeDefined()
+            expect((<StringAttribute>employee1['createdAt']).S).toBeDefined()
+            expect((<StringAttribute>employee1['createdAt']).S).toBe(createdAtDateEmployee1.toISOString())
 
             // test employee2
             const employee2: MapAttributeValue = (<MapAttribute>employeesL[1]).M
-            expect(employee2.name).toBeDefined()
-            expect(employee2.name.S).toBeDefined()
-            expect(employee2.name.S).toBe('anna')
-            expect(employee2.age).toBeDefined()
-            expect(employee2.age.N).toBeDefined()
-            expect(employee2.age.N).toBe('27')
-            expect(employee2.createdAt).toBeDefined()
-            expect(employee2.createdAt.S).toBeDefined()
-            expect(employee2.createdAt.S).toBe(createdAtDateEmployee2.toISOString())
+            expect(employee2['name']).toBeDefined()
+            expect(employee2['name'].S).toBeDefined()
+            expect(employee2['name'].S).toBe('anna')
+            expect(employee2['age']).toBeDefined()
+            expect(employee2['age'].N).toBeDefined()
+            expect(employee2['age'].N).toBe('27')
+            expect(employee2['createdAt']).toBeDefined()
+            expect(employee2['createdAt'].S).toBeDefined()
+            expect(employee2['createdAt'].S).toBe(createdAtDateEmployee2.toISOString())
           })
 
           it('cities', () => {
@@ -535,49 +535,49 @@ describe('Mapper', () => {
 
             // birthday 1
             const birthday1 = (<MapAttribute>birthdays[0]).M
-            expect(birthday1.date).toBeDefined()
-            expect(keyOf(birthday1.date)).toBe('S')
-            expect((<StringAttribute>birthday1.date).S).toBe(birthday1Date.toISOString())
+            expect(birthday1['date']).toBeDefined()
+            expect(keyOf(birthday1['date'])).toBe('S')
+            expect((<StringAttribute>birthday1['date']).S).toBe(birthday1Date.toISOString())
 
-            expect(birthday1.presents).toBeDefined()
-            expect(keyOf(birthday1.presents)).toBe('L')
-            expect((<ListAttribute>birthday1.presents).L.length).toBe(2)
-            expect(keyOf((<ListAttribute>birthday1.presents).L[0])).toBe('M')
+            expect(birthday1['presents']).toBeDefined()
+            expect(keyOf(birthday1['presents'])).toBe('L')
+            expect((<ListAttribute>birthday1['presents']).L.length).toBe(2)
+            expect(keyOf((<ListAttribute>birthday1['presents']).L[0])).toBe('M')
 
-            expect(keyOf((<ListAttribute>birthday1.presents).L[0])).toBe('M')
+            expect(keyOf((<ListAttribute>birthday1['presents']).L[0])).toBe('M')
 
-            const birthday1gift1 = (<MapAttribute>(<ListAttribute>birthday1.presents).L[0]).M
-            expect(birthday1gift1.description).toBeDefined()
-            expect(keyOf(birthday1gift1.description)).toBe('S')
-            expect((<StringAttribute>birthday1gift1.description).S).toBe('ticket to rome')
+            const birthday1gift1 = (<MapAttribute>(<ListAttribute>birthday1['presents']).L[0]).M
+            expect(birthday1gift1['description']).toBeDefined()
+            expect(keyOf(birthday1gift1['description'])).toBe('S')
+            expect((<StringAttribute>birthday1gift1['description']).S).toBe('ticket to rome')
 
-            const birthday1gift2 = (<MapAttribute>(<ListAttribute>birthday1.presents).L[1]).M
-            expect(birthday1gift2.description).toBeDefined()
-            expect(keyOf(birthday1gift2.description)).toBe('S')
-            expect((<StringAttribute>birthday1gift2.description).S).toBe('camper van')
+            const birthday1gift2 = (<MapAttribute>(<ListAttribute>birthday1['presents']).L[1]).M
+            expect(birthday1gift2['description']).toBeDefined()
+            expect(keyOf(birthday1gift2['description'])).toBe('S')
+            expect((<StringAttribute>birthday1gift2['description']).S).toBe('camper van')
 
             // birthday 2
             const birthday2 = (<MapAttribute>birthdays[1]).M
-            expect(birthday2.date).toBeDefined()
-            expect(keyOf(birthday2.date)).toBe('S')
-            expect((<StringAttribute>birthday2.date).S).toBe(birthday2Date.toISOString())
+            expect(birthday2['date']).toBeDefined()
+            expect(keyOf(birthday2['date'])).toBe('S')
+            expect((<StringAttribute>birthday2['date']).S).toBe(birthday2Date.toISOString())
 
-            expect(birthday2.presents).toBeDefined()
-            expect(keyOf(birthday2.presents)).toBe('L')
-            expect((<ListAttribute>birthday2.presents).L.length).toBe(2)
-            expect(keyOf((<ListAttribute>birthday2.presents).L[0])).toBe('M')
+            expect(birthday2['presents']).toBeDefined()
+            expect(keyOf(birthday2['presents'])).toBe('L')
+            expect((<ListAttribute>birthday2['presents']).L.length).toBe(2)
+            expect(keyOf((<ListAttribute>birthday2['presents']).L[0])).toBe('M')
 
-            expect(keyOf((<ListAttribute>birthday2.presents).L[0])).toBe('M')
+            expect(keyOf((<ListAttribute>birthday2['presents']).L[0])).toBe('M')
 
-            const birthday2gift1 = (<MapAttribute>(<ListAttribute>birthday2.presents).L[0]).M
-            expect(birthday2gift1.description).toBeDefined()
-            expect(keyOf(birthday2gift1.description)).toBe('S')
-            expect((<StringAttribute>birthday2gift1.description).S).toBe('car')
+            const birthday2gift1 = (<MapAttribute>(<ListAttribute>birthday2['presents']).L[0]).M
+            expect(birthday2gift1['description']).toBeDefined()
+            expect(keyOf(birthday2gift1['description'])).toBe('S')
+            expect((<StringAttribute>birthday2gift1['description']).S).toBe('car')
 
-            const birthday2gift2 = (<MapAttribute>(<ListAttribute>birthday2.presents).L[1]).M
-            expect(birthday2gift2.description).toBeDefined()
-            expect(keyOf(birthday2gift2.description)).toBe('S')
-            expect((<StringAttribute>birthday2gift2.description).S).toBe('gin')
+            const birthday2gift2 = (<MapAttribute>(<ListAttribute>birthday2['presents']).L[1]).M
+            expect(birthday2gift2['description']).toBeDefined()
+            expect(keyOf(birthday2gift2['description'])).toBe('S')
+            expect((<StringAttribute>birthday2gift2['description']).S).toBe('gin')
           })
 
           it('awards', () => {
@@ -602,13 +602,13 @@ describe('Mapper', () => {
             const a = <MapAttribute>events[0]
 
             expect(keyOf(a)).toBe('M')
-            expect(a.M.name).toBeDefined()
-            expect(keyOf(a.M.name)).toBe('S')
-            expect((<StringAttribute>a.M.name).S).toBe('shift the web')
+            expect(a.M['name']).toBeDefined()
+            expect(keyOf(a.M['name'])).toBe('S')
+            expect((<StringAttribute>a.M['name']).S).toBe('shift the web')
 
-            expect(a.M.participantCount).toBeDefined()
-            expect(keyOf(a.M.participantCount)).toBe('N')
-            expect((<NumberAttribute>a.M.participantCount).N).toBe('1520')
+            expect(a.M['participantCount']).toBeDefined()
+            expect(keyOf(a.M['participantCount'])).toBe('N')
+            expect((<NumberAttribute>a.M['participantCount']).N).toBe('1520')
           })
 
           it('transient', () => {
@@ -617,7 +617,7 @@ describe('Mapper', () => {
 
           // an empty set is not a valid attribute value to be persisted either NULL:true or
           it('emptySet', () => {
-            expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
+            expect(organizationAttrMap['emptySet']).toEqual({ NULL: true })
           })
         })
       })
@@ -641,7 +641,7 @@ describe('Mapper', () => {
           expect(keyOf(toDb.id)).toBe('S')
           // https://stackoverflow.com/questions/7905929/how-to-test-valid-uuid-guid
           expect((<StringAttribute>toDb.id).S).toMatch(
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
           )
         })
       })
@@ -682,8 +682,8 @@ describe('Mapper', () => {
           expect(toDb.nestedValue).toBeDefined()
           expect((<MapAttribute>toDb.nestedValue).M).toBeDefined()
           expect(Object.keys((<MapAttribute>toDb.nestedValue).M).length).toBe(1)
-          expect((<MapAttribute>toDb.nestedValue).M.sortedSet).toBeDefined()
-          expect(keyOf((<MapAttribute>toDb.nestedValue).M.sortedSet)).toBe('L')
+          expect((<MapAttribute>toDb.nestedValue).M['sortedSet']).toBeDefined()
+          expect(keyOf((<MapAttribute>toDb.nestedValue).M['sortedSet'])).toBe('L')
         })
 
         it('list', () => {
@@ -752,7 +752,7 @@ describe('Mapper', () => {
           expect(organization.employees[0].createdAt instanceof Date).toBeTruthy()
           expect(isNaN(<any>organization.employees[0].createdAt)).toBeFalsy()
           expect((<Date>organization.employees[0].createdAt).toISOString()).toEqual(
-            organization1Employee1CreatedAt.toISOString(),
+            organization1Employee1CreatedAt.toISOString()
           )
 
           // set is mapped to set but would expect list, should not work without extra @Sorted() decorator

@@ -47,7 +47,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
 
         return response
       }),
-      tap(response => this.logger.debug('mapped items', response.Items)),
+      tap(response => this.logger.debug('mapped items', response.Items))
     )
   }
 
@@ -62,7 +62,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     return this.dynamoRx.scan(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => response.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))),
-      tap(items => this.logger.debug('mapped items', items)),
+      tap(items => this.logger.debug('mapped items', items))
     )
   }
 
@@ -72,7 +72,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     return this.dynamoRx.scan(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => Mapper.fromDb(<Attributes>response.Items![0], this.modelClazz)),
-      tap(item => this.logger.debug('mapped item', item)),
+      tap(item => this.logger.debug('mapped item', item))
     )
   }
 
@@ -84,7 +84,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     return this.dynamoRx.scan(params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => response.Count!),
-      tap(count => this.logger.debug('count', count)),
+      tap(count => this.logger.debug('count', count))
     )
   }
 

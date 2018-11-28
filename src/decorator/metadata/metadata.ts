@@ -16,7 +16,7 @@ export class Metadata<T> {
 
     if (this.modelOptions.properties) {
       options = this.modelOptions.properties.find(
-        property => property.name === propertyKey || property.nameDb === propertyKey,
+        property => property.name === propertyKey || property.nameDb === propertyKey
       )
     }
 
@@ -106,7 +106,7 @@ export class Metadata<T> {
 
   private filterBy<R>(
     predicate: (property: PropertyMetadata<any>) => boolean,
-    defaultValue: R,
+    defaultValue: R
   ): Array<PropertyMetadata<any>> | R {
     if (this.modelOptions && this.modelOptions.properties) {
       const properties = this.modelOptions.properties.filter(predicate)

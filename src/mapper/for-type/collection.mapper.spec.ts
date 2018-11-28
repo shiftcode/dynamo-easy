@@ -12,8 +12,8 @@ describe('collection mapper', () => {
   describe('to db', () => {
     describe('no metadata', () => {
       /*
-       * Arrays
-       */
+         * Arrays
+         */
       it('arr (homogeneous string)', () => {
         const attributeValue = <StringSetAttribute>mapper.toDb(['value1', 'value2', 'value3'])
         expect(Object.keys(attributeValue)[0]).toBe('SS')
@@ -47,8 +47,8 @@ describe('collection mapper', () => {
       })
 
       /*
-       * Set
-       */
+         * Set
+         */
       it('set (homogeneous string)', () => {
         const attributeValue = <StringSetAttribute>mapper.toDb(new Set(['value1', 'value2', 'value3']))
         expect(Object.keys(attributeValue)[0]).toBe('SS')
@@ -137,8 +137,8 @@ describe('collection mapper', () => {
   describe('from db', () => {
     describe('no metadata', () => {
       /*
-       * S(et)
-       */
+         * S(et)
+         */
       it('arr (homogeneous string)', () => {
         const stringSet = <Set<string>>mapper.fromDb({ SS: ['value1', 'value2', 'value3'] })
         expect(stringSet instanceof Set).toBeTruthy()

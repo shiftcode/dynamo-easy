@@ -17,7 +17,7 @@ describe('batch get', () => {
     request.forModel(Organization, ['idValue'])
     const params = request.params
     expect(params.RequestItems).toBeDefined()
-    expect(params.RequestItems.Organization).toBeDefined()
-    expect(params.RequestItems.Organization).toEqual({ Keys: [{ id: { S: 'idValue' } }] })
+    expect(params.RequestItems['Organization']).toBeDefined()
+    expect(params.RequestItems['Organization']).toEqual({ Keys: [{ id: { S: 'idValue' } }] })
   })
 })

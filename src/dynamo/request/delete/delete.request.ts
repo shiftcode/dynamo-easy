@@ -16,7 +16,7 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteIt
     modelClazz: ModelConstructor<T>,
     tableName: string,
     partitionKey: any,
-    sortKey?: any,
+    sortKey?: any
   ) {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
@@ -40,7 +40,7 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteIt
 
     // sort key
     if (hasSortKey) {
-      const sortKeyValue = Mapper.toDbOne(sortKey, this.metaData.forProperty(this.metaData.getSortKey()!))
+      const sortKeyValue = Mapper.toDbOne(sortKey!, this.metaData.forProperty(this.metaData.getSortKey()!))
 
       if (sortKeyValue === null) {
         throw new Error('please provide an actual value for sort key, got null')
@@ -61,7 +61,7 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DeleteIt
     return this.execFullResponse().pipe(
       map(response => {
         return
-      }),
+      })
     )
   }
 }

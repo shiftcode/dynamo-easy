@@ -70,7 +70,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
                 throw new Error(
                   `there is already a partition key defined for global secondary index ${indexName} (property name: ${
                     property.nameDb
-                  })`,
+                  })`
                 )
               }
 
@@ -81,7 +81,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
                 throw new Error(
                   `there is already a sort key defined for global secondary index ${indexName} (property name: ${
                     property.nameDb
-                  })`,
+                  })`
                 )
               }
 
@@ -110,7 +110,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
 
 function getLocalSecondaryIndexes(
   basePartitionKey: string | null,
-  properties: Array<PropertyMetadata<any>>,
+  properties: Array<PropertyMetadata<any>>
 ): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
     return properties
@@ -123,13 +123,13 @@ function getLocalSecondaryIndexes(
             throw new Error(
               `only one sort key can be defined for the same local secondary index, ${
                 property.nameDb
-              } is already defined as sort key for index ${indexName}`,
+              } is already defined as sort key for index ${indexName}`
             )
           }
 
           if (!basePartitionKey) {
             throw new Error(
-              'a local secondary index requires the partition key to be defined, use the @PartitionKey decorator',
+              'a local secondary index requires the partition key to be defined, use the @PartitionKey decorator'
             )
           }
 

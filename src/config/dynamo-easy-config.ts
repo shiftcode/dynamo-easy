@@ -6,7 +6,6 @@ import { Config } from './config'
  * the config cannot be changed afterwards
  */
 export class DynamoEasyConfig {
-  // tslint:disable:no-empty
   static config: Config = {
     dateMapper: DateToStringMapper,
     logReceiver: () => {},

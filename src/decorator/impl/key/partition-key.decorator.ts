@@ -16,7 +16,7 @@ export function PartitionKey(): PropertyDecorator {
           } else {
             throw new Error(
               'only one partition key is allowed per model, if you want to define key for indexes use one of these decorators: ' +
-                '@GSIPartitionKey,  @GSISortKey or @LSISortKey',
+                '@GSIPartitionKey,  @GSISortKey or @LSISortKey'
             )
           }
         }

@@ -93,7 +93,7 @@ describe('query request', () => {
     const request = new QueryRequest(
       <any>null,
       ModelWithCustomMapperForSortKeyModel,
-      getTableName(ModelWithCustomMapperForSortKeyModel),
+      getTableName(ModelWithCustomMapperForSortKeyModel)
     )
 
     request.whereSortKey().between(new CustomId(new Date('2018-01-01'), 0), new CustomId(new Date('2018-12-31'), 99999))

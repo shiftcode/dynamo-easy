@@ -78,7 +78,7 @@ export class OrderId {
   }
 
   static fromDb(dbValue: StringAttribute): OrderId {
-    return OrderId.parse(dbValue.S)
+    return OrderId.parse(dbValue['S'])
   }
 
   constructor(counter: number, year: number) {

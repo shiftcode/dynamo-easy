@@ -3,5 +3,5 @@ import { UpdateExpression } from './update-expression.type'
 
 export type UpdateExpressionDefinitionFunction = (
   expressionAttributeValues: string[] | undefined,
-  metadata: Metadata<any> | undefined,
+  metadata: Metadata<any> | undefined
 ) => UpdateExpression

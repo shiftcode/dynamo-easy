@@ -89,7 +89,7 @@ export class Util {
 
   static isSet(value: any): value is Set<any> {
     return (
-      (value !== null && value !== undefined && value.hasOwnProperty('name') && value.name === 'Set') ||
+      (value !== null && value !== undefined && value.hasOwnProperty('name') && (<any>value).name === 'Set') ||
       value instanceof Set
     )
   }
@@ -204,7 +204,7 @@ export class Util {
         type =>
           data !== undefined &&
           data.constructor &&
-          (Util.isType(data, type) || Util.typeName(data.constructor) === type),
+          (Util.isType(data, type) || Util.typeName(data.constructor) === type)
       )
     }
   }

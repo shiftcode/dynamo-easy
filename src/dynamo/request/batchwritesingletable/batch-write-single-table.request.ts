@@ -49,7 +49,7 @@ export class BatchWriteSingleTableRequest<T> {
 
   put(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(
-      ...items.map<WriteRequest>(item => ({ PutRequest: { Item: Mapper.toDb(item, this.modelClazz) } })),
+      ...items.map<WriteRequest>(item => ({ PutRequest: { Item: Mapper.toDb(item, this.modelClazz) } }))
     )
     this.logger.debug(`${items.length} items added for PutRequest`)
     return this
@@ -82,7 +82,7 @@ export class BatchWriteSingleTableRequest<T> {
         if (response.capacityExceeded) {
           this.logger.info('capacity exceeded', response.consumedCapacity)
         }
-      }),
+      })
     )
   }
 
@@ -112,7 +112,7 @@ export class BatchWriteSingleTableRequest<T> {
         } else {
           return of()
         }
-      }),
+      })
     )
   }
 }
