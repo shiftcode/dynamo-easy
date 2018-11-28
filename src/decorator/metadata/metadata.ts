@@ -1,8 +1,18 @@
 import { ModelConstructor } from '../../model/model-constructor'
+import { Omit } from '../../model/omit.type'
 import { SecondaryIndex } from '../impl/index/secondary-index'
 import { KEY_MODEL } from '../impl/model/model.decorator'
 import { ModelMetadata } from './model-metadata.model'
 import { PropertyMetadata } from './property-metadata.model'
+
+export type MetadataWithSortKey<T> = Omit<Metadata<T>, 'getSortKey'> & { getSortKey: (indexName?: string) => keyof T }
+
+/**
+ * Checks if given metadata returns a sort key when calling metadata.getSortKey
+ */
+export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSortKey<T> {
+  return metadata.getSortKey() !== null
+}
 
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata<T>
@@ -16,7 +26,7 @@ export class Metadata<T> {
 
     if (this.modelOptions.properties) {
       options = this.modelOptions.properties.find(
-        property => property.name === propertyKey || property.nameDb === propertyKey
+        property => property.name === propertyKey || property.nameDb === propertyKey,
       )
     }
 
@@ -28,7 +38,7 @@ export class Metadata<T> {
    * @returns {Array<PropertyMetadata<any>>} Returns all the properties property the @PartitionKeyUUID decorator is present, returns an empty array by default
    */
   getKeysWithUUID(): Array<PropertyMetadata<any>> {
-    return this.filterBy(p => !!(p.key && p.key.uuid), [])
+    return filterBy(this.modelOptions, p => !!(p.key && p.key.uuid), [])
   }
 
   /**
@@ -46,7 +56,7 @@ export class Metadata<T> {
         throw new Error(`there is no index defined for name ${indexName}`)
       }
     } else {
-      const property = this.filterByFirst(p => !!(p.key && p.key.type === 'HASH'))
+      const property = filterByFirst(this.modelOptions, p => !!(p.key && p.key.type === 'HASH'))
 
       if (property) {
         return property.name
@@ -74,7 +84,7 @@ export class Metadata<T> {
         throw new Error(`there is no index defined for name ${indexName}`)
       }
     } else {
-      const property = this.filterByFirst(p => !!(p.key && p.key.type === 'RANGE'))
+      const property = filterByFirst(this.modelOptions, p => !!(p.key && p.key.type === 'RANGE'))
       return property ? property.name : null
     }
   }
@@ -103,23 +113,27 @@ export class Metadata<T> {
 
     return null
   }
+}
 
-  private filterBy<R>(
-    predicate: (property: PropertyMetadata<any>) => boolean,
-    defaultValue: R
-  ): Array<PropertyMetadata<any>> | R {
-    if (this.modelOptions && this.modelOptions.properties) {
-      const properties = this.modelOptions.properties.filter(predicate)
-      if (properties && properties.length) {
-        return properties
-      }
+function filterBy<T, R>(
+  modelOptions: ModelMetadata<T>,
+  predicate: (property: PropertyMetadata<any>) => boolean,
+  defaultValue: R,
+): Array<PropertyMetadata<any>> | R {
+  if (modelOptions && modelOptions.properties) {
+    const properties = modelOptions.properties.filter(predicate)
+    if (properties && properties.length) {
+      return properties
     }
-
-    return defaultValue
   }
 
-  private filterByFirst(predicate: (property: PropertyMetadata<T>) => boolean): PropertyMetadata<T> | null {
-    const properties = this.filterBy(predicate, null)
-    return properties && properties.length ? properties[0] : null
-  }
+  return defaultValue
+}
+
+function filterByFirst<T>(
+  modelOptions: ModelMetadata<T>,
+  predicate: (property: PropertyMetadata<T>) => boolean,
+): PropertyMetadata<T> | null {
+  const properties = filterBy(modelOptions, predicate, null)
+  return properties && properties.length ? properties[0] : null
 }

@@ -1,22 +1,24 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
-import { MetadataHelper } from '../decorator/metadata/metadata-helper'
+import { metadataForClass } from '../decorator/metadata'
 import { createLogger, Logger } from '../logger/logger'
-import { ModelConstructor } from '../model/model-constructor'
+import { ModelConstructor } from '../model'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from './default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
 import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoRx } from './dynamo-rx'
-import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
+import {
+  BatchGetSingleTableRequest,
+  DeleteRequest,
+  GetRequest,
+  PutRequest,
+  QueryRequest,
+  ScanRequest,
+  UpdateRequest,
+} from './request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
-import { DeleteRequest } from './request/delete/delete.request'
-import { GetRequest } from './request/get/get.request'
-import { PutRequest } from './request/put/put.request'
-import { QueryRequest } from './request/query/query.request'
 import { REGEX_TABLE_NAME } from './request/regex'
-import { ScanRequest } from './request/scan/scan.request'
-import { UpdateRequest } from './request/update/update.request'
 import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 import { TableNameResolver } from './table-name-resolver.type'
 
@@ -29,14 +31,14 @@ export class DynamoStore<T> {
   constructor(
     private modelClazz: ModelConstructor<T>,
     tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
+    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
   ) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
-    const tableName = tableNameResolver(MetadataHelper.get(this.modelClazz).modelOptions.tableName)
+    const tableName = tableNameResolver(metadataForClass(this.modelClazz).modelOptions.tableName)
     if (!REGEX_TABLE_NAME.test(tableName)) {
       throw new Error(
-        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long'
+        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long',
       )
     }
 

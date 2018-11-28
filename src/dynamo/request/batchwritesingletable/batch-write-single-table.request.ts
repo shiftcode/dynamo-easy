@@ -1,12 +1,12 @@
 import { BatchWriteItemInput, BatchWriteItemOutput, WriteRequest, WriteRequests } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap, tap } from 'rxjs/operators'
-import { DynamoRx } from '../../../dynamo/dynamo-rx'
+import { PutRequest } from '../../../../node_modules/aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Mapper } from '../../../mapper'
-import { Attributes } from '../../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { Attributes, createToKeyFn, toDb } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
+import { DynamoRx } from '../../dynamo-rx'
 import { BatchWriteSingleTableResponse } from './batch-write-single-table.response'
 
 const MAX_BATCH_WRITE_ITEMS = 25
@@ -15,18 +15,17 @@ export class BatchWriteSingleTableRequest<T> {
   private readonly logger: Logger
 
   private get toKey(): (item: T) => Attributes {
-    if (!this._keyFn) {
-      this._keyFn = Mapper.createToKeyFn(this.modelClazz)
+    if (!this.keyFn) {
+      this.keyFn = createToKeyFn(this.modelClazz)
     }
-    return this._keyFn
+    return this.keyFn
   }
+  private keyFn: any
 
   readonly dynamoRx: DynamoRx
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
   readonly itemsToProcess: WriteRequests
-
-  private _keyFn: any
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     this.logger = createLogger('dynamo.request.BatchWriteSingleTableRequest', modelClazz)
@@ -49,7 +48,7 @@ export class BatchWriteSingleTableRequest<T> {
 
   put(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(
-      ...items.map<WriteRequest>(item => ({ PutRequest: { Item: Mapper.toDb(item, this.modelClazz) } }))
+      ...items.map<WriteRequest>(item => ({ PutRequest: <PutRequest>{ Item: toDb(item, this.modelClazz) } })),
     )
     this.logger.debug(`${items.length} items added for PutRequest`)
     return this
@@ -82,7 +81,7 @@ export class BatchWriteSingleTableRequest<T> {
         if (response.capacityExceeded) {
           this.logger.info('capacity exceeded', response.consumedCapacity)
         }
-      })
+      }),
     )
   }
 
@@ -112,7 +111,7 @@ export class BatchWriteSingleTableRequest<T> {
         } else {
           return of()
         }
-      })
+      }),
     )
   }
 }

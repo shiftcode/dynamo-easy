@@ -1,14 +1,25 @@
 // tslint:disable:max-classes-per-file
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { CustomMapper } from '../../src/decorator/impl/mapper/custom-mapper.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { PropertyMetadata } from '../../src/decorator/metadata/property-metadata.model'
-import { MapperForType } from '../../src/mapper/for-type/base.mapper'
-import { StringAttribute } from '../../src/mapper/type/attribute.type'
+// tslint:disable:no-non-null-assertion
+
+import { CustomMapper, Model, PartitionKey } from '../../src/decorator/impl'
+import { MapperForType, StringAttribute } from '../../src/mapper'
 
 export class Id {
   counter: number
   year: number
+
+  static parse(idString: string): Id {
+    const id: Id = new Id()
+    id.counter = parseInt(idString.slice(0, 4).replace('0', ''), 10)
+    id.year = parseInt(idString.slice(4, 8), 10)
+    return id
+  }
+
+  static unparse(propertyValue: Id): string {
+    // create leading zeroes so the counter matches the pattern /d{4}
+    const leadingZeroes: string = new Array(4 + 1 - (propertyValue.counter + '').length).join('0')
+    return `${leadingZeroes}${propertyValue.counter}${propertyValue.year}`
+  }
 
   constructor(counter?: number, year?: number) {
     this.counter = counter!
@@ -16,22 +27,9 @@ export class Id {
   }
 }
 
-export class IdMapper implements MapperForType<Id, StringAttribute> {
-  fromDb(attributeValue: StringAttribute, propertyMetadata?: PropertyMetadata<any>): Id {
-    const id: Id = new Id()
-
-    const idString = attributeValue.S
-    id.counter = parseInt(idString.slice(0, 4).replace('0', ''), 10)
-    id.year = parseInt(idString.slice(4, 8), 10)
-
-    return id
-  }
-
-  toDb(propertyValue: Id, propertyMetadata?: PropertyMetadata<any>): StringAttribute {
-    // create leading zeroes so the counter matches the pattern /d{4}
-    const leadingZeroes: string = new Array(4 + 1 - (propertyValue.counter + '').length).join('0')
-    return { S: `${leadingZeroes}${propertyValue.counter}${propertyValue.year}` }
-  }
+export const IdMapper: MapperForType<Id, StringAttribute> = {
+  fromDb: (attributeValue: StringAttribute) => Id.parse(attributeValue.S),
+  toDb: (propertyValue: Id) => ({ S: `${Id.unparse(propertyValue)}` }),
 }
 
 @Model()

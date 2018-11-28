@@ -2,10 +2,10 @@ import { PutItemOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Mapper } from '../../../mapper/mapper'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { toDb } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
-import { attribute } from '../../expression/logical-operator/attribute.function'
+import { attribute } from '../../expression/logical-operator'
 import { WriteRequest } from '../write.request'
 
 export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
@@ -14,7 +14,7 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, item: T) {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
-    this.params.Item = Mapper.toDb(item, this.modelClazz)
+    this.params.Item = toDb(item, this.modelClazz)
   }
 
   /**
@@ -25,9 +25,9 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
     // FIXME should we check for sort key too?
     const conditionDefFns = []
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
-      conditionDefFns.push(attribute<T>(this.metaData.getPartitionKey()).attributeNotExists())
+      conditionDefFns.push(attribute<T>(this.metadata.getPartitionKey()).attributeNotExists())
 
-      const sortKey = this.metaData.getSortKey()
+      const sortKey = this.metadata.getSortKey()
       if (sortKey !== null) {
         conditionDefFns.push(attribute<T>(sortKey).attributeNotExists())
       }
@@ -47,7 +47,7 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
     return this.execFullResponse().pipe(
       map(response => {
         return
-      })
+      }),
     )
   }
 }

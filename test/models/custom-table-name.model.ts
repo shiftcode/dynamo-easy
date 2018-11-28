@@ -1,3 +1,5 @@
+// tslint:disable:no-unnecessary-class
+
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 
 @Model({ tableName: 'myCustomName' })

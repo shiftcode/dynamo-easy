@@ -1,6 +1,7 @@
 import { Attributes } from '../../src/mapper/type/attribute.type'
+import { Product } from '../models'
 
-export const productFromDb: Attributes = <any>{
+export const productFromDb: Attributes<Product> = {
   nestedValue: {
     M: {
       sortedSet: {

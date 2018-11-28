@@ -11,7 +11,7 @@ describe('get requst', () => {
       <any>null,
       SimpleWithPartitionKeyModel,
       getTableName(SimpleWithPartitionKeyModel),
-      'partitionKeyValue'
+      'partitionKeyValue',
     )
   })
 

@@ -1,7 +1,6 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
-import { MapperForType } from '../../mapper/for-type/base.mapper'
-import { Attribute } from '../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../model/model-constructor'
+import { Attribute, MapperForType } from '../../mapper'
+import { ModelConstructor } from '../../model'
 
 export interface TypeInfo {
   type: ModelConstructor<any>
@@ -16,7 +15,7 @@ export interface Key {
 }
 
 export interface PropertyMetadata<T, R extends Attribute = Attribute> {
-  // this property desribes a key attribute (either partition or sort) for the table
+  // this property describes a key attribute (either partition or sort) for the table
   key?: Key
 
   // name of the property on js side
@@ -27,16 +26,16 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
 
   /*
    * the type will re resolved using compile time information leveraging the reflect api, due to some limitations we
-   * cannot differ between Object, Set, Map so we need an additional @Type decorator
+   * cannot differ between Object, Set, Map and custom Classes so we need an additional @Type decorator
    */
-  typeInfo?: Partial<TypeInfo>
+  typeInfo?: TypeInfo
 
   /*
    * defines which dynamodb type should be used for storing collection data, only L(ist) preserves order (compared to Set types)
    */
   isSortedCollection?: boolean
 
-  mapper?: ModelConstructor<MapperForType<any, R>>
+  mapper?: () => MapperForType<any, R>
 
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
   keyForGSI?: { [key: string]: KeyType }
@@ -48,6 +47,13 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   transient?: boolean
 }
 
-export function hasGenericType(propertyMetadata?: PropertyMetadata<any, any>): boolean {
+// todo: fixme
+// export function hasSortKey(propertyMetadata: PropertyMetadata<any, any>): propertyMetadata is PropertyMetadata<any, any> & {} {
+//   return propertyMetadata.getSortKey() !== null
+// }
+
+export function hasGenericType(
+  propertyMetadata?: PropertyMetadata<any, any>,
+): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { genericType: ModelConstructor<any> } } {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType)
 }

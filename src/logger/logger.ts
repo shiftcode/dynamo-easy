@@ -1,5 +1,5 @@
-import { DynamoEasyConfig } from '../config'
-import { ModelConstructor } from '../model/model-constructor'
+import { dynamoEasyConfig } from '../config/dynamo-easy-config'
+import { ModelConstructor } from '../model'
 import { LogLevel } from './log-level.type'
 
 export type LogFn = (message: string, data?: any) => void
@@ -12,7 +12,7 @@ export interface Logger {
 
 function getLogFn(className: string, modelClass: string, level: LogLevel): LogFn {
   return (message: string, data?: any) => {
-    DynamoEasyConfig.config.logReceiver({
+    dynamoEasyConfig.logReceiver({
       className,
       modelClass,
       level,

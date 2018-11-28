@@ -1,3 +1,6 @@
+// tslint:disable:no-non-null-assertion
+
+import { ListAttribute, MapperForType, StringAttribute } from '../../../src/mapper'
 import { FormType } from './order.model'
 
 export class FormId {
@@ -55,7 +58,7 @@ export class FormId {
    * @param hidePostfix
    * @returns {string}
    */
-  static toString(formId: FormId, hidePostfix?: boolean): string {
+  static unparse(formId: FormId, hidePostfix?: boolean): string {
     // use the join method with array length to produce leading zeroes
     let prefix: string | undefined
     const leadingZeroes: string = new Array(4 + 1 - (formId.counter + '').length).join('0')
@@ -64,7 +67,6 @@ export class FormId {
         prefix = key
       }
     }
-
     return (
       (prefix ? prefix : '') +
       leadingZeroes +
@@ -80,4 +82,34 @@ export class FormId {
     this.year = year
     this.counter = counter
   }
+}
+
+export const FormIdMapper: MapperForType<FormId, StringAttribute> = {
+  fromDb: (attributeValue: StringAttribute) => FormId.parse(attributeValue.S),
+  toDb: (propertyValue: FormId) => ({ S: FormId.unparse(propertyValue) }),
+}
+
+type AttributeStringOrListValue = StringAttribute | ListAttribute
+
+function formIdsFromDb(attributeValue: AttributeStringOrListValue): FormId[] | FormId {
+  if ('L' in attributeValue) {
+    return attributeValue.L.map(formIdDb => FormId.parse((<StringAttribute>formIdDb).S))
+  } else if ('S' in attributeValue) {
+    return FormId.parse(attributeValue.S)
+  } else {
+    throw new Error('there is no mapping defined to read attributeValue ' + JSON.stringify(attributeValue))
+  }
+}
+
+function formIdsToDb(propertyValue: FormId[] | FormId): AttributeStringOrListValue | null {
+  if (Array.isArray(propertyValue)) {
+    return { L: propertyValue.map(a => ({ S: FormId.unparse(a) })) }
+  } else {
+    return { S: FormId.unparse(propertyValue) }
+  }
+}
+
+export const FormIdsMapper: MapperForType<FormId[] | FormId, AttributeStringOrListValue> = {
+  fromDb: formIdsFromDb,
+  toDb: formIdsToDb,
 }

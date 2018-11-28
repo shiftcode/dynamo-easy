@@ -9,7 +9,7 @@ import { initOrUpdateProperty } from '../property/property.decorator'
 export function TypedArray<T>(modelClass?: ModelConstructor<T>): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-      const typeInfo: Partial<TypeInfo> = <Partial<TypeInfo>>{
+      const typeInfo: TypeInfo = {
         type: Array,
         isCustom: true,
       }
