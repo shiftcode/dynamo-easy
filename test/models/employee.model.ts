@@ -1,5 +1,6 @@
 import { DateProperty, Model, SortedSet } from '../../src/dynamo-easy'
 
+// comment
 @Model()
 export class Employee {
   name: string

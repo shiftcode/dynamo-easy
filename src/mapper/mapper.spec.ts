@@ -222,8 +222,11 @@ describe('Mapper', () => {
       })
 
       it('complex object', () => {
-
-        interface ObjType{ name: StringAttribute; age: NumberAttribute; children: ListAttribute }
+        interface ObjType {
+          name: StringAttribute
+          age: NumberAttribute
+          children: ListAttribute
+        }
         const attrValue = <MapAttribute<ObjType>>toDbOne({
           name: 'Max',
           age: 35,
@@ -839,7 +842,6 @@ describe('Mapper', () => {
           expect(Array.isArray(birthday.presents)).toBeTruthy()
         })
 
-
         it('awards', () => {
           expect(organization.awards).toBeDefined()
           expect(organization.awards instanceof Set).toBeTruthy()
@@ -852,7 +854,7 @@ describe('Mapper', () => {
           expect(award).toBe('Best of Swiss Web')
         })
 
-        it('events', ()=>{
+        it('events', () => {
           expect(organization.events).toBeDefined()
           expect(organization.events instanceof Set).toBeTruthy()
 
