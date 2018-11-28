@@ -1,4 +1,4 @@
-import { RequestExpressionBuilder } from '../request-expression-builder'
+import { propertyDefinitionFunction } from '../request-expression-builder'
 import { ConditionExpressionDefinitionChain } from '../type/condition-expression-definition-chain'
 
 /**
@@ -12,5 +12,5 @@ export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinit
 export function attribute(attributePath: string): ConditionExpressionDefinitionChain
 
 export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain {
-  return RequestExpressionBuilder.propertyDefinitionFunction<T>(attributePath)
+  return propertyDefinitionFunction<T>(attributePath)
 }

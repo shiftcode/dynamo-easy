@@ -39,7 +39,7 @@ export abstract class Request<
   }
 
   index(indexName: string): R {
-    const index = this.metaData.getIndex(indexName)
+    const index = this.metadata.getIndex(indexName)
 
     if (index) {
       this.params.IndexName = indexName

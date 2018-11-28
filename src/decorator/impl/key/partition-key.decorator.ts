@@ -1,5 +1,6 @@
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
-import { initOrUpdateProperty, KEY_PROPERTY } from '../property/property.decorator'
+import { initOrUpdateProperty } from '../property/init-or-update-property.function'
+import { KEY_PROPERTY } from '../property/key-property.const'
 
 export function PartitionKey(): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
@@ -16,7 +17,7 @@ export function PartitionKey(): PropertyDecorator {
           } else {
             throw new Error(
               'only one partition key is allowed per model, if you want to define key for indexes use one of these decorators: ' +
-                '@GSIPartitionKey,  @GSISortKey or @LSISortKey'
+                '@GSIPartitionKey,  @GSISortKey or @LSISortKey',
             )
           }
         }

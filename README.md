@@ -22,7 +22,7 @@ Checkout the full technical api documentation [here](https://shiftcode.github.io
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
-```
+```typescript
 @Model()
 class Person{
   @PartitionKeyUUID() 
@@ -109,7 +109,7 @@ Simple Type (no decorators required to work)
 - Boolean
 - Null
 - Array
-- Date (we only support MomentJS)
+- String/Number Enum
 
 Complex Types (properties with these types need some decorators to work properly)
 - Set<simpleType | complexType>
@@ -121,7 +121,6 @@ Complex Types (properties with these types need some decorators to work properly
 | String        | S             |
 | Number        | N             |
 | Boolean       | BOOL          |
-| moment.Moment | S (ISO-8601 formatted) |
 | null          | NULL          |
 | Array         | L, (S,N,B)S   |
 | ES6 Set       | L, (S,N,B)S   |
@@ -132,7 +131,8 @@ Complex Types (properties with these types need some decorators to work properly
 | Date          | Not Supported |
 
 ## Custom Attribute Mapping
-It is always possible to define a custom mapping strategy, just implement the [MapperForType](https://shiftcode.github.io/dynamo-easy/interfaces/_mapper_for_type_base_mapper_.mapperfortype.html) class.
+It is always possible to define a custom mapping strategy, 
+just implement the [MapperForType](https://shiftcode.github.io/dynamo-easy/interfaces/_mapper_for_type_base_mapper_.mapperfortype.html) and provide with the CustomMapper directive.
 
 ## Collection Mapping (Array & Set)
 
@@ -150,13 +150,42 @@ When one of the following decorators is present, the value is always mapped to a
 - @TypedArray()
 
 ## Date
-Right now we only support [MomentJS](http://momentjs.com/) Dates.
+We only support the native Date type and you need to explicitly mark a property to be a Date by using the @Date() decorator\
+(which is basically just syntactic sugar for @CustomMapper(TheDateMapper)).\
+If you want to use a different type for the @Date decorator (eg. Moment) you need to define a custom mapper and provide it to the dynamo easy config like this:\
+`updateDynamoEasyConfig({ dateMapper: MomentMapper })`\
 
-If you want to explicitly mark a property to be a Date use the @Date() decorator. If we find a moment value we automatically map it to a String (using ISO-8601 format).
-When coming from db we do a regex test for ISO-8601 format and map it back to a moment object.
+
+A mapper for moment dates could look like this:
+```typescript
+import * as moment from 'moment'
+import { MapperForType, StringAttribute } from '@shiftcoders/dynamo-easy'
+
+export const MomentMapper: MapperForType<moment.Moment, StringAttribute> = {
+
+  fromDb: (value: StringAttribute) => {
+    const parsed = moment(value.S, moment.ISO_8601)
+    if (!parsed.isValid()) {
+      throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
+    }
+    return parsed
+  },
+
+  toDb: (value: moment.Moment) => {
+    if (!moment.isMoment(value)) {
+      throw new Error(`the value ${value} is not of type moment`)
+    }
+    if (!value.isValid()) {
+      throw new Error(`cannot map property value ${value}, because it is not a valid moment date`)
+    }
+    return { S: value.clone().utc().format() }
+  },
+}
+```
+
 
 ## Enum
-Enum values are persisted as Numbers (index of enum).
+Enum values are persisted as Numbers (index of enum) or string if string value was given.
 
 # Request API
 To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
@@ -168,7 +197,8 @@ We support the following dynamodb operations with a fluent api:
 - Delete
 - Scan
 - Query
-- BatchGet
+- BatchGet (from a single table)
+- BatchWrite (to a single table)
 - MakeRequest (generic low level method for special scenarios)
 
 There is always the possibility to access the Params object directly to add values which are not covered with our api.
@@ -189,7 +219,7 @@ function sessionValidityEnsurer(): Observable<boolean> {
           this.logger.debug('withValidSession :: cognitoService.isLoggedIn() -> we have a valid session -> proceed')
           return Observable.of(true)
         } else {
-          this.logger.debug('withValidSession :: cognitoService.isLoggedIn() -> user is not logged in or token expired, try to get a new session')
+          this.logger.debug(metadata)
           return this.getUser()
             .catch((err, caught): Observable<boolean> => {
               this.logger.error('withValidSession :: there was an error when refreshing the session', err)
@@ -209,7 +239,7 @@ By default we create a substitution placeholder for all the attributes, just to 
 
 attributename: age
 
-```
+```typescript
 expression: '#age = :age' 
 attributeExpressionNames: {'#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
@@ -218,8 +248,8 @@ attributeExpressionValues: {':age': {N: '10'}}
 this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
 nested attribute: person.age
 
-```
-attributeExpressionNames: {'#person':'person', '#age': 'age'}
+```typescript
+attributeExpressionNames: {'#person': 'person', '#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
 expression: '#person.#age = :age'
 ```
@@ -240,7 +270,7 @@ There are two scenarios for a batch get item request. One is requesting multiple
 tables.
 The first scenario is support using DynamoStore.batchGet() the second one must be implemented using the BatchGetItem class.
 
-```
+```typescript
 const request = new BatchRequest()
 
 // table with simple primary key

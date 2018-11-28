@@ -3,16 +3,17 @@ import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { fetchAll } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Mapper } from '../../../mapper/mapper'
-import { Attributes } from '../../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { Attributes, fromDb } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
-import { and } from '../../expression/logical-operator/and.function'
-import { ParamUtil } from '../../expression/param-util'
-import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { RequestConditionFunction } from '../../expression/type/request-condition-function'
-import { RequestSortKeyConditionFunction } from '../../expression/type/sort-key-condition-function'
+import { and } from '../../expression'
+import { addExpression } from '../../expression/param-util'
+import { addCondition, addSortKeyCondition } from '../../expression/request-expression-builder'
+import {
+  ConditionExpressionDefinitionFunction,
+  RequestConditionFunction,
+  RequestSortKeyConditionFunction,
+} from '../../expression/type'
 import { Pageable } from '../../paged'
 import { Request } from '../request.model'
 import { QueryResponse } from './query.response'
@@ -27,11 +28,11 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
-    let partitionKey: string
+    let partitionKey: keyof T
     if (this.params.IndexName) {
-      const index = this.metaData.getIndex(this.params.IndexName)
+      const index = this.metadata.getIndex(this.params.IndexName)
       if (index) {
-        partitionKey = <string>index.partitionKey
+        partitionKey = index.partitionKey
         if (!partitionKey) {
           throw new Error(`there is no parition key defined for index <${this.params.IndexName}>`)
         }
@@ -39,12 +40,10 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
         throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
       }
     } else {
-      partitionKey = <string>this.metaData.getPartitionKey()
+      partitionKey = this.metadata.getPartitionKey()
     }
 
-    return RequestExpressionBuilder.addSortKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData).equals(
-      partitionKeyValue
-    )
+    return addSortKeyCondition(partitionKey, this, this.metadata).equals(partitionKeyValue)
   }
 
   /**
@@ -52,12 +51,12 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
    * @returns {RequestConditionFunction<T>}
    */
   whereSortKey(): RequestSortKeyConditionFunction<QueryRequest<T>> {
-    let sortKey: string | null
+    let sortKey: keyof T | null
     if (this.params.IndexName) {
-      const index = this.metaData.getIndex(this.params.IndexName)
+      const index = this.metadata.getIndex(this.params.IndexName)
       if (index) {
         if (index.sortKey) {
-          sortKey = <string>index.sortKey
+          sortKey = index.sortKey
         } else {
           throw new Error(`there is no sort key defined for index <${this.params.IndexName}>`)
         }
@@ -65,25 +64,25 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
         throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
       }
     } else {
-      sortKey = <string>this.metaData.getSortKey()
+      sortKey = this.metadata.getSortKey()
     }
 
     if (!sortKey) {
       throw new Error('There was no sort key defined for current schema')
     }
 
-    return RequestExpressionBuilder.addSortKeyCondition(sortKey, this, this.metaData)
+    return addSortKeyCondition(sortKey, this, this.metadata)
   }
 
   // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
   // update2.function)
   whereAttribute(attributePath: keyof T): RequestConditionFunction<QueryRequest<T>> {
-    return RequestExpressionBuilder.addCondition('FilterExpression', <string>attributePath, this, this.metaData)
+    return addCondition('FilterExpression', <string>attributePath, this, this.metadata)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {
-    const condition = and(...conditionDefFns)(undefined, this.metaData)
-    ParamUtil.addExpression('FilterExpression', condition, this.params)
+    const condition = and(...conditionDefFns)(undefined, this.metadata)
+    addExpression('FilterExpression', condition, this.params)
     return this
   }
 
@@ -104,8 +103,8 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     this.logger.debug('count request', params)
     return this.dynamoRx.query(params).pipe(
       tap(response => this.logger.debug('response', response)),
-      map(response => response.Count!),
-      tap(count => this.logger.debug('count', count))
+      map(response => response.Count || 0),
+      tap(count => this.logger.debug('count', count)),
     )
   }
 
@@ -115,11 +114,11 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
       tap(response => this.logger.debug('response', response)),
       map(queryResponse => {
         const response: QueryResponse<T> = <any>{ ...queryResponse }
-        response.Items = queryResponse.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))
+        response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
 
         return response
       }),
-      tap(response => this.logger.debug('mapped items', response.Items))
+      tap(response => this.logger.debug('mapped items', response.Items)),
     )
   }
 
@@ -127,8 +126,8 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     this.logger.debug('request', this.params)
     return this.dynamoRx.query(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
-      map(response => response.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))),
-      tap(items => this.logger.debug('mapped items', items))
+      map(response => (response.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))),
+      tap(items => this.logger.debug('mapped items', items)),
     )
   }
 
@@ -143,13 +142,11 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this.dynamoRx.query(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => {
-        if (response.Count) {
-          return Mapper.fromDb(<Attributes>response.Items![0], this.modelClazz)
-        } else {
-          return null
-        }
+        return response.Items && response.Items.length
+          ? fromDb(<Attributes<T>>response.Items[0], this.modelClazz)
+          : null
       }),
-      tap(item => this.logger.debug('mapped item', item))
+      tap(item => this.logger.debug('mapped item', item)),
     )
   }
 

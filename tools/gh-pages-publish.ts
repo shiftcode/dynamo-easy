@@ -10,7 +10,7 @@ const info = {
 echo(`running on branch ${JSON.stringify(info)}`)
 
 if (info.TRAVIS_BRANCH === 'master' && info.TRAVIS_PULL_REQUEST === 'false') {
-  const pkg = JSON.parse(readFileSync('package.json') as any)
+  const pkg = JSON.parse(readFileSync('package.json'))
   let repoUrl
   if (typeof pkg.repository === 'object') {
     if (!pkg.repository.hasOwnProperty('url')) {

@@ -1,13 +1,12 @@
-import { PropertyMetadata } from '../../../src/decorator'
-import { MapperForType } from '../../../src/mapper'
-import { NumberSetAttribute } from '../../../src/mapper/type/attribute.type'
+import { MapperForType, NumberSetAttribute } from '../../../src/dynamo-easy'
 
-export class NumberEnumMapper implements MapperForType<any, NumberSetAttribute> {
-  fromDb(attributeValue: NumberSetAttribute, propertyMetadata?: PropertyMetadata<any>): any[] {
+// FIXME investigate: if the extra enum mapper makes sence, don't think so
+export const NumberEnumMapper: MapperForType<any, NumberSetAttribute> = {
+  fromDb(attributeValue: NumberSetAttribute): any[] {
     return <any[]>attributeValue.NS.map(numberEnumValue => parseInt(numberEnumValue, 10))
-  }
+  },
 
-  toDb(propertyValues: any[], propertyMetadata?: PropertyMetadata<any>): NumberSetAttribute {
+  toDb(propertyValues: any[]): NumberSetAttribute {
     return { NS: propertyValues.map(propertyValue => propertyValue.toString()) }
-  }
+  },
 }

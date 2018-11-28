@@ -10,7 +10,7 @@ export interface ModelMetadata<T> {
   clazz: any
   tableName: string
   properties?: Array<PropertyMetadata<T>>
-  transientProperties?: string[]
+  transientProperties?: Array<string | number | symbol>
 
   // local and global secondary indexes maps the name to the index definition (partition and optional sort key depending on index type)
   indexes?: Map<string, SecondaryIndex<T>>

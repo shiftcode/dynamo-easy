@@ -1,5 +1,4 @@
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
+import { Model, PartitionKey } from '../../src/dynamo-easy'
 
 @Model()
 export class SimpleWithPartitionKeyModel {

@@ -1,6 +1,5 @@
-import { MetadataHelper } from '../../src/decorator/metadata/metadata-helper'
-import { ModelConstructor } from '../../src/model/model-constructor'
+import { metadataForClass, ModelConstructor } from '../../src/dynamo-easy'
 
 export function getTableName<T>(modelClazz: ModelConstructor<T>): string {
-  return MetadataHelper.get(modelClazz).modelOptions.tableName
+  return metadataForClass(modelClazz).modelOptions.tableName
 }

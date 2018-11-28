@@ -1,20 +1,24 @@
 // tslint:disable:max-classes-per-file
-import * as moment from 'moment'
-import { GSIPartitionKey } from '../../src/decorator/impl/index/gsi-partition-key.decorator'
-import { GSISortKey } from '../../src/decorator/impl/index/gsi-sort-key.decorator'
-import { LSISortKey } from '../../src/decorator/impl/index/lsi-sort-key.decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { Property } from '../../src/decorator/impl/property/property.decorator'
+import {
+  DateProperty,
+  GSIPartitionKey,
+  GSISortKey,
+  LSISortKey,
+  Model,
+  PartitionKey,
+  Property,
+  SortKey,
+} from '../../src/dynamo-easy'
 
 export const INDEX_ACTIVE = 'active-index'
+
 @Model()
 export class ModelWithGSI {
   @PartitionKey()
   id: string
 
-  createdAt: moment.Moment
+  @DateProperty()
+  createdAt: Date
 
   @GSIPartitionKey(INDEX_ACTIVE)
   active: boolean
@@ -25,7 +29,8 @@ export class ModelWithLSI {
   @PartitionKey()
   id: string
 
-  createdAt: moment.Moment
+  @DateProperty()
+  createdAt: Date
 
   @LSISortKey(INDEX_ACTIVE)
   active: boolean
@@ -42,7 +47,8 @@ export class ModelWithABunchOfIndexes {
 
   @SortKey()
   @GSISortKey(INDEX_ACTIVE_CREATED_AT)
-  createdAt: moment.Moment
+  @DateProperty()
+  createdAt: Date
 
   @GSIPartitionKey(INDEX_ACTIVE_CREATED_AT)
   active: boolean

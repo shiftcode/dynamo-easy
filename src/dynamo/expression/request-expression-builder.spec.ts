@@ -1,14 +1,14 @@
-import { getTableName } from '../../../test/helper/get-table-name.function'
-import { Organization } from '../../../test/models/organization.model'
-import { QueryRequest } from '../request/query/query.request'
+import { getTableName } from '../../../test/helper'
+import { Organization } from '../../../test/models'
+import { QueryRequest } from '../request'
 import { DYNAMO_RX_MOCK } from '../request/query/query.request.spec'
-import { RequestExpressionBuilder } from './request-expression-builder'
+import { addCondition, addPartitionKeyCondition, addSortKeyCondition } from './request-expression-builder'
 
 describe('request expression builder', () => {
   describe('adds condition expression to request', () => {
     it('partition key', () => {
       const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
-      RequestExpressionBuilder.addPartitionKeyCondition('id', 'idValue', queryRequest)
+      addPartitionKeyCondition('id', 'idValue', queryRequest)
 
       const params = queryRequest.params
       expect(params.KeyConditionExpression).toBe('#id = :id')
@@ -18,7 +18,7 @@ describe('request expression builder', () => {
 
     it('sort key', () => {
       const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
-      RequestExpressionBuilder.addSortKeyCondition('count', queryRequest).equals(25)
+      addSortKeyCondition('count', queryRequest).equals(25)
 
       const params = queryRequest.params
       expect(params.KeyConditionExpression).toBe('#count = :count')
@@ -28,7 +28,7 @@ describe('request expression builder', () => {
 
     it('non key', () => {
       const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
-      RequestExpressionBuilder.addCondition('FilterExpression', 'age', queryRequest).lte(45)
+      addCondition('FilterExpression', 'age', queryRequest).lte(45)
 
       const params = queryRequest.params
       expect(params.FilterExpression).toBe('#age <= :age')

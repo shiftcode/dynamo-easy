@@ -1,7 +1,4 @@
-import * as moment from 'moment'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
+import { DateProperty, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
 @Model()
 export class SimpleWithCompositePartitionKeyModel {
@@ -9,7 +6,8 @@ export class SimpleWithCompositePartitionKeyModel {
   id: string
 
   @SortKey()
-  creationDate: moment.Moment
+  @DateProperty()
+  creationDate: Date
 
   age: number
 }

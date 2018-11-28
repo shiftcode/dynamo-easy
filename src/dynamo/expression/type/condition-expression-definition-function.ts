@@ -3,5 +3,5 @@ import { Expression } from './expression.type'
 
 export type ConditionExpressionDefinitionFunction = (
   expressionAttributeValues: string[] | undefined,
-  metadata: Metadata<any> | undefined
+  metadata: Metadata<any> | undefined,
 ) => Expression

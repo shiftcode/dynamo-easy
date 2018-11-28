@@ -3,7 +3,7 @@ import { ConditionExpressionDefinitionFunction } from '../type/condition-express
 import { Expression } from '../type/expression.type'
 
 export function not(
-  conditionDefinitionFn: ConditionExpressionDefinitionFunction
+  conditionDefinitionFn: ConditionExpressionDefinitionFunction,
 ): ConditionExpressionDefinitionFunction {
   return (expressionAttributeValues: string[] | undefined, metadata: Metadata<any> | undefined): Expression => {
     const condition = conditionDefinitionFn(expressionAttributeValues, metadata)

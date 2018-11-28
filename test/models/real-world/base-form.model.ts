@@ -1,7 +1,4 @@
-import * as moment from 'moment'
-import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
-import { PartitionKey } from '../../../src/decorator/impl/key/partition-key.decorator'
-import { Model } from '../../../src/decorator/impl/model/model.decorator'
+import { DateProperty, GSIPartitionKey, Model, PartitionKey } from '../../../src/dynamo-easy'
 
 export const INDEX_CREATION_DATE = 'index-creationDate'
 
@@ -11,6 +8,9 @@ export class BaseForm {
   id: string
 
   @GSIPartitionKey(INDEX_CREATION_DATE)
-  creationDate: moment.Moment
-  lastSavedDate: moment.Moment
+  @DateProperty()
+  creationDate: Date
+
+  @DateProperty()
+  lastSavedDate: Date
 }

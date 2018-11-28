@@ -1,10 +1,11 @@
+import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { kebabCase } from 'lodash'
+import { ModelMetadata } from '../../metadata'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'
-import { KEY_PROPERTY } from '../property/property.decorator'
+import { KEY_PROPERTY } from '../property/key-property.const'
+import { KEY_MODEL } from './key-model.const'
 import { ModelData } from './model-data.model'
-
-export const KEY_MODEL = 'sc-reflect:model'
 
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
@@ -14,8 +15,12 @@ export function Model(opts: ModelData = {}): ClassDecorator {
     // const classType = getMetadataType(constructor)
     const type = constructor as any
 
-    // get all the properties with @Property() annotation
-    const properties: Array<PropertyMetadata<any>> = Reflect.getOwnMetadata(KEY_PROPERTY, constructor)
+    // get all the properties with @Property() annotation (or @PartitionKey(),...)
+    // if given class has own properties, all inherited properties are already set and we can get the properties with 'getOwnMetadata'.
+    // otherwise when the given class does not have own properties, there's no 'ownMetadata' but we need to get them from the class it extends with 'getMetadata'
+    const properties: Array<PropertyMetadata<any>> = Reflect.hasOwnMetadata(KEY_PROPERTY, constructor)
+      ? Reflect.getOwnMetadata(KEY_PROPERTY, constructor)
+      : Reflect.getMetadata(KEY_PROPERTY, constructor)
 
     // get partition key
     const partitionKeys = properties
@@ -35,7 +40,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
         ? properties.filter(property => property.transient === true).map(property => property.name)
         : []
 
-    const finalOpts = {
+    const metaData: ModelMetadata<any> = {
       clazz: constructor,
       clazzName: type.name,
       tableName: `${kebabCase(type.name)}s`,
@@ -44,65 +49,72 @@ export function Model(opts: ModelData = {}): ClassDecorator {
       indexes,
       ...opts,
     }
-    // logger.debug('here are the final opts', finalOpts)
 
-    // console.log(`Decorating: ${finalOpts.clazzName}`, finalOpts);
-    Reflect.defineMetadata(KEY_MODEL, finalOpts, constructor)
+    // console.log(`Decorating: ${metaData.clazzName}`, metaData);
+    Reflect.defineMetadata(KEY_MODEL, metaData, constructor)
   }
+}
+
+function testForGSI<T>(
+  property: PropertyMetadata<T>,
+): property is PropertyMetadata<T> & { keyForGSI: { [key: string]: KeyType } } {
+  return !!(property.keyForGSI && Object.keys(property.keyForGSI).length)
+}
+
+function testForLSI<T>(property: PropertyMetadata<T>): property is PropertyMetadata<T> & { sortKeyForLSI: string[] } {
+  return !!(property.sortKeyForLSI && property.sortKeyForLSI.length)
 }
 
 function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
-    return properties
-      .filter(property => property.keyForGSI && Object.keys(property.keyForGSI).length)
-      .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex<any>> => {
-        let gsi: SecondaryIndex<any>
-        Object.keys(property.keyForGSI!).forEach(indexName => {
-          if (map.has(indexName)) {
-            gsi = map.get(indexName)
-          } else {
-            gsi = <SecondaryIndex<any>>{}
-          }
+    return properties.filter(testForGSI).reduce((map, property): Map<string, SecondaryIndex<any>> => {
+      let gsi: SecondaryIndex<any>
+      Object.keys(property.keyForGSI).forEach(indexName => {
+        if (map.has(indexName)) {
+          gsi = map.get(indexName)
+        } else {
+          gsi = <SecondaryIndex<any>>{}
+        }
 
-          switch (property.keyForGSI![indexName]) {
-            case 'HASH':
-              if (gsi.partitionKey) {
-                throw new Error(
-                  `there is already a partition key defined for global secondary index ${indexName} (property name: ${
-                    property.nameDb
-                  })`
-                )
-              }
+        switch (property.keyForGSI[indexName]) {
+          case 'HASH':
+            if (gsi.partitionKey) {
+              throw new Error(
+                `there is already a partition key defined for global secondary index ${indexName} (property name: ${
+                  property.nameDb
+                })`,
+              )
+            }
 
-              gsi.partitionKey = property.nameDb
-              break
-            case 'RANGE':
-              if (gsi.sortKey) {
-                throw new Error(
-                  `there is already a sort key defined for global secondary index ${indexName} (property name: ${
-                    property.nameDb
-                  })`
-                )
-              }
+            gsi.partitionKey = property.nameDb
+            break
+          case 'RANGE':
+            if (gsi.sortKey) {
+              throw new Error(
+                `there is already a sort key defined for global secondary index ${indexName} (property name: ${
+                  property.nameDb
+                })`,
+              )
+            }
 
-              gsi.sortKey = property.nameDb
-              break
-          }
+            gsi.sortKey = property.nameDb
+            break
+        }
 
-          if (map.has(indexName)) {
+        if (map.has(indexName)) {
+          map.set(indexName, gsi)
+        } else {
+          if (map.size < 5) {
             map.set(indexName, gsi)
           } else {
-            if (map.size < 5) {
-              map.set(indexName, gsi)
-            } else {
-              // a maximum of 5 global secondary indexes can be defined per table
-              throw new Error('make sure to define no more than 5 global secondary indexes per model')
-            }
+            // a maximum of 5 global secondary indexes can be defined per table
+            throw new Error('make sure to define no more than 5 global secondary indexes per model')
           }
-        })
+        }
+      })
 
-        return map
-      }, new Map())
+      return map
+    }, new Map())
   } else {
     return null
   }
@@ -110,39 +122,37 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
 
 function getLocalSecondaryIndexes(
   basePartitionKey: string | null,
-  properties: Array<PropertyMetadata<any>>
+  properties: Array<PropertyMetadata<any>>,
 ): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
-    return properties
-      .filter(property => property.sortKeyForLSI && property.sortKeyForLSI.length)
-      .reduce((map, property: PropertyMetadata<any>): Map<string, SecondaryIndex<any>> => {
-        let lsi: SecondaryIndex<any>
+    return properties.filter(testForLSI).reduce((map, property): Map<string, SecondaryIndex<any>> => {
+      let lsi: SecondaryIndex<any>
 
-        property.sortKeyForLSI!.forEach(indexName => {
-          if (map.has(indexName)) {
-            throw new Error(
-              `only one sort key can be defined for the same local secondary index, ${
-                property.nameDb
-              } is already defined as sort key for index ${indexName}`
-            )
-          }
+      property.sortKeyForLSI.forEach(indexName => {
+        if (map.has(indexName)) {
+          throw new Error(
+            `only one sort key can be defined for the same local secondary index, ${
+              property.nameDb
+            } is already defined as sort key for index ${indexName}`,
+          )
+        }
 
-          if (!basePartitionKey) {
-            throw new Error(
-              'a local secondary index requires the partition key to be defined, use the @PartitionKey decorator'
-            )
-          }
+        if (!basePartitionKey) {
+          throw new Error(
+            'a local secondary index requires the partition key to be defined, use the @PartitionKey decorator',
+          )
+        }
 
-          lsi = {
-            partitionKey: basePartitionKey,
-            sortKey: property.nameDb,
-          }
+        lsi = {
+          partitionKey: basePartitionKey,
+          sortKey: property.nameDb,
+        }
 
-          map.set(indexName, lsi)
-        })
+        map.set(indexName, lsi)
+      })
 
-        return map
-      }, new Map())
+      return map
+    }, new Map())
   } else {
     return null
   }

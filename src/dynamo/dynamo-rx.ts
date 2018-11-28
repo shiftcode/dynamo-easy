@@ -64,7 +64,7 @@ export class DynamoRx {
 
   makeRequest(operation: string, params?: { [key: string]: any }): Observable<any> {
     return this.sessionValidityEnsurer().pipe(
-      switchMap(() => from(this.dynamoDb.makeRequest(operation, params).promise()))
+      switchMap(() => from(this.dynamoDb.makeRequest(operation, params).promise())),
     )
   }
 }

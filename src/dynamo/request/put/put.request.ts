@@ -1,25 +1,20 @@
-import { PutItemOutput, ReturnConsumedCapacity, ReturnItemCollectionMetrics } from 'aws-sdk/clients/dynamodb'
+import { PutItemOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Mapper } from '../../../mapper/mapper'
-import { ModelConstructor } from '../../../model/model-constructor'
+import { toDb } from '../../../mapper'
+import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
-import { and } from '../../expression/logical-operator/and.function'
-import { attribute } from '../../expression/logical-operator/attribute.function'
-import { ParamUtil } from '../../expression/param-util'
-import { RequestExpressionBuilder } from '../../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction } from '../../expression/type/condition-expression-definition-function'
-import { RequestConditionFunction } from '../../expression/type/request-condition-function'
-import { BaseRequest } from '../base.request'
+import { attribute } from '../../expression/logical-operator'
+import { WriteRequest } from '../write.request'
 
-export class PutRequest<T> extends BaseRequest<T, any> {
+export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, item: T) {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
-    this.params.Item = Mapper.toDb(item, this.modelClazz)
+    this.params.Item = toDb(item, this.modelClazz)
   }
 
   /**
@@ -30,45 +25,16 @@ export class PutRequest<T> extends BaseRequest<T, any> {
     // FIXME should we check for sort key too?
     const conditionDefFns = []
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
-      conditionDefFns.push(attribute<T>(this.metaData.getPartitionKey()).attributeNotExists())
+      conditionDefFns.push(attribute<T>(this.metadata.getPartitionKey()).attributeNotExists())
 
-      const sortKey = this.metaData.getSortKey()
+      const sortKey = this.metadata.getSortKey()
       if (sortKey !== null) {
         conditionDefFns.push(attribute<T>(sortKey).attributeNotExists())
       }
 
-      this.where(...conditionDefFns)
+      this.onlyIf(...conditionDefFns)
     }
 
-    return this
-  }
-
-  returnConsumedCapacity(level: ReturnConsumedCapacity): PutRequest<T> {
-    this.params.ReturnConsumedCapacity = level
-    return this
-  }
-
-  returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): PutRequest<T> {
-    this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return this
-  }
-
-  /*
-   * The ReturnValues parameter is used by several DynamoDB operations,
-   * however, PutItem does not recognize any values other than NONE or ALL_OLD.
-   */
-  returnValues(returnValues: 'NONE' | 'ALL_OLD'): PutRequest<T> {
-    this.params.ReturnValues = returnValues
-    return this
-  }
-
-  whereAttribute(attributePath: keyof T): RequestConditionFunction<PutRequest<T>> {
-    return RequestExpressionBuilder.addCondition('ConditionExpression', <string>attributePath, this, this.metaData)
-  }
-
-  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): PutRequest<T> {
-    const condition = and(...conditionDefFns)(undefined, this.metaData)
-    ParamUtil.addExpression('ConditionExpression', condition, this.params)
     return this
   }
 
@@ -81,7 +47,7 @@ export class PutRequest<T> extends BaseRequest<T, any> {
     return this.execFullResponse().pipe(
       map(response => {
         return
-      })
+      }),
     )
   }
 }

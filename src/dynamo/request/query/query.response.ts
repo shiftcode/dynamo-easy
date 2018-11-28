@@ -8,11 +8,11 @@ export interface QueryResponse<T> {
   /**
    * An array of item attributes that match the query criteria. Each element in this array consists of an attribute name and the value for that attribute.
    */
-  Items?: T[]
+  Items: T[]
   /**
    * The number of items in the response. If you used a QueryFilter in the request, then Count is the number of items returned after the filter was applied, and ScannedCount is the number of matching items before the filter was applied. If you did not use a filter in the request, then Count and ScannedCount are the same.
    */
-  Count?: Integer
+  Count: Integer
   /**
    * The number of items evaluated, before any QueryFilter is applied. A high ScannedCount value with few, or no, Count results indicates an inefficient Query operation. For more information, see Count and ScannedCount in the Amazon DynamoDB Developer Guide. If you did not use a filter in the request, then ScannedCount is the same as Count.
    */

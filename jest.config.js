@@ -2,7 +2,7 @@ module.exports = {
   testEnvironment: "node",
   globals: {
     "ts-jest": {
-      tsConfigFile: "./tsconfig.jest.json"
+      tsConfig: "./tsconfig.jest.json"
     }
   },
   transform: {
@@ -27,6 +27,7 @@ module.exports = {
     }
   },
   setupFiles: [
-    "reflect-metadata"
+    "reflect-metadata",
+    './test/jest-setup.ts'
   ]
-}
+};

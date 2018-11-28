@@ -1,24 +1,21 @@
-import * as moment from 'moment'
-import { Attributes } from '../../src/mapper/type/attribute.type'
+import { Attributes } from '../../src/dynamo-easy'
+import { Organization } from '../models'
 
-export const organization1CreatedAt: moment.Moment = moment('2017-05-15', 'YYYY-MM-DD')
-export const organization1LastUpdated: moment.Moment = moment('2017-07-25', 'YYYY-MM-DD')
-export const organization1Employee1CreatedAt: moment.Moment = moment('2015-02-15', 'YYYY-MM-DD')
-export const organization1Employee2CreatedAt: moment.Moment = moment('2015-07-03', 'YYYY-MM-DD')
+export const organization1CreatedAt = new Date('2017-05-15')
+export const organization1LastUpdated = new Date('2017-07-25')
+export const organization1Employee1CreatedAt = new Date('2015-02-15')
+export const organization1Employee2CreatedAt = new Date('2015-07-03')
 
-export const organizationFromDb: Attributes = <any>{
+// FIXME: transient should not be included in Attributes, make use of Transient Marker Type and build new type
+export const organizationFromDb: Attributes<Organization> = {
+  name: { S: 'myOrganization' },
   id: { S: 'myId' },
+  transient: { NULL: true },
   createdAtDate: {
-    S: organization1CreatedAt
-      .clone()
-      .utc()
-      .format(moment.defaultFormat),
+    S: organization1CreatedAt.toISOString(),
   },
   lastUpdated: {
-    S: organization1LastUpdated
-      .clone()
-      .utc()
-      .format(moment.defaultFormat),
+    S: organization1LastUpdated.toISOString(),
   },
   active: { BOOL: true },
   count: { N: '52' },
@@ -29,10 +26,7 @@ export const organizationFromDb: Attributes = <any>{
           name: { S: 'max' },
           age: { N: '50' },
           createdAt: {
-            S: organization1Employee1CreatedAt
-              .clone()
-              .utc()
-              .format(moment.defaultFormat),
+            S: organization1Employee1CreatedAt.toISOString(),
           },
           sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },
@@ -42,10 +36,7 @@ export const organizationFromDb: Attributes = <any>{
           name: { S: 'anna' },
           age: { N: '27' },
           createdAt: {
-            S: organization1Employee2CreatedAt
-              .clone()
-              .utc()
-              .format(moment.defaultFormat),
+            S: organization1Employee2CreatedAt.toISOString(),
           },
           sortedSet: { L: [{ S: 'first' }, { S: 'third' }, { S: 'second' }] },
         },
@@ -53,7 +44,32 @@ export const organizationFromDb: Attributes = <any>{
     ],
   },
   cities: { SS: ['zürich', 'bern'] },
-  awardWinningYears: { NS: ['2002', '2015', '2017'] },
-  mixedList: { L: [{ S: 'sample' }, { N: '26' }, { BOOL: true }] },
-  sortedSet: { L: [{ S: '1' }, { S: '2' }] },
+  domains: { SS: ['myOrg.ch', 'myOrg.com'] },
+  randomDetails: { L: [{ S: 'detail' }, { N: '5' }] },
+  birthdays: {
+    L: [
+      {
+        M: {
+          date: { S: new Date('1958-04-13').toISOString() },
+          presents: {
+            L: [{ M: { description: { S: 'NHL voucher' } } }],
+          },
+        },
+      },
+    ],
+  },
+  awards: {
+    L: [{ S: 'Best of Swiss Web' }],
+  },
+  events: {
+    L: [
+      {
+        M: {
+          name: { S: 'yearly get together' },
+          participants: { N: '125' },
+        },
+      },
+    ],
+  },
+  emptySet: { SS: [] },
 }

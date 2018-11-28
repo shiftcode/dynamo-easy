@@ -5,7 +5,7 @@ const NESTED_ATTR_PATH_REGEX = /^.+((\[(\d+)])|(\.)).*$/
 
 export function resolveAttributeNames(
   attributePath: string,
-  propertyMetadata?: PropertyMetadata<any>
+  propertyMetadata?: PropertyMetadata<any>,
 ): { placeholder: string; attributeNames: { [key: string]: string } } {
   let placeholder: string
   // tslint:disable-next-line:no-shadowed-variable

@@ -1,5 +1,5 @@
-import { Employee } from '../../test/models/employee.model'
-import { DynamoEasyConfig } from '../config'
+import { Employee } from '../../test/models'
+import { updateDynamoEasyConfig } from '../config'
 import { DynamoStore } from '../dynamo'
 import { LogInfo } from './log-info.type'
 import { LogReceiver } from './log-receiver.type'
@@ -7,7 +7,7 @@ import { LogReceiver } from './log-receiver.type'
 describe('log receiver', () => {
   let logs: LogInfo[] = []
   const logReceiver: LogReceiver = logInfo => logs.push(logInfo)
-  DynamoEasyConfig.updateConfig({ logReceiver })
+  updateDynamoEasyConfig({ logReceiver })
 
   beforeEach(() => (logs = []))
 

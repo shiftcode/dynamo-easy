@@ -1,11 +1,11 @@
-import { Model } from '../decorator/impl/model/model.decorator'
+// tslint:disable:max-classes-per-file
+// tslint:disable:no-unnecessary-class
+import { Model } from '../decorator/impl'
 import { DynamoStore } from './dynamo-store'
 
-// tslint:disable-next-line:max-classes-per-file
 @Model()
 class DynamoStoreModel {}
 
-// tslint:disable-next-line:max-classes-per-file
 @Model({ tableName: 'myTableName' })
 class DynamoStoreModel2 {}
 

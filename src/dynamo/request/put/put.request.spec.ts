@@ -1,14 +1,17 @@
 import { PutItemInput } from 'aws-sdk/clients/dynamodb'
-import * as moment from 'moment'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { SimpleWithCompositePartitionKeyModel } from '../../../../test/models/simple-with-composite-partition-key.model'
-import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'
+import { getTableName } from '../../../../test/helper'
+import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {
   it('default params', () => {
     const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-    const request = new PutRequest(null, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), item)
+    const request = new PutRequest(
+      <any>null,
+      SimpleWithPartitionKeyModel,
+      getTableName(SimpleWithPartitionKeyModel),
+      item,
+    )
     const params: PutItemInput = request.params
 
     expect(params.TableName).toBe('simple-with-partition-key-models')
@@ -19,7 +22,12 @@ describe('put request', () => {
   describe('if exists condition', () => {
     it('simple partition key', () => {
       const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-      const request = new PutRequest(null, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), item)
+      const request = new PutRequest(
+        <any>null,
+        SimpleWithPartitionKeyModel,
+        getTableName(SimpleWithPartitionKeyModel),
+        item,
+      )
       request.ifNotExists()
 
       const params: PutItemInput = request.params
@@ -29,13 +37,13 @@ describe('put request', () => {
     })
 
     it('composite partition key', () => {
-      const now = moment()
+      const now = new Date()
       const item: SimpleWithCompositePartitionKeyModel = { id: 'myId', creationDate: now, age: 45 }
       const request = new PutRequest(
-        null,
+        <any>null,
         SimpleWithCompositePartitionKeyModel,
         getTableName(SimpleWithCompositePartitionKeyModel),
-        item
+        item,
       )
       request.ifNotExists()
 
@@ -47,7 +55,12 @@ describe('put request', () => {
 
     it('predicate', () => {
       const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-      const request = new PutRequest(null, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), item)
+      const request = new PutRequest(
+        <any>null,
+        SimpleWithPartitionKeyModel,
+        getTableName(SimpleWithPartitionKeyModel),
+        item,
+      )
       request.ifNotExists(25 + 20 === 40)
 
       const params: PutItemInput = request.params

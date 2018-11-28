@@ -1,6 +1,6 @@
 import { GetItemInput } from 'aws-sdk/clients/dynamodb'
-import { getTableName } from '../../../../test/helper/get-table-name.function'
-import { SimpleWithPartitionKeyModel } from '../../../../test/models/simple-with-partition-key.model'
+import { getTableName } from '../../../../test/helper'
+import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { GetRequest } from './get.request'
 
 describe('get requst', () => {
@@ -11,7 +11,7 @@ describe('get requst', () => {
       <any>null,
       SimpleWithPartitionKeyModel,
       getTableName(SimpleWithPartitionKeyModel),
-      'partitionKeyValue'
+      'partitionKeyValue',
     )
   })
 

@@ -1,13 +1,14 @@
-import * as moment from 'moment'
-import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
-import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
-import { TypedSet } from '../../src/decorator/impl/collection/typed-set.decorator'
-import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { SortKey } from '../../src/decorator/impl/key/sort-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { Property } from '../../src/decorator/impl/property/property.decorator'
-import { Transient } from '../../src/decorator/impl/transient/transient.decorator'
+import {
+  DateProperty,
+  Model,
+  PartitionKey,
+  Property,
+  SortedSet,
+  SortKey,
+  Transient,
+  TypedArray,
+  TypedSet,
+} from '../../src/dynamo-easy'
 import { Employee } from './employee.model'
 
 // tslint:disable:max-classes-per-file
@@ -18,12 +19,13 @@ export class Gift {
 
 @Model()
 export class Birthday {
-  date: moment.Moment
+  @DateProperty()
+  date: Date
 
   @TypedArray(Gift)
   presents: Gift[]
 
-  constructor(date: moment.Moment, ...gifts: string[]) {
+  constructor(date: Date, ...gifts: string[]) {
     this.date = date
     const giftArr: Gift[] = []
     gifts.forEach(giftDescription => giftArr.push({ description: giftDescription }))
@@ -44,6 +46,9 @@ export class OrganizationEvent {
   }
 }
 
+// TODO LOW maybe we can map the transient fields to be optional in Attributes
+// export type Transient<T> = T
+
 @Model({ tableName: 'Organization' })
 export class Organization {
   // String
@@ -53,10 +58,11 @@ export class Organization {
   name: string
 
   @SortKey()
-  createdAtDate: moment.Moment
+  @DateProperty()
+  createdAtDate: Date
 
-  @Date()
-  lastUpdated: moment.Moment
+  @DateProperty()
+  lastUpdated: Date
 
   // Boolean
   active: boolean
@@ -64,10 +70,8 @@ export class Organization {
   // Number
   count = 52
 
-  // @Property()
-  // myMap: Map<string, string>;
-
   @Transient()
+  // transient: Transient<any>
   transient: any
 
   /*
@@ -84,7 +88,7 @@ export class Organization {
   // simple type, mixed (no metadata required)
   randomDetails: any[]
 
-  // complex type (requries metadata)
+  // complex type (requires metadata)
   @TypedArray(Employee)
   employees: Employee[]
 
