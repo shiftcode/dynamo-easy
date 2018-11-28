@@ -34,7 +34,6 @@
     "commitmsg": "validate-commit-msg",
     "deploy-docs": "ts-node tools/gh-pages-publish",
     "lint": "npm run prettier && tslint --project tsconfig.json -t codeFrame --fix",
-    "prepush": "npm run test:prod && npm run build",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "test": "jest",
