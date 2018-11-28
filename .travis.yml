@@ -28,7 +28,7 @@ before_script: npx greenkeeper-lockfile-update
 
 script:
 - npm run lint:ci
-- npm run test:ci
+- npm run test:coverage
 - npm run build
 - npm run build:docs
 

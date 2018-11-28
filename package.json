@@ -35,11 +35,11 @@
     "deploy-docs": "ts-node tools/gh-pages-publish",
     "lint": "tslint --project tsconfig.json -t codeFrame --fix",
     "lint:ci": "tslint --project tsconfig.json -t codeFrame",
-    "prepush": "npm run test:prod && npm run build",
+    "prepush": "npm run test:coverage && npm run build",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "test": "jest",
-    "test:ci": "npm run test -- --coverage --no-cache",
+    "test:coverage": "npm run test -- --coverage --no-cache",
     "test:watch": "jest --watch",
     "prettier": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'"
   },
