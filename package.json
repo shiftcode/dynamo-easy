@@ -45,6 +45,7 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "prettier:all": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'",
     "precommit": "lint-staged",
+    "prepush": "npm run test:prod && npm run build",
     "commitmsg": "validate-commit-msg"
   },
   "lint-staged": {
