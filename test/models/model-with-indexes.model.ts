@@ -5,7 +5,8 @@ import {
   GSISortKey,
   LSISortKey,
   Model,
-  PartitionKey, Property,
+  PartitionKey,
+  Property,
   SortKey,
 } from '../../src/dynamo-easy'
 

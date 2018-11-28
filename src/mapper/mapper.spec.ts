@@ -222,7 +222,8 @@ describe('Mapper', () => {
       })
 
       it('complex object', () => {
-        type ObjType = { name: StringAttribute; age: NumberAttribute; children: ListAttribute }
+
+        interface ObjType{ name: StringAttribute; age: NumberAttribute; children: ListAttribute }
         const attrValue = <MapAttribute<ObjType>>toDbOne({
           name: 'Max',
           age: 35,
@@ -738,7 +739,6 @@ describe('Mapper', () => {
     })
 
     describe('from db', () => {
-      // FIXME TEST fix this test
       describe('model with complex property values (decorators)', () => {
         let product: Product
 
@@ -826,37 +826,46 @@ describe('Mapper', () => {
           expect(Array.from(cities)[1]).toBe('bern')
         })
 
-        // it('awardWinningYears', () => {
-        //   expect(organization.awardWinningYears).toBeDefined();
-        //   expect(organization.awardWinningYears instanceof Set).toBeTruthy();
-        //
-        //   const awardWinningYears: Set<number> = organization.awardWinningYears;
-        //   expect(awardWinningYears.size).toBe(3);
-        //   expect(Array.from(awardWinningYears)[0]).toBe(2002);
-        //   expect(Array.from(awardWinningYears)[1]).toBe(2015);
-        //   expect(Array.from(awardWinningYears)[2]).toBe(2017);
-        // });
-        //
-        // it('mixedList', () => {
-        //   expect(organization.mixedList).toBeDefined();
-        //   expect(Array.isArray(organization.mixedList)).toBeTruthy();
-        //
-        //   const mixedList: any[] = organization.mixedList;
-        //   expect(mixedList.length).toBe(3);
-        //   expect(mixedList[0]).toBe('sample');
-        //   expect(mixedList[1]).toBe(26);
-        //   expect(mixedList[2]).toBe(true);
-        // });
-        //
-        // it('sortedSet', () => {
-        //   expect(organization.setWithComplexSorted).toBeDefined();
-        //   expect(organization.setWithComplexSorted instanceof Set).toBeTruthy();
-        //
-        //   const sortedSet: Set<string> = organization.setWithComplexSorted;
-        //   expect(sortedSet.size).toBe(2);
-        //   expect(Array.from(sortedSet)[0]).toBe('1');
-        //   expect(Array.from(sortedSet)[1]).toBe('2');
-        // });
+        it('birthdays', () => {
+          expect(organization.birthdays).toBeDefined()
+          expect(organization.birthdays instanceof Set).toBeTruthy()
+
+          const birthdays: Set<Birthday> = organization.birthdays
+          expect(birthdays.size).toBe(1)
+
+          const birthday: Birthday = Array.from(birthdays)[0]
+          expect(birthday).toBeDefined()
+          expect(birthday.date).toEqual(new Date('1958-04-13'))
+          expect(Array.isArray(birthday.presents)).toBeTruthy()
+        })
+
+
+        it('awards', () => {
+          expect(organization.awards).toBeDefined()
+          expect(organization.awards instanceof Set).toBeTruthy()
+
+          const awards = organization.awards
+          expect(awards.size).toBe(1)
+          const award = Array.from(awards)[0]
+
+          expect(award).toBeDefined()
+          expect(award).toBe('Best of Swiss Web')
+        })
+
+        it('events', ()=>{
+          expect(organization.events).toBeDefined()
+          expect(organization.events instanceof Set).toBeTruthy()
+
+          const events = organization.events
+          expect(events.size).toBe(1)
+
+          const event = Array.from(events)[0]
+
+          expect(event).toBeDefined()
+          expect(typeof event).toBe('object')
+          expect(event.name).toBe('yearly get together')
+          expect(event.participants).toBe(125)
+        })
       })
     })
   })

@@ -1,4 +1,13 @@
-import { DateProperty, Model, PartitionKey, Property, SortedSet, SortKey, Transient, TypedSet } from '../../src/dynamo-easy'
+import {
+  DateProperty,
+  Model,
+  PartitionKey,
+  Property,
+  SortedSet,
+  SortKey,
+  Transient,
+  TypedSet,
+} from '../../src/dynamo-easy'
 import { NestedObject } from './nested-object.model'
 
 @Model({ tableName: 'complex_model' })
