@@ -1,18 +1,9 @@
 // tslint:disable:max-classes-per-file
-import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
-import { TypedArray } from '../../src/decorator/impl/collection/typed-array.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { Property } from '../../src/decorator/impl/property/property.decorator'
+import { Model, Property, SortedSet, TypedArray } from '../../src/dynamo-easy'
 import { NestedComplexModel } from './nested-complex.model'
 
 @Model()
 export class ProductNested {
-  /*
-   * introduce new decorators
-   */
-  // @SortedArray()
-  // @Set()
-  // @Date()
   @SortedSet()
   collection: Set<string>
 
@@ -31,7 +22,6 @@ export class Product {
   @Property()
   nestedValue: NestedComplexModel
 
-  // @Type(Array, ProductNested)
   @TypedArray(ProductNested)
   list: ProductNested[]
 

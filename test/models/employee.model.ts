@@ -1,14 +1,13 @@
-import { SortedSet } from '../../src/decorator/impl/collection/sorted-set.decorator'
-import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
+import { DateProperty, Model, SortedSet } from '../../src/dynamo-easy'
 
+// comment
 @Model()
 export class Employee {
   name: string
 
   age: number
 
-  @Date()
+  @DateProperty()
   createdAt: Date | null
 
   @SortedSet()

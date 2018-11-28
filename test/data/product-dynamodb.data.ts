@@ -1,4 +1,4 @@
-import { Attributes } from '../../src/mapper/type/attribute.type'
+import { Attributes } from '../../src/dynamo-easy'
 import { Product } from '../models'
 
 export const productFromDb: Attributes<Product> = {

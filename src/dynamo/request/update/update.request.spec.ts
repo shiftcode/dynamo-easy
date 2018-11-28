@@ -435,17 +435,16 @@ describe('update request', () => {
     })
   })
 
-  // todo: activate when inheritance is fixed
-  xdescribe('real world scenario', () => {
+  describe('real world scenario', () => {
     it('should create correct update statement', () => {
       const request = new UpdateRequest(<any>null, Order, getTableName(Order), new OrderId(5, 2018))
 
-      request
-        .operations(
-          update2(Order, 'types').add([FormType.INVOICE]),
-          update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)]),
-        )
-        .onlyIf(attribute<Order>('types').attributeExists(), attribute<Order>('formIds').attributeExists())
+      const u1 = update2(Order, 'types').add([FormType.INVOICE])
+      const u2 = update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)])
+
+      const c1 = attribute<Order>('types').attributeExists()
+      const c2 = attribute<Order>('formIds').attributeExists()
+      request.operations(u1, u2).onlyIf(c1, c2)
 
       expect(request.params.UpdateExpression).toBe('ADD #types :types SET #formIds = list_append(#formIds, :formIds)')
       expect(request.params.ExpressionAttributeNames).toEqual({

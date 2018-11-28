@@ -1,6 +1,4 @@
-import { Enum } from '../../src/decorator/impl/enum/enum.decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
+import { Enum, Model, PartitionKey } from '../../src/dynamo-easy'
 import { Type } from './types.enum'
 
 @Model()

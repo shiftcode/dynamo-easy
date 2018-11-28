@@ -1,4 +1,4 @@
-import { PropertyMetadata } from '../../decorator/metadata'
+import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { fromDb, toDb } from '../mapper'
 import { Attributes, MapAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'

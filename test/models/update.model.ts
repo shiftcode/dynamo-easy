@@ -1,8 +1,4 @@
-import { SortedSet } from '../../src/decorator'
-import { Date } from '../../src/decorator/impl/date/date.decorator'
-import { PartitionKey } from '../../src/decorator/impl/key/partition-key.decorator'
-import { Model } from '../../src/decorator/impl/model/model.decorator'
-import { Property } from '../../src/decorator/impl/property/property.decorator'
+import { DateProperty, Model, PartitionKey, Property, SortedSet } from '../../src/dynamo-easy'
 
 // tslint:disable-next-line:max-classes-per-file
 @Model()
@@ -24,10 +20,10 @@ export class UpdateModel {
   @PartitionKey()
   id: string
 
-  @Date()
+  @DateProperty()
   creationDate: Date
 
-  @Date()
+  @DateProperty()
   lastUpdated: Date
 
   name: string

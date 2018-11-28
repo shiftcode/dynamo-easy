@@ -1,11 +1,11 @@
 import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { kebabCase } from 'lodash'
+import { ModelMetadata } from '../../metadata'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'
-import { KEY_PROPERTY } from '../property/property.decorator'
+import { KEY_PROPERTY } from '../property/key-property.const'
+import { KEY_MODEL } from './key-model.const'
 import { ModelData } from './model-data.model'
-
-export const KEY_MODEL = 'sc-reflect:model'
 
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
@@ -15,8 +15,12 @@ export function Model(opts: ModelData = {}): ClassDecorator {
     // const classType = getMetadataType(constructor)
     const type = constructor as any
 
-    // get all the properties with @Property() annotation
-    const properties: Array<PropertyMetadata<any>> = Reflect.getOwnMetadata(KEY_PROPERTY, constructor)
+    // get all the properties with @Property() annotation (or @PartitionKey(),...)
+    // if given class has own properties, all inherited properties are already set and we can get the properties with 'getOwnMetadata'.
+    // otherwise when the given class does not have own properties, there's no 'ownMetadata' but we need to get them from the class it extends with 'getMetadata'
+    const properties: Array<PropertyMetadata<any>> = Reflect.hasOwnMetadata(KEY_PROPERTY, constructor)
+      ? Reflect.getOwnMetadata(KEY_PROPERTY, constructor)
+      : Reflect.getMetadata(KEY_PROPERTY, constructor)
 
     // get partition key
     const partitionKeys = properties
@@ -36,7 +40,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
         ? properties.filter(property => property.transient === true).map(property => property.name)
         : []
 
-    const finalOpts = {
+    const metaData: ModelMetadata<any> = {
       clazz: constructor,
       clazzName: type.name,
       tableName: `${kebabCase(type.name)}s`,
@@ -45,10 +49,9 @@ export function Model(opts: ModelData = {}): ClassDecorator {
       indexes,
       ...opts,
     }
-    // logger.debug('here are the final opts', finalOpts)
 
-    // console.log(`Decorating: ${finalOpts.clazzName}`, finalOpts);
-    Reflect.defineMetadata(KEY_MODEL, finalOpts, constructor)
+    // console.log(`Decorating: ${metaData.clazzName}`, metaData);
+    Reflect.defineMetadata(KEY_MODEL, metaData, constructor)
   }
 }
 

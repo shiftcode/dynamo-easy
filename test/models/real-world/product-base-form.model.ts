@@ -1,5 +1,4 @@
-import { SortKey } from '../../../src/decorator/impl/key/sort-key.decorator'
-import { Model } from '../../../src/decorator/impl/model/model.decorator'
+import { Model, SortKey } from '../../../src/dynamo-easy'
 import { BaseForm } from './base-form.model'
 
 @Model({ tableName: 'forms' })

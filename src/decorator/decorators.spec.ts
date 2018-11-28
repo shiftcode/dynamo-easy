@@ -1,3 +1,5 @@
+// tslint:disable:max-classes-per-file
+// tslint:disable:no-unnecessary-class
 // tslint:disable:no-non-null-assertion
 import { getMetaDataProperty } from '../../test/helper'
 import {
@@ -16,9 +18,12 @@ import {
   NestedObject,
   SimpleModel,
 } from '../../test/models'
-import { ExtendedFormModel, Form } from '../../test/models/real-world'
+import { Form } from '../../test/models/real-world'
 import { EnumType } from '../mapper'
+import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortedSet, SortKey, Transient } from './impl'
+import { Model } from './impl/model/model.decorator'
 import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
+import { metadataForProperty } from './metadata'
 
 describe('Decorators should add correct metadata', () => {
   describe('CustomMapper() should allow to define a different Mapper', () => {
@@ -345,32 +350,193 @@ describe('Decorators should add correct metadata', () => {
     })
   })
 
-  // FIXME TEST make this work
-  xdescribe('models inheritance', () => {
-    let metadata: Metadata<Form>
+  describe('with inheritance', () => {
+    it('should override the table name', () => {
+      @Model({ tableName: 'super-table-name' })
+      class A {}
 
-    beforeEach(() => {
-      metadata = metadataForClass(Form)
+      @Model({ tableName: 'my-real-table-name' })
+      class B extends A {}
+
+      const metaData = metadataForModel(B)
+      expect(metaData.tableName).toBe('my-real-table-name')
     })
 
-    it('model metadata should be defined', () => {
-      const meta = metadata.forProperty('id')
+    it("should contain the super-class' and own properties", () => {
+      @Model()
+      class A {
+        @PartitionKey()
+        myPartitionKey: string
+
+        @SortKey()
+        mySortKey: number
+      }
+
+      @Model()
+      class B extends A {
+        @SortedSet()
+        myOwnProp: string[]
+      }
+
+      const metaData = metadataForModel(B)
+
+      expect(metaData.properties).toBeDefined()
+      expect(metaData.properties!.length).toBe(3)
+
+      expect(metadataForProperty(B, 'myPartitionKey')).toBeDefined()
+      expect(metadataForProperty(B, 'mySortKey')).toBeDefined()
+      expect(metadataForProperty(B, 'myOwnProp')).toBeDefined()
+    })
+
+    it("should contain the super-class' and own indexes", () => {
+      @Model()
+      class A {
+        @PartitionKey()
+        myPartitionKey: string
+
+        @GSIPartitionKey('my-gsi')
+        myGsiPartitionKey: string
+
+        @GSISortKey('my-gsi')
+        myGsiSortKey: number
+
+        @LSISortKey('my-lsi')
+        myLsiSortKey: number
+      }
+
+      @Model()
+      class B extends A {
+        @GSIPartitionKey('my-other-gsi')
+        myOtherGsiPartitionKey: string
+      }
+
+      const metaData = metadataForModel(B)
+
+      expect(metaData.properties).toBeDefined()
+      expect(metaData.properties!.length).toBe(5)
+
+      expect(metadataForProperty(B, 'myPartitionKey')).toBeDefined()
+      expect(metadataForProperty(B, 'myGsiPartitionKey')).toBeDefined()
+      expect(metadataForProperty(B, 'myGsiSortKey')).toBeDefined()
+      expect(metadataForProperty(B, 'myLsiSortKey')).toBeDefined()
+      expect(metadataForProperty(B, 'myOtherGsiPartitionKey')).toBeDefined()
+
+      expect(metaData.indexes).toBeDefined()
+      expect(metaData.indexes!.get('my-gsi')).toBeDefined()
+      expect(metaData.indexes!.get('my-lsi')).toBeDefined()
+      expect(metaData.indexes!.get('my-other-gsi')).toBeDefined()
+    })
+
+    it("should contain the super-class' and own transient properties", () => {
+      @Model()
+      class A {
+        @Transient()
+        myTransientProp: string
+      }
+
+      @Model()
+      class B extends A {
+        @Transient()
+        myOtherTransientProp: number
+      }
+
+      const metaData = metadataForModel(B)
+      expect(metaData.transientProperties).toBeDefined()
+      expect(metaData.transientProperties!.length).toBe(2)
+      expect(metaData.transientProperties!.includes('myTransientProp')).toBeTruthy()
+      expect(metaData.transientProperties!.includes('myOtherTransientProp')).toBeTruthy()
+    })
+
+    it(`should not contains 'sibling' props `, () => {
+      @Model()
+      class A {
+        @Property()
+        aProp: string
+      }
+
+      @Model()
+      class B extends A {
+        @Property()
+        bProp: string
+      }
+
+      @Model()
+      class C extends A {
+        @Property()
+        cProp: string
+      }
+
+      const aMetaData = metadataForModel(A)
+      const bMetaData = metadataForModel(B)
+      const cMetaData = metadataForModel(C)
+
+      expect(aMetaData.properties).toBeDefined()
+      expect(aMetaData.properties!.length).toBe(1)
+
+      expect(bMetaData.properties).toBeDefined()
+      expect(bMetaData.properties!.length).toBe(2)
+      expect(metadataForProperty(B, 'bProp')).toBeDefined()
+      expect(metadataForProperty(B, 'cProp')).toBeFalsy()
+
+      expect(cMetaData.properties).toBeDefined()
+      expect(cMetaData.properties!.length).toBe(2)
+      expect(metadataForProperty(C, 'cProp')).toBeDefined()
+      expect(metadataForProperty(C, 'bProp')).toBeFalsy()
+    })
+
+    it('should not alter super props', () => {
+      @Model()
+      class A {
+        @Property()
+        aProp: string
+      }
+
+      @Model()
+      class B extends A {
+        @Property({ name: 'bProp' })
+        aProp: string
+      }
+
+      const aMeta = metadataForModel(A)
+      expect(aMeta.properties).toBeDefined()
+      expect(aMeta.properties!.length).toBe(1)
+
+      const aPropMeta = aMeta.properties![0]
+      expect(aPropMeta).toBeDefined()
+      expect(aPropMeta!.name).toBe('aProp')
+      expect(aPropMeta!.nameDb).toBe('aProp')
+
+      const bMeta = metadataForModel(B)
+      expect(bMeta.properties).toBeDefined()
+      expect(bMeta.properties!.length).toBe(1)
+
+      const bPropMeta = bMeta.properties![0]
+      expect(bPropMeta).toBeDefined()
+      expect(bPropMeta!.name).toBe('aProp')
+      expect(bPropMeta!.nameDb).toBe('bProp')
+    })
+
+    it('should have all parents props even if empty', () => {
+      @Model()
+      class A {
+        @Property()
+        aProp: string
+      }
+
+      @Model()
+      class B extends A {}
+
+      const bMeta = metadataForModel(B)
+
+      expect(bMeta.properties).toBeDefined()
+      expect(bMeta.properties!.length).toBe(1)
+    })
+
+    it('should work for real world scenario 1', () => {
+      const metadata = metadataForClass(Form)
       expect(metadata.modelOptions.properties!.length).toBe(4)
+      const meta = metadata.forProperty('id')
       expect(meta).toBeDefined()
-    })
-  })
-
-  // FIXME TEST make this work
-  xdescribe('models inheritance', () => {
-    let metadata: Metadata<ExtendedFormModel>
-
-    beforeEach(() => {
-      metadata = metadataForClass(Form)
-    })
-
-    it('model metadata schould be defined', () => {
-      expect(metadata).toBeDefined()
-      expect(metadata.modelOptions.properties!.length).toBe(2)
     })
   })
 })

@@ -17,7 +17,7 @@ export * from './key/partition-key.decorator'
 export * from './key/partition-key-uuid.decorator'
 export * from './key/sort-key.decorator'
 // mapper
-export * from './mapper/custom-mapper.decorator'
+export * from './custom-mapper/custom-mapper.decorator'
 // model
 export * from './model/model.decorator'
 // property

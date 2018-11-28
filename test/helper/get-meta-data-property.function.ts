@@ -1,4 +1,4 @@
-import { ModelMetadata, PropertyMetadata } from '../../src/decorator'
+import { ModelMetadata, PropertyMetadata } from '../../src/dynamo-easy'
 
 export function getMetaDataProperty<T, K extends keyof T>(
   modelOptions: ModelMetadata<T>,

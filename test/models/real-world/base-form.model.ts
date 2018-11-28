@@ -1,7 +1,4 @@
-import { Date } from '../../../src/decorator/impl/date/date.decorator'
-import { GSIPartitionKey } from '../../../src/decorator/impl/index/gsi-partition-key.decorator'
-import { PartitionKey } from '../../../src/decorator/impl/key/partition-key.decorator'
-import { Model } from '../../../src/decorator/impl/model/model.decorator'
+import { DateProperty, GSIPartitionKey, Model, PartitionKey } from '../../../src/dynamo-easy'
 
 export const INDEX_CREATION_DATE = 'index-creationDate'
 
@@ -11,9 +8,9 @@ export class BaseForm {
   id: string
 
   @GSIPartitionKey(INDEX_CREATION_DATE)
-  @Date()
+  @DateProperty()
   creationDate: Date
 
-  @Date()
+  @DateProperty()
   lastSavedDate: Date
 }

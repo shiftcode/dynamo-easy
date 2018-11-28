@@ -1,4 +1,4 @@
-import { DateToStringMapper } from '../mapper/custom'
+import { DateToStringMapper } from '../mapper/custom/date-to-string.mapper'
 import { Config } from './config.type'
 
 /**

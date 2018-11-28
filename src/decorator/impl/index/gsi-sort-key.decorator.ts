@@ -1,5 +1,5 @@
-import { initOrUpdateIndex } from '../property/property.decorator'
 import { IndexType } from './index-type.enum'
+import { initOrUpdateIndex } from './util'
 
 export function GSISortKey(indexName: string): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
