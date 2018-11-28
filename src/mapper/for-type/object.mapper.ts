@@ -1,6 +1,6 @@
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { fromDb, toDb } from '../mapper'
-import { MapAttribute } from '../type/attribute.type'
+import { Attributes, MapAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 function objectFromDb(val: MapAttribute, propertyMetadata?: PropertyMetadata<any, MapAttribute>): any {
@@ -12,7 +12,7 @@ function objectFromDb(val: MapAttribute, propertyMetadata?: PropertyMetadata<any
 }
 
 function objectToDb(modelValue: any, propertyMetadata?: PropertyMetadata<any, MapAttribute>): MapAttribute {
-  let value: any
+  let value: Attributes
   if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom) {
     value = toDb(modelValue, propertyMetadata.typeInfo.type)
   } else {

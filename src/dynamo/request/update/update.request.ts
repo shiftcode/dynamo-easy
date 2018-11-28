@@ -2,6 +2,7 @@ import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
 import { forEach } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
+import { hasSortKey } from '../../../decorator/metadata'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, toDbOne } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
@@ -26,32 +27,30 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
 
-    const hasSortKey: boolean = this.metaData.getSortKey() !== null
-
-    if (hasSortKey && (sortKey === null || sortKey === undefined)) {
-      throw new Error(`please provide the sort key for attribute ${this.metaData.getSortKey()}`)
+    if (hasSortKey(this.metadata) && (sortKey === null || sortKey === undefined)) {
+      throw new Error(`please provide the sort key for attribute ${this.metadata.getSortKey()}`)
     }
 
-    const keyAttributeMap: Attributes = {}
+    const keyAttributeMap: Attributes<T> = <any>{}
 
     // partition key
-    const partitionKeyValue = toDbOne(partitionKey, this.metaData.forProperty(this.metaData.getPartitionKey()))
+    const partitionKeyValue = toDbOne(partitionKey, this.metadata.forProperty(this.metadata.getPartitionKey()))
 
     if (partitionKeyValue === null) {
       throw new Error('please provide an acutal value for partition key, got null')
     }
 
-    keyAttributeMap[<string>this.metaData.getPartitionKey()] = partitionKeyValue
+    keyAttributeMap[this.metadata.getPartitionKey()] = partitionKeyValue
 
     // sort key
-    if (hasSortKey) {
-      const sortKeyValue = toDbOne(sortKey, this.metaData.forProperty(<keyof T>this.metaData.getSortKey()))
+    if (hasSortKey(this.metadata)) {
+      const sortKeyValue = toDbOne(sortKey, this.metadata.forProperty(this.metadata.getSortKey()))
 
       if (sortKeyValue === null) {
         throw new Error('please provide an actual value for sort key, got null')
       }
 
-      keyAttributeMap[<string>this.metaData.getSortKey()] = sortKeyValue
+      keyAttributeMap[this.metadata.getSortKey()] = sortKeyValue
     }
 
     this.params.Key = keyAttributeMap
@@ -61,7 +60,7 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
     if (updateDefFns && updateDefFns.length) {
       const sortedByActionKeyWord: SortedUpdateExpressions = updateDefFns
         .map(updateDefFn => {
-          return updateDefFn(this.params.ExpressionAttributeValues, this.metaData)
+          return updateDefFn(this.params.ExpressionAttributeValues, this.metadata)
         })
         .reduce(
           (result, expr) => {

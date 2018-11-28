@@ -88,7 +88,7 @@ export function buildFilterExpression(
   // check if provided values are valid for given operator
   validateValues(operator, values)
 
-  // load property metadat if model metadata was provided
+  // load property metadata if model metadata was provided
   let propertyMetadata: PropertyMetadata<any> | undefined
   if (metadata) {
     propertyMetadata = metadata.forProperty(attributePath)
@@ -150,7 +150,7 @@ function buildInConditionExpression(
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
 ): Expression {
-  const attributeValues: Attributes = (<any[]>values[0])
+  const attributeValues: Attributes<any> = (<any[]>values[0])
     .map(value => toDbOne(value, propertyMetadata))
     .reduce(
       (result, mappedValue: Attribute | null, index: number) => {
@@ -159,7 +159,7 @@ function buildInConditionExpression(
         }
         return result
       },
-      <Attributes>{},
+      <Attributes<any>>{},
     )
 
   const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
@@ -180,7 +180,7 @@ function buildBetweenConditionExpression(
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
 ): Expression {
-  const attributes: Attributes = {}
+  const attributes: Attributes<any> = {}
   const mappedValue1 = toDbOne(values[0], propertyMetadata)
   const mappedValue2 = toDbOne(values[1], propertyMetadata)
 
@@ -224,7 +224,7 @@ function buildDefaultConditionExpression(
     statement = [namePlaceholder, operator, valuePlaceholder].join(' ')
   }
 
-  const attributes: Attributes = {}
+  const attributes: Attributes<any> = {}
   if (hasValue) {
     let attribute: Attribute | null
     switch (operator) {

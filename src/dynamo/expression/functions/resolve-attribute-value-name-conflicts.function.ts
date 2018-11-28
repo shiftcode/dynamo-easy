@@ -13,7 +13,7 @@ export function resolveAttributeValueNameConflicts(
   expression: Expression,
   params: QueryInput | ScanInput | UpdateItemInput,
 ): Expression {
-  let attributeValues: Attributes = {}
+  let attributeValues: Attributes<any> = {}
   let statement: string = expression.statement
 
   if (params.ExpressionAttributeValues) {

@@ -24,11 +24,11 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
   }
 
   whereAttribute(attributePath: keyof T): RequestConditionFunction<ScanRequest<T>> {
-    return addCondition('FilterExpression', <string>attributePath, this, this.metaData)
+    return addCondition('FilterExpression', <string>attributePath, this, this.metadata)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): ScanRequest<T> {
-    const condition = and(...conditionDefFns)(undefined, this.metaData)
+    const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('FilterExpression', condition, this.params)
     return this
   }
@@ -42,7 +42,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
       map(queryResponse => {
         const response: ScanResponse<T> = <any>{ ...queryResponse }
         if (queryResponse.Items) {
-          response.Items = queryResponse.Items.map(item => fromDb(<Attributes>item, this.modelClazz))
+          response.Items = queryResponse.Items.map(item => fromDb(<Attributes<T>>item, this.modelClazz))
         }
         return response
       }),
@@ -60,7 +60,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     this.logger.debug('request', this.params)
     return this.dynamoRx.scan(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
-      map(response => (response.Items || []).map(item => fromDb(<Attributes>item, this.modelClazz))),
+      map(response => (response.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))),
       tap(items => this.logger.debug('mapped items', items)),
     )
   }
@@ -71,7 +71,9 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     return this.dynamoRx.scan(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => {
-        return response.Items && response.Items.length ? fromDb(<Attributes>response.Items[0], this.modelClazz) : null
+        return response.Items && response.Items.length
+          ? fromDb(<Attributes<T>>response.Items[0], this.modelClazz)
+          : null
       }),
       tap(item => this.logger.debug('mapped item', item)),
     )

@@ -25,29 +25,40 @@ import { buildUpdateExpression } from './update-expression-builder'
 /**
  * Adds a condition to the given query.
  */
-export function addCondition<T extends BaseRequest<any, any>>(
+export function addCondition<R extends BaseRequest<any, any>>(
   expressionType: ExpressionType,
   attributePath: string,
-  request: T,
+  request: R,
   metadata?: Metadata<any>,
-): RequestConditionFunction<T> {
+): RequestConditionFunction<R> {
   const f = (operator: ConditionOperator) => {
-    return (...values: any[]): T => {
+    return (...values: any[]): R => {
       return doAddCondition(expressionType, attributePath, request, metadata, operator, ...values)
     }
   }
 
-  return createConditionFunctions<RequestConditionFunction<T>>(f)
+  return createConditionFunctions<RequestConditionFunction<R>>(f)
 }
 
-export function addSortKeyCondition<T extends BaseRequest<any, any>>(
-  keyName: string,
-  request: T,
-  metadata?: Metadata<any>,
-): RequestSortKeyConditionFunction<T> {
+export function addSortKeyCondition<R extends BaseRequest<any, any>>(
+  keyName: keyof any,
+  request: R,
+): RequestSortKeyConditionFunction<R>
+
+export function addSortKeyCondition<T, R extends BaseRequest<T, any>>(
+  keyName: keyof T,
+  request: R,
+  metadata: Metadata<T>,
+): RequestSortKeyConditionFunction<R>
+
+export function addSortKeyCondition<T, R extends BaseRequest<T, any>>(
+  keyName: keyof T,
+  request: R,
+  metadata?: Metadata<T>,
+): RequestSortKeyConditionFunction<R> {
   const f = (operator: ConditionOperator) => {
-    return (...values: any[]): T => {
-      return doAddCondition('KeyConditionExpression', keyName, request, metadata, operator, ...values)
+    return (...values: any[]): R => {
+      return doAddCondition('KeyConditionExpression', <string>keyName, request, metadata, operator, ...values)
     }
   }
 
@@ -55,14 +66,14 @@ export function addSortKeyCondition<T extends BaseRequest<any, any>>(
   return createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
 }
 
-export function doAddCondition<T extends BaseRequest<any, any>>(
+export function doAddCondition<T, R extends BaseRequest<T, any>>(
   expressionType: ExpressionType,
   attributePath: string,
-  request: T,
-  metadata: Metadata<any> | undefined,
+  request: R,
+  metadata: Metadata<T> | undefined,
   operator: ConditionOperator,
   ...values: any[]
-): T {
+): R {
   const copy = [...values]
   const existingValueKeys = request.params.ExpressionAttributeValues
     ? Object.keys(request.params.ExpressionAttributeValues)
@@ -73,13 +84,30 @@ export function doAddCondition<T extends BaseRequest<any, any>>(
   return request
 }
 
-export function addPartitionKeyCondition<T extends BaseRequest<any, any>>(
-  keyName: string,
+export function addPartitionKeyCondition<R extends BaseRequest<any, any>>(
+  keyName: keyof any,
   keyValue: any,
-  request: T,
-  metadata?: Metadata<any>,
-): T {
-  return addSortKeyCondition(keyName, request, metadata).equals(keyValue)
+  request: R,
+): R
+
+export function addPartitionKeyCondition<T, R extends BaseRequest<T, any>>(
+  keyName: keyof T,
+  keyValue: any,
+  request: R,
+  metadata: Metadata<T>,
+): R
+
+export function addPartitionKeyCondition<T, R extends BaseRequest<T, any>>(
+  keyName: keyof T,
+  keyValue: any,
+  request: R,
+  metadata?: Metadata<T>,
+): R {
+  if (metadata) {
+    return addSortKeyCondition(keyName, request, metadata).equals(keyValue)
+  } else {
+    return addSortKeyCondition(keyName, request).equals(keyValue)
+  }
 }
 
 export function updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain

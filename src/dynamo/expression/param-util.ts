@@ -13,7 +13,6 @@ export function addUpdateExpression(updateExpression: Expression, params: Update
   addExpression('UpdateExpression', updateExpression, params)
 }
 
-// FIXME: name conflicts are not resolved yet (eg. when condition uses same property as update)
 export function addExpression(
   expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression' | 'UpdateExpression',
   condition: Expression,
