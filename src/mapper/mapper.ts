@@ -164,23 +164,23 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
     )
 }
 
-export function toKey<T>(item: T, modelConstructor: ModelConstructor<T>): Attributes {
+export function toKey<T>(item: T, modelConstructor: ModelConstructor<T>): Attributes<T> {
   return createToKeyFn(modelConstructor)(item)
 }
 
-export function fromDb<T>(attributeMap: Attributes, modelClass?: ModelConstructor<T>): T {
+export function fromDb<T>(attributeMap: Attributes<T>, modelClass?: ModelConstructor<T>): T {
   const model: T = <T>{}
 
   Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {
     /*
      * 1) get the value of the property
      */
-    const attributeValue = attributeMap[attributeName]
+    const attributeValue = (<any>attributeMap)[attributeName]
 
     /*
      * 2) decide how to map the property depending on type or value
      */
-    let modelValue: any
+    let modelValue: T | undefined
     let propertyMetadata: PropertyMetadata<any, any> | null | undefined
     if (modelClass) {
       propertyMetadata = metadataForProperty(modelClass, attributeName)
@@ -218,7 +218,9 @@ export function fromDb<T>(attributeMap: Attributes, modelClass?: ModelConstructo
       // }
     }
 
-    Reflect.set(<any>model, propertyMetadata ? propertyMetadata.name : attributeName, modelValue)
+    if (modelValue) {
+      Reflect.set(<any>model, propertyMetadata ? propertyMetadata.name : attributeName, modelValue)
+    }
     // throw new Error('don\'t know how to map without model class');
   })
 

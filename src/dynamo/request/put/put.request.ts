@@ -25,9 +25,9 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
     // FIXME should we check for sort key too?
     const conditionDefFns = []
     if (predicate === undefined || (predicate !== undefined && predicate === true)) {
-      conditionDefFns.push(attribute<T>(this.metaData.getPartitionKey()).attributeNotExists())
+      conditionDefFns.push(attribute<T>(this.metadata.getPartitionKey()).attributeNotExists())
 
-      const sortKey = this.metaData.getSortKey()
+      const sortKey = this.metadata.getSortKey()
       if (sortKey !== null) {
         conditionDefFns.push(attribute<T>(sortKey).attributeNotExists())
       }

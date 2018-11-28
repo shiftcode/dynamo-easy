@@ -1,6 +1,7 @@
 import { BatchWriteItemInput, BatchWriteItemOutput, WriteRequest, WriteRequests } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap, tap } from 'rxjs/operators'
+import { PutRequest } from '../../../../node_modules/aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createToKeyFn, toDb } from '../../../mapper'
@@ -47,7 +48,7 @@ export class BatchWriteSingleTableRequest<T> {
 
   put(items: T[]): BatchWriteSingleTableRequest<T> {
     this.itemsToProcess.push(
-      ...items.map<WriteRequest>(item => ({ PutRequest: { Item: toDb(item, this.modelClazz) } })),
+      ...items.map<WriteRequest>(item => ({ PutRequest: <PutRequest>{ Item: toDb(item, this.modelClazz) } })),
     )
     this.logger.debug(`${items.length} items added for PutRequest`)
     return this

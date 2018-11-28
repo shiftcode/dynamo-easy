@@ -2,7 +2,7 @@ import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { Metadata, metadataForClass } from '../../../decorator/metadata'
+import { hasSortKey, Metadata, metadataForClass } from '../../../decorator/metadata'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, fromDb, toDbOne } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
@@ -17,7 +17,7 @@ export class BatchGetSingleTableRequest<T> {
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
 
-  private metadata: Metadata<T>
+  readonly metadata: Metadata<T>
 
   // todo: make use of toKey<T>(item: T, modelConstructor: ModelConstructor<T>)
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: any[]) {
@@ -34,16 +34,9 @@ export class BatchGetSingleTableRequest<T> {
     }
 
     this.tableName = tableName
+    this.metadata = metadataForClass(this.modelClazz)
 
     this.addKeyParams(keys)
-  }
-
-  get metaData(): Metadata<T> {
-    if (!this.metadata) {
-      this.metadata = metadataForClass(this.modelClazz)
-    }
-
-    return this.metadata
   }
 
   execFullResponse(): Observable<BatchGetSingleTableResponse<T>> {
@@ -54,7 +47,7 @@ export class BatchGetSingleTableRequest<T> {
         let items: T[]
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
           const mapped: T[] = response.Responses[this.tableName].map(attributeMap =>
-            fromDb(<Attributes>attributeMap, this.modelClazz),
+            fromDb(<Attributes<T>>attributeMap, this.modelClazz),
           )
           items = mapped
         } else {
@@ -78,7 +71,7 @@ export class BatchGetSingleTableRequest<T> {
       map(response => {
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
           return response.Responses[this.tableName].map(attributeMap =>
-            fromDb(<Attributes>attributeMap, this.modelClazz),
+            fromDb(<Attributes<T>>attributeMap, this.modelClazz),
           )
         } else {
           return []
@@ -89,10 +82,10 @@ export class BatchGetSingleTableRequest<T> {
   }
 
   private addKeyParams(keys: any[]) {
-    const attributeMaps: Attributes[] = []
+    const attributeMaps: Array<Attributes<T>> = []
 
     keys.forEach(key => {
-      const idOb: Attributes = {}
+      const idOb: Attributes<T> = <any>{}
       if (isObject(key)) {
         // TODO add some more checks
         // got a composite primary key
@@ -102,15 +95,17 @@ export class BatchGetSingleTableRequest<T> {
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
-        idOb[<string>this.metaData.getPartitionKey()] = mappedPartitionKey
+        idOb[this.metadata.getPartitionKey()] = mappedPartitionKey
 
         // sort key
-        const mappedSortKey = toDbOne(key.sortKey)
-        if (mappedSortKey === null) {
-          throw Error('please provide an actual value for partition key')
-        }
+        if (key.sortKey && hasSortKey(this.metadata)) {
+          const mappedSortKey = toDbOne(key.sortKey)
+          if (mappedSortKey === null) {
+            throw Error('please provide an actual value for sort key')
+          }
 
-        idOb[<string>this.metaData.getSortKey()] = mappedSortKey
+          idOb[this.metadata.getSortKey()] = mappedSortKey
+        }
       } else {
         // got a simple primary key
         const value = toDbOne(key)
@@ -118,14 +113,14 @@ export class BatchGetSingleTableRequest<T> {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[<string>this.metaData.getPartitionKey()] = value
+        idOb[this.metadata.getPartitionKey()] = value
       }
 
       attributeMaps.push(idOb)
     })
 
     this.params.RequestItems[this.tableName] = {
-      Keys: attributeMaps,
+      Keys: <any>attributeMaps,
     }
   }
 }

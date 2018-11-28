@@ -44,6 +44,9 @@ export class OrganizationEvent {
   }
 }
 
+// TODO LOW maybe we can map the transient fields to be optional in Attributes
+// export type Transient<T> = T
+
 @Model({ tableName: 'Organization' })
 export class Organization {
   // String
@@ -65,10 +68,8 @@ export class Organization {
   // Number
   count = 52
 
-  // @Property()
-  // myMap: Map<string, string>;
-
   @Transient()
+  // transient: Transient<any>
   transient: any
 
   /*

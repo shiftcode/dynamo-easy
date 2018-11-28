@@ -2,6 +2,7 @@ import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
 import { isObject, isString } from 'lodash'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { hasSortKey } from '../../decorator/metadata'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { fromDb, toDbOne } from '../../mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
@@ -49,7 +50,7 @@ export class BatchGetRequest {
 
     // loop over all the keys
     keys.forEach(key => {
-      const idOb: Attributes = {}
+      const idOb: Attributes<T> = <any>{}
 
       if (isString(key)) {
         // got a simple primary key
@@ -57,8 +58,8 @@ export class BatchGetRequest {
         if (value === null) {
           throw Error('please provide an actual value for partition key')
         }
-        // FIXME: should work  without cast - because keyof T must be a string or symbol (error exists since update to  2.9.x -> check in a later version, there are some open issues)
-        idOb[<string>metadata.getPartitionKey()] = value
+
+        idOb[metadata.getPartitionKey()] = value
       } else if (isObject(key) && key.partitionKey !== undefined && key.partitionKey !== null) {
         // got a composite primary key
 
@@ -67,7 +68,7 @@ export class BatchGetRequest {
         if (mappedPartitionKey === null) {
           throw Error('please provide an actual value for partition key')
         }
-        idOb[<string>metadata.getPartitionKey()] = mappedPartitionKey
+        idOb[metadata.getPartitionKey()] = mappedPartitionKey
 
         // sort key
         const mappedSortKey = toDbOne(key.sortKey)
@@ -75,7 +76,9 @@ export class BatchGetRequest {
           throw Error('please provide an actual value for partition key')
         }
 
-        idOb[<string>metadata.getSortKey()] = mappedSortKey
+        if (hasSortKey(metadata)) {
+          idOb[metadata.getSortKey()] = mappedSortKey
+        }
       } else {
         throw new Error('a key must either be a string or a PrimaryKey')
       }

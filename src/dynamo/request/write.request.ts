@@ -33,14 +33,14 @@ export abstract class WriteRequest<
   }
 
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
-    return addCondition('ConditionExpression', <string>attributePath, <R>(<any>this), this.metaData)
+    return addCondition('ConditionExpression', <string>attributePath, <R>(<any>this), this.metadata)
   }
 
   /**
    * @param conditionDefFns
    */
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
-    const condition = and(...conditionDefFns)(undefined, this.metaData)
+    const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
     return <R>(<any>this)
   }

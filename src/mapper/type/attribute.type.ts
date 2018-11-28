@@ -1,4 +1,3 @@
-// TODO investigate if we can make Attribute generic, would be useful for Map- / ListAttribute
 export type Attribute =
   | StringAttribute
   | NumberAttribute
@@ -11,12 +10,12 @@ export type Attribute =
   | NullAttribute
   | BooleanAttribute
 
-export interface Attributes<T = {}> {
-  // todo
-  // basically correct, but typescript no longer sees Attributes<T> as indexed type
-  // [key in keyof T]: Attribute
-  [key: string]: Attribute
-}
+/**
+ * the key is either a key of the object T or any string to support for custom property
+ * names @Property({name: 'myOtherName'}) and the value is one of Attribute
+ * (we can't narrow the type of Attribute)
+ */
+export type Attributes<T = {}> = { [key in keyof T | string]: Attribute }
 
 /**
  * An attribute of type String. For example:  "S": "Hello"
@@ -64,8 +63,8 @@ export interface BinarySetAttribute {
  * An attribute of type Map. For example:  "M": {"Name": {"S": "Joe"}, "Age": {"N": "35"}}
  */
 
-export interface MapAttribute {
-  M: Attributes
+export interface MapAttribute<T = {}> {
+  M: Attributes<T>
 }
 
 /**

@@ -133,7 +133,7 @@ function buildDefaultExpression(
 
   const hasValue = !isNoValueAction(operator.action)
 
-  const attributes: Attributes = {}
+  const attributes: Attributes<any> = {}
   if (hasValue) {
     const attribute: Attribute | null = toDbOne(values[0], propertyMetadata)
 
