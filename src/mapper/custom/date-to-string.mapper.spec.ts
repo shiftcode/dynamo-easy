@@ -11,8 +11,8 @@ describe('DateToStringMapper', () => {
       const now = new Date()
       const toDb: AttributeValue = dateMapper.toDb(now)
       expect(toDb).toBeDefined()
-      expect(toDb['S']).toBeDefined()
-      expect(toDb['S']).toEqual(`${now.toISOString()}`)
+      expect(toDb.S).toBeDefined()
+      expect(toDb.S).toEqual(`${now.toISOString()}`)
     })
 
     it('throws', () => {

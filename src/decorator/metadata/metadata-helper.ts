@@ -26,7 +26,7 @@ export class MetadataHelper {
    */
   static forProperty<T>(
     modelClass: ModelConstructor<T>,
-    propertyKey: keyof T | string
+    propertyKey: keyof T | string,
   ): PropertyMetadata<T> | null | undefined {
     if (modelClass) {
       const modelMetadata: ModelMetadata<T> = Reflect.getMetadata(KEY_MODEL, modelClass)
@@ -35,14 +35,14 @@ export class MetadataHelper {
         throw new Error(
           `make sure the @Model decorator was added to the given modelClass ${
             Object.hasOwnProperty('name') ? (<any>modelClass).name : modelClass
-          }, was not able to find model metadata`
+          }, was not able to find model metadata`,
         )
       }
 
       let options: PropertyMetadata<T> | undefined
       if (modelMetadata.properties) {
         options = modelMetadata.properties.find(
-          property => property.name === propertyKey || property.nameDb === propertyKey
+          property => property.name === propertyKey || property.nameDb === propertyKey,
         )
       }
 

@@ -85,8 +85,8 @@ export class Mapper {
           // let typeByConvention = Util.typeByConvention(propertyKey);
           // if (typeByConvention) {
           /*
-             * 4a) matches a convention
-             */
+           * 4a) matches a convention
+           */
           // attributeValue = Mapper.mapperForConvention(typeByConvention).toDb(propertyValue);
           // } else {
           //   /*
@@ -133,7 +133,7 @@ export class Mapper {
           `\
 DynamoDb only allows string, number or binary type for RANGE and HASH key. \
 Make sure to define a custom mapper for '${propertyMetadata.name.toString()}' which returns a string, number or binary value for partition key, \
-type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyValue)}`
+type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyValue)}`,
         )
       }
     }
@@ -162,7 +162,7 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
           const attributeValue = Mapper.toDbOne(propertyValue, propMeta)!
           return { ...key, [<string>propMeta.name]: attributeValue }
         },
-        <Attributes>{}
+        <Attributes>{},
       )
   }
 
@@ -215,8 +215,8 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
         //   modelValue = Mapper.mapperForConvention(typeByConvention).fromDb(attributeValue);
         // } else {
         /*
-           * 4b) no naming convention matches
-           */
+         * 4b) no naming convention matches
+         */
         modelValue = Mapper.fromDbOne(attributeValue)
         // }
       }
@@ -305,7 +305,7 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
       }
     } else {
       throw new Error(
-        `there is no property descriptor for item ${JSON.stringify(item)} and property key ${<string>propertyKey}`
+        `there is no property descriptor for item ${JSON.stringify(item)} and property key ${<string>propertyKey}`,
       )
     }
   }

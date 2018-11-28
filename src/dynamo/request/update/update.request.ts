@@ -24,7 +24,7 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
     modelClazz: ModelConstructor<T>,
     tableName: string,
     partitionKey: any,
-    sortKey?: any
+    sortKey?: any,
   ) {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
@@ -48,7 +48,7 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
 
     // sort key
     if (hasSortKey) {
-      const sortKeyValue = Mapper.toDbOne(sortKey!, this.metaData.forProperty(this.metaData.getSortKey()!))
+      const sortKeyValue = Mapper.toDbOne(sortKey, this.metaData.forProperty(this.metaData.getSortKey()!))
 
       if (sortKeyValue === null) {
         throw new Error('please provide an actual value for sort key, got null')
@@ -75,7 +75,7 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
             result[expr.type].push(expr)
             return result
           },
-          <SortedUpdateExpressions>{}
+          <SortedUpdateExpressions>{},
         )
 
       const actionStatements: string[] = []
@@ -116,7 +116,7 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
     return this.execFullResponse().pipe(
       map(response => {
         return
-      })
+      }),
     )
   }
 }

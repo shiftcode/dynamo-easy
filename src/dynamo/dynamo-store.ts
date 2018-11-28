@@ -29,14 +29,14 @@ export class DynamoStore<T> {
   constructor(
     private modelClazz: ModelConstructor<T>,
     tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
+    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
   ) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
     const tableName = tableNameResolver(MetadataHelper.get(this.modelClazz).modelOptions.tableName)
     if (!REGEX_TABLE_NAME.test(tableName)) {
       throw new Error(
-        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long'
+        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long',
       )
     }
 

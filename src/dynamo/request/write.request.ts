@@ -38,7 +38,7 @@ export abstract class WriteRequest<
       'ConditionExpression',
       <string>attributePath,
       <R>(<any>this),
-      this.metaData
+      this.metaData,
     )
   }
 
@@ -52,9 +52,9 @@ export abstract class WriteRequest<
   }
 
   /*
-     * The ReturnValues parameter is used by several DynamoDB operations; however,
-     * DeleteItem/PutItem/UpdateItem does not recognize any values other than NONE or ALL_OLD.
-     */
+   * The ReturnValues parameter is used by several DynamoDB operations; however,
+   * DeleteItem/PutItem/UpdateItem does not recognize any values other than NONE or ALL_OLD.
+   */
   returnValues(returnValues: 'NONE' | 'ALL_OLD'): R {
     this.params.ReturnValues = returnValues
     return <R>(<any>this)

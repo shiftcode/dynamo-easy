@@ -24,7 +24,7 @@ export class BatchGetRequest {
 
   constructor(
     private tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER
+    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
   ) {
     this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
     this.params = <BatchGetItemInput>{
@@ -102,14 +102,14 @@ export class BatchGetRequest {
         if (response.Responses && Object.keys(response.Responses).length) {
           Object.keys(response.Responses).forEach(tableName => {
             const mapped = response.Responses![tableName].map(attributes =>
-              Mapper.fromDb(<Attributes>attributes, this.tables.get(tableName))
+              Mapper.fromDb(<Attributes>attributes, this.tables.get(tableName)),
             )
             r.Responses![tableName] = mapped
           })
         }
 
         return r
-      })
+      }),
     )
   }
 
@@ -120,7 +120,7 @@ export class BatchGetRequest {
         if (response.Responses && Object.keys(response.Responses).length) {
           Object.keys(response.Responses).forEach(tableName => {
             const mapped = response.Responses![tableName].map(attributeMap =>
-              Mapper.fromDb(<Attributes>attributeMap, this.tables.get(tableName))
+              Mapper.fromDb(<Attributes>attributeMap, this.tables.get(tableName)),
             )
             r[tableName] = mapped
           })
@@ -129,7 +129,7 @@ export class BatchGetRequest {
         } else {
           return {}
         }
-      })
+      }),
     )
   }
 
@@ -137,7 +137,7 @@ export class BatchGetRequest {
     const tableName = tableNameResolver(MetadataHelper.get(modelClazz).modelOptions.tableName)
     if (!REGEX_TABLE_NAME.test(tableName)) {
       throw new Error(
-        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long'
+        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long',
       )
     }
 

@@ -55,8 +55,8 @@ export class BatchGetSingleTableRequest<T> {
       map(response => {
         let items: T[]
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          const mapped: T[] = response.Responses![this.tableName].map(attributeMap =>
-            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
+          const mapped: T[] = response.Responses[this.tableName].map(attributeMap =>
+            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz),
           )
           items = mapped
         } else {
@@ -69,7 +69,7 @@ export class BatchGetSingleTableRequest<T> {
           ConsumedCapacity: response.ConsumedCapacity,
         }
       }),
-      tap(response => this.logger.debug('mapped items', response.Items))
+      tap(response => this.logger.debug('mapped items', response.Items)),
     )
   }
 
@@ -79,14 +79,14 @@ export class BatchGetSingleTableRequest<T> {
       tap(response => this.logger.debug('response', response)),
       map(response => {
         if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          return response.Responses![this.tableName].map(attributeMap =>
-            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz)
+          return response.Responses[this.tableName].map(attributeMap =>
+            Mapper.fromDb(<Attributes>attributeMap, this.modelClazz),
           )
         } else {
           return []
         }
       }),
-      tap(items => this.logger.debug('mapped items', items))
+      tap(items => this.logger.debug('mapped items', items)),
     )
   }
 

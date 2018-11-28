@@ -19,7 +19,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     modelClazz: ModelConstructor<T>,
     tableName: string,
     partitionKey: any,
-    sortKey?: any
+    sortKey?: any,
   ) {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
@@ -43,7 +43,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
 
     // sort key
     if (hasSortKey) {
-      const sortKeyValue = Mapper.toDbOne(sortKey!, this.metaData.forProperty(this.metaData.getSortKey()!))
+      const sortKeyValue = Mapper.toDbOne(sortKey, this.metaData.forProperty(this.metaData.getSortKey()!))
 
       if (sortKeyValue === null) {
         throw new Error('please provide an actual value for sort key, got null')
@@ -66,7 +66,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
   }
 
   projectionExpression(...attributesToGet: string[]): GetRequest<T> {
-    const resolved = attributesToGet.map(attr => resolveAttributeNames(attr))
+    const resolved = attributesToGet.map(resolveAttributeNames)
     this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
     objValues(resolved).forEach(r => {
       this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
@@ -89,7 +89,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
 
         return response
       }),
-      tap(response => this.logger.debug('mapped item', response.Item))
+      tap(response => this.logger.debug('mapped item', response.Item)),
     )
   }
 
@@ -104,7 +104,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
           return null
         }
       }),
-      tap(item => this.logger.debug('mapped item', item))
+      tap(item => this.logger.debug('mapped item', item)),
     )
   }
 }

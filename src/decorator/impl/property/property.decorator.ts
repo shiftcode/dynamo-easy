@@ -37,13 +37,13 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
     case IndexType.GSI:
       propertyMetadata = initOrUpdateGSI(
         existingProperty && existingProperty.keyForGSI ? existingProperty.keyForGSI : {},
-        indexData
+        indexData,
       )
       break
     case IndexType.LSI:
       propertyMetadata = initOrUpdateLSI(
         existingProperty && existingProperty.sortKeyForLSI ? existingProperty.sortKeyForLSI : [],
-        indexData
+        indexData,
       )
       break
     default:
@@ -74,7 +74,7 @@ function initOrUpdateLSI(indexes: string[], indexData: IndexData): Partial<Prope
 export function initOrUpdateProperty(
   propertyMetadata: Partial<PropertyMetadata<any, Attribute>> = {},
   target: any,
-  propertyKey: string
+  propertyKey: string,
 ): void {
   // Update the attribute array
 
@@ -86,7 +86,7 @@ export function initOrUpdateProperty(
     // console.log('merge into existing property', existingProperty, propertyMetadata);
     Object.assign<PropertyMetadata<any, Attribute>, Partial<PropertyMetadata<any, Attribute>>>(
       existingProperty,
-      propertyMetadata
+      propertyMetadata,
     )
   } else {
     // add new options
@@ -101,7 +101,7 @@ export function initOrUpdateProperty(
 function createNewProperty(
   propertyOptions: Partial<PropertyMetadata<any, Attribute>> = {},
   target: any,
-  propertyKey: string
+  propertyKey: string,
 ): PropertyMetadata<any> {
   const propertyType: AttributeValueType = getMetadataType(target, propertyKey)
   const customType = isCustomType(propertyType)

@@ -12,7 +12,7 @@ describe('chained conditions', () => {
   it('and & not', () => {
     const condition = and(not(attribute('name').contains('z')), attribute('name').beginsWith('Sta'))(
       undefined,
-      undefined
+      undefined,
     )
 
     expect(condition.attributeNames).toBeDefined()
@@ -29,7 +29,7 @@ describe('chained conditions', () => {
   it('or', () => {
     const condition = or(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
       undefined,
-      undefined
+      undefined,
     )
 
     expect(condition.statement).toBe('(#age > :age OR contains (#name, :name))')
@@ -38,7 +38,7 @@ describe('chained conditions', () => {
   it('and', () => {
     const condition = and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
       undefined,
-      undefined
+      undefined,
     )
 
     expect(condition.statement).toBe('(#age > :age AND contains (#name, :name))')
@@ -47,11 +47,11 @@ describe('chained conditions', () => {
   it('mixed', () => {
     const condition = or(
       and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions')),
-      attribute('doAddCondition').beginsWith('Start')
+      attribute('doAddCondition').beginsWith('Start'),
     )(undefined, undefined)
 
     expect(condition.statement).toBe(
-      '((#age > :age AND contains (#name, :name)) OR begins_with (#doAddCondition, :doAddCondition))'
+      '((#age > :age AND contains (#name, :name)) OR begins_with (#doAddCondition, :doAddCondition))',
     )
   })
 })

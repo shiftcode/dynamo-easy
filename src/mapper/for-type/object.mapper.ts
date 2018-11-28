@@ -4,8 +4,6 @@ import { MapAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 export class ObjectMapper<T> implements MapperForType<any, MapAttribute> {
-  constructor() {}
-
   fromDb(val: MapAttribute, propertyMetadata?: PropertyMetadata<any, MapAttribute>): any {
     if (propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom) {
       return Mapper.fromDb(val.M, propertyMetadata.typeInfo.type)

@@ -10,7 +10,7 @@ import {
  */
 export function update2<T, K extends keyof T>(
   modelConstructor: ModelConstructor<T>,
-  attributePath: K
+  attributePath: K,
 ): UpdateExpressionDefinitionChainTyped<T, K> {
   return RequestExpressionBuilder.updateDefinitionFunction<T, K>(attributePath)
 }

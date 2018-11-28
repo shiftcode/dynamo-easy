@@ -29,7 +29,7 @@ export class FormIdsMapper implements MapperForType<FormId[] | FormId, Attribute
 
   toDb(
     propertyValue: FormId[] | FormId,
-    propertyMetadata?: PropertyMetadata<FormId[]>
+    propertyMetadata?: PropertyMetadata<FormId[]>,
   ): AttributeStringOrListValue | null {
     if (Array.isArray(propertyValue)) {
       return { L: propertyValue.map(a => ({ S: FormId.toString(a) })) }

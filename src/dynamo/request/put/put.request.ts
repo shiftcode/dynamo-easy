@@ -47,7 +47,7 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
     return this.execFullResponse().pipe(
       map(response => {
         return
-      })
+      }),
     )
   }
 }

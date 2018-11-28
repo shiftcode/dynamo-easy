@@ -11,7 +11,7 @@ import { uniqAttributeValueName } from './unique-attribute-value-name.function'
  */
 export function resolveAttributeValueNameConflicts(
   expression: Expression,
-  params: QueryInput | ScanInput | UpdateItemInput
+  params: QueryInput | ScanInput | UpdateItemInput,
 ): Expression {
   let attributeValues: Attributes = {}
   let statement: string = expression.statement

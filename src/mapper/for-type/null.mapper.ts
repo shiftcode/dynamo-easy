@@ -3,8 +3,6 @@ import { NullAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 export class NullMapper implements MapperForType<null, NullAttribute> {
-  constructor() {}
-
   fromDb(value: NullAttribute): null {
     if (value.NULL) {
       return null

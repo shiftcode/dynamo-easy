@@ -18,11 +18,11 @@ export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?
     concatMap<ScanResponse<T>, T[]>(response => {
       if (response.LastEvaluatedKey) {
         return fetchAll(request, response.LastEvaluatedKey).pipe(
-          map(innerResponse => response.Items!.concat(innerResponse))
+          map(innerResponse => response.Items!.concat(innerResponse)),
         )
       } else {
         return of(response.Items)
       }
-    })
+    }),
   )
 }

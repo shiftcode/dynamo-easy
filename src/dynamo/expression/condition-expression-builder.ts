@@ -36,7 +36,7 @@ export class ConditionExpressionBuilder {
       return returnArr.length ? returnArr : null
     } else if (obj instanceof Set) {
       const returnArr: any[] = []
-      Array.from(<Set<any>>obj).forEach(i => {
+      Array.from(obj).forEach(i => {
         const item = ConditionExpressionBuilder.deepFilter(i, filterFn)
         if (item !== null) {
           returnArr.push(item)
@@ -80,7 +80,7 @@ export class ConditionExpressionBuilder {
     operator: ConditionOperator,
     values: any[],
     existingValueNames: string[] | undefined,
-    metadata: Metadata<any> | undefined
+    metadata: Metadata<any> | undefined,
   ): Expression {
     // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
     // get rid of undefined values
@@ -129,7 +129,7 @@ export class ConditionExpressionBuilder {
       resolvedAttributeNames.attributeNames,
       values,
       existingValueNames,
-      propertyMetadata
+      propertyMetadata,
     )
   }
 
@@ -149,17 +149,19 @@ export class ConditionExpressionBuilder {
     attributeNames: { [key: string]: string },
     values: any[],
     existingValueNames: string[] | undefined,
-    propertyMetadata: PropertyMetadata<any> | undefined
+    propertyMetadata: PropertyMetadata<any> | undefined,
   ): Expression {
-    const attributeValues: Attributes = (<any[]>values[0]).map(value => Mapper.toDbOne(value, propertyMetadata)).reduce(
-      (result, mappedValue: Attribute | null, index: number) => {
-        if (mappedValue !== null) {
-          result[`${valuePlaceholder}_${index}`] = mappedValue
-        }
-        return result
-      },
-      <Attributes>{}
-    )
+    const attributeValues: Attributes = (<any[]>values[0])
+      .map(value => Mapper.toDbOne(value, propertyMetadata))
+      .reduce(
+        (result, mappedValue: Attribute | null, index: number) => {
+          if (mappedValue !== null) {
+            result[`${valuePlaceholder}_${index}`] = mappedValue
+          }
+          return result
+        },
+        <Attributes>{},
+      )
 
     const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
@@ -177,7 +179,7 @@ export class ConditionExpressionBuilder {
     attributeNames: { [key: string]: string },
     values: string[],
     existingValueNames: string[] | undefined,
-    propertyMetadata: PropertyMetadata<any> | undefined
+    propertyMetadata: PropertyMetadata<any> | undefined,
   ): Expression {
     const attributes: Attributes = {}
     const mappedValue1 = Mapper.toDbOne(values[0], propertyMetadata)
@@ -208,7 +210,7 @@ export class ConditionExpressionBuilder {
     values: any[],
     existingValueNames: string[] | undefined,
     propertyMetadata: PropertyMetadata<any> | undefined,
-    operator: ConditionOperator
+    operator: ConditionOperator,
   ): Expression {
     let statement: string
     let hasValue = true
@@ -262,7 +264,7 @@ export class ConditionExpressionBuilder {
       if (isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
         // the operator needs some values to work
         throw new Error(
-          `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`
+          `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`,
         )
       }
     } else if (values && Array.isArray(values)) {
@@ -271,11 +273,11 @@ export class ConditionExpressionBuilder {
         switch (operator) {
           case 'IN':
             throw new Error(
-              `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)`
+              `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)`,
             )
           default:
             throw new Error(
-              `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`
+              `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`,
             )
         }
       }
@@ -287,8 +289,8 @@ export class ConditionExpressionBuilder {
           if (Util.typeOf(values[0]) !== Util.typeOf(values[1])) {
             throw new Error(
               `both values for operator BETWEEN must have the same type, got ${Util.typeOf(
-                values[0]
-              )} and ${Util.typeOf(values[1])}`
+                values[0],
+              )} and ${Util.typeOf(values[1])}`,
             )
           }
           break

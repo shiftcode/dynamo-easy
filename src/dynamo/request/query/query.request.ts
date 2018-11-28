@@ -43,7 +43,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     }
 
     return RequestExpressionBuilder.addSortKeyCondition<QueryRequest<T>>(partitionKey, this, this.metaData).equals(
-      partitionKeyValue
+      partitionKeyValue,
     )
   }
 
@@ -105,7 +105,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this.dynamoRx.query(params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => response.Count!),
-      tap(count => this.logger.debug('count', count))
+      tap(count => this.logger.debug('count', count)),
     )
   }
 
@@ -119,7 +119,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
 
         return response
       }),
-      tap(response => this.logger.debug('mapped items', response.Items))
+      tap(response => this.logger.debug('mapped items', response.Items)),
     )
   }
 
@@ -128,7 +128,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this.dynamoRx.query(this.params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(response => response.Items!.map(item => Mapper.fromDb(<Attributes>item, this.modelClazz))),
-      tap(items => this.logger.debug('mapped items', items))
+      tap(items => this.logger.debug('mapped items', items)),
     )
   }
 
@@ -149,7 +149,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
           return null
         }
       }),
-      tap(item => this.logger.debug('mapped item', item))
+      tap(item => this.logger.debug('mapped item', item)),
     )
   }
 
