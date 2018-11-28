@@ -16,10 +16,10 @@ cache: npm
 # of updating the package lock.
 install:
 #  decide if running on greenkeeper branch or not
-- case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
+#- case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
 # somehow the above command fails when we have a cache available on travis - needs some more investigation, stick with
 # npm i for now
-#- npm i
+- npm i
 
 notifications:
   email: false
