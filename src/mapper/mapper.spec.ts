@@ -26,6 +26,11 @@ import {
   ProductNested,
   Type,
 } from '../../test/models'
+import { IdMapper } from '../../test/models/model-with-custom-mapper.model'
+import {
+  ModelWithNestedModelWithCustomMapper,
+  NestedModelWithCustomMapper,
+} from '../../test/models/model-with-nested-model-with-custom-mapper.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
 import { PropertyMetadata } from '../decorator'
 import { fromDb, fromDbOne, toDb, toDbOne } from './mapper'
@@ -713,6 +718,21 @@ describe('Mapper', () => {
           const productNested = (<MapAttribute<ProductNested>>list.L[0]).M
           expect(productNested.collection).toBeDefined()
           expect(keyOf(productNested.collection)).toBe('L')
+        })
+      })
+
+      describe('model with nested model with custom mapper', () => {
+        const object = new ModelWithNestedModelWithCustomMapper()
+        const toDbVal: Attributes<ModelWithNestedModelWithCustomMapper> = toDb(
+          object,
+          ModelWithNestedModelWithCustomMapper,
+        )
+
+        it('custom mapper', () => {
+          expect(toDbVal).toBeDefined()
+          expect(toDbVal.nestedModel).toBeDefined()
+          const nestedModel = <MapAttribute<NestedModelWithCustomMapper>>toDbVal.nestedModel
+          expect(nestedModel.M.id).toEqual(IdMapper.toDb(object.nestedModel.id))
         })
       })
     })
