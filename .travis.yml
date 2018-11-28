@@ -19,7 +19,7 @@ install:
 #- case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
 # somehow the above command fails when we have a cache available on travis - needs some more investigation, stick with
 # npm i for now
-- npm i
+- npm ci
 
 notifications:
   email: false
