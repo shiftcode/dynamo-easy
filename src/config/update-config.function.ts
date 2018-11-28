@@ -5,5 +5,8 @@ export function updateDynamoEasyConfig(config: Partial<Config>): void {
   if (config.logReceiver !== undefined && typeof config.logReceiver !== 'function') {
     throw new Error('Config.logReceiver has to be a function')
   }
+  if(!config.dateMapper || typeof config.dateMapper.toDb !== 'function' || typeof config.dateMapper.fromDb !== 'function') {
+    throw new Error('Config.dateMapper must be an object of type MapperForType')
+  }
   Object.assign(dynamoEasyConfig, config)
 }
