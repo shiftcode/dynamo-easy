@@ -10,8 +10,6 @@ import {
 } from '../../src/dynamo-easy'
 import { NestedObject } from './nested-object.model'
 
-// TODO remove test comment
-
 @Model({ tableName: 'complex_model' })
 export class ComplexModel {
   @PartitionKey()

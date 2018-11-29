@@ -1,6 +1,5 @@
 import { ObjectMapper } from './object.mapper'
 
-// TODO remove test comment
 describe('object mapper', () => {
   describe('to db', () => {
     it('should work', () => {
