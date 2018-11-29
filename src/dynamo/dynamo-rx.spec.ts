@@ -1,6 +1,6 @@
 // tslint:disable:no-empty
 
-import { Config, Credentials } from 'aws-sdk'
+import { Config, Credentials, DynamoDB } from 'aws-sdk'
 import { EMPTY, Observable } from 'rxjs'
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from './default-session-validity-ensurer.const'
 import { DynamoRx } from './dynamo-rx'
@@ -47,8 +47,12 @@ describe('dynamo rx', () => {
       expect(spyValidityEnsurer).toHaveBeenCalled()
     })
     it('query', () => {
-      expect(dynamoRx.query(<any>{ KeyConditionExpression: true }) instanceof Observable).toBeTruthy()
+      const params: DynamoDB.QueryInput = {
+        TableName: 'tableName',
+      }
+      expect(dynamoRx.query({ ...params, KeyConditionExpression: 'blub' }) instanceof Observable).toBeTruthy()
       expect(spyValidityEnsurer).toHaveBeenCalled()
+      expect(() => dynamoRx.query(params)).toThrow()
     })
     it('makeRequest', () => {
       expect(dynamoRx.makeRequest(<any>null) instanceof Observable).toBeTruthy()
