@@ -1,4 +1,5 @@
 // tslint:disable:no-empty
+// tslint:disable:no-unnecessary-callback-wrapper
 
 import { Config, Credentials, DynamoDB } from 'aws-sdk'
 import { EMPTY, Observable } from 'rxjs'
@@ -7,8 +8,7 @@ import { DynamoRx } from './dynamo-rx'
 import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 
 describe('dynamo rx', () => {
-
-
+  
   describe('should call the validity ensurer before each call and return an observable', () => {
     let dynamoRx: DynamoRx
     let spyValidityEnsurer: SessionValidityEnsurer
@@ -58,6 +58,16 @@ describe('dynamo rx', () => {
       expect(dynamoRx.makeRequest(<any>null) instanceof Observable).toBeTruthy()
       expect(spyValidityEnsurer).toHaveBeenCalled()
     })
+  })
+
+  it('should call makeRequest with the given params', async () => {
+    const dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
+    const makeRequest = jasmine.createSpy().and.returnValue({ promise: () => Promise.resolve(null) })
+    Object.assign(dynamoRx, { dynamoDb: { makeRequest } })
+
+    await dynamoRx.makeRequest(<any>{ ok: true }).toPromise()
+    expect(makeRequest).toHaveBeenCalled()
+    expect(makeRequest.calls.mostRecent().args[0]).toEqual({ ok: true })
   })
 
   it('should update the credentials', () => {
