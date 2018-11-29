@@ -1,63 +1,137 @@
 import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable, of } from 'rxjs'
+import { EMPTY, of } from 'rxjs'
 import { getTableName } from '../../../../test/helper'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
-import { LogInfo } from '../../../logger'
+import { Attributes } from '../../../mapper'
+import { or } from '../../expression/logical-operator'
+import { attribute } from '../../expression/logical-operator/attribute.function'
 import { Request } from '../request.model'
 import { ScanRequest } from './scan.request'
 
-class DynamoRxMock {
-  scan(): Observable<ScanOutput> {
-    return of({ Count: 10 })
-  }
-}
-
-let logInfos: LogInfo[]
-updateDynamoEasyConfig({ logReceiver: item => logInfos.push(item) })
 
 describe('scan request', () => {
-  const dynamoRxMock: DynamoRxMock = new DynamoRxMock()
-  let scanRequest: ScanRequest<any>
+  let scanSpy: jasmine.Spy
 
-  beforeEach(() => {
-    scanRequest = new ScanRequest(<any>dynamoRxMock, ComplexModel, getTableName(ComplexModel))
-    logInfos = []
+  describe('default params', () => {
+    let scanRequest: ScanRequest<ComplexModel>
+    beforeEach(() => {
+      scanSpy = jasmine.createSpy().and.returnValue(of({ Count: 1 }))
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, ComplexModel, getTableName(ComplexModel))
+    })
+
+    it('default params', () => {
+      const params: ScanInput = scanRequest.params
+      expect(params.TableName).toBe('complex_model')
+      expect(params.Limit).toBe(Request.DEFAULT_LIMIT)
+      expect(Object.keys(params).length).toBe(2)
+    })
   })
 
-  it('default params', () => {
-    const params: ScanInput = scanRequest.params
-    expect(params.TableName).toBe('complex_model')
-    expect(params.Limit).toBe(Request.DEFAULT_LIMIT)
-    expect(Object.keys(params).length).toBe(2)
+  describe('conditions functions', () => {
+    let scanRequest: ScanRequest<SimpleWithPartitionKeyModel>
+    beforeEach(() => {
+      scanSpy = jasmine.createSpy().and.returnValue(EMPTY)
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, 'tableName')
+    })
+
+    it('whereAttribute', () => {
+      scanRequest.whereAttribute('age').gt(20)
+      expect(scanRequest.params.FilterExpression).toEqual('#age > :age')
+      expect(scanRequest.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
+      expect(scanRequest.params.ExpressionAttributeValues).toEqual({ ':age': { 'N': '20' } })
+    })
+    it('where', () => {
+      scanRequest.where(or(attribute('age').lt(10), attribute('age').gt(20)))
+      expect(scanRequest.params.FilterExpression).toEqual('((#age < :age OR #age > :age_2))')
+      expect(scanRequest.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
+      expect(scanRequest.params.ExpressionAttributeValues).toEqual({
+        ':age': { N: '10' },
+        ':age_2': { N: '20' },
+      })
+    })
+
+  })
+
+  describe('exec functions', () => {
+    let scanRequest: ScanRequest<SimpleWithPartitionKeyModel>
+    const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 15 }
+    const dbItem: Attributes<SimpleWithPartitionKeyModel> = {
+      id: { S: `${jsItem.id}` },
+      age: { N: `${jsItem.age}` },
+    }
+    const scanOutput: ScanOutput = {
+      Count: 2,
+      Items: [dbItem, dbItem],
+    }
+    beforeEach(() => {
+      scanSpy = jasmine.createSpy().and.returnValue(of(scanOutput))
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, 'tableName')
+    })
+
+    it('execFullResponse', async () => {
+      const res = await scanRequest.execFullResponse().toPromise()
+      expect(res).toEqual({ ...scanOutput, Items: [jsItem, jsItem] })
+    })
+
+    it('execNoMap', async () => {
+      const res = await scanRequest.execNoMap().toPromise()
+      expect(res).toEqual(scanOutput)
+    })
+
+    it('exec', async () => {
+      const res = await scanRequest.exec().toPromise()
+      expect(res).toEqual([jsItem, jsItem])
+    })
+
+    it('execSingle', async () => {
+      const res = await scanRequest.execSingle().toPromise()
+      // fixme
+      // expect(scanSpy).toHaveBeenCalled()
+      // expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
+      // expect(scanSpy.calls.mostRecent().args[0].Limit).toBe(1)
+      expect(res).toEqual(jsItem)
+    })
+
+    it('execCount', async () => {
+      const res = await scanRequest.execCount().toPromise()
+      expect(scanSpy).toHaveBeenCalled()
+      expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
+      expect(scanSpy.calls.mostRecent().args[0].Select).toBe('COUNT')
+      expect(res).toBe(scanOutput.Count)
+    })
+
+    it('execFetchAll', async () => {
+      const res = await scanRequest.execFetchAll().toPromise()
+      expect(res).toEqual([jsItem, jsItem])
+    })
   })
 
   describe('logger', () => {
+    let scanRequest: ScanRequest<SimpleWithPartitionKeyModel>
     const sampleResponse: ScanOutput = { Items: [] }
     let logReceiver: jasmine.Spy
-    let scanSpy: jasmine.Spy
-    let req: ScanRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
       logReceiver = jasmine.createSpy()
       scanSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      req = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
     })
 
     it('exec should log params and response', async () => {
-      await req.exec().toPromise()
+      await scanRequest.exec().toPromise()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
-      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(scanRequest.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
 
     it('execFullResponse should log params and response', async () => {
-      await req.execFullResponse().toPromise()
+      await scanRequest.execFullResponse().toPromise()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
-      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(scanRequest.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
 
