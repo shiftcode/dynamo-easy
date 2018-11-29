@@ -1,6 +1,9 @@
+import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
+import { of } from 'rxjs'
 import { getTableName } from '../../../../test/helper'
-import { Address, UpdateModel } from '../../../../test/models'
+import { Address, SimpleWithPartitionKeyModel, UpdateModel } from '../../../../test/models'
 import { FormId, FormType, Order, OrderId } from '../../../../test/models/real-world'
+import { updateDynamoEasyConfig } from '../../../config'
 import { attribute, not, update, update2 } from '../../expression'
 import { UpdateRequest } from './update.request'
 
@@ -457,5 +460,38 @@ describe('update request', () => {
       })
       expect(request.params.ConditionExpression).toEqual('(attribute_exists (#types) AND attribute_exists (#formIds))')
     })
+  })
+
+  describe('logger', () => {
+    const sampleResponse: UpdateItemOutput = { Attributes: undefined }
+    let logReceiver: jasmine.Spy
+    let updateItemSpy: jasmine.Spy
+    let req: UpdateRequest<SimpleWithPartitionKeyModel>
+
+
+    beforeEach(() => {
+      logReceiver = jasmine.createSpy()
+      updateItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver })
+      req = new UpdateRequest(<any>{ updateItem: updateItemSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), 'id')
+      req.operations(update2(SimpleWithPartitionKeyModel, 'age').set(10))
+    })
+
+    it('exec should log params and response', async () => {
+      await req.exec().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+    it('execFullResponse should log params and response', async () => {
+      await req.execFullResponse().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
   })
 })

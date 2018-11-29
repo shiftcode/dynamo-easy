@@ -9,7 +9,9 @@ import {
   INDEX_ACTIVE_CREATED_AT,
   ModelWithABunchOfIndexes,
   ModelWithCustomMapperForSortKeyModel,
+  SimpleWithPartitionKeyModel,
 } from '../../../../test/models'
+import { updateDynamoEasyConfig } from '../../../config'
 import { DynamoRx } from '../../dynamo-rx'
 import { attribute } from '../../expression'
 import { QueryRequest } from './query.request'
@@ -119,4 +121,37 @@ describe('query request', () => {
   //     querySpy = spyOn(dynamoRx, 'query').and.callThrough()
   //   })
   // })
+
+
+  describe('logger', () => {
+    const sampleResponse: QueryOutput = { Items: [] }
+    let logReceiver: jasmine.Spy
+    let querySpy: jasmine.Spy
+    let req: QueryRequest<SimpleWithPartitionKeyModel>
+
+    beforeEach(() => {
+      logReceiver = jasmine.createSpy()
+      querySpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver })
+      req = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
+      req.wherePartitionKey('id')
+    })
+
+    it('exec should log params and response', async () => {
+      await req.exec().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+    it('execFullResponse should log params and response', async () => {
+      await req.execFullResponse().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+  })
 })

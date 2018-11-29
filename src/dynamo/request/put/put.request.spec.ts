@@ -1,6 +1,8 @@
-import { PutItemInput } from 'aws-sdk/clients/dynamodb'
+import { PutItemInput, PutItemOutput } from 'aws-sdk/clients/dynamodb'
+import { of } from 'rxjs'
 import { getTableName } from '../../../../test/helper'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
+import { updateDynamoEasyConfig } from '../../../config'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {
@@ -68,5 +70,41 @@ describe('put request', () => {
       expect(params.ExpressionAttributeNames).toBeUndefined()
       expect(params.ExpressionAttributeValues).toBeUndefined()
     })
+  })
+
+  describe('logger', () => {
+    const sampleResponse: PutItemOutput = { Attributes: undefined }
+    let logReceiver: jasmine.Spy
+    let putItemSpy: jasmine.Spy
+    let req: PutRequest<SimpleWithPartitionKeyModel>
+
+    const jsItem: SimpleWithPartitionKeyModel = {
+      id: 'id',
+      age: 0,
+    }
+
+    beforeEach(() => {
+      logReceiver = jasmine.createSpy()
+      putItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver })
+      req = new PutRequest(<any>{ putItem: putItemSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), jsItem)
+    })
+
+    it('exec should log params and response', async () => {
+      await req.exec().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+    it('execFullResponse should log params and response', async () => {
+      await req.execFullResponse().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
   })
 })

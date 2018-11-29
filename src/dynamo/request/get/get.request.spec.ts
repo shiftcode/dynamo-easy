@@ -82,9 +82,9 @@ describe('GetRequest', () => {
   })
 
   describe('logger', () => {
+    const sampleResponse: GetItemOutput = { Item: undefined }
     let logReceiverSpy: jasmine.Spy
     let getItemSpy: jasmine.Spy
-    const sampleResponse: GetItemOutput = { Item: undefined }
     let req: GetRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
