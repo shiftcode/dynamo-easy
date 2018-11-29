@@ -1,4 +1,5 @@
 import { EMPTY } from 'rxjs'
+import { SimpleWithPartitionKeyModel } from '../../test/models'
 import { updateDynamoEasyConfig } from '../config'
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
@@ -6,6 +7,16 @@ import { updateDynamoEasyConfig } from '../config'
 import { Model } from '../decorator/impl'
 import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
 import { DynamoStore } from './dynamo-store'
+import {
+  BatchGetSingleTableRequest,
+  DeleteRequest,
+  GetRequest,
+  PutRequest,
+  QueryRequest,
+  ScanRequest,
+  UpdateRequest,
+} from './request'
+import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
 
 @Model()
 class DynamoStoreModel {}
@@ -59,6 +70,33 @@ describe('dynamo store', () => {
       new DynamoStore(DynamoStoreModel)
       expect(logReceiverSpy).toHaveBeenCalled()
     })
+  })
+
+  describe('should create request objects', () => {
+    let store: DynamoStore<SimpleWithPartitionKeyModel>
+    beforeEach(() => store = new DynamoStore(SimpleWithPartitionKeyModel))
+
+    it('put', () => expect(store.put({ id: 'id', age: 0 }) instanceof PutRequest).toBeTruthy())
+    it('get', () => expect(store.get('id') instanceof GetRequest).toBeTruthy())
+    it('update', () => expect(store.update('id') instanceof UpdateRequest).toBeTruthy())
+    it('delete', () => expect(store.delete('id') instanceof DeleteRequest).toBeTruthy())
+    it('batchWrite', () => expect(store.batchWrite() instanceof BatchWriteSingleTableRequest).toBeTruthy())
+    it('scan', () => expect(store.scan() instanceof ScanRequest).toBeTruthy())
+    it('query', () => expect(store.query() instanceof QueryRequest).toBeTruthy())
+    it('batchGetItem', () => expect(store.batchGetItem(['id']) instanceof BatchGetSingleTableRequest).toBeTruthy())
+  })
+
+  describe('should enable custom requests', () => {
+    const makeRequestSpy = jasmine.createSpy().and.returnValue(EMPTY)
+    const store = new DynamoStore(SimpleWithPartitionKeyModel)
+    Object.assign(store, { dynamoRx: { makeRequest: makeRequestSpy } })
+    store.makeRequest('updateTimeToLive', {})
+    expect(makeRequestSpy).toBeCalled()
+  })
+
+  describe('allow to get dynamodb instance', () => {
+    const store = new DynamoStore(SimpleWithPartitionKeyModel)
+    expect(store.dynamoDb).toBeDefined()
   })
 
 })
