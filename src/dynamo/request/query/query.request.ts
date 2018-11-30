@@ -14,12 +14,10 @@ import {
   RequestConditionFunction,
   RequestSortKeyConditionFunction,
 } from '../../expression/type'
-import { Pageable } from '../../paged'
 import { Request } from '../request.model'
 import { QueryResponse } from './query.response'
 
-export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>>
-  implements Pageable<T, QueryRequest<T>, QueryResponse<T>> {
+export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
