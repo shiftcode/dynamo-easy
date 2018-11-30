@@ -1,8 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": false,
-    "allowJs": true           // allow js to be compiled with ts for jest es2015 module import (lodash-es)
-  }
+    "declaration": false,         /* Generates corresponding '.d.ts' file. */
+    "types": [                    /* Type declaration files to be included in compilation. */
+      "node",
+      "reflect-metadata",
+      "jest"
+    ]
+  },
+  "include": [
+    "src/**/*.spec.ts",
+    "test/**/*"
+  ]
 }
