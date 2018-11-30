@@ -1,3 +1,4 @@
+import {v4 as uuidv4} from 'uuid'
 import { Metadata } from '../decorator/metadata/metadata'
 import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
 import { Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
@@ -16,7 +17,7 @@ import { Binary } from './type/binary.type'
 import { EnumType } from './type/enum.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
-import { typeOf, typeOfFromDb, uuidv4 } from './util'
+import { typeOf, typeOfFromDb } from './util'
 
 const mapperForType: Map<AttributeValueType, MapperForType<any, any>> = new Map()
 
