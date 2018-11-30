@@ -1,5 +1,4 @@
 import { isNumber, isString } from 'lodash'
-import {v4} from 'uuid'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
 import { Attribute } from './type/attribute.type'
@@ -251,8 +250,4 @@ export function typeName(type: any): 'Null' | 'Undefined' | string {
   }
 
   throw new Error(`was not able to resolve type name for type ${type}`)
-}
-
-export function uuidv4() {
-  return v4()
 }
