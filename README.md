@@ -17,19 +17,23 @@ Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 # Get Started
 
-## Metadata Reflection API
+## Prerequisite
+
+### Typescript Metadata
+
+#### Reflection API
 
 > ⚠ The reflect-metadata polyfill should be imported only once in your entire application because the Reflect object is 
 mean to be a global singleton.
 
-Required always. Use reflect-metadata as polyfill.
+Install the reflect-metadata polyfill.
 
 ```
 npm install reflect-metadata --save
 ```
 
 The type definitions for reflect-metadata are included in the npm package. 
-You need to add the following reference to the types field in your tsconfig.json:
+You need to add the following reference to the types field in your [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types):
 
 ```
 "types": ["reflect-metadata"]
@@ -41,7 +45,19 @@ Finally, import reflect-metadata in some entry file in your application.
 import "reflect-metadata"
 ```
 
+#### Decorators
+
+
+We need to enable the two experimental features to work with decorators, add this to your tsconfig.json:
+
+```
+"experimentalDecorators": true
+"emitDecoratorMetadata": true
+```
+
+#### Other
 Also make sure to install the other peer dependencies of @shiftcoders/dynamo-easy.
+
 
 ## First Sample
 
@@ -84,11 +100,6 @@ dynamoStore.scan()
 
 # Decorators
 Decorators are used to add some metadata to our model classes, relevant to our javascript-to-dynamo mapper.
-
-This is an experimental feature and requires to set the following typescript compiler options:
- 
-- "experimentalDecorators": true
-- "emitDecoratorMetadata": true
 
 Additionally we rely on the reflect-metadata (https://www.npmjs.com/package/reflect-metadata) library for reflection api.
 
