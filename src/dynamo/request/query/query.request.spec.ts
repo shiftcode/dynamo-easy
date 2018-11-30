@@ -1,7 +1,7 @@
 // tslint:disable:no-non-null-assertion
 
-import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable, of } from 'rxjs'
+import { QueryOutput } from 'aws-sdk/clients/dynamodb'
+import { of } from 'rxjs'
 import { getTableName } from '../../../../test/helper'
 import {
   ComplexModel,
@@ -9,18 +9,16 @@ import {
   INDEX_ACTIVE_CREATED_AT,
   ModelWithABunchOfIndexes,
   ModelWithCustomMapperForSortKeyModel,
+  SimpleWithPartitionKeyModel,
 } from '../../../../test/models'
-import { DynamoRx } from '../../dynamo-rx'
+import { updateDynamoEasyConfig } from '../../../config'
+import { Attributes } from '../../../mapper'
 import { attribute } from '../../expression'
 import { QueryRequest } from './query.request'
 
-export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
-  query(params: QueryInput): Observable<QueryOutput> {
-    return of({})
-  },
-}
-
 describe('query request', () => {
+  let querySpy: jasmine.Spy
+
   describe('defines correct params', () => {
     let request: QueryRequest<ComplexModel>
 
@@ -109,14 +107,101 @@ describe('query request', () => {
     })
   })
 
-  // describe('calls endpoint with correct params', () => {
-  //   const dynamoRx: DynamoRx = DYNAMO_RX_MOCK as DynamoRx
-  //   let querySpy: jasmine.Spy
-  //   let request: QueryRequest<ComplexModel>
-  //
-  //   beforeEach(() => {
-  //     request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
-  //     querySpy = spyOn(dynamoRx, 'query').and.callThrough()
-  //   })
-  // })
+  describe('scan direction', () => {
+    let req: QueryRequest<SimpleWithPartitionKeyModel>
+    beforeEach(() => req = new QueryRequest(<any>null, SimpleWithPartitionKeyModel, 'tableName'))
+    it('ascending', () => {
+      req.ascending()
+      expect(req.params.ScanIndexForward).toBeTruthy()
+    })
+    it('descending', () => {
+      req.descending()
+      expect(req.params.ScanIndexForward).toBeFalsy()
+    })
+  })
+
+  describe('exec functions', () => {
+    let queryRequest: QueryRequest<SimpleWithPartitionKeyModel>
+    const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 15 }
+    const dbItem: Attributes<SimpleWithPartitionKeyModel> = {
+      id: { S: `${jsItem.id}` },
+      age: { N: `${jsItem.age}` },
+    }
+    const queryOutput: QueryOutput = {
+      Count: 2,
+      Items: [dbItem, dbItem],
+    }
+    beforeEach(() => {
+      querySpy = jasmine.createSpy().and.returnValue(of(queryOutput))
+      queryRequest = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel, 'tableName')
+      queryRequest.wherePartitionKey('myId')
+    })
+
+    it('execFullResponse', async () => {
+      const res = await queryRequest.execFullResponse().toPromise()
+      expect(res).toEqual({ ...queryOutput, Items: [jsItem, jsItem] })
+    })
+
+    it('execNoMap', async () => {
+      const res = await queryRequest.execNoMap().toPromise()
+      expect(res).toEqual(queryOutput)
+    })
+
+    it('exec', async () => {
+      const res = await queryRequest.exec().toPromise()
+      expect(res).toEqual([jsItem, jsItem])
+    })
+
+    it('execSingle', async () => {
+      const res = await queryRequest.execSingle().toPromise()
+      expect(querySpy).toHaveBeenCalled()
+      expect(querySpy.calls.mostRecent().args[0]).toBeDefined()
+      expect(querySpy.calls.mostRecent().args[0].Limit).toBe(1)
+      expect(res).toEqual(jsItem)
+    })
+
+    it('execCount', async () => {
+      const res = await queryRequest.execCount().toPromise()
+      expect(querySpy).toHaveBeenCalled()
+      expect(querySpy.calls.mostRecent().args[0]).toBeDefined()
+      expect(querySpy.calls.mostRecent().args[0].Select).toBe('COUNT')
+      expect(res).toBe(queryOutput.Count)
+    })
+
+    it('execFetchAll', async () => {
+      const res = await queryRequest.execFetchAll().toPromise()
+      expect(res).toEqual([jsItem, jsItem])
+    })
+  })
+
+  describe('logger', () => {
+    const sampleResponse: QueryOutput = { Items: [] }
+    let logReceiver: jasmine.Spy
+    let req: QueryRequest<SimpleWithPartitionKeyModel>
+
+    beforeEach(() => {
+      logReceiver = jasmine.createSpy()
+      querySpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver })
+      req = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
+      req.wherePartitionKey('id')
+    })
+
+    it('exec should log params and response', async () => {
+      await req.exec().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+    it('execFullResponse should log params and response', async () => {
+      await req.execFullResponse().toPromise()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+  })
 })
