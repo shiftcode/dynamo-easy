@@ -77,6 +77,4 @@ describe('dynamo rx', () => {
     expect(dynamoRx.dynamoDb.config.credentials).toBe(credentials)
   })
 
-  xit('should use the given aws region', () => {})
-
 })

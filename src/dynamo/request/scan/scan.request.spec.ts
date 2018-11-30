@@ -86,7 +86,7 @@ describe('scan request', () => {
 
     it('execSingle', async () => {
       const res = await scanRequest.execSingle().toPromise()
-      // fixme
+      // todo: uncomment when todo in scanRequest::execSingle was done
       // expect(scanSpy).toHaveBeenCalled()
       // expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
       // expect(scanSpy.calls.mostRecent().args[0].Limit).toBe(1)

@@ -66,6 +66,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
   }
 
   execSingle(): Observable<T | null> {
+    // todo: add Limit=1 to params
     delete this.params.Select
     this.logger.debug('single request', this.params)
     return this.dynamoRx.scan(this.params).pipe(

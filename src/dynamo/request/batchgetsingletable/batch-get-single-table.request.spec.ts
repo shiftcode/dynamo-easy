@@ -2,11 +2,7 @@ import { of } from 'rxjs'
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression
 import { getTableName } from '../../../../test/helper'
-import {
-  Organization,
-  SimpleWithCompositePartitionKeyModel,
-  SimpleWithPartitionKeyModel,
-} from '../../../../test/models'
+import { Organization, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { BatchGetSingleTableRequest } from './batch-get-single-table.request'
 
@@ -18,24 +14,12 @@ describe('batch get', () => {
       expect(() => new BatchGetSingleTableRequest(<any>null, <any>null, 'tableName', [])).toThrow()
     })
 
-    xit('should throw when a class without metadata was given', () => {
-      class NoModelClass {}
-
-      expect(() => new BatchGetSingleTableRequest(<any>null, NoModelClass, 'tableName', [])).toThrow()
-    })
-
     it('should throw when adding a key without partition key', () => {
       expect(() => {
         new BatchGetSingleTableRequest(<any>null, SimpleWithPartitionKeyModel, 'tableName', [{}])
       }).toThrow()
       expect(() => {
         new BatchGetSingleTableRequest(<any>null, SimpleWithPartitionKeyModel, 'tableName', [undefined])
-      }).toThrow()
-    })
-
-    xit('should throw when sort key is missing', () => {
-      expect(() => {
-        new BatchGetSingleTableRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'tableName', [{ partitionKey: 'aKey' }])
       }).toThrow()
     })
 

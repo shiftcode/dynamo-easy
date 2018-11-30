@@ -72,7 +72,6 @@ export class Metadata<T> {
    * @throws Throws an error if an indexName was delivered but no index was found for given name or the found index has no sort key defined
    */
   getSortKey(indexName?: string): keyof T | null {
-    // todo: is this ok?! it returns null when no sortKey is defined but throws when no sortKey when index was given
     if (indexName) {
       const index = this.getIndex(indexName)
       if (index) {

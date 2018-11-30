@@ -107,17 +107,6 @@ describe('query request', () => {
     })
   })
 
-  // describe('calls endpoint with correct params', () => {
-  //   const dynamoRx: DynamoRx = DYNAMO_RX_MOCK as DynamoRx
-  //   let querySpy: jasmine.Spy
-  //   let request: QueryRequest<ComplexModel>
-  //
-  //   beforeEach(() => {
-  //     request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
-  //     querySpy = spyOn(dynamoRx, 'query').and.callThrough()
-  //   })
-  // })
-
   describe('scan direction', () => {
     let req: QueryRequest<SimpleWithPartitionKeyModel>
     beforeEach(() => req = new QueryRequest(<any>null, SimpleWithPartitionKeyModel, 'tableName'))
