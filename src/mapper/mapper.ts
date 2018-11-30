@@ -141,7 +141,7 @@ function testForKey<T>(p: PropertyMetadata<T>): p is PropertyMetadata<T> & { key
  * returns the function for the given ModelConstructor to create the AttributeMap with HASH (and RANGE) Key of a given item. used to delete items
  * @param modelConstructor
  */
-export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: T) => Attributes<T> {
+export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: Partial<T>) => Attributes<T> {
   const metadata = metadataForClass(modelConstructor)
   const properties = metadata.modelOptions.properties
   if (!properties) {
@@ -150,7 +150,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
 
   const keyProperties = properties.filter(testForKey)
 
-  return (item: T) =>
+  return (item: Partial<T>) =>
     keyProperties.reduce(
       (key, propMeta) => {
         const propertyValue = getPropertyValue(item, propMeta.name)

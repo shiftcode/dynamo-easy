@@ -14,12 +14,10 @@ import {
   RequestConditionFunction,
   RequestSortKeyConditionFunction,
 } from '../../expression/type'
-import { Pageable } from '../../paged'
 import { Request } from '../request.model'
 import { QueryResponse } from './query.response'
 
-export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>>
-  implements Pageable<T, QueryRequest<T>, QueryResponse<T>> {
+export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
@@ -137,6 +135,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   }
 
   execSingle(): Observable<T | null> {
+    // fixme, copy params, don't add limit on member (too implicit, --> request instance can't be reused to fetch many)
     this.limit(1)
     this.logger.debug('single request', this.params)
     return this.dynamoRx.query(this.params).pipe(

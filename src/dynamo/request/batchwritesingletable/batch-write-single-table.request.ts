@@ -20,6 +20,7 @@ export class BatchWriteSingleTableRequest<T> {
     }
     return this.keyFn
   }
+
   private keyFn: any
 
   readonly dynamoRx: DynamoRx
@@ -85,6 +86,7 @@ export class BatchWriteSingleTableRequest<T> {
     )
   }
 
+  // fixme backoff time is resetted for every request.. :/
   /**
    *
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
@@ -92,18 +94,15 @@ export class BatchWriteSingleTableRequest<T> {
    */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = 1000): Observable<void> {
     this.logger.debug('starting batchWriteItem')
-    let rBoT = backoffTimer()
-    let backoffTime = 0
+    const rBoT = backoffTimer()
     return this.execNextBatch().pipe(
       mergeMap((r: BatchWriteSingleTableResponse) => {
-        if (!r.capacityExceeded) {
-          rBoT = backoffTimer()
-          backoffTime = 0
-        } else {
-          backoffTime = rBoT.next().value * throttleTimeSlot
+        if (r.capacityExceeded) {
+          const backoffTime = rBoT.next().value * throttleTimeSlot
           this.logger.info(`wait ${backoffTime} ms until next request`, { backoffTime })
+          return of(r).pipe(delay(backoffTime))
         }
-        return of(r).pipe(delay(backoffTime))
+        return of(r)
       }),
       mergeMap((r: BatchWriteSingleTableResponse) => {
         if (r.remainingItems > 0) {

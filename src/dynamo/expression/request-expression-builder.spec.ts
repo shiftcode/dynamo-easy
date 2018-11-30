@@ -1,8 +1,16 @@
+import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
+import { Observable, of } from 'rxjs'
 import { getTableName } from '../../../test/helper'
 import { Organization } from '../../../test/models'
+import { DynamoRx } from '../dynamo-rx'
 import { QueryRequest } from '../request'
-import { DYNAMO_RX_MOCK } from '../request/query/query.request.spec'
 import { addCondition, addPartitionKeyCondition, addSortKeyCondition } from './request-expression-builder'
+
+const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
+  query(params: QueryInput): Observable<QueryOutput> {
+    return of({})
+  },
+}
 
 describe('request expression builder', () => {
   describe('adds condition expression to request', () => {
