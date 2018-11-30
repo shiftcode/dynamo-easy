@@ -10,12 +10,10 @@ import { and } from '../../expression'
 import { addExpression } from '../../expression/param-util'
 import { addCondition } from '../../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../../expression/type'
-import { Pageable } from '../../paged'
 import { Request } from '../request.model'
 import { ScanResponse } from './scan.response'
 
-export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanResponse<T>>
-  implements Pageable<T, ScanRequest<T>, ScanResponse<T>> {
+export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanResponse<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {

@@ -1,6 +1,5 @@
 export * from './batchget'
 export * from './expression'
-export * from './paged'
 export * from './request'
 export * from './dynamo-rx'
 export * from './dynamo-store'
