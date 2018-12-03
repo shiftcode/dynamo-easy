@@ -46,7 +46,7 @@
     "@commitlint/prompt-cli": "^7.2.1",
     "@types/jest": "^23.3.1",
     "@types/lodash": "^4.14.116",
-    "@types/node": "^8.0.26",
+    "@types/node": "^10.12.12",
     "@types/reflect-metadata": "^0.1.0",
     "@types/uuid": "^3.4.1",
     "aws-sdk": "^2.286.1",
