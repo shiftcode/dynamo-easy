@@ -21,7 +21,7 @@ export abstract class BaseRequest<
   readonly metadata: Metadata<T>
   readonly abstract params: I
 
-  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
+  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     this.dynamoRx = dynamoRx
 
     if (modelClazz === null || modelClazz === undefined) {

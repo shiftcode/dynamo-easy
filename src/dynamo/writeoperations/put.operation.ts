@@ -10,10 +10,9 @@ export class PutOperation<T> extends WriteOperation<T, PutOperationParams<T>, Pu
 
   constructor(
     modelClazz: ModelConstructor<T>,
-    tableName: string,
     item: T,
   ) {
-    super(modelClazz, tableName)
+    super(modelClazz)
     this.params.Item = toDb(item, this.modelClazz)
   }
 

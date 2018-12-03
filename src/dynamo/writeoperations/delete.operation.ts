@@ -8,11 +8,10 @@ export class DeleteOperation<T> extends WriteOperation<T, DeleteOperationParams<
 
   constructor(
     modelClazz: ModelConstructor<T>,
-    tableName: string,
     partitionKey: any,
     sortKey?: any,
   ) {
-    super(modelClazz, tableName)
+    super(modelClazz)
 
     const partitionKeyProp = this.metadata.getPartitionKey()
 

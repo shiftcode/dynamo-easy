@@ -13,8 +13,8 @@ import { QueryResponse } from './query.response'
 export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+    super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.QueryRequest', modelClazz)
   }
 

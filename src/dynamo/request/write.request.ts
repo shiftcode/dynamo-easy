@@ -18,8 +18,8 @@ export abstract class WriteRequest<R extends BaseRequest<T, I>,
   I extends DeleteItemInput | PutItemInput | UpdateItemInput> extends BaseRequest<T, I> {
 
 
-  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
-    super(dynamoRx, modelClazz, tableName)
+  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+    super(dynamoRx, modelClazz)
   }
 
   returnConsumedCapacity(level: ReturnConsumedCapacity): R {

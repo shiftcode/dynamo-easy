@@ -1,5 +1,4 @@
 import { of } from 'rxjs'
-import { getTableName } from '../../../test/helper'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { BaseRequest } from './base.request'
@@ -12,7 +11,7 @@ describe('base request', () => {
       }
 
       constructor(modelClazz: ModelConstructor<T>) {
-        super(<any>null, modelClazz, getTableName(modelClazz))
+        super(<any>null, modelClazz)
       }
 
       exec() {

@@ -6,12 +6,8 @@ import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, fromDb } from '../../mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../default-session-validity-ensurer.const'
-import { DEFAULT_TABLE_NAME_RESOLVER } from '../default-table-name-resolver.const'
 import { DynamoRx } from '../dynamo-rx'
-import { REGEX_TABLE_NAME } from '../request/regex'
-import { SessionValidityEnsurer } from '../session-validity-ensurer.type'
-import { TableNameResolver } from '../table-name-resolver.type'
+import { getTableName } from '../get-table-name.function'
 import { BatchGetFullResponse } from './batch-get-full.response'
 import { batchGetItemsFetchAll } from './batch-get-utils'
 import { BatchGetResponse } from './batch-get.response'
@@ -25,11 +21,8 @@ export class BatchGetRequest {
   readonly params: DynamoDB.BatchGetItemInput
   private itemCounter = 0
 
-  constructor(
-    private tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
-  ) {
-    this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
+  constructor() {
+    this.dynamoRx = new DynamoRx()
     this.params = {
       RequestItems: {},
     }
@@ -47,14 +40,14 @@ export class BatchGetRequest {
    */
   forModel<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>, consistentRead = false): BatchGetRequest {
 
-    // check if table was already used in this request
-    const tableName = this.getTableName(modelClazz, this.tableNameResolver)
-    if (this.tables.has(tableName)) { throw new Error('table name already exists, please provide all the keys for the same table at once') }
-    this.tables.set(tableName, modelClazz)
-
     // check if modelClazz is really an @Model() decorated class
     const metadata = metadataForClass(modelClazz)
     if (!metadata.modelOptions) { throw new Error('given ModelConstructor has no @Model decorator')}
+
+    // check if table was already used in this request
+    const tableName = getTableName(metadata)
+    if (this.tables.has(tableName)) { throw new Error('table name already exists, please provide all the keys for the same table at once') }
+    this.tables.set(tableName, modelClazz)
 
     // check if keys to add do not exceed max count
     if (this.itemCounter + keys.length > MAX_REQUEST_ITEM_COUNT) { throw new Error(`you can request at max ${MAX_REQUEST_ITEM_COUNT} items per request`)}
@@ -69,16 +62,6 @@ export class BatchGetRequest {
     return this
   }
 
-  private getTableName(modelClazz: ModelConstructor<any>, tableNameResolver: TableNameResolver) {
-    const tableName = tableNameResolver(metadataForClass(modelClazz).modelOptions.tableName)
-    if (!REGEX_TABLE_NAME.test(tableName)) {
-      throw new Error(
-        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long',
-      )
-    }
-
-    return tableName
-  }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput): BatchGetFullResponse => {
     let Responses: BatchGetResponse = {}

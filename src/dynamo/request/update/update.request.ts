@@ -19,16 +19,10 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, DynamoDB
     return this.operation.params
   }
 
-  constructor(
-    dynamoRx: DynamoRx,
-    modelClazz: ModelConstructor<T>,
-    tableName: string,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
-    this.operation = new UpdateOperation(modelClazz, tableName, partitionKey, sortKey)
+    this.operation = new UpdateOperation(modelClazz, partitionKey, sortKey)
   }
 
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {

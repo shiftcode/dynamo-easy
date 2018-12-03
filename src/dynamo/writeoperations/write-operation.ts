@@ -4,6 +4,7 @@ import { and } from '../expression/logical-operator'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
+import { getTableName } from '../get-table-name.function'
 import { ConditionalParamsHost } from '../operation-params.type'
 import { WriteOperationParams } from './write-operation-params.type'
 
@@ -15,7 +16,7 @@ export abstract class WriteOperation<T,
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>
 
-  protected constructor(modelClazz: ModelConstructor<T>, tableName: string) {
+  protected constructor(modelClazz: ModelConstructor<T>) {
     if (!modelClazz) {
       throw new Error(`please provide the model class`)
     }
@@ -26,11 +27,8 @@ export abstract class WriteOperation<T,
       throw new Error('the given model class has no model decorator')
     }
 
-    if (!tableName) {
-      throw new Error(`please provide the table name for the given model class`)
-    }
     this.params = <I>{
-      TableName: tableName,
+      TableName: getTableName(this.metadata),
     }
   }
 

@@ -9,6 +9,7 @@ import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
 import { DynamoRx } from '../../dynamo-rx'
+import { getTableName } from '../../get-table-name.function'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
 const MAX_REQUEST_ITEM_COUNT = 100
@@ -24,7 +25,7 @@ export class BatchGetSingleTableRequest<T> {
 
   readonly metadata: Metadata<T>
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: Array<Partial<T>>) {
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
     this.dynamoRx = dynamoRx
 
@@ -32,13 +33,13 @@ export class BatchGetSingleTableRequest<T> {
       throw new Error("please provide the model clazz for the request, won't work otherwise")
     }
     this.modelClazz = modelClazz
-    this.tableName = tableName
 
 
     this.metadata = metadataForClass(this.modelClazz)
     if (!this.metadata.modelOptions) {
       throw new Error('given ModelConstructor has no @Model decorator')
     }
+    this.tableName = getTableName(this.metadata)
 
     if (keys.length > MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`you can request at max ${MAX_REQUEST_ITEM_COUNT} items per request`)

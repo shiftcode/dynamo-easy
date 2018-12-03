@@ -1,13 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { tap } from 'rxjs/operators'
-import { metadataForClass } from '../decorator/metadata'
 import { createLogger, Logger } from '../logger/logger'
 import { ModelConstructor } from '../model'
-import { DEFAULT_SESSION_VALIDITY_ENSURER } from './default-session-validity-ensurer.const'
-import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
 import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoRx } from './dynamo-rx'
+import { getTableName } from './get-table-name.function'
 import {
   BatchGetSingleTableRequest,
   DeleteRequest,
@@ -18,9 +16,6 @@ import {
   UpdateRequest,
 } from './request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
-import { REGEX_TABLE_NAME } from './request/regex'
-import { SessionValidityEnsurer } from './session-validity-ensurer.type'
-import { TableNameResolver } from './table-name-resolver.type'
 
 export class DynamoStore<T> {
   private readonly logger: Logger
@@ -30,19 +25,10 @@ export class DynamoStore<T> {
 
   constructor(
     private modelClazz: ModelConstructor<T>,
-    tableNameResolver: TableNameResolver = DEFAULT_TABLE_NAME_RESOLVER,
-    sessionValidityEnsurer: SessionValidityEnsurer = DEFAULT_SESSION_VALIDITY_ENSURER,
   ) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
-    this.dynamoRx = new DynamoRx(sessionValidityEnsurer)
-    const tableName = tableNameResolver(metadataForClass(this.modelClazz).modelOptions.tableName)
-    if (!REGEX_TABLE_NAME.test(tableName)) {
-      throw new Error(
-        'make sure the table name only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long',
-      )
-    }
-
-    this.tableName = tableName
+    this.dynamoRx = new DynamoRx()
+    this.tableName = getTableName(modelClazz)
     this.logger.debug('instance created')
   }
 
@@ -51,19 +37,19 @@ export class DynamoStore<T> {
   }
 
   put(item: T): PutRequest<T> {
-    return new PutRequest(this.dynamoRx, this.modelClazz, this.tableName, item)
+    return new PutRequest(this.dynamoRx, this.modelClazz, item)
   }
 
   get(partitionKey: any, sortKey?: any): GetRequest<T> {
-    return new GetRequest<T>(this.dynamoRx, this.modelClazz, this.tableName, partitionKey, sortKey)
+    return new GetRequest<T>(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
   }
 
   update(partitionKey: any, sortKey?: any): UpdateRequest<T> {
-    return new UpdateRequest(this.dynamoRx, this.modelClazz, this.tableName, partitionKey, sortKey)
+    return new UpdateRequest(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
   }
 
   delete(partitionKey: any, sortKey?: any): DeleteRequest<T> {
-    return new DeleteRequest(this.dynamoRx, this.modelClazz, this.tableName, partitionKey, sortKey)
+    return new DeleteRequest(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
   }
 
   /**
@@ -72,15 +58,15 @@ export class DynamoStore<T> {
    * create an instance of BatchWriteItemInput and use store.makeRequest with it.
    */
   batchWrite(): BatchWriteSingleTableRequest<T> {
-    return new BatchWriteSingleTableRequest<T>(this.dynamoRx, this.modelClazz, this.tableName)
+    return new BatchWriteSingleTableRequest<T>(this.dynamoRx, this.modelClazz)
   }
 
   scan(): ScanRequest<T> {
-    return new ScanRequest<T>(this.dynamoRx, this.modelClazz, this.tableName)
+    return new ScanRequest<T>(this.dynamoRx, this.modelClazz)
   }
 
   query(): QueryRequest<T> {
-    return new QueryRequest(this.dynamoRx, this.modelClazz, this.tableName)
+    return new QueryRequest(this.dynamoRx, this.modelClazz)
   }
 
   /**
@@ -89,7 +75,7 @@ export class DynamoStore<T> {
    * create an instance of BatchGetItemInput and use store.makeRequest with it.
    */
   batchGetItem(keys: any[]): BatchGetSingleTableRequest<T> {
-    return new BatchGetSingleTableRequest(this.dynamoRx, this.modelClazz, this.tableName, keys)
+    return new BatchGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
   }
 
   makeRequest<Z>(operation: DynamoApiOperations, params?: { [key: string]: any }): Observable<Z> {
@@ -97,12 +83,4 @@ export class DynamoStore<T> {
     return this.dynamoRx.makeRequest(operation, params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
-  // Commented because not used at the moment
-  // private createBaseParams(): { TableName: string } {
-  //   const params: { TableName: string } = {
-  //     TableName: this.tableName,
-  //   }
-  //
-  //   return params
-  // }
 }

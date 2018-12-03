@@ -3,6 +3,7 @@ import { Attributes } from '../../mapper'
 import { ModelConstructor } from '../../model'
 import { or } from '../expression/logical-operator'
 import { attribute } from '../expression/logical-operator/attribute.function'
+import { getTableName } from '../get-table-name.function'
 import { WriteOperation } from './write-operation'
 import { WriteOperationParams } from './write-operation-params.type'
 
@@ -12,7 +13,7 @@ interface MyWriteOpertationParams<T> extends WriteOperationParams {
 
 class MyWriteOperation<T> extends WriteOperation<T, MyWriteOpertationParams<T>, MyWriteOperation<T>> {
   constructor(modelClazz: ModelConstructor<T>) {
-    super(modelClazz, 'tableName')
+    super(modelClazz)
   }
 }
 
@@ -43,7 +44,7 @@ describe('write operation', () => {
 
     it('the table name should be written tot the params', () => {
       expect(op.params).toBeDefined()
-      expect(op.params.TableName).toBe('tableName')
+      expect(op.params.TableName).toBe(getTableName(SimpleModel))
     })
   })
 

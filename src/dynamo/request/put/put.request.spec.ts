@@ -1,6 +1,5 @@
 import { PutItemInput, PutItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { PutOperation } from '../../writeoperations'
@@ -8,7 +7,7 @@ import { PutRequest } from './put.request'
 
 describe('put request', () => {
   it('should create put operation', () => {
-    const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), {
+    const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, {
       id: 'myId',
       age: 45,
     })
@@ -19,12 +18,7 @@ describe('put request', () => {
 
   it('should propagate ifNotExists to the putOperation', () => {
     const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-    const request = new PutRequest(
-      <any>null,
-      SimpleWithPartitionKeyModel,
-      getTableName(SimpleWithPartitionKeyModel),
-      item,
-    )
+    const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, item)
     request.ifNotExists()
 
     const params: PutItemInput = request.params
@@ -49,12 +43,7 @@ describe('put request', () => {
       logReceiver = jasmine.createSpy()
       putItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      req = new PutRequest(
-        <any>{ putItem: putItemSpy },
-        SimpleWithPartitionKeyModel,
-        getTableName(SimpleWithPartitionKeyModel),
-        jsItem,
-      )
+      req = new PutRequest(<any>{ putItem: putItemSpy }, SimpleWithPartitionKeyModel, jsItem)
     })
 
     it('exec should log params and response', async () => {

@@ -7,6 +7,7 @@ import { and } from '../expression'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
+import { getTableName } from '../get-table-name.function'
 import { BaseRequest } from './base.request'
 import { QueryRequest } from './query/query.request'
 import { QueryResponse } from './query/query.response'
@@ -22,11 +23,11 @@ export abstract class Request<T,
 
   readonly params: I
 
-  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
-    super(dynamoRx, modelClazz, tableName)
+  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+    super(dynamoRx, modelClazz)
 
     this.params = <any>{
-      TableName: tableName,
+      TableName: getTableName(this.metadata),
     }
 
     this.limit(Request.DEFAULT_LIMIT)

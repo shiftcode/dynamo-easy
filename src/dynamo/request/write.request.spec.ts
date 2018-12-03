@@ -1,5 +1,4 @@
 import { of } from 'rxjs'
-import { getTableName } from '../../../test/helper'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { or } from '../expression/logical-operator'
@@ -11,7 +10,7 @@ describe('write request', () => {
     readonly params: any = {}
 
     constructor(modelClazz: ModelConstructor<T>) {
-      super(<any>null, modelClazz, getTableName(modelClazz))
+      super(<any>null, modelClazz)
     }
 
     exec() {

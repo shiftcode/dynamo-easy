@@ -8,6 +8,7 @@ import { Attribute, Attributes, fromDb, toDbOne } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
+import { getTableName } from '../../get-table-name.function'
 import { BaseRequest } from '../base.request'
 import { GetResponse } from './get.response'
 
@@ -15,14 +16,8 @@ export class GetRequest<T> extends BaseRequest<T, any> {
   private readonly logger: Logger
   readonly params: DynamoDB.GetItemInput
 
-  constructor(
-    dynamoRx: DynamoRx,
-    modelClazz: ModelConstructor<T>,
-    tableName: string,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
 
     const partitionKeyProp = this.metadata.getPartitionKey()
@@ -40,7 +35,7 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     }
 
     this.params = {
-      TableName: tableName,
+      TableName: getTableName(this.metadata),
       Key: keyAttributeMap,
     }
   }

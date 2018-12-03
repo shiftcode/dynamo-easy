@@ -1,10 +1,9 @@
-import { getTableName } from '../../../test/helper'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { DeleteOperation } from './delete.operation'
 
 describe('delete operation', () => {
   it('should create request with key (simple) expression', () => {
-    const delOp = new DeleteOperation(SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), 'myId')
+    const delOp = new DeleteOperation(SimpleWithPartitionKeyModel, 'myId')
     const key = delOp.params.Key
     expect(key).toBeDefined()
     expect(Object.keys(key).length).toBe(1)
@@ -15,7 +14,7 @@ describe('delete operation', () => {
 
   it('should create request with key (composite) expression', () => {
     const now = new Date()
-    const delOp = new DeleteOperation(ComplexModel, 'tableName', 'partitionValue', now)
+    const delOp = new DeleteOperation(ComplexModel, 'partitionValue', now)
     const key = delOp.params.Key
     expect(key).toBeDefined()
     expect(Object.keys(key).length).toBe(2)
@@ -29,6 +28,6 @@ describe('delete operation', () => {
   })
 
   it('should throw for no sort key value', () => {
-    expect(() => new DeleteOperation(ComplexModel, getTableName(ComplexModel), 'partitionValue')).toThrowError()
+    expect(() => new DeleteOperation(ComplexModel, 'partitionValue')).toThrowError()
   })
 })

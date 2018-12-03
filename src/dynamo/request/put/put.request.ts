@@ -15,10 +15,10 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, DynamoDB.PutIt
     return this.operation.params
   }
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, item: T) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, item: T) {
+    super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
-    this.operation = new PutOperation(modelClazz, tableName, item)
+    this.operation = new PutOperation(modelClazz, item)
   }
 
   /**

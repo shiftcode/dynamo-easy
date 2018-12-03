@@ -15,16 +15,10 @@ export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DynamoDB
     return this.operation.params
   }
 
-  constructor(
-    dynamoRx: DynamoRx,
-    modelClazz: ModelConstructor<T>,
-    tableName: string,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
-    this.operation = new DeleteOperation(modelClazz, tableName, partitionKey, sortKey)
+    this.operation = new DeleteOperation(modelClazz, partitionKey, sortKey)
   }
 
   execFullResponse(): Observable<DynamoDB.DeleteItemOutput> {

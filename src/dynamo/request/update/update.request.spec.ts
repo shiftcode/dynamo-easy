@@ -1,19 +1,19 @@
 import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel, UpdateModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { update2 } from '../../expression'
 import { update } from '../../expression/logical-operator/update.function'
+import { getTableName } from '../../get-table-name.function'
 import { UpdateRequest } from './update.request'
 
 describe('update request', () => {
   it('should create updateOperations, with initial params', () => {
     const now = new Date()
-    const request = new UpdateRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'tableNameVal', 'myId', now)
+    const request = new UpdateRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'myId', now)
 
     expect(request.params).toBeDefined()
-    expect(request.params.TableName).toBe('tableNameVal')
+    expect(request.params.TableName).toBe(getTableName(SimpleWithCompositePartitionKeyModel))
     expect(request.params.Key).toEqual({
       id: { S: 'myId' },
       creationDate: { S: now.toISOString() },
@@ -24,7 +24,7 @@ describe('update request', () => {
   it('should delegate all operations to UpdateOperation.operations()', () => {
     const now = new Date()
 
-    const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
+    const request = new UpdateRequest(<any>null, UpdateModel, 'myId', now)
     request.operations(update<UpdateModel>('lastUpdated').set(now))
 
     expect(request.operation.params).toBe(request.params)
@@ -48,12 +48,7 @@ describe('update request', () => {
       logReceiver = jasmine.createSpy()
       updateItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      req = new UpdateRequest(
-        <any>{ updateItem: updateItemSpy },
-        SimpleWithPartitionKeyModel,
-        getTableName(SimpleWithPartitionKeyModel),
-        'id',
-      )
+      req = new UpdateRequest(<any>{ updateItem: updateItemSpy }, SimpleWithPartitionKeyModel, 'id')
       req.operations(update2(SimpleWithPartitionKeyModel, 'age').set(10))
     })
 

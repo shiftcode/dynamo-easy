@@ -1,10 +1,12 @@
 // tslint:disable:no-empty
 
+import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { DateToNumberMapper } from '../mapper/custom'
 import { dynamoEasyConfig } from './dynamo-easy-config'
 import { updateDynamoEasyConfig } from './update-config.function'
 
 describe('updateDynamoEasyConfig', () => {
+  afterEach(resetDynamoEasyConfig)
 
   it('should throw when providing invalid stuff', () => {
     expect(() => updateDynamoEasyConfig({ logReceiver: <any>null })).toThrow()
@@ -25,7 +27,5 @@ describe('updateDynamoEasyConfig', () => {
     })
     expect(dynamoEasyConfig.logReceiver).toBe(myLogReceiver)
     expect(dynamoEasyConfig.dateMapper).toBe(myDateMapper)
-
   })
-
 })

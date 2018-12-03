@@ -7,6 +7,7 @@ import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createToKeyFn, toDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
+import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableResponse } from './batch-write-single-table.response'
 
 const MAX_BATCH_WRITE_ITEMS = 25
@@ -28,7 +29,7 @@ export class BatchWriteSingleTableRequest<T> {
   readonly tableName: string
   readonly itemsToProcess: WriteRequests
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     this.logger = createLogger('dynamo.request.BatchWriteSingleTableRequest', modelClazz)
     this.dynamoRx = dynamoRx
 
@@ -36,7 +37,7 @@ export class BatchWriteSingleTableRequest<T> {
       throw new Error("please provide the model clazz for the request, won't work otherwise")
     }
     this.modelClazz = modelClazz
-    this.tableName = tableName
+    this.tableName = getTableName(modelClazz)
 
     this.itemsToProcess = []
   }

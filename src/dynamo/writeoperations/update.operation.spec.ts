@@ -1,23 +1,23 @@
-import { getTableName } from '../../../test/helper'
 import { Address, SimpleWithCompositePartitionKeyModel, UpdateModel } from '../../../test/models'
 import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world'
 import { not, update2 } from '../expression/logical-operator'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { update } from '../expression/logical-operator/update.function'
+import { getTableName } from '../get-table-name.function'
 import { UpdateOperation } from './update.operation'
 
 describe('update operation', () => {
   describe('constructor', () => {
     it('should throw when no sortKey was given but necessary', () => {
-      expect(() => new UpdateOperation(SimpleWithCompositePartitionKeyModel, 'tableNameVal', 'myId')).toThrow()
+      expect(() => new UpdateOperation(SimpleWithCompositePartitionKeyModel, 'myId')).toThrow()
     })
 
     it('should create correct initial params', () => {
       const now = new Date()
-      const updateOp = new UpdateOperation(SimpleWithCompositePartitionKeyModel, 'tableNameVal', 'myId', now)
+      const updateOp = new UpdateOperation(SimpleWithCompositePartitionKeyModel, 'myId', now)
 
       expect(updateOp.params).toBeDefined()
-      expect(updateOp.params.TableName).toBe('tableNameVal')
+      expect(updateOp.params.TableName).toBe(getTableName(SimpleWithCompositePartitionKeyModel))
       expect(updateOp.params.Key).toEqual({
         id: { S: 'myId' },
         creationDate: { S: now.toISOString() },
@@ -30,7 +30,7 @@ describe('update operation', () => {
       it('incrementBy', () => {
         const now = new Date()
 
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
         updateOp.operations(update<UpdateModel>('counter').incrementBy(5))
 
         expect(updateOp.params.UpdateExpression).toBe('SET #counter = #counter + :counter')
@@ -41,7 +41,7 @@ describe('update operation', () => {
       it('decrementBy', () => {
         const now = new Date()
 
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
         updateOp.operations(update<UpdateModel>('counter').decrementBy(5))
 
         expect(updateOp.params.UpdateExpression).toBe('SET #counter = #counter - :counter')
@@ -52,7 +52,7 @@ describe('update operation', () => {
       it('set', () => {
         const now = new Date()
 
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('lastUpdated').set(now))
 
@@ -68,7 +68,7 @@ describe('update operation', () => {
       it('set (nested map)', () => {
         const now = new Date()
 
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update('info.details').set('the new detail'))
 
@@ -83,7 +83,7 @@ describe('update operation', () => {
 
       it('set (list)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update('addresses[1]').set({ street: 'Bond Street', place: 'London', zip: 25650 }))
 
@@ -108,7 +108,7 @@ describe('update operation', () => {
 
       it('append to list simple (default position)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('numberValues').appendToList([5]))
 
@@ -123,7 +123,7 @@ describe('update operation', () => {
 
       it('append to list (default position)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
         updateOp.operations(update<UpdateModel>('addresses').appendToList([newAddress]))
@@ -153,7 +153,7 @@ describe('update operation', () => {
 
       it('append to list (position = END)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
         updateOp.operations(update<UpdateModel>('addresses').appendToList([newAddress], 'END'))
@@ -183,7 +183,7 @@ describe('update operation', () => {
 
       it('append to list (position = START)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
         updateOp.operations(update<UpdateModel>('addresses').appendToList([newAddress], 'START'))
@@ -213,7 +213,7 @@ describe('update operation', () => {
 
       it('remove', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('counter').remove(), update<UpdateModel>('name').remove())
 
@@ -224,7 +224,7 @@ describe('update operation', () => {
 
       it('remove from list at (single)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('addresses').removeFromListAt(2))
 
@@ -235,7 +235,7 @@ describe('update operation', () => {
 
       it('remove from list at (many)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('addresses').removeFromListAt(2, 5, 6))
 
@@ -246,7 +246,7 @@ describe('update operation', () => {
 
       it('add (multiple arr)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').add(['newTopic', 'newTopic2']))
 
@@ -261,7 +261,7 @@ describe('update operation', () => {
 
       it('add (multiple set)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').add(new Set(['newTopic', 'newTopic2'])))
 
@@ -276,7 +276,7 @@ describe('update operation', () => {
 
       it('add (multiple vararg)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').add('newTopic', 'newTopic2'))
 
@@ -291,7 +291,7 @@ describe('update operation', () => {
 
       it('add (single)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').add('newTopic'))
 
@@ -306,7 +306,7 @@ describe('update operation', () => {
 
       it('remove from set (single)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').removeFromSet('newTopic'))
 
@@ -321,7 +321,7 @@ describe('update operation', () => {
 
       it('remove from set (multiple vararg)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').removeFromSet('newTopic', 'newTopic2'))
 
@@ -336,7 +336,7 @@ describe('update operation', () => {
 
       it('remove from set (multiple arr)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').removeFromSet(['newTopic', 'newTopic2']))
 
@@ -351,7 +351,7 @@ describe('update operation', () => {
 
       it('remove from set (multiple set)', () => {
         const now = new Date()
-        const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+        const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
 
         updateOp.operations(update<UpdateModel>('topics').removeFromSet(new Set(['newTopic', 'newTopic2'])))
 
@@ -370,7 +370,7 @@ describe('update operation', () => {
     it('one type (SET)', () => {
       const now = new Date()
 
-      const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+      const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
       updateOp.operations(update<UpdateModel>('active').set(true), update<UpdateModel>('name').set('newName'))
 
       expect(updateOp.params.UpdateExpression).toBe('SET #active = :active, #name = :name')
@@ -384,7 +384,7 @@ describe('update operation', () => {
     it('mixed types (SET, ADD)', () => {
       const now = new Date()
 
-      const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+      const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
       updateOp.operations(
         update<UpdateModel>('active').set(true),
         update<UpdateModel>('name').set('newName'),
@@ -407,7 +407,7 @@ describe('update operation', () => {
     it('with where clause', () => {
       const now = new Date()
 
-      const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+      const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
       updateOp
         .operations(update<UpdateModel>('active').set(true), update<UpdateModel>('name').set('newName'))
         .onlyIf(not(attribute('topics').contains('otherTopic')))
@@ -429,7 +429,7 @@ describe('update operation', () => {
     it('with name conflicting where clause', () => {
       const now = new Date()
 
-      const updateOp = new UpdateOperation(UpdateModel, getTableName(UpdateModel), 'myId', now)
+      const updateOp = new UpdateOperation(UpdateModel, 'myId', now)
       updateOp
         .operations(
           update<UpdateModel>('active').set(true),
@@ -457,7 +457,7 @@ describe('update operation', () => {
 
   describe('real world scenario', () => {
     it('should create correct update statement', () => {
-      const updateOp = new UpdateOperation(Order, getTableName(Order), new OrderId(5, 2018))
+      const updateOp = new UpdateOperation(Order, new OrderId(5, 2018))
 
       const u1 = update2(Order, 'types').add([FormType.INVOICE])
       const u2 = update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)])

@@ -12,11 +12,10 @@ export class UpdateOperation<T> extends WriteOperation<T, UpdateOperationParams<
 
   constructor(
     modelClazz: ModelConstructor<T>,
-    tableName: string,
     partitionKey: any,
     sortKey?: any,
   ) {
-    super(modelClazz, tableName)
+    super(modelClazz)
 
     const partitionKeyProp = this.metadata.getPartitionKey()
 
