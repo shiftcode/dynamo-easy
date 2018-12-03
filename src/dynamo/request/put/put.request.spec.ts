@@ -2,7 +2,7 @@ import { PutItemInput, PutItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
-import { PutOperation } from '../../writeoperations'
+import { PutOperation } from '../../writeoperations/put.operation'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {

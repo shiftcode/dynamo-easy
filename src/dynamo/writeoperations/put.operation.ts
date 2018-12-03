@@ -1,8 +1,6 @@
-import { hasSortKey } from '../../decorator/metadata'
 import { toDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { attribute } from '../expression/logical-operator'
-import { ConditionExpressionDefinitionFunction } from '../expression/type'
+import { createIfNotExistsCondition } from '../create-if-not-exists-condition.function'
 import { WriteOperation } from './write-operation'
 import { PutOperationParams } from './write-operation-params.type'
 
@@ -22,15 +20,7 @@ export class PutOperation<T> extends WriteOperation<T, PutOperationParams<T>, Pu
    */
   ifNotExists(predicate: boolean = true): PutOperation<T> {
     if (predicate) {
-      const conditionDefFns: ConditionExpressionDefinitionFunction[] = [
-        attribute<T>(this.metadata.getPartitionKey()).attributeNotExists()
-      ]
-
-      if (hasSortKey(this.metadata)) {
-        conditionDefFns.push(attribute<T>(this.metadata.getSortKey()).attributeNotExists())
-      }
-
-      this.onlyIf(...conditionDefFns)
+      this.onlyIf(...createIfNotExistsCondition(this.metadata))
     }
     return this
   }

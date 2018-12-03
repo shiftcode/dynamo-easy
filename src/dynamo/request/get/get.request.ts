@@ -2,10 +2,10 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { hasSortKey } from '../../../decorator/metadata'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attribute, Attributes, fromDb, toDbOne } from '../../../mapper'
+import { Attributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
+import { createKeyAttributes } from '../../create-ket-attributes.function'
 import { DynamoRx } from '../../dynamo-rx'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 import { getTableName } from '../../get-table-name.function'
@@ -19,24 +19,9 @@ export class GetRequest<T> extends BaseRequest<T, any> {
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
-
-    const partitionKeyProp = this.metadata.getPartitionKey()
-
-    const keyAttributeMap = <Attributes<Partial<T>>>{
-      [partitionKeyProp]: toDbOne(partitionKey, this.metadata.forProperty(partitionKeyProp)),
-    }
-
-    if (hasSortKey(this.metadata)) {
-      if (sortKey === null || sortKey === undefined) {
-        throw new Error(`please provide the sort key for attribute ${this.metadata.getSortKey()}`)
-      }
-      const sortKeyProp = this.metadata.getSortKey()
-      keyAttributeMap[sortKeyProp] = <Attribute>toDbOne(sortKey, this.metadata.forProperty(sortKeyProp))
-    }
-
     this.params = {
       TableName: getTableName(this.metadata),
-      Key: keyAttributeMap,
+      Key: createKeyAttributes(this.metadata, partitionKey, sortKey),
     }
   }
 

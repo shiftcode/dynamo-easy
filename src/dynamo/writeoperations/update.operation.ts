@@ -1,7 +1,7 @@
 import { forEach } from 'lodash'
-import { hasSortKey } from '../../decorator/metadata/metadata'
-import { Attribute, Attributes, toDbOne } from '../../mapper'
+import { Attributes } from '../../mapper'
 import { ModelConstructor } from '../../model'
+import { createKeyAttributes } from '../create-ket-attributes.function'
 import { addUpdateExpression } from '../expression/param-util'
 import { Expression, UpdateExpressionDefinitionFunction } from '../expression/type'
 import { SortedUpdateExpressions } from '../request/update/update.request'
@@ -10,31 +10,10 @@ import { UpdateOperationParams } from './write-operation-params.type'
 
 export class UpdateOperation<T> extends WriteOperation<T, UpdateOperationParams<T>, UpdateOperation<T>> {
 
-  constructor(
-    modelClazz: ModelConstructor<T>,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
+  constructor(modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(modelClazz)
-
-    const partitionKeyProp = this.metadata.getPartitionKey()
-
-    const keyAttributeMap = <Attributes<Partial<T>>>{
-      [partitionKeyProp]: toDbOne(partitionKey, this.metadata.forProperty(partitionKeyProp)),
-    }
-
-    if (hasSortKey(this.metadata)) {
-      if (sortKey === null || sortKey === undefined) {
-        throw new Error(`please provide the sort key for attribute ${this.metadata.getSortKey()}`)
-      }
-      const sortKeyProp = this.metadata.getSortKey()
-      keyAttributeMap[sortKeyProp] = <Attribute>toDbOne(sortKey, this.metadata.forProperty(sortKeyProp))
-    }
-
-    this.params.Key = keyAttributeMap
-
+    this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
-
 
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateOperation<T> {
     if (updateDefFns && updateDefFns.length) {

@@ -2,7 +2,7 @@ import { DeleteItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
-import { DeleteOperation } from '../../writeoperations'
+import { DeleteOperation } from '../../writeoperations/delete.operation'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
