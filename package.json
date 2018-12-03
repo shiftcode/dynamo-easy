@@ -48,7 +48,7 @@
     "@types/lodash": "^4.14.116",
     "@types/node": "^8.0.26",
     "@types/uuid": "^3.4.1",
-    "aws-sdk": "^2.286.1",
+    "aws-sdk": "^2.368.0",
     "colors": "^1.1.2",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.5",
@@ -75,7 +75,7 @@
     "uuid": "^3.3.2"
   },
   "peerDependencies": {
-    "aws-sdk": "^2.286.1",
+    "aws-sdk": "^2.368.0",
     "lodash": "^4.17.10",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.0.0",

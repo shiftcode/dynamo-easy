@@ -1,19 +1,12 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { fetchAll } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
-import { and } from '../../expression'
-import { addExpression } from '../../expression/param-util'
-import { addCondition, addSortKeyCondition } from '../../expression/request-expression-builder'
-import {
-  ConditionExpressionDefinitionFunction,
-  RequestConditionFunction,
-  RequestSortKeyConditionFunction,
-} from '../../expression/type'
+import { addSortKeyCondition } from '../../expression/request-expression-builder'
+import { RequestSortKeyConditionFunction } from '../../expression/type'
 import { Request } from '../request.model'
 import { QueryResponse } from './query.response'
 
@@ -23,6 +16,13 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     super(dynamoRx, modelClazz, tableName)
     this.logger = createLogger('dynamo.request.QueryRequest', modelClazz)
+  }
+
+  private mapFromDb = (queryResponse: QueryOutput) => {
+    const response: QueryResponse<T> = <any>{ ...queryResponse }
+    response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
+
+    return response
   }
 
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
@@ -72,18 +72,6 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return addSortKeyCondition(sortKey, this, this.metadata)
   }
 
-  // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
-  // update2.function)
-  whereAttribute(attributePath: keyof T): RequestConditionFunction<QueryRequest<T>> {
-    return addCondition('FilterExpression', <string>attributePath, this, this.metadata)
-  }
-
-  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): QueryRequest<T> {
-    const condition = and(...conditionDefFns)(undefined, this.metadata)
-    addExpression('FilterExpression', condition, this.params)
-    return this
-  }
-
   ascending(): QueryRequest<T> {
     this.params.ScanIndexForward = true
     return this
@@ -94,9 +82,51 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this
   }
 
+  execNoMap(): Observable<QueryOutput> {
+    this.logger.debug('request (noMap)', this.params)
+    return this.dynamoRx.query(this.params).pipe(tap(response => this.logger.debug('response', response)))
+  }
+
+  execFullResponse(): Observable<QueryResponse<T>> {
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.query(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
+      map(this.mapFromDb),
+      tap(response => this.logger.debug('mapped items', response.Items)),
+    )
+  }
+
+  exec(): Observable<T[]> {
+    this.logger.debug('request', this.params)
+    return this.dynamoRx.query(this.params).pipe(
+      tap(response => this.logger.debug('response', response)),
+      map(this.mapFromDb),
+      map(r => r.Items),
+      tap(items => this.logger.debug('mapped items', items)),
+    )
+  }
+
+  execSingle(): Observable<T | null> {
+    const params = {
+      ...this.params,
+      Limit: 1
+    }
+
+    this.logger.debug('single request', params)
+    return this.dynamoRx.query(params)
+      .pipe(
+        tap(response => this.logger.debug('response', response)),
+        map(this.mapFromDb),
+        map(r => r.Items && r.Items.length ? r.Items[0] : null),
+        tap(item => this.logger.debug('mapped item', item)),
+      )
+  }
+
   execCount(): Observable<number> {
-    const params = { ...this.params }
-    params.Select = 'COUNT'
+    const params = {
+      ...this.params,
+      Select: 'COUNT',
+    }
 
     this.logger.debug('count request', params)
     return this.dynamoRx.query(params).pipe(
@@ -106,53 +136,4 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     )
   }
 
-  execFullResponse(): Observable<QueryResponse<T>> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.query(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(queryResponse => {
-        const response: QueryResponse<T> = <any>{ ...queryResponse }
-        response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
-
-        return response
-      }),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
-  }
-
-  exec(): Observable<T[]> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.query(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => (response.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
-  }
-
-  execNoMap(): Observable<QueryOutput> {
-    this.logger.debug('request (noMap)', this.params)
-    return this.dynamoRx.query(this.params).pipe(tap(response => this.logger.debug('response', response)))
-  }
-
-  execSingle(): Observable<T | null> {
-    // fixme, copy params, don't add limit on member (too implicit, --> request instance can't be reused to fetch many)
-    this.limit(1)
-    this.logger.debug('single request', this.params)
-    return this.dynamoRx.query(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => {
-        return response.Items && response.Items.length
-          ? fromDb(<Attributes<T>>response.Items[0], this.modelClazz)
-          : null
-      }),
-      tap(item => this.logger.debug('mapped item', item)),
-    )
-  }
-
-  /**
-   * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
-   */
-  execFetchAll(): Observable<T[]> {
-    return fetchAll(this)
-  }
 }

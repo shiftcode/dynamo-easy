@@ -1,11 +1,6 @@
-import {
-  ExpressionAttributeNameMap,
-  ExpressionAttributeValueMap,
-  QueryInput,
-  ScanInput,
-  UpdateItemInput,
-} from 'aws-sdk/clients/dynamodb'
+import { ExpressionAttributeNameMap, ExpressionAttributeValueMap, UpdateItemInput } from 'aws-sdk/clients/dynamodb'
 import { isEmpty, isString } from 'lodash'
+import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type'
 
@@ -16,7 +11,7 @@ export function addUpdateExpression(updateExpression: Expression, params: Update
 export function addExpression(
   expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression' | 'UpdateExpression',
   condition: Expression,
-  params: QueryInput | ScanInput | UpdateItemInput,
+  params: ConditionalParams,
 ) {
   const nameSafeCondition = resolveAttributeValueNameConflicts(condition, params)
 

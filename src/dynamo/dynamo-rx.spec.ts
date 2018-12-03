@@ -8,7 +8,6 @@ import { DynamoRx } from './dynamo-rx'
 import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 
 describe('dynamo rx', () => {
-  
   describe('should call the validity ensurer before each call and return an observable', () => {
     let dynamoRx: DynamoRx
     let spyValidityEnsurer: SessionValidityEnsurer
@@ -40,6 +39,14 @@ describe('dynamo rx', () => {
     })
     it('batchGetItems', () => {
       expect(dynamoRx.batchGetItems(<any>null) instanceof Observable).toBeTruthy()
+      expect(spyValidityEnsurer).toHaveBeenCalled()
+    })
+    it('transactWriteItem', () => {
+      expect(dynamoRx.transactWriteItems(<any>null) instanceof Observable).toBeTruthy()
+      expect(spyValidityEnsurer).toHaveBeenCalled()
+    })
+    it('transactGetItems', () => {
+      expect(dynamoRx.transactGetItems(<any>null) instanceof Observable).toBeTruthy()
       expect(spyValidityEnsurer).toHaveBeenCalled()
     })
     it('scan', () => {
@@ -76,5 +83,4 @@ describe('dynamo rx', () => {
     dynamoRx.updateAwsConfigCredentials(new Config({ credentials }))
     expect(dynamoRx.dynamoDb.config.credentials).toBe(credentials)
   })
-
 })

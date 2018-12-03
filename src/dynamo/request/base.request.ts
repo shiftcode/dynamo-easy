@@ -17,12 +17,11 @@ export abstract class BaseRequest<
   I extends DeleteItemInput | GetItemInput | PutItemInput | QueryInput | ScanInput | UpdateItemInput
 > {
   readonly dynamoRx: DynamoRx
-  readonly params: I
   readonly modelClazz: ModelConstructor<T>
-
   readonly metadata: Metadata<T>
+  readonly abstract params: I
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
+  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
     this.dynamoRx = dynamoRx
 
     if (modelClazz === null || modelClazz === undefined) {
@@ -30,13 +29,9 @@ export abstract class BaseRequest<
     }
 
     this.modelClazz = modelClazz
-    this.params = <I>{
-      TableName: tableName,
-    }
     this.metadata = metadataForClass(this.modelClazz)
   }
 
   abstract execFullResponse(): Observable<any>
-
   abstract exec(): Observable<T[] | T | null | void>
 }

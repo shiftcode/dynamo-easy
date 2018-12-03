@@ -50,6 +50,14 @@ export class DynamoRx {
     return this.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDb.batchGetItem(params).promise())))
   }
 
+  transactWriteItems(params: DynamoDB.TransactWriteItemsInput): Observable<DynamoDB.TransactWriteItemsOutput> {
+    return this.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDb.transactWriteItems(params).promise())))
+  }
+
+  transactGetItems(params: DynamoDB.TransactGetItemsInput): Observable<DynamoDB.TransactGetItemsOutput> {
+    return this.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDb.transactGetItems(params).promise())))
+  }
+
   scan(params: DynamoDB.ScanInput): Observable<DynamoDB.ScanOutput> {
     return this.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDb.scan(params).promise())))
   }
