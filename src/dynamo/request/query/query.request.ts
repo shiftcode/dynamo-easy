@@ -12,8 +12,8 @@ import { addCondition, addSortKeyCondition } from '../../expression/request-expr
 import {
   ConditionExpressionDefinitionFunction,
   RequestConditionFunction,
-  RequestSortKeyConditionFunction,
 } from '../../expression/type'
+import { SortKeyConditionFunction } from '../../expression/type'
 import { Request } from '../request.model'
 import { QueryResponse } from './query.response'
 
@@ -48,7 +48,7 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
    * used to define some condition for the sort key, use the secondary index to query based on a custom index
    * @returns {RequestConditionFunction<T>}
    */
-  whereSortKey(): RequestSortKeyConditionFunction<QueryRequest<T>> {
+  whereSortKey(): SortKeyConditionFunction<QueryRequest<T>> {
     let sortKey: keyof T | null
     if (this.params.IndexName) {
       const index = this.metadata.getIndex(this.params.IndexName)
