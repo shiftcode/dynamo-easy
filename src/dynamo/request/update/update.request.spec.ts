@@ -35,7 +35,7 @@ describe('update request', () => {
       it('set', () => {
         const now = new Date()
 
-        const request = new UpdateRequest(<any>null, UpdateModel, 'myId', now)
+        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
         request.operations(update<UpdateModel>('lastUpdated').set(now))
 
         expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
