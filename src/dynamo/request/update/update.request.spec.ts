@@ -35,8 +35,7 @@ describe('update request', () => {
       it('set', () => {
         const now = new Date()
 
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
+        const request = new UpdateRequest(<any>null, UpdateModel, 'myId', now)
         request.operations(update<UpdateModel>('lastUpdated').set(now))
 
         expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
@@ -468,12 +467,16 @@ describe('update request', () => {
     let updateItemSpy: jasmine.Spy
     let req: UpdateRequest<SimpleWithPartitionKeyModel>
 
-
     beforeEach(() => {
       logReceiver = jasmine.createSpy()
       updateItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      req = new UpdateRequest(<any>{ updateItem: updateItemSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), 'id')
+      req = new UpdateRequest(
+        <any>{ updateItem: updateItemSpy },
+        SimpleWithPartitionKeyModel,
+        getTableName(SimpleWithPartitionKeyModel),
+        'id',
+      )
       req.operations(update2(SimpleWithPartitionKeyModel, 'age').set(10))
     })
 
@@ -492,6 +495,5 @@ describe('update request', () => {
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
-
   })
 })

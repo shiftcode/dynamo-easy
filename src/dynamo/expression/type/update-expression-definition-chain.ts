@@ -5,7 +5,7 @@ import { UpdateExpressionDefinitionFunction } from './update-expression-definiti
  */
 export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
   /* ----------------------------------------------------------------
-      SET operation TODO add support for ifNotExists
+      SET operation
    ---------------------------------------------------------------- */
   incrementBy: (value: number) => UpdateExpressionDefinitionFunction
   decrementBy: (value: number) => UpdateExpressionDefinitionFunction
@@ -67,7 +67,7 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
  */
 export interface UpdateExpressionDefinitionChain {
   /* ----------------------------------------------------------------
-      SET operation TODO add support for ifNotExists
+      SET operation
    ---------------------------------------------------------------- */
   incrementBy: (value: number) => UpdateExpressionDefinitionFunction
   decrementBy: (value: number) => UpdateExpressionDefinitionFunction

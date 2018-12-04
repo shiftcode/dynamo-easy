@@ -86,7 +86,7 @@ export class BatchWriteSingleTableRequest<T> {
     )
   }
 
-  // fixme backoff time is resetted for every request.. :/
+  // FIXME LOW backoff time is resetted for every request.. :/
   /**
    *
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer

@@ -1,6 +1,14 @@
 // tslint:disable:max-classes-per-file
 
-import { CustomMapper, DateProperty, GSIPartitionKey, GSISortKey, Model, PartitionKey } from '../../../src/dynamo-easy'
+import {
+  CustomMapper,
+  DateProperty,
+  GSIPartitionKey,
+  GSISortKey,
+  Model,
+  PartitionKey,
+  Transient,
+} from '../../../src/dynamo-easy'
 import { FormId, FormIdsMapper } from './form-id.model'
 import { FormType } from './form-type.enum'
 import { OrderId, OrderIdMapper } from './order-id.model'
@@ -21,8 +29,8 @@ export class BaseOrder {
   @CustomMapper(FormIdsMapper)
   formIds: FormId[]
 
-  // FIXME DE check if persisted
   // internal use for UI only, should not be persisted
+  @Transient()
   isNew?: boolean
 }
 

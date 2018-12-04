@@ -25,14 +25,13 @@ export function buildUpdateExpression(
   existingValueNames: string[] | undefined,
   metadata: Metadata<any> | undefined,
 ): UpdateExpression {
-  // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
-  // metadata rid of undefined values
+  // metadata get rid of undefined values
   values = deepFilter(values, value => value !== undefined)
 
   // TODO check if provided values are valid for given operation
   // validateValues(operation, values)
 
-  // load property metadat if model metadata was provided
+  // load property metadata if model metadata was provided
   let propertyMetadata: PropertyMetadata<any> | undefined
   if (metadata) {
     propertyMetadata = metadata.forProperty(attributePath)

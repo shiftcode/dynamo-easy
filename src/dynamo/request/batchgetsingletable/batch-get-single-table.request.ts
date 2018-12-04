@@ -14,7 +14,6 @@ import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 const MAX_REQUEST_ITEM_COUNT = 100
 const DEFAULT_TIME_SLOT = 1000
 
-// TODO add support for indexes
 export class BatchGetSingleTableRequest<T> {
   private readonly logger: Logger
   readonly dynamoRx: DynamoRx

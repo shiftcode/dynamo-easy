@@ -81,8 +81,7 @@ export function buildFilterExpression(
   existingValueNames: string[] | undefined,
   metadata: Metadata<any> | undefined,
 ): Expression {
-  // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
-  // metadata rid of undefined values
+  // metadata get rid of undefined values
   values = deepFilter(values, value => value !== undefined)
 
   // check if provided values are valid for given operator

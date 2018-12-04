@@ -9,7 +9,6 @@ import { attribute } from '../../expression/logical-operator/attribute.function'
 import { Request } from '../request.model'
 import { ScanRequest } from './scan.request'
 
-
 describe('scan request', () => {
   let scanSpy: jasmine.Spy
 
@@ -39,7 +38,7 @@ describe('scan request', () => {
       scanRequest.whereAttribute('age').gt(20)
       expect(scanRequest.params.FilterExpression).toEqual('#age > :age')
       expect(scanRequest.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
-      expect(scanRequest.params.ExpressionAttributeValues).toEqual({ ':age': { 'N': '20' } })
+      expect(scanRequest.params.ExpressionAttributeValues).toEqual({ ':age': { N: '20' } })
     })
     it('where', () => {
       scanRequest.where(or(attribute('age').lt(10), attribute('age').gt(20)))
@@ -50,7 +49,6 @@ describe('scan request', () => {
         ':age_2': { N: '20' },
       })
     })
-
   })
 
   describe('exec functions', () => {
@@ -84,12 +82,12 @@ describe('scan request', () => {
       expect(res).toEqual([jsItem, jsItem])
     })
 
-    it('execSingle', async () => {
+    // todo umcomment if todo in execSingle is implemented
+    xit('execSingle', async () => {
       const res = await scanRequest.execSingle().toPromise()
-      // todo: uncomment when todo in scanRequest::execSingle was done
-      // expect(scanSpy).toHaveBeenCalled()
-      // expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
-      // expect(scanSpy.calls.mostRecent().args[0].Limit).toBe(1)
+      expect(scanSpy).toHaveBeenCalled()
+      expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
+      expect(scanSpy.calls.mostRecent().args[0].Limit).toBe(1)
       expect(res).toEqual(jsItem)
     })
 
@@ -116,7 +114,11 @@ describe('scan request', () => {
       logReceiver = jasmine.createSpy()
       scanSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
+      scanRequest = new ScanRequest(
+        <any>{ scan: scanSpy },
+        SimpleWithPartitionKeyModel,
+        getTableName(SimpleWithPartitionKeyModel),
+      )
     })
 
     it('exec should log params and response', async () => {
@@ -134,6 +136,5 @@ describe('scan request', () => {
       expect(logInfoData.includes(scanRequest.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
-
   })
 })
