@@ -8,45 +8,48 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg)](#contributors)
 
-Abstracts away the complexity of the low level aws dynamosdk. Provides an easy to use fluent api to for requests and supports typescript decorators,
-to define some metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
 
-Checkout the full technical api documentation [here](https://shiftcode.github.io/dynamo-easy/).
+
+Provides an easy to use fluent api to send request to DynamoDB. Abstracts away the complexity of the low level aws dynamo-sdk. 
+Uses typescript decorators to declare the models and will take care of the mapping between js types to their dynamo types.
+  
+TODO link
+Checkout the full technical api documentation [here](https://dynamo-easy.shiftcode.io).
 
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
-# Get Started
+## Goals / Non-Goals
 
-## Prerequisite
+Goals
+- Decorators to declare models and metadata for properties
+- Api Support for the 
 
-### Typescript Metadata
+Non-Goals
+- Api to manage dynamoDb (create table, update capacity, etc.)
 
-#### Reflection API
+## Installation
+
+```
+npm i @shiftcoders/dynamo-easy --save
+npm i aws-sdk@^2.286.1 lodash@^4.17.10 rxjs@^6.0.0 uuid@^3.3.2  --save
+npm i reflect-metadata@^0.1.12 --save
+```
 
 > ⚠ The reflect-metadata polyfill should be imported only once in your entire application because the Reflect object is 
-mean to be a global singleton.
-
-Install the reflect-metadata polyfill.
+mean to be a global singleton. Import it in some entry file of your application, like polyfill.ts or similar.
 
 ```
-npm install reflect-metadata --save
+app.ts (or some other entry file)
+
+import "reflect-metadata"
 ```
 
-The type definitions for reflect-metadata are included in the npm package. 
+The type definitions for reflect-metadata are included in the npm package. Only required if you use reflect-metadata in your project.
 You need to add the following reference to the types field in your [tsconfig.json](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#types-typeroots-and-types):
 
 ```
 "types": ["reflect-metadata"]
 ```
-
-Finally, import reflect-metadata in some entry file in your application.
-
-```
-import "reflect-metadata"
-```
-
-#### Decorators
-
 
 We need to enable the two experimental features to work with decorators, add this to your tsconfig.json:
 
@@ -55,56 +58,61 @@ We need to enable the two experimental features to work with decorators, add thi
 "emitDecoratorMetadata": true
 ```
 
-#### Other
-Also make sure to install the other peer dependencies of @shiftcoders/dynamo-easy.
+## Quick Start
 
-
-## First Sample
-
-When all the setup work is done, define your first model and create a dynamo store to execute actions on the dynamoDB.
+Define your first model:
 
 ```typescript
 @Model()
 class Person{
-  @PartitionKeyUUID() 
+  @PartitionKey() 
   id: string
   
   name: string
 }
+```
 
+and create a dynamo store to execute actions on the dynamoDB.
+
+```typescript
 const dynamoStore = new DynamoStore(Person)
 
 // add a new item
-dynamoStore.put({name: 'peter'})
-  .exec().subscribe(()=>{
-    console.log('peter was saved')
+dynamoStore.put({id: 'wernervogels', name: 'Werner Hans Peter Vogels'})
+  .exec()
+  .subscribe(() => {
+    console.log('saved person')
   })
 
-// search for all persons which start with the character 'p'
+// search for a single person by known id
 dynamoStore.query()
-  .where('name').startsWith('p')
-  .exec()
-  .subscribe((persons: Person[])=>{
-    console.log('got persons')
+  .wherePartitionKey('wernervogels')
+  .execSingle()
+  .subscribe((person: Person) => {
+    console.log('got person', person)
   })
   
   
-// returns all persons
+// returns all persons where the name starts with w
 dynamoStore.scan()
+  .whereAttribute('name').beginsWith('w')
   .exec()
   .subscribe((persons: Person[]) => {
-    console.log('all persons')
+    console.log('all persons', persons)
   })
-
 ```
+
+Checkout our sample (TODO link to glitch) where more use-cases are covered. 
+
+# Config
+The global configuration must be manipulated before any model class is loaded, because . Check the [doc](TODO) for possible configuration.
 
 # Decorators
 Decorators are used to add some metadata to our model classes, relevant to our javascript-to-dynamo mapper.
 
-Additionally we rely on the reflect-metadata (https://www.npmjs.com/package/reflect-metadata) library for reflection api.
+To get started with decorators just add a [@Model()](TODO - https://shiftcode.github.io/dynamo-easy/modules/_decorator_impl_model_model_decorator_.html) Decorator to any typescript class. 
 
-To get started with decorators just add a [@Model()](https://shiftcode.github.io/dynamo-easy/modules/_decorator_impl_model_model_decorator_.html) Decorator to any typescript class. 
-
+TODO update link
 If you need to read the metadata by hand for some purpose, use the [MetadataHelper](https://shiftcode.github.io/dynamo-easy/classes/_decorator_metadata_metadata_helper_.metadatahelper.html) to read the informations.
 
 We make heavy usage of compile time informations about our models and the property types.
@@ -118,12 +126,12 @@ present on a property)
 - Custom Types
 - ES6 types like Set, Map will be mapped to Object when calling for the type via Reflect.get(design:type), so we need some extra info.
 
-Generic information is never available due to some serialization limitations at the time of writing.
+Generic information is never available due to some serialization limitations of typescript at the time of writing.
 
 ## Model
 
 ### Custom TableName
-Here is the rule how a table name is built `${kebabCase(modelName)}s` so for a model called Product the table will be named products, this is a default implementation.
+Here is the rule how a table name is built `${kebabCase(modelName)}s` so for a model called Product the table will be named products, this is the default implementation.
 
 There are two possibilities to change the name:
 
@@ -135,9 +143,19 @@ There are two possibilities to change the name:
 
 ## Types
 
-We do the mapping from javascript objects to dynamodb types for you in requests and responses
+We do the mapping from javascript objects to dynamodb json for you. The dynamodb api only understands json in a special format.
 
-Simple Type (no decorators required to work)
+Here is a sample of a string mapped to dynamodb json: 
+
+```
+# javascript string
+const name = 'sample'
+
+# dynamodb json
+const dynamodbJson = {S: "sample"}
+```
+
+Simple Type (no property decorators required)
 - String
 - Number
 - Boolean
@@ -145,12 +163,12 @@ Simple Type (no decorators required to work)
 - Array
 - String/Number Enum
 
-Complex Types (properties with these types need some decorators to work properly)
+Complex Types (decorators required)
 - Set<simpleType | complexType>
 - Map
 - Array<complexType>
 
-| TS Type       | Dynamo Type   |
+| Javascript Type       | Dynamo Type   |
 | ------------- |:-------------:|
 | String        | S             |
 | Number        | N             |
@@ -159,99 +177,138 @@ Complex Types (properties with these types need some decorators to work properly
 | Array         | L, (S,N,B)S   |
 | ES6 Set       | L, (S,N,B)S   |
 | Object       | M   |
+| Date          | N (unix timestamp) |
 |---|---|
 | Binary        | Not Supported |
 | ES6 Map       | Not Supported   |
-| Date          | Not Supported |
 
-## Custom Attribute Mapping
+## Custom Mapper
 It is always possible to define a custom mapping strategy, 
-just implement the [MapperForType](https://shiftcode.github.io/dynamo-easy/interfaces/_mapper_for_type_base_mapper_.mapperfortype.html) and provide with the CustomMapper directive.
+just provide a Mapper of type [MapperForType](TODO - https://shiftcode.github.io/dynamo-easy/interfaces/_mapper_for_type_base_mapper_.mapperfortype.html) and provide with the CustomMapper directive.
+
+
+```typescript
+interface Detail{
+  name: string
+  email: string
+}
+
+function toDb(modelValue: Detail){
+  return `${modelValue.name}_${modelValue.email}`
+}
+
+function fromDb(attributeValue: StringAttribute): Detail {
+  const detailValues = attributeValue.S.split('_')
+  return {
+    name: detailValues[0],
+     email: detailValues[1]
+  }
+}
+
+const DetailMapper: MapperForType<Detail, StringAttribute> = {
+  toDb,
+  fromDb
+}
+
+@Model()
+class Model{
+  @PartitionKey()
+  id: string
+
+  @CustomMapper(DetailMapper)
+  details: Detail
+}
+```
 
 ## Collection Mapping (Array & Set)
 
 ### Array
-Javascript Arrays with a items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
-If the items have a complex type it will be mapped to a L(ist).
+Homogeneous javascript arrays with items of type String, Number or Binary will be mapped to a S(et) type, by default all other types are mapped to L(ist) type.
+If the items have a non-primitive type it will be mapped to a L(ist).
 
 ### Set
-An instance of ES6 Set type will be mapped to a S(et) type if the type of the items is supported (String, Number, Binary), otherwise it is mapped to a L(ist).  
+An instance of ES6 Set type will be mapped to a S(et) type if the type of the item is supported (String, Number, Binary), otherwise it is mapped to a L(ist).  
 
 When one of the following decorators is present, the value is always mapped to a L(ist).
 
-- @SortedSet(itemType?: ModelClazz) - only L(ist) type preserves order
-- @TypedSet(itemType?: ModelClazz) - if the itemType is not one of String | Number | Binary
+- @SortedSet(itemType?: ModelConstructor) - only L(ist) type preserves order
+- @TypedSet(itemType?: ModelConstructor) - if the itemType is none one of String | Number | Binary
 - @TypedArray()
 
 ## Date
-We only support the native Date type and you need to explicitly mark a property to be a Date by using the @Date() decorator\
+We only support the native Date type and you need to explicitly mark a property to be a Date by using the @DateProperty() decorator\
 (which is basically just syntactic sugar for @CustomMapper(TheDateMapper)).\
+We provide two mappers:
+- Unix Timestamp (default)
+- UTC ISO Timestamp
+
 If you want to use a different type for the @Date decorator (eg. Moment) you need to define a custom mapper and provide it to the dynamo easy config like this:\
 `updateDynamoEasyConfig({ dateMapper: MomentMapper })`\
-
 
 A mapper for moment dates could look like this:
 ```typescript
 import * as moment from 'moment'
 import { MapperForType, StringAttribute } from '@shiftcoders/dynamo-easy'
 
+function fromDb(value: StringAttribute){
+  const parsed = moment(value.S, moment.ISO_8601)
+  if (!parsed.isValid()) {
+    throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
+  }
+  return parsed
+},
+
+function toDb(value: moment.Moment){
+  if (!moment.isMoment(value)) {
+    throw new Error(`the value ${value} is not of type moment`)
+  }
+  if (!value.isValid()) {
+    throw new Error(`cannot map property value ${value}, because it is not a valid moment date`)
+  }
+  return { S: value.clone().utc().format() }
+}
+
 export const MomentMapper: MapperForType<moment.Moment, StringAttribute> = {
-
-  fromDb: (value: StringAttribute) => {
-    const parsed = moment(value.S, moment.ISO_8601)
-    if (!parsed.isValid()) {
-      throw new Error(`the value ${value} cannot be parsed into a valid moment date`)
-    }
-    return parsed
-  },
-
-  toDb: (value: moment.Moment) => {
-    if (!moment.isMoment(value)) {
-      throw new Error(`the value ${value} is not of type moment`)
-    }
-    if (!value.isValid()) {
-      throw new Error(`cannot map property value ${value}, because it is not a valid moment date`)
-    }
-    return { S: value.clone().utc().format() }
-  },
+  fromDb,
+  toDb
 }
 ```
-
 
 ## Enum
 Enum values are persisted as Numbers (index of enum) or string if string value was given.
 
 # Request API
-To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
+To start making requests create an instance of [DynamoStore](TODO - https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
 We support the following dynamodb operations with a fluent api:
 
-- Put
-- Get
-- Update
-- Delete
-- Scan
-- Query
+- TODO - TransactionPut
 - BatchGet (from a single table)
 - BatchWrite (to a single table)
+- Delete
+- Get
+- Put
+- Query
+- Scan
+- Update
 - MakeRequest (generic low level method for special scenarios)
 
 There is always the possibility to access the Params object directly to add values which are not covered with our api.
 
 # Authentication
-In a real world scenario you'll have some kind of authentication to protect your dynamodb ressources. You can customize on how to authenticate when providing a custom
-SessionValidityEnsurer function to the DynamoStore when creating a new instance.
+In a real world scenario you'll have some kind of authentication to protect your dynamodb resources. You can customize on how to authenticate when providing a custom
+SessionValidityEnsurer function to the global configuration.
 The default implementation is a no-op function.
 
 ## Session Validity Ensurer
 Here is an example of an implementation using amazon cognito
 
-```javascript
+```typescript
 function sessionValidityEnsurer(): Observable<boolean> {
-  return Observable.of(this.isLoggedIn())
-    .switchMap(isLoggedIn => {
+  return of(this.isLoggedIn()).pipe(
+    switchMap(isLoggedIn => {
        if (isLoggedIn) {
           this.logger.debug('withValidSession :: cognitoService.isLoggedIn() -> we have a valid session -> proceed')
-          return Observable.of(true)
+          return of(true)
         } else {
           this.logger.debug(metadata)
           return this.getUser()
@@ -261,15 +318,16 @@ function sessionValidityEnsurer(): Observable<boolean> {
             })
             .do(user => this.logger.debug('withValidSession :: we got new valid session', user))
         }
-      })
-      .map((value: boolean | CognitoUser) => {
+      }),
+      map((value: boolean | CognitoUser) => {
         return
       })
+    )
   }
 ```
 
 ## Expressions ([AWS Doc](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html))
-By default we create a substitution placeholder for all the attributes, just to not implement a [blacklist](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html) with reserved words in the context of aws dynamodb.
+By default we create a substitution placeholder for all the attributes (stored in AttributeExpressionNames), just to not implement a [blacklist](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html) with reserved words in the context of aws dynamodb.
 
 attributename: age
 
@@ -279,7 +337,8 @@ attributeExpressionNames: {'#age': 'age'}
 attributeExpressionValues: {':age': {N: '10'}}
 ```
 
-this works seemlesly for top level attribtues, but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
+this works seemlesly for top level attributes but if we wanna build an expression for where the attribute needs to be accessed with a document path, we need some special logic
+
 nested attribute: person.age
 
 ```typescript
@@ -295,55 +354,39 @@ these are the accessor rules for nested attribute types
 - [n] — for list elements
 - . (dot) — for map elements
 
-## Pagination 
-TODO
-
-## BatchGet
-
-There are two scenarios for a batch get item request. One is requesting multiple items from one table by id and the other is requesting multiple items by id from multiple
-tables.
-The first scenario is support using DynamoStore.batchGet() the second one must be implemented using the BatchGetItem class.
+# Logging
+We will log on different log levels. By default none of the log outputs is visible. You can provide your own log provider.
 
 ```typescript
-const request = new BatchRequest()
+const consoleLogReceiver: LogReceiver = (logInfo: LogInfo) => {
+  console.log(logInfo)
+}
 
-// table with simple primary key
-request.forModel(MyModelClass, ['idValue', 'idValue2'])
-
-// table with composite primary key (sortkey is optional)
-request.forModel(MyOtherModelClass, [{partitionKey: 'id', sortKey: 'sortKeyValue'}])
-
-request.exec().subscribe(response => {
-  // an object where the items are mapped to the table name 
-})
+updateDynamoEasyConfig({ logReceiver: consoleLogReceiver })
 
 ```
 
+
 # Development
 
-## NPM scripts
- - `npm t`: Run test suite
- - `npm start`: Runs `npm run build` in watch mode
- - `npm run test:watch`: Run test suite in [interactive watch mode](http://facebook.github.io/jest/docs/cli.html#watch)
- - `npm run test:prod`: Run linting and generate coverage
- - `npm run build`: Generage bundles and typings, create docs
- - `npm run lint`: Lints code
- - `npm run commit`: Commit using conventional commit style ([husky](https://github.com/typicode/husky) will tell you to use it if you haven't :wink:)
-
 ## Automatic releases
-Use the npm comand `npm run commit`, which is a convenient way to create conventional commits. Those messages are used to run [semantic releases](https://github.com/semantic-release/semantic-release),
-which publishes our code automatically on github and npm, plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
+We use [semantic releases](https://github.com/semantic-release/semantic-release) to release dynamo-easy.
+
+Use the npm command `npm run commity`, which is a convenient way to create conventional commits using cli. 
 
 ## Git Hooks
-We use 2 git hooks:
+We use git hooks to maintain code style & quality:
 
-`precommit`
+`commit-msg`
+- makes sure the commit message follows [conventional commit message](https://github.com/conventional-changelog/conventional-changelog)
+
+`pre-commit`
 - to format the code with Prettier :nail_care:
-- to check if the commit message follows a [conventional commit message](https://github.com/conventional-changelog/conventional-changelog)
+- and sort package.json entries A -> Z
 
-`prepush`
-- to check if the code can be built running `npm run build`
-- to check if all tests pass
+`pre-push`
+- run tests
+- to check if the code can be compiled running `npm run build`
 
 ## Credits
 - [https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) For the awesome project which helps to scaffold, develop and build a typescript library project

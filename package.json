@@ -28,7 +28,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
-    "build:docs": "typedoc --out dist/docs --target es6 --theme minimal",
+    "build:docs": "typedoc --out dist/docs --target es6 --theme default",
     "commity": "commit",
     "deploy-docs": "ts-node tools/gh-pages-publish",
     "lint": "tslint --project tsconfig.json -t codeFrame --fix",
@@ -48,7 +48,7 @@
     "@types/lodash": "^4.14.116",
     "@types/node": "^8.0.26",
     "@types/uuid": "^3.4.1",
-    "aws-sdk": "^2.286.1",
+    "aws-sdk": "^2.369.0",
     "colors": "^1.1.2",
     "coveralls": "^3.0.0",
     "cross-env": "^5.0.5",
