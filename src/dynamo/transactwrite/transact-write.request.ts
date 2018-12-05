@@ -43,7 +43,10 @@ export class TransactWriteRequest {
   }
 
   exec(): Observable<void> {
-    return this.dynamoRx.transactWriteItems(this.params)
-      .pipe(map(() => {}))
+    return this.dynamoRx.transactWriteItems(this.params).pipe(
+      map(response => {
+        return
+      }),
+    )
   }
 }
