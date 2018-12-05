@@ -1,3 +1,5 @@
+// tslint:disable:max-classes-per-file
+// tslint:disable:no-unnecessary-class
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
@@ -14,6 +16,17 @@ describe('TransactBaseOperation', () => {
       return {}
     }
   }
+
+  describe('constructor', () => {
+    it('should throw when not providing a ModelConstructor', () => {
+      expect(() => new TestOperation(<any>null)).toThrow()
+    })
+    it('should throw when provided ModelConstructor has no @Model decoration', () => {
+      class X {}
+
+      expect(() => new TestOperation(X)).toThrow()
+    })
+  })
 
   describe('params', () => {
     let op: TestOperation<SimpleWithPartitionKeyModel>

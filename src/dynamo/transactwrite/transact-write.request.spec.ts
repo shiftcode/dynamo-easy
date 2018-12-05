@@ -1,3 +1,5 @@
+import { of } from 'rxjs'
+
 // tslint:disable:no-non-null-assertion
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { attribute } from '../expression/logical-operator/attribute.function'
@@ -5,11 +7,41 @@ import { update } from '../expression/logical-operator/update.function'
 import { getTableName } from '../get-table-name.function'
 import { TransactConditionCheck } from './transact-condition-check'
 import { TransactDelete } from './transact-delete'
+import { TransactOperation } from './transact-operation.type'
 import { TransactPut } from './transact-put'
 import { TransactWriteRequest } from './transact-write.request'
 import { TransactUpdate } from './transact-update'
 
 describe('TransactWriteRequest', () => {
+  describe('constructor', () => {
+    let req: TransactWriteRequest
+    beforeEach(() => {
+      req = new TransactWriteRequest()
+    })
+
+    it('should add transactItems array to params', () => {
+      expect(req.params).toEqual({
+        TransactItems: [],
+      })
+    })
+  })
+
+  describe('transact', () => {
+    let req: TransactWriteRequest
+    beforeEach(() => {
+      req = new TransactWriteRequest()
+    })
+
+    it('should throw when no operations are provided', () => {
+      const ops: TransactOperation[] = []
+      expect(() => req.transact(...ops)).toThrow()
+    })
+    it('should throw when too many conditions are given in one step', () => {
+      const ops = Array(11).map((_, i) => new TransactDelete(SimpleWithPartitionKeyModel, `id-${i}`))
+      expect(() => req.transact(...ops)).toThrow()
+    })
+  })
+
   describe('correct params', () => {
     let req: TransactWriteRequest
 
@@ -90,10 +122,33 @@ describe('TransactWriteRequest', () => {
       expect(req.params.TransactItems[2].Put!.Item).toEqual({ id: { S: 'put-ID-1' }, age: { N: '21' } })
       expect(req.params.TransactItems[3].Put!.Item).toEqual({ id: { S: 'put-ID-2' }, age: { N: '22' } })
     })
+  })
 
-    it('should throw when too many conditions are given in one step', () => {
-      const ops = Array(11).map((_, i) => new TransactDelete(SimpleWithPartitionKeyModel, `id-${i}`))
-      expect(() => req.transact(...ops)).toThrow()
+  describe('execFullResponse / exec', () => {
+    let req: TransactWriteRequest
+    let transactWriteItemsSpy: jasmine.Spy
+
+    beforeEach(() => {
+      req = new TransactWriteRequest()
+
+      transactWriteItemsSpy = jasmine.createSpy().and.returnValue(of({ myResponse: true }))
+      Object.assign(req, { dynamoRx: { transactWriteItems: transactWriteItemsSpy } })
+
+      req.transact(new TransactDelete(SimpleWithPartitionKeyModel, 'myId'))
+    })
+
+    it('execFullResponse should call dynamoRx.transactWriteItems with the params and return the response', async () => {
+      const response = await req.execFullResponse().toPromise()
+      expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
+      expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
+      expect(response).toEqual({ myResponse: true })
+    })
+
+    it('exec should call dynamoRx.transactWriteItems with the params and return void', async () => {
+      const response = await req.exec().toPromise()
+      expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
+      expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
+      expect(response).toBeUndefined()
     })
   })
 })

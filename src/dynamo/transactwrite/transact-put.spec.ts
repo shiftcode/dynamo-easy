@@ -31,4 +31,22 @@ describe('TransactPut', () => {
       },
     })
   })
+
+  it('ifNotExists should do nothing when predicate is falsy', () => {
+    op.ifNotExists(false)
+    expect(op.params).toEqual({
+      TableName: getTableName(UpdateModel),
+      Item: toDb(item, UpdateModel),
+    })
+  })
+
+  it('ifNotExists should add param when predicate is truthy (default)', () => {
+    op.ifNotExists()
+    expect(op.params).toEqual({
+      TableName: getTableName(UpdateModel),
+      Item: toDb(item, UpdateModel),
+      ConditionExpression: '(attribute_not_exists (#id))',
+      ExpressionAttributeNames: { '#id': 'id' },
+    })
+  })
 })
