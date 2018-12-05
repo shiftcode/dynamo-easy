@@ -2,30 +2,31 @@ import { PutItemInput, PutItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
-import { PutOperation } from '../../writeoperations/put.operation'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {
-  it('should create put operation', () => {
+  describe('params', () => {
     const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, {
       id: 'myId',
       age: 45,
     })
-    expect(request.operation).toBeDefined()
-    expect(request.operation instanceof PutOperation).toBeTruthy()
-    expect(request.operation.params).toBeDefined()
-  })
 
-  it('should propagate ifNotExists to the putOperation', () => {
-    const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-    const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, item)
-    request.ifNotExists()
+    it('constructor', () => {
+      const params: PutItemInput = request.params
 
-    const params: PutItemInput = request.params
-    expect(params.ConditionExpression).toBe('(attribute_not_exists (#id))')
-    expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
-    expect(params.ExpressionAttributeValues).toBeUndefined()
-    expect(request.operation.params).toBe(params)
+      expect(params.TableName).toBe('simple-with-partition-key-models')
+      expect(params.Item).toEqual({ id: { S: 'myId' }, age: { N: '45' } })
+      expect(Object.keys(params).length).toBe(2)
+    })
+
+    it('ifNotExists', () => {
+      request.ifNotExists()
+
+      const params: PutItemInput = request.params
+      expect(params.ConditionExpression).toBe('(attribute_not_exists (#id))')
+      expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
+      expect(params.ExpressionAttributeValues).toBeUndefined()
+    })
   })
 
   describe('logger', () => {

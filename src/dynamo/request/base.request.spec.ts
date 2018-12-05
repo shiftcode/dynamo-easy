@@ -6,10 +6,6 @@ import { BaseRequest } from './base.request'
 describe('base request', () => {
   describe('constructor', () => {
     class TestRequest<T> extends BaseRequest<T, any> {
-      get params(): any {
-        return {}
-      }
-
       constructor(modelClazz: ModelConstructor<T>) {
         super(<any>null, modelClazz)
       }
@@ -25,11 +21,6 @@ describe('base request', () => {
 
     it('should throw when model class is null or undefined', () => {
       expect(() => new TestRequest(<any>null)).toThrow()
-    })
-
-    it('should create dynamoRx instance', () => {
-      const i = new TestRequest(SimpleWithPartitionKeyModel)
-      expect(i.dynamoRx).toBeDefined()
     })
 
     it('should store model class', () => {

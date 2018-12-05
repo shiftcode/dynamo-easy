@@ -1,20 +1,22 @@
-import { Metadata, metadataForClass } from '../../decorator/metadata'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { Metadata, metadataForClass } from '../../decorator/metadata/index'
 import { ModelConstructor } from '../../model/model-constructor'
-import { and } from '../expression/logical-operator'
+import { and } from '../expression/logical-operator/index'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
+import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type/index'
 import { getTableName } from '../get-table-name.function'
 import { ConditionalParamsHost } from '../operation-params.type'
-import { WriteOperationParams } from './write-operation-params.type'
 
-export abstract class WriteOperation<T,
-  I extends WriteOperationParams,
-  R extends WriteOperation<T, I, any>> implements ConditionalParamsHost {
+export abstract class TransactBaseOperation<T,
+  I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
+  R extends TransactBaseOperation<T, I, any>> implements ConditionalParamsHost {
 
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>
+
+  abstract readonly transactItem: DynamoDB.TransactWriteItem
 
   protected constructor(modelClazz: ModelConstructor<T>) {
     if (!modelClazz) {
@@ -32,6 +34,7 @@ export abstract class WriteOperation<T,
     }
   }
 
+
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
     return addCondition('ConditionExpression', <string>attributePath, <R><any>this, this.metadata)
   }
@@ -40,6 +43,10 @@ export abstract class WriteOperation<T,
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
     return <R>(<any>this)
+  }
+
+  returnValuesOnConditionCheckFailure(value: DynamoDB.ReturnValuesOnConditionCheckFailure) {
+    this.params.ReturnValuesOnConditionCheckFailure = value
   }
 
 }

@@ -1,40 +1,60 @@
 import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel, UpdateModel } from '../../../../test/models'
+import {
+  ComplexModel,
+  SimpleWithCompositePartitionKeyModel,
+  SimpleWithPartitionKeyModel,
+  UpdateModel,
+} from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { update2 } from '../../expression'
 import { update } from '../../expression/logical-operator/update.function'
-import { getTableName } from '../../get-table-name.function'
 import { UpdateRequest } from './update.request'
 
 describe('update request', () => {
-  it('should create updateOperations, with initial params', () => {
-    const now = new Date()
-    const request = new UpdateRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'myId', now)
+  describe('params', () => {
+    it('simple key', () => {
+      const request = new UpdateRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
 
-    expect(request.params).toBeDefined()
-    expect(request.params.TableName).toBe(getTableName(SimpleWithCompositePartitionKeyModel))
-    expect(request.params.Key).toEqual({
-      id: { S: 'myId' },
-      creationDate: { S: now.toISOString() },
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(1)
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
     })
-    expect(request.params).toBe(request.operation.params)
-  })
 
-  it('should delegate all operations to UpdateOperation.operations()', () => {
-    const now = new Date()
+    it('composite key', () => {
+      const now = new Date()
+      const request = new UpdateRequest(<any>null, ComplexModel, 'myId', now)
 
-    const request = new UpdateRequest(<any>null, UpdateModel, 'myId', now)
-    request.operations(update<UpdateModel>('lastUpdated').set(now))
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(2)
 
-    expect(request.operation.params).toBe(request.params)
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
 
-    expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
-    expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
-    expect(request.params.ExpressionAttributeValues).toEqual({
-      ':lastUpdated': {
-        S: now.toISOString(),
-      },
+      expect(key.creationDate).toBeDefined()
+      expect(key.creationDate).toEqual({ S: now.toISOString() })
+    })
+
+    it('should throw when no sortKey was given but necessary', () => {
+      expect(() => new UpdateRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'myId')).toThrow()
+    })
+
+    it('should add operations', () => {
+      const now = new Date()
+
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId', now)
+      request.operations(update<UpdateModel>('lastUpdated').set(now))
+
+      expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':lastUpdated': { S: now.toISOString() },
+      })
     })
   })
 

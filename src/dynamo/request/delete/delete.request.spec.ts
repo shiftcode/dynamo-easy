@@ -2,16 +2,40 @@ import { DeleteItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
-import { DeleteOperation } from '../../writeoperations/delete.operation'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
-  it('should create delete operation', () => {
-    const now = new Date()
-    const request = new DeleteRequest(<any>null, ComplexModel, 'partitionValue', now)
-    expect(request.operation).toBeDefined()
-    expect(request.operation instanceof DeleteOperation).toBeTruthy()
-    expect(request.operation.params).toBeDefined()
+  describe('params', () => {
+    it('simple key', () => {
+      const request = new DeleteRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
+
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(1)
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
+    })
+
+    it('composite key', () => {
+      const now = new Date()
+      const request = new DeleteRequest(<any>null, ComplexModel, 'myId', now)
+
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(2)
+
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
+
+      expect(key.creationDate).toBeDefined()
+      expect(key.creationDate).toEqual({ S: now.toISOString() })
+    })
+
+    it('should throw for no sort key value', () => {
+      expect(() => new DeleteRequest(<any>null, ComplexModel, 'myId')).toThrowError()
+    })
   })
 
   describe('logger', () => {

@@ -3,22 +3,17 @@ import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
 import { ModelConstructor } from '../../../model'
+import { createKeyAttributes } from '../../create-ket-attributes.function'
 import { DynamoRx } from '../../dynamo-rx'
-import { DeleteOperation } from '../../writeoperations/delete.operation'
 import { WriteRequest } from '../write.request'
 
 export class DeleteRequest<T> extends WriteRequest<DeleteRequest<T>, T, DynamoDB.DeleteItemInput> {
   private readonly logger: Logger
-  readonly operation: DeleteOperation<T>
-
-  get params(): DynamoDB.DeleteItemInput {
-    return this.operation.params
-  }
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
-    this.operation = new DeleteOperation(modelClazz, partitionKey, sortKey)
+    this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
   execFullResponse(): Observable<DynamoDB.DeleteItemOutput> {

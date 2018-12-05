@@ -2,23 +2,19 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
+import { toDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
+import { createIfNotExistsCondition } from '../../create-if-not-exists-condition.function'
 import { DynamoRx } from '../../dynamo-rx'
-import { PutOperation } from '../../writeoperations/put.operation'
 import { WriteRequest } from '../write.request'
 
 export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, DynamoDB.PutItemInput> {
   private readonly logger: Logger
-  readonly operation: PutOperation<T>
-
-  get params(): DynamoDB.PutItemInput {
-    return this.operation.params
-  }
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, item: T) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
-    this.operation = new PutOperation(modelClazz, item)
+    this.params.Item = toDb(item, this.modelClazz)
   }
 
   /**
@@ -26,7 +22,9 @@ export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, DynamoDB.PutIt
    * @returns {PutRequest<T>}
    */
   ifNotExists(predicate: boolean = true): PutRequest<T> {
-    this.operation.ifNotExists(predicate)
+    if (predicate) {
+      this.onlyIf(...createIfNotExistsCondition(this.metadata))
+    }
     return this
   }
 
