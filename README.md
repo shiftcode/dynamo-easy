@@ -237,6 +237,48 @@ We support the following dynamodb operations with a fluent api:
 
 There is always the possibility to access the Params object directly to add values which are not covered with our api.
 
+## non table tied requests
+Currently two type of requests exists which are not tied to one table/model and therefore are not created from a DynamoStore instance.
+
+### BatchGet
+
+There are two scenarios for a batch get item request. One is requesting multiple items from one table by id and the other is requesting multiple items by id from multiple
+tables. The first scenario is support using DynamoStore.batchGet() the second one can be achieved by using the [BatchGetRequest](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_batchget_batch_get_request_.batchgetrequest.html) class.
+
+```typescript
+  new BatchGetRequest()
+      // table with simple primary key
+    .forModel(SimpleWithPartitionKeyModel, [{ id: 'myId' }], /* consistentRead */ true)
+    // table with composite primary key (sortkey is optional)
+    .forModel(SimpleWithCompositePartitionKeyModel, [{ id: 'myId', creationDate: new Date('2018-01-01') }])
+    .exec().subscribe(response => {
+       // an object where the items are mapped to the table name 
+     })
+```
+### TransactWriteRequest
+Create transactions for all-or-nothing operations with [TransactWriteRequest](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_transactwrite_transact_write_request_.transactwriterequest.html) across one or more tables.
+The different operations are:
+* [TransactConditionCheck](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_transactwrite_transact_condition_check_.transactconditioncheck.html)
+* [TransactPut](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_transactwrite_transact_put_.transactput.html)
+* [TransactDelete](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_transactwrite_transact_delete_.transactdelete.html)
+* [TransactUpdate](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_transactwrite_transact_update_.transactupdate.html)
+
+The transaction operations can optionally check for prerequisite conditions that must be satisfied before making updates. 
+For conditions not involving a an item to write on, use the TransactConditionCheck.
+
+```typescript
+  new TransactWriteRequest()
+    .transact(
+      new TransactConditionCheck(SimpleWithPartitionKeyModel, 'check-ID').onlyIf(attribute('age').gt(18)),
+      new TransactDelete(SimpleWithPartitionKeyModel, 'del-ID'),
+      new TransactPut(SimpleWithPartitionKeyModel, { id: 'put-ID-1', age: 21 }).ifNotExists(),
+      new TransactPut(SimpleWithPartitionKeyModel, { id: 'put-ID-2', age: 22 }).ifNotExists(),
+    )
+    .returnItemCollectionMetrics('SIZE')
+    .returnConsumedCapacity('TOTAL')
+    .execFullResponse()
+```
+
 # Authentication
 In a real world scenario you'll have some kind of authentication to protect your dynamodb ressources. You can customize on how to authenticate when providing a custom
 SessionValidityEnsurer function to the DynamoStore when creating a new instance.
@@ -245,7 +287,7 @@ The default implementation is a no-op function.
 ## Session Validity Ensurer
 Here is an example of an implementation using amazon cognito
 
-```javascript
+```typescript
 function sessionValidityEnsurer(): Observable<boolean> {
   return Observable.of(this.isLoggedIn())
     .switchMap(isLoggedIn => {
@@ -294,30 +336,6 @@ the above solution needs to be used
 these are the accessor rules for nested attribute types
 - [n] — for list elements
 - . (dot) — for map elements
-
-## Pagination 
-TODO
-
-## BatchGet
-
-There are two scenarios for a batch get item request. One is requesting multiple items from one table by id and the other is requesting multiple items by id from multiple
-tables.
-The first scenario is support using DynamoStore.batchGet() the second one must be implemented using the BatchGetItem class.
-
-```typescript
-const request = new BatchRequest()
-
-// table with simple primary key
-request.forModel(MyModelClass, ['idValue', 'idValue2'])
-
-// table with composite primary key (sortkey is optional)
-request.forModel(MyOtherModelClass, [{partitionKey: 'id', sortKey: 'sortKeyValue'}])
-
-request.exec().subscribe(response => {
-  // an object where the items are mapped to the table name 
-})
-
-```
 
 # Development
 
