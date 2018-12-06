@@ -1,18 +1,17 @@
 // tslint:disable:no-non-null-assertion
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../test/helper'
 import { Organization, SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes, toDb } from '../../mapper'
 import { DynamoRx } from '../dynamo-rx'
+import { getTableName } from '../get-table-name.function'
 import { BatchGetRequest } from './batch-get.request'
 
 describe('batch get', () => {
   let request: BatchGetRequest
 
   describe('params', () => {
-
-    beforeEach(() => request = new BatchGetRequest())
+    beforeEach(() => (request = new BatchGetRequest()))
 
     it('base params', () => {
       const params = request.params
@@ -29,15 +28,17 @@ describe('batch get', () => {
       expect(params.RequestItems).toBeDefined()
       expect(params.RequestItems.Organization).toBeDefined()
       expect(params.RequestItems.Organization.Keys).toBeDefined()
-      expect(params.RequestItems.Organization.Keys).toEqual([{
-        id: { S: 'idValue' },
-        createdAtDate: { S: o.createdAtDate!.toISOString() },
-      }])
+      expect(params.RequestItems.Organization.Keys).toEqual([
+        {
+          id: { S: 'idValue' },
+          createdAtDate: { S: o.createdAtDate!.toISOString() },
+        },
+      ])
     })
   })
 
   describe('forModel', () => {
-    beforeEach(() => request = new BatchGetRequest())
+    beforeEach(() => (request = new BatchGetRequest()))
 
     it('should throw when same table is used 2 times', () => {
       request.forModel(SimpleWithPartitionKeyModel, [{ id: 'idVal' }])
@@ -49,7 +50,9 @@ describe('batch get', () => {
     })
 
     it('should throw when modelClazz is not @Model decorated', () => {
-      class X {id: string}
+      class X {
+        id: string
+      }
 
       expect(() => request.forModel(X, [{ id: 'ok' }])).toThrow()
     })
@@ -68,10 +71,11 @@ describe('batch get', () => {
     })
 
     it('should throw when more than 100 items are added', () => {
-      const items55: Array<Partial<SimpleWithPartitionKeyModel>> = new Array(55)
-        .map((x, i) => ({ id: `id-${i}` }))
-      const items60: Array<Partial<Organization>> = new Array(60)
-        .map((x, i) => ({ id: `id-${i}`, createdAtDate: new Date() }))
+      const items55: Array<Partial<SimpleWithPartitionKeyModel>> = new Array(55).map((x, i) => ({ id: `id-${i}` }))
+      const items60: Array<Partial<Organization>> = new Array(60).map((x, i) => ({
+        id: `id-${i}`,
+        createdAtDate: new Date(),
+      }))
 
       // at once
       expect(() => request.forModel(SimpleWithPartitionKeyModel, [...items55, ...items55])).toThrow()
@@ -82,7 +86,6 @@ describe('batch get', () => {
         request.forModel(Organization, items60)
       }).toThrow()
     })
-
   })
 
   describe('execNoMap, execFullResponse, exec', () => {
@@ -162,7 +165,6 @@ describe('batch get', () => {
       expect(resultItems[0]).toEqual(jsItem1)
       expect(resultItems[1]).toEqual(jsItem2)
     })
-
   })
 
   describe('should map the result items', () => {
@@ -201,6 +203,5 @@ describe('batch get', () => {
         UnprocessedKeys: {},
       })
     })
-
   })
 })

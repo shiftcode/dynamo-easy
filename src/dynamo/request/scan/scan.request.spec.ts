@@ -1,6 +1,5 @@
 import { ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
 import { EMPTY, of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { Attributes } from '../../../mapper'
@@ -9,7 +8,6 @@ import { attribute } from '../../expression/logical-operator/attribute.function'
 import { Request } from '../request.model'
 import { ScanRequest } from './scan.request'
 
-
 describe('scan request', () => {
   let scanSpy: jasmine.Spy
 
@@ -17,7 +15,7 @@ describe('scan request', () => {
     let scanRequest: ScanRequest<ComplexModel>
     beforeEach(() => {
       scanSpy = jasmine.createSpy().and.returnValue(of({ Count: 1 }))
-      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, ComplexModel, getTableName(ComplexModel))
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, ComplexModel)
     })
 
     it('default params', () => {
@@ -32,14 +30,14 @@ describe('scan request', () => {
     let scanRequest: ScanRequest<SimpleWithPartitionKeyModel>
     beforeEach(() => {
       scanSpy = jasmine.createSpy().and.returnValue(EMPTY)
-      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, 'tableName')
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel)
     })
 
     it('whereAttribute', () => {
       scanRequest.whereAttribute('age').gt(20)
       expect(scanRequest.params.FilterExpression).toEqual('#age > :age')
       expect(scanRequest.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
-      expect(scanRequest.params.ExpressionAttributeValues).toEqual({ ':age': { 'N': '20' } })
+      expect(scanRequest.params.ExpressionAttributeValues).toEqual({ ':age': { N: '20' } })
     })
     it('where', () => {
       scanRequest.where(or(attribute('age').lt(10), attribute('age').gt(20)))
@@ -50,7 +48,6 @@ describe('scan request', () => {
         ':age_2': { N: '20' },
       })
     })
-
   })
 
   describe('exec functions', () => {
@@ -66,7 +63,7 @@ describe('scan request', () => {
     }
     beforeEach(() => {
       scanSpy = jasmine.createSpy().and.returnValue(of(scanOutput))
-      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, 'tableName')
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel)
     })
 
     it('execFullResponse', async () => {
@@ -116,7 +113,7 @@ describe('scan request', () => {
       logReceiver = jasmine.createSpy()
       scanSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
+      scanRequest = new ScanRequest(<any>{ scan: scanSpy }, SimpleWithPartitionKeyModel)
     })
 
     it('exec should log params and response', async () => {
@@ -134,6 +131,5 @@ describe('scan request', () => {
       expect(logInfoData.includes(scanRequest.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
-
   })
 })

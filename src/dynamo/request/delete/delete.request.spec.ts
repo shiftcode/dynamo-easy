@@ -1,45 +1,41 @@
 import { DeleteItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
-  it('should create request with key (composite) expression', () => {
-    const now = new Date()
-    const request = new DeleteRequest(<any>null, ComplexModel, getTableName(ComplexModel), 'partitionValue', now)
-    const key = request.params.Key
-    expect(key).toBeDefined()
-    expect(Object.keys(key).length).toBe(2)
+  describe('params', () => {
+    it('simple key', () => {
+      const request = new DeleteRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
 
-    expect(key.id).toBeDefined()
-    expect(key.id).toEqual({ S: 'partitionValue' })
-    expect(key.creationDate).toBeDefined()
-    expect(key.creationDate).toEqual({
-      S: now.toISOString(),
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(1)
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
     })
-  })
 
-  it('should create request with key (simple) expression', () => {
-    const request = new DeleteRequest(
-      <any>null,
-      SimpleWithPartitionKeyModel,
-      getTableName(SimpleWithPartitionKeyModel),
-      'myId',
-    )
-    const key = request.params.Key
-    expect(key).toBeDefined()
-    expect(Object.keys(key).length).toBe(1)
+    it('composite key', () => {
+      const now = new Date()
+      const request = new DeleteRequest(<any>null, ComplexModel, 'myId', now)
 
-    expect(key.id).toBeDefined()
-    expect(key.id).toEqual({ S: 'myId' })
-  })
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(2)
 
-  it('should throw for no sort key value', () => {
-    expect(
-      () => new DeleteRequest(<any>null, ComplexModel, getTableName(ComplexModel), 'partitionValue'),
-    ).toThrowError()
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
+
+      expect(key.creationDate).toBeDefined()
+      expect(key.creationDate).toEqual({ S: now.toISOString() })
+    })
+
+    it('should throw for no sort key value', () => {
+      expect(() => new DeleteRequest(<any>null, ComplexModel, 'myId')).toThrowError()
+    })
   })
 
   describe('logger', () => {
@@ -52,7 +48,7 @@ describe('delete request', () => {
       logReceiver = jasmine.createSpy()
       deleteItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      req = new DeleteRequest(<any>{ deleteItem: deleteItemSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), 'id')
+      req = new DeleteRequest(<any>{ deleteItem: deleteItemSpy }, SimpleWithPartitionKeyModel, 'id')
     })
 
     it('exec should log params and response', async () => {
@@ -70,6 +66,5 @@ describe('delete request', () => {
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
-
   })
 })

@@ -1,6 +1,6 @@
 extends:
-- "tslint:latest"
-- "tslint-config-prettier"
+  - "tslint:latest"
+  - "tslint-config-prettier"
 rules:
   #
   # override rules from tslint:recommended
@@ -11,11 +11,15 @@ rules:
     true,
     {
       order: [
-        "static-field",
-        "instance-field",
-        "static-method",
+        "public-static-field",
+        "private-static-field",
+        "public-instance-field",
+        "private-instance-field",
+        "public-static-method",
+        "private-static-method",
         "constructor",
-        "instance-method"
+        "public-instance-method",
+        "private-instance-method",
       ]
     }
   ]

@@ -1,24 +1,35 @@
 import { Key, QueryInput, QueryOutput, ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
+import { fetchAll } from '../../helper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
+import { and } from '../expression'
+import { addExpression } from '../expression/param-util'
+import { addCondition } from '../expression/request-expression-builder'
+import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
+import { getTableName } from '../get-table-name.function'
 import { BaseRequest } from './base.request'
 import { QueryRequest } from './query/query.request'
 import { QueryResponse } from './query/query.response'
 import { ScanRequest } from './scan/scan.request'
 import { ScanResponse } from './scan/scan.response'
 
-export abstract class Request<
-  T,
+export abstract class Request<T,
   R extends QueryRequest<T> | ScanRequest<T>,
   I extends QueryInput | ScanInput,
-  Z extends QueryResponse<T> | ScanResponse<T>
-> extends BaseRequest<T, I> {
+  Z extends QueryResponse<T> | ScanResponse<T>> extends BaseRequest<T, I> {
   static DEFAULT_LIMIT = 10
   static INFINITE_LIMIT = -1
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
-    super(dynamoRx, modelClazz, tableName)
+  readonly params: I
+
+  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+    super(dynamoRx, modelClazz)
+
+    this.params = <any>{
+      TableName: getTableName(this.metadata),
+    }
+
     this.limit(Request.DEFAULT_LIMIT)
   }
 
@@ -63,13 +74,32 @@ export abstract class Request<
     return <any>this
   }
 
-  abstract execFullResponse(): Observable<Z>
+  // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
+  // update2.function)
+  whereAttribute(attributePath: keyof T): RequestConditionFunction<R> {
+    return addCondition('FilterExpression', <string>attributePath, <any>this, this.metadata)
+  }
+
+  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
+    const condition = and(...conditionDefFns)(undefined, this.metadata)
+    addExpression('FilterExpression', condition, this.params)
+    return <any>this
+  }
 
   abstract execNoMap(): Observable<QueryOutput | ScanOutput>
+
+  abstract execFullResponse(): Observable<Z>
 
   abstract exec(): Observable<T[]>
 
   abstract execSingle(): Observable<T | null>
 
   abstract execCount(): Observable<number>
+
+  /**
+   * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
+   */
+  execFetchAll(): Observable<T[]> {
+    return fetchAll(<R><any>this)
+  }
 }

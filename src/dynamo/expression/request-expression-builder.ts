@@ -1,5 +1,6 @@
 import { curry } from 'lodash'
 import { Metadata } from '../../decorator/metadata'
+import { ConditionalParamsHost } from '../operation-params.type'
 import { BaseRequest } from '../request/base.request'
 import { buildFilterExpression } from './condition-expression-builder'
 import { addExpression } from './param-util'
@@ -25,7 +26,7 @@ import { buildUpdateExpression } from './update-expression-builder'
 /**
  * Adds a condition to the given query.
  */
-export function addCondition<R extends BaseRequest<any, any>>(
+export function addCondition<R extends ConditionalParamsHost>(
   expressionType: ExpressionType,
   attributePath: string,
   request: R,
@@ -40,18 +41,18 @@ export function addCondition<R extends BaseRequest<any, any>>(
   return createConditionFunctions<RequestConditionFunction<R>>(f)
 }
 
-export function addSortKeyCondition<R extends BaseRequest<any, any>>(
+export function addSortKeyCondition<R extends ConditionalParamsHost>(
   keyName: keyof any,
   request: R,
 ): RequestSortKeyConditionFunction<R>
 
-export function addSortKeyCondition<T, R extends BaseRequest<T, any>>(
+export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata: Metadata<T>,
 ): RequestSortKeyConditionFunction<R>
 
-export function addSortKeyCondition<T, R extends BaseRequest<T, any>>(
+export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata?: Metadata<T>,
@@ -66,7 +67,7 @@ export function addSortKeyCondition<T, R extends BaseRequest<T, any>>(
   return createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
 }
 
-export function doAddCondition<T, R extends BaseRequest<T, any>>(
+export function doAddCondition<T, R extends ConditionalParamsHost>(
   expressionType: ExpressionType,
   attributePath: string,
   request: R,

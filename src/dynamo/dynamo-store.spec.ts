@@ -1,11 +1,11 @@
-import { EMPTY } from 'rxjs'
-import { SimpleWithPartitionKeyModel } from '../../test/models'
-import { updateDynamoEasyConfig } from '../config'
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression
+import { EMPTY } from 'rxjs'
+import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
+import { SimpleWithPartitionKeyModel } from '../../test/models'
+import { updateDynamoEasyConfig } from '../config'
 import { Model } from '../decorator/impl'
-import { DEFAULT_TABLE_NAME_RESOLVER } from './default-table-name-resolver.const'
 import { DynamoStore } from './dynamo-store'
 import {
   BatchGetSingleTableRequest,
@@ -25,26 +25,10 @@ class DynamoStoreModel {}
 class DynamoStoreModel2 {}
 
 describe('dynamo store', () => {
-
   describe('table name', () => {
-    it('correct table name - default', () => {
-      const dynamoStore = new DynamoStore(DynamoStoreModel)
-      expect(dynamoStore.tableName).toBe('dynamo-store-models')
-    })
-
-    it('correct table name - by decorator', () => {
-      const dynamoStore = new DynamoStore(DynamoStoreModel2)
-      expect(dynamoStore.tableName).toBe('myTableName')
-    })
-
-    it('correct table name - by tableNameResolver', () => {
-      const dynamoStore = new DynamoStore(DynamoStoreModel2, tableName => `${tableName}-with-special-thing`)
-      expect(dynamoStore.tableName).toBe('myTableName-with-special-thing')
-    })
-
-    it('throw error because table name is invalid', () => {
-      // tslint:disable-next-line:no-unused-expression
-      expect(() => new DynamoStore(DynamoStoreModel2, tableName => `${tableName}$`)).toThrowError()
+    it('correct table name', () => {
+      const store = new DynamoStore(DynamoStoreModel2)
+      expect(store.tableName).toBe('myTableName')
     })
   })
 
@@ -52,10 +36,17 @@ describe('dynamo store', () => {
     let validityEnsurerSpy: jasmine.Spy
     beforeEach(() => {
       validityEnsurerSpy = jasmine.createSpy().and.returnValue(EMPTY)
+      updateDynamoEasyConfig({ sessionValidityEnsurer: validityEnsurerSpy })
     })
+
+    afterEach(resetDynamoEasyConfig)
+
     it('custom session validity ensurer is used', async () => {
-      const store = new DynamoStore(DynamoStoreModel, DEFAULT_TABLE_NAME_RESOLVER, validityEnsurerSpy)
-      await store.scan().exec().toPromise()
+      const store = new DynamoStore(DynamoStoreModel)
+      await store
+        .scan()
+        .exec()
+        .toPromise()
       expect(validityEnsurerSpy).toHaveBeenCalled()
     })
   })
@@ -74,7 +65,10 @@ describe('dynamo store', () => {
 
   describe('should create request objects', () => {
     let store: DynamoStore<SimpleWithPartitionKeyModel>
-    beforeEach(() => store = new DynamoStore(SimpleWithPartitionKeyModel))
+
+    beforeEach(() => {
+      store = new DynamoStore(SimpleWithPartitionKeyModel)
+    })
 
     it('put', () => expect(store.put({ id: 'id', age: 0 }) instanceof PutRequest).toBeTruthy())
     it('get', () => expect(store.get('id') instanceof GetRequest).toBeTruthy())
@@ -83,7 +77,8 @@ describe('dynamo store', () => {
     it('batchWrite', () => expect(store.batchWrite() instanceof BatchWriteSingleTableRequest).toBeTruthy())
     it('scan', () => expect(store.scan() instanceof ScanRequest).toBeTruthy())
     it('query', () => expect(store.query() instanceof QueryRequest).toBeTruthy())
-    it('batchGetItem', () => expect(store.batchGetItem([{id:'id'}]) instanceof BatchGetSingleTableRequest).toBeTruthy())
+    it('batchGetItem', () =>
+      expect(store.batchGetItem([{ id: 'id' }]) instanceof BatchGetSingleTableRequest).toBeTruthy())
   })
 
   describe('should enable custom requests', () => {
@@ -98,5 +93,4 @@ describe('dynamo store', () => {
     const store = new DynamoStore(SimpleWithPartitionKeyModel)
     expect(store.dynamoDb).toBeDefined()
   })
-
 })

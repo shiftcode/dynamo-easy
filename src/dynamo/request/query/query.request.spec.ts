@@ -2,7 +2,6 @@
 
 import { QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import {
   ComplexModel,
   CustomId,
@@ -23,7 +22,7 @@ describe('query request', () => {
     let request: QueryRequest<ComplexModel>
 
     beforeEach(() => {
-      request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+      request = new QueryRequest(<any>null, ComplexModel)
     })
 
     it('defaults should be defined', () => {
@@ -40,7 +39,7 @@ describe('query request', () => {
 
   describe('indexes', () => {
     it('simple', () => {
-      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes, getTableName(ModelWithABunchOfIndexes))
+      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes)
 
       const now = new Date()
 
@@ -65,7 +64,7 @@ describe('query request', () => {
 
   describe('filter expression', () => {
     it('simple', () => {
-      const request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+      const request = new QueryRequest(<any>null, ComplexModel)
 
       request.whereAttribute('active').eq(true)
       expect(request.params.FilterExpression).toBe('#active = :active')
@@ -80,7 +79,7 @@ describe('query request', () => {
     })
 
     it('complex', () => {
-      const request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+      const request = new QueryRequest(<any>null, ComplexModel)
 
       request.where(attribute<ComplexModel>('active').eq(true), attribute('creationDate').lt(new Date()))
 
@@ -90,11 +89,7 @@ describe('query request', () => {
   })
 
   describe('uses custom mapper for sortKey', () => {
-    const request = new QueryRequest(
-      <any>null,
-      ModelWithCustomMapperForSortKeyModel,
-      getTableName(ModelWithCustomMapperForSortKeyModel),
-    )
+    const request = new QueryRequest(<any>null, ModelWithCustomMapperForSortKeyModel)
 
     request.whereSortKey().between(new CustomId(new Date('2018-01-01'), 0), new CustomId(new Date('2018-12-31'), 99999))
 
@@ -109,7 +104,7 @@ describe('query request', () => {
 
   describe('scan direction', () => {
     let req: QueryRequest<SimpleWithPartitionKeyModel>
-    beforeEach(() => req = new QueryRequest(<any>null, SimpleWithPartitionKeyModel, 'tableName'))
+    beforeEach(() => (req = new QueryRequest(<any>null, SimpleWithPartitionKeyModel)))
     it('ascending', () => {
       req.ascending()
       expect(req.params.ScanIndexForward).toBeTruthy()
@@ -133,7 +128,7 @@ describe('query request', () => {
     }
     beforeEach(() => {
       querySpy = jasmine.createSpy().and.returnValue(of(queryOutput))
-      queryRequest = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel, 'tableName')
+      queryRequest = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel)
       queryRequest.wherePartitionKey('myId')
     })
 
@@ -183,7 +178,7 @@ describe('query request', () => {
       logReceiver = jasmine.createSpy()
       querySpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
-      req = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel))
+      req = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel)
       req.wherePartitionKey('id')
     })
 
@@ -202,6 +197,5 @@ describe('query request', () => {
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
-
   })
 })

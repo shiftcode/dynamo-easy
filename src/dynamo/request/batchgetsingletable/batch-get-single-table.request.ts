@@ -9,6 +9,7 @@ import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
 import { DynamoRx } from '../../dynamo-rx'
+import { getTableName } from '../../get-table-name.function'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
 const MAX_REQUEST_ITEM_COUNT = 100
@@ -16,15 +17,15 @@ const DEFAULT_TIME_SLOT = 1000
 
 // TODO add support for indexes
 export class BatchGetSingleTableRequest<T> {
-  private readonly logger: Logger
   readonly dynamoRx: DynamoRx
   readonly params: BatchGetItemInput
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
 
   readonly metadata: Metadata<T>
+  private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: Array<Partial<T>>) {
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
     this.dynamoRx = dynamoRx
 
@@ -32,13 +33,13 @@ export class BatchGetSingleTableRequest<T> {
       throw new Error("please provide the model clazz for the request, won't work otherwise")
     }
     this.modelClazz = modelClazz
-    this.tableName = tableName
 
 
     this.metadata = metadataForClass(this.modelClazz)
     if (!this.metadata.modelOptions) {
       throw new Error('given ModelConstructor has no @Model decorator')
     }
+    this.tableName = getTableName(this.metadata)
 
     if (keys.length > MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`you can request at max ${MAX_REQUEST_ITEM_COUNT} items per request`)
@@ -56,6 +57,25 @@ export class BatchGetSingleTableRequest<T> {
   consistentRead(value: boolean = true): BatchGetSingleTableRequest<T> {
     this.params.RequestItems[this.tableName].ConsistentRead = value
     return this
+  }
+
+  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+  }
+
+  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<BatchGetSingleTableResponse<T>> {
+    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
+      map(this.mapResponse),
+      tap(response => this.logger.debug('mapped items', response.Items)),
+    )
+  }
+
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<T[]> {
+    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
+      map(this.mapResponse),
+      map(r => r.Items),
+      tap(items => this.logger.debug('mapped items', items)),
+    )
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
@@ -79,25 +99,6 @@ export class BatchGetSingleTableRequest<T> {
       .pipe(
         tap(response => this.logger.debug('response', response)),
       )
-  }
-
-  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
-    return this.fetch(backoffTimer, throttleTimeSlot)
-  }
-
-  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<BatchGetSingleTableResponse<T>> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
-  }
-
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<T[]> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      map(r => r.Items),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
   }
 
 }

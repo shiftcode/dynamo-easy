@@ -1,4 +1,3 @@
-import { getTableName } from '../../../test/helper'
 import {
   ModelWithABunchOfIndexes,
   SimpleWithCompositePartitionKeyModel,
@@ -8,25 +7,31 @@ import { INDEX_ACTIVE_CREATED_AT, INDEX_COUNT } from '../../../test/models/model
 import { ModelConstructor } from '../../model/model-constructor'
 import { Request } from './request.model'
 
-
 class TestRequest<T> extends Request<T, any, any, any> {
-
   constructor(modelClazz: ModelConstructor<T>) {
-    super(<any>null, modelClazz, getTableName(modelClazz))
+    super(<any>null, modelClazz)
   }
 
-  exec() {return <any>null}
+  exec() {
+    return <any>null
+  }
 
-  execCount() {return <any>null}
+  execCount() {
+    return <any>null
+  }
 
-  execFullResponse() {return <any>null}
+  execFullResponse() {
+    return <any>null
+  }
 
-  execNoMap() {return <any>null}
+  execNoMap() {
+    return <any>null
+  }
 
-  execSingle() {return <any>null}
-
+  execSingle() {
+    return <any>null
+  }
 }
-
 
 describe('Request', () => {
   let request: TestRequest<any>
@@ -79,7 +84,6 @@ describe('Request', () => {
     it('should throw when index does not exist on model', () => {
       expect(() => request.index('NON_EXISTENT_INDEX')).toThrow()
     })
-
   })
 
   describe('limit', () => {
@@ -107,7 +111,5 @@ describe('Request', () => {
       expect(request.params.Limit).toBeUndefined()
       expect(Object.keys(request.params).includes('Limit')).toBeFalsy()
     })
-
   })
-
 })

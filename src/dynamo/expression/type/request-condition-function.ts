@@ -1,7 +1,7 @@
 import { AttributeType } from '../../../mapper/type/attribute-type.type'
-import { BaseRequest } from '../../request/base.request'
+import { ConditionalParamsHost } from '../../operation-params.type'
 
-export interface RequestConditionFunction<T extends BaseRequest<any, any>> {
+export interface RequestConditionFunction<T extends ConditionalParamsHost> {
   equals: (value: any) => T
   eq: (value: any) => T
   ne: (value: any) => T
