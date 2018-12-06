@@ -16,9 +16,9 @@ const MAX_REQUEST_ITEM_COUNT = 100
 const DEFAULT_TIME_SLOT = 1000
 
 export class BatchGetRequest {
+  readonly params: DynamoDB.BatchGetItemInput
   private readonly dynamoRx: DynamoRx
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
-  readonly params: DynamoDB.BatchGetItemInput
   private itemCounter = 0
 
   constructor() {
@@ -26,10 +26,6 @@ export class BatchGetRequest {
     this.params = {
       RequestItems: {},
     }
-  }
-
-  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT) {
-    return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
   /**
@@ -62,24 +58,6 @@ export class BatchGetRequest {
     return this
   }
 
-
-  private mapResponse = (response: DynamoDB.BatchGetItemOutput): BatchGetFullResponse => {
-    let Responses: BatchGetResponse = {}
-
-    if (response.Responses && Object.keys(response.Responses).length) {
-      Responses = Object.entries(response.Responses).reduce((u: BatchGetResponse, [key, val]) => {
-        u[key] = val.map(attributes => fromDb(<Attributes>attributes, this.tables.get(key)))
-        return u
-      }, {})
-    }
-
-    return {
-      ConsumedCapacity: response.ConsumedCapacity,
-      UnprocessedKeys: response.UnprocessedKeys,
-      Responses,
-    }
-  }
-
   execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
@@ -97,6 +75,28 @@ export class BatchGetRequest {
         map(this.mapResponse),
         map(r => r.Responses),
       )
+  }
+
+  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT) {
+    return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
+  }
+
+
+  private mapResponse = (response: DynamoDB.BatchGetItemOutput): BatchGetFullResponse => {
+    let Responses: BatchGetResponse = {}
+
+    if (response.Responses && Object.keys(response.Responses).length) {
+      Responses = Object.entries(response.Responses).reduce((u: BatchGetResponse, [key, val]) => {
+        u[key] = val.map(attributes => fromDb(<Attributes>attributes, this.tables.get(key)))
+        return u
+      }, {})
+    }
+
+    return {
+      ConsumedCapacity: response.ConsumedCapacity,
+      UnprocessedKeys: response.UnprocessedKeys,
+      Responses,
+    }
   }
 
 }
