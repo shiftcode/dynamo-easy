@@ -16,14 +16,6 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     this.logger = createLogger('dynamo.request.ScanRequest', modelClazz)
   }
 
-  private mapFromDb = (output: ScanOutput) => {
-    const response: ScanResponse<T> = <any>{ ...output }
-    if (output.Items) {
-      response.Items = output.Items.map(item => fromDb(<Attributes<T>>item, this.modelClazz))
-    }
-    return response
-  }
-
   execNoMap(): Observable<ScanOutput> {
     this.logger.debug('request (noMap)', this.params)
     return this.dynamoRx.scan(this.params)
@@ -75,6 +67,14 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
       map(response => response.Count || 0),
       tap(count => this.logger.debug('count', count)),
     )
+  }
+
+  private mapFromDb = (output: ScanOutput) => {
+    const response: ScanResponse<T> = <any>{ ...output }
+    if (output.Items) {
+      response.Items = output.Items.map(item => fromDb(<Attributes<T>>item, this.modelClazz))
+    }
+    return response
   }
 
 }

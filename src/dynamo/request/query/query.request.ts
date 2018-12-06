@@ -18,13 +18,6 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     this.logger = createLogger('dynamo.request.QueryRequest', modelClazz)
   }
 
-  private mapFromDb = (queryResponse: QueryOutput) => {
-    const response: QueryResponse<T> = <any>{ ...queryResponse }
-    response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
-
-    return response
-  }
-
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
     let partitionKey: keyof T
     if (this.params.IndexName) {
@@ -134,6 +127,13 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
       map(response => response.Count || 0),
       tap(count => this.logger.debug('count', count)),
     )
+  }
+
+  private mapFromDb = (queryResponse: QueryOutput) => {
+    const response: QueryResponse<T> = <any>{ ...queryResponse }
+    response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
+
+    return response
   }
 
 }

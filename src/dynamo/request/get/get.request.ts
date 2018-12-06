@@ -13,8 +13,8 @@ import { BaseRequest } from '../base.request'
 import { GetResponse } from './get.response'
 
 export class GetRequest<T> extends BaseRequest<T, any> {
-  private readonly logger: Logger
   readonly params: DynamoDB.GetItemInput
+  private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoRx, modelClazz)

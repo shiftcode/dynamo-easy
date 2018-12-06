@@ -11,12 +11,12 @@ rules:
     true,
     {
       order: [
-        "public-instance-field",
-        "private-instance-field",
         "public-static-field",
         "private-static-field",
-        "instance-field",
-        "static-method",
+        "public-instance-field",
+        "private-instance-field",
+        "public-static-method",
+        "private-static-method",
         "constructor",
         "public-instance-method",
         "private-instance-method",

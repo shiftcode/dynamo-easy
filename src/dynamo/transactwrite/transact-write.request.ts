@@ -6,8 +6,8 @@ import { TransactOperation } from './transact-operation.type'
 
 
 export class TransactWriteRequest {
-  private readonly dynamoRx: DynamoRx
   readonly params: DynamoDB.TransactWriteItemsInput
+  private readonly dynamoRx: DynamoRx
 
   constructor() {
     this.dynamoRx = new DynamoRx()

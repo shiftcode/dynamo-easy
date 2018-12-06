@@ -13,7 +13,6 @@ import { BatchWriteSingleTableResponse } from './batch-write-single-table.respon
 const MAX_BATCH_WRITE_ITEMS = 25
 
 export class BatchWriteSingleTableRequest<T> {
-  private readonly logger: Logger
 
   private get toKey(): (item: T) => Attributes {
     if (!this.keyFn) {
@@ -22,12 +21,13 @@ export class BatchWriteSingleTableRequest<T> {
     return this.keyFn
   }
 
-  private keyFn: any
-
   readonly dynamoRx: DynamoRx
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
   readonly itemsToProcess: WriteRequests
+  private readonly logger: Logger
+
+  private keyFn: any
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     this.logger = createLogger('dynamo.request.BatchWriteSingleTableRequest', modelClazz)
@@ -56,6 +56,34 @@ export class BatchWriteSingleTableRequest<T> {
     return this
   }
 
+  // fixme backoff time is resetted for every request.. :/
+  /**
+   *
+   * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
+   * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
+   */
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = 1000): Observable<void> {
+    this.logger.debug('starting batchWriteItem')
+    const rBoT = backoffTimer()
+    return this.execNextBatch().pipe(
+      mergeMap((r: BatchWriteSingleTableResponse) => {
+        if (r.capacityExceeded) {
+          const backoffTime = rBoT.next().value * throttleTimeSlot
+          this.logger.info(`wait ${backoffTime} ms until next request`, { backoffTime })
+          return of(r).pipe(delay(backoffTime))
+        }
+        return of(r)
+      }),
+      mergeMap((r: BatchWriteSingleTableResponse) => {
+        if (r.remainingItems > 0) {
+          return this.exec()
+        } else {
+          return of()
+        }
+      }),
+    )
+  }
+
   private execNextBatch(): Observable<BatchWriteSingleTableResponse> {
     const batch = this.itemsToProcess.splice(0, MAX_BATCH_WRITE_ITEMS)
     const batchWriteItemInput: BatchWriteItemInput = {
@@ -82,34 +110,6 @@ export class BatchWriteSingleTableRequest<T> {
       tap(response => {
         if (response.capacityExceeded) {
           this.logger.info('capacity exceeded', response.consumedCapacity)
-        }
-      }),
-    )
-  }
-
-  // fixme backoff time is resetted for every request.. :/
-  /**
-   *
-   * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
-   * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
-   */
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = 1000): Observable<void> {
-    this.logger.debug('starting batchWriteItem')
-    const rBoT = backoffTimer()
-    return this.execNextBatch().pipe(
-      mergeMap((r: BatchWriteSingleTableResponse) => {
-        if (r.capacityExceeded) {
-          const backoffTime = rBoT.next().value * throttleTimeSlot
-          this.logger.info(`wait ${backoffTime} ms until next request`, { backoffTime })
-          return of(r).pipe(delay(backoffTime))
-        }
-        return of(r)
-      }),
-      mergeMap((r: BatchWriteSingleTableResponse) => {
-        if (r.remainingItems > 0) {
-          return this.exec()
-        } else {
-          return of()
         }
       }),
     )

@@ -18,10 +18,14 @@ import {
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
 
 export class DynamoStore<T> {
-  private readonly logger: Logger
-  private readonly dynamoRx: DynamoRx
+
+  get dynamoDb(): DynamoDB {
+    return this.dynamoRx.dynamoDb
+  }
 
   readonly tableName: string
+  private readonly logger: Logger
+  private readonly dynamoRx: DynamoRx
 
   constructor(
     private modelClazz: ModelConstructor<T>,
@@ -30,10 +34,6 @@ export class DynamoStore<T> {
     this.dynamoRx = new DynamoRx()
     this.tableName = getTableName(modelClazz)
     this.logger.debug('instance created')
-  }
-
-  get dynamoDb(): DynamoDB {
-    return this.dynamoRx.dynamoDb
   }
 
   put(item: T): PutRequest<T> {

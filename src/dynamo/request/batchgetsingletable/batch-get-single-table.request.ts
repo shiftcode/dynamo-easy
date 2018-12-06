@@ -17,13 +17,13 @@ const DEFAULT_TIME_SLOT = 1000
 
 // TODO add support for indexes
 export class BatchGetSingleTableRequest<T> {
-  private readonly logger: Logger
   readonly dynamoRx: DynamoRx
   readonly params: BatchGetItemInput
   readonly modelClazz: ModelConstructor<T>
   readonly tableName: string
 
   readonly metadata: Metadata<T>
+  private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
@@ -59,6 +59,25 @@ export class BatchGetSingleTableRequest<T> {
     return this
   }
 
+  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+  }
+
+  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<BatchGetSingleTableResponse<T>> {
+    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
+      map(this.mapResponse),
+      tap(response => this.logger.debug('mapped items', response.Items)),
+    )
+  }
+
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<T[]> {
+    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
+      map(this.mapResponse),
+      map(r => r.Items),
+      tap(items => this.logger.debug('mapped items', items)),
+    )
+  }
+
   private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
     let items: T[] = []
     if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
@@ -80,25 +99,6 @@ export class BatchGetSingleTableRequest<T> {
       .pipe(
         tap(response => this.logger.debug('response', response)),
       )
-  }
-
-  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
-    return this.fetch(backoffTimer, throttleTimeSlot)
-  }
-
-  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<BatchGetSingleTableResponse<T>> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
-  }
-
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<T[]> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      map(r => r.Items),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
   }
 
 }
