@@ -23,15 +23,6 @@ export class TransactGetRequest {
     }
   }
 
-  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetFullResponse<[]> => {
-    const Items: any = response.Responses && Object.keys(response.Responses).length
-      ? response.Responses.map((item, ix) => fromDb(<Attributes>item.Item, this.tables[ix]))
-      : []
-    return {
-      ConsumedCapacity: response.ConsumedCapacity,
-      Items,
-    }
-  }
 
   forModel<T>(modelClazz: ModelConstructor<T>, key: Partial<T>): TransactGetRequest1<T> {
 
@@ -84,5 +75,15 @@ export class TransactGetRequest {
     )
   }
 
+
+  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetFullResponse<[]> => {
+    const Items: any = response.Responses && Object.keys(response.Responses).length
+      ? response.Responses.map((item, ix) => fromDb(<Attributes>item.Item, this.tables[ix]))
+      : []
+    return {
+      ConsumedCapacity: response.ConsumedCapacity,
+      Items,
+    }
+  }
 }
 
