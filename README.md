@@ -187,7 +187,7 @@ When one of the following decorators is present, the value is always mapped to a
 We only support the native Date type and you need to explicitly mark a property to be a Date by using the @Date() decorator\
 (which is basically just syntactic sugar for @CustomMapper(TheDateMapper)).\
 If you want to use a different type for the @Date decorator (eg. Moment) you need to define a custom mapper and provide it to the dynamo easy config like this:\
-`updateDynamoEasyConfig({ dateMapper: MomentMapper })`\
+`updateDynamoEasyConfig({ dateMapper: MomentMapper })`
 
 
 A mapper for moment dates could look like this:
@@ -219,7 +219,7 @@ export const MomentMapper: MapperForType<moment.Moment, StringAttribute> = {
 
 
 ## Enum
-Enum values are persisted as Numbers (index of enum) or string if string value was given.
+Enum values are persisted as Numbers (index of enum or assigned value) or string if string value was assigned.
 
 # Request API
 To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
@@ -246,11 +246,12 @@ There are two scenarios for a batch get item request. One is requesting multiple
 tables. The first scenario is support using DynamoStore.batchGet() the second one can be achieved by using the [BatchGetRequest](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_batchget_batch_get_request_.batchgetrequest.html) class.
 
 ```typescript
+  import { BatchGetRequest } from '@shiftcoders/dynamo-easy'
   new BatchGetRequest()
       // table with simple primary key
-    .forModel(SimpleWithPartitionKeyModel, [{ id: 'myId' }], /* consistentRead */ true)
+    .forModel(YourModelWithPartitionKey, [{ id: 'myId' }], /* consistentRead */ true)
     // table with composite primary key (sortkey is optional)
-    .forModel(SimpleWithCompositePartitionKeyModel, [{ id: 'myId', creationDate: new Date('2018-01-01') }])
+    .forModel(YourModelWithCompositeKey, [{ id: 'myId', creationDate: new Date('2018-01-01') }])
     .exec().subscribe(response => {
        // an object where the items are mapped to the table name 
      })
@@ -267,16 +268,21 @@ The transaction operations can optionally check for prerequisite conditions that
 For conditions not involving a an item to write on, use the TransactConditionCheck.
 
 ```typescript
+  import { TransactWriteRequest, TransactConditionCheck, TransactDelete, TransactPut, attribute } from '@shiftcoders/dynamo-easy'
+  
   new TransactWriteRequest()
     .transact(
-      new TransactConditionCheck(SimpleWithPartitionKeyModel, 'check-ID').onlyIf(attribute('age').gt(18)),
-      new TransactDelete(SimpleWithPartitionKeyModel, 'del-ID'),
-      new TransactPut(SimpleWithPartitionKeyModel, { id: 'put-ID-1', age: 21 }).ifNotExists(),
-      new TransactPut(SimpleWithPartitionKeyModel, { id: 'put-ID-2', age: 22 }).ifNotExists(),
+      new TransactConditionCheck(YourModelWithPartitionKey, 'check-ID').onlyIf(attribute('age').gt(18)),
+      new TransactDelete(YourModelWithCompositeKey, 'the-partition-key', 'the-sort-key'),
+      new TransactPut(YourCustomModel, { id: 'put-ID-1', age: 21 }).ifNotExists(),
     )
     .returnItemCollectionMetrics('SIZE')
     .returnConsumedCapacity('TOTAL')
     .execFullResponse()
+    .subscribe(resp => {
+      console.log(resp.ItemCollectionMetrics)
+      console.log(resp.ConsumedCapacity)
+    })
 ```
 
 # Authentication
@@ -349,7 +355,7 @@ these are the accessor rules for nested attribute types
  - `npm run commit`: Commit using conventional commit style ([husky](https://github.com/typicode/husky) will tell you to use it if you haven't :wink:)
 
 ## Automatic releases
-Use the npm comand `npm run commit`, which is a convenient way to create conventional commits. Those messages are used to run [semantic releases](https://github.com/semantic-release/semantic-release),
+Use the npm comand `npm run commity`, which is a convenient way to create conventional commits. Those messages are used to run [semantic releases](https://github.com/semantic-release/semantic-release),
 which publishes our code automatically on github and npm, plus generates automatically a changelog. This setup is highly influenced by [Kent C. Dodds course on egghead.io](https://egghead.io/courses/how-to-write-an-open-source-javascript-library)
 
 ## Git Hooks
@@ -372,7 +378,7 @@ We use 2 git hooks:
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") | [<img src="https://avatars2.githubusercontent.com/u/8321523?s=460&v=4" width="100px;"/><br /><sub>Michael Lieberherr</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Tests") | [<img src="https://avatars3.githubusercontent.com/u/37636934?s=460&v=4" width="100px;"/><br /><sub>Simon Mumenthaler</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Code") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Tests") |
+| [<img src="https://avatars1.githubusercontent.com/u/8394182?v=4" width="100px;"/><br /><sub>Michael Wittwer</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaelwittwer "Tests") | [<img src="https://avatars2.githubusercontent.com/u/8321523?s=460&v=4" width="100px;"/><br /><sub>Michael Lieberherr</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=michaellieberherrr "Tests") | [<img src="https://avatars3.githubusercontent.com/u/37636934?s=460&v=4" width="100px;"/><br /><sub>Simon Mumenthaler</sub>](https://www.shiftcode.ch)<br />[💻](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Code") [📖](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Documentation") [⚠️](https://github.com/shiftcode/dynamo-easy/commits?author=simonmumenthaler "Tests") |
 | :---: | :---:| :---: |
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
