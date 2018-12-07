@@ -1,5 +1,12 @@
 {
   "extends": [
     "config:base"
+  ],
+  "ignoreDeps": ["@types/node"],
+  "packageRules": [
+    {
+      "packagePatterns": [ "^@types" ],
+      "groupName": "@types"
+    }
   ]
 }
