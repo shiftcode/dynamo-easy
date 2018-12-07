@@ -4,6 +4,7 @@ import { ConditionalParamsHost } from '../operation-params.type'
 import { BaseRequest } from '../request/base.request'
 import { buildFilterExpression } from './condition-expression-builder'
 import { addExpression } from './param-util'
+import { RequestSortKeyConditionFunction } from './type'
 import { ConditionExpressionDefinitionChain } from './type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from './type/condition-expression-definition-function'
 import { OperatorAlias } from './type/condition-operator-alias.type'
@@ -12,13 +13,9 @@ import { ConditionOperator } from './type/condition-operator.type'
 import { ExpressionType } from './type/expression-type.type'
 import { Expression } from './type/expression.type'
 import { RequestConditionFunction } from './type/request-condition-function'
-import { SortKeyConditionFunction } from './type/sort-key-condition-function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
-import {
-  UpdateExpressionDefinitionChain,
-  UpdateExpressionDefinitionChainTyped,
-} from './type/update-expression-definition-chain'
+import { UpdateExpressionDefinitionChain, UpdateExpressionDefinitionChainTyped, } from './type/update-expression-definition-chain'
 import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
 import { UpdateExpression } from './type/update-expression.type'
 import { buildUpdateExpression } from './update-expression-builder'
@@ -44,19 +41,19 @@ export function addCondition<R extends ConditionalParamsHost>(
 export function addSortKeyCondition<R extends ConditionalParamsHost>(
   keyName: keyof any,
   request: R,
-): SortKeyConditionFunction<R>
+): RequestSortKeyConditionFunction<R>
 
 export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata: Metadata<T>,
-): SortKeyConditionFunction<R>
+): RequestSortKeyConditionFunction<R>
 
 export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata?: Metadata<T>,
-): SortKeyConditionFunction<R> {
+): RequestSortKeyConditionFunction<R> {
   const f = (operator: ConditionOperator) => {
     return (...values: any[]): R => {
       return doAddCondition('KeyConditionExpression', <string>keyName, request, metadata, operator, ...values)

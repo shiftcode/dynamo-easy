@@ -56,7 +56,7 @@ export class BatchWriteSingleTableRequest<T> {
     return this
   }
 
-  // fixme backoff time is resetted for every request.. :/
+  // fixme LOW backoff time is resetted for every request.. :/
   /**
    *
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
@@ -110,34 +110,6 @@ export class BatchWriteSingleTableRequest<T> {
       tap(response => {
         if (response.capacityExceeded) {
           this.logger.info('capacity exceeded', response.consumedCapacity)
-        }
-      }),
-    )
-  }
-
-  // fixme LOW backoff time is resetted for every request.. :/
-  /**
-   *
-   * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
-   * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
-   */
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = 1000): Observable<void> {
-    this.logger.debug('starting batchWriteItem')
-    const rBoT = backoffTimer()
-    return this.execNextBatch().pipe(
-      mergeMap((r: BatchWriteSingleTableResponse) => {
-        if (r.capacityExceeded) {
-          const backoffTime = rBoT.next().value * throttleTimeSlot
-          this.logger.info(`wait ${backoffTime} ms until next request`, { backoffTime })
-          return of(r).pipe(delay(backoffTime))
-        }
-        return of(r)
-      }),
-      mergeMap((r: BatchWriteSingleTableResponse) => {
-        if (r.remainingItems > 0) {
-          return this.exec()
-        } else {
-          return of()
         }
       }),
     )
