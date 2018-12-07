@@ -1,6 +1,5 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
-import { getTableName } from '../../../test/helper'
 import { Organization } from '../../../test/models'
 import { DynamoRx } from '../dynamo-rx'
 import { QueryRequest } from '../request'
@@ -15,7 +14,7 @@ const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
 describe('request expression builder', () => {
   describe('adds condition expression to request', () => {
     it('partition key', () => {
-      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
+      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
       addPartitionKeyCondition('id', 'idValue', queryRequest)
 
       const params = queryRequest.params
@@ -25,7 +24,7 @@ describe('request expression builder', () => {
     })
 
     it('sort key', () => {
-      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
+      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
       addSortKeyCondition('count', queryRequest).equals(25)
 
       const params = queryRequest.params
@@ -35,7 +34,7 @@ describe('request expression builder', () => {
     })
 
     it('non key', () => {
-      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization, getTableName(Organization))
+      const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
       addCondition('FilterExpression', 'age', queryRequest).lte(45)
 
       const params = queryRequest.params

@@ -1,9 +1,8 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { Organization } from '../../../../test/models'
-import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../../default-session-validity-ensurer.const'
 import { DynamoRx } from '../../dynamo-rx'
+import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
 
 describe('batch write single table request', () => {
@@ -27,8 +26,8 @@ describe('batch write single table request', () => {
 
   describe('correct params', () => {
     beforeEach(() => {
-      dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization, tableName)
+      dynamoRx = new DynamoRx()
+      request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
 
       const output: DynamoDB.BatchWriteItemOutput = {}
       spyOn(dynamoRx, 'batchWriteItem').and.returnValue(of(output))
@@ -94,8 +93,8 @@ describe('batch write single table request', () => {
 
   describe('correct backoff', () => {
     beforeEach(() => {
-      dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization, tableName)
+      dynamoRx = new DynamoRx()
+      request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
 
       const output: DynamoDB.BatchWriteItemOutput = {
         UnprocessedItems: {

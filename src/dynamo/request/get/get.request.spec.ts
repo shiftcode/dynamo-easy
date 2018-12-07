@@ -1,22 +1,21 @@
 // tslint:disable:no-unused-expression
 import { GetItemInput, GetItemOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { Attributes } from '../../../mapper'
+import { getTableName } from '../../get-table-name.function'
 import { GetRequest } from './get.request'
 
 describe('GetRequest', () => {
-
   describe('constructor', () => {
     it('should throw when not providing correct args', () => {
       expect(() => {
-        new GetRequest(<any>null, SimpleWithPartitionKeyModel, 'tableName', null)
+        new GetRequest(<any>null, SimpleWithPartitionKeyModel, null)
       }).toThrow()
 
       expect(() => {
-        new GetRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'tableName', 'partitionKey')
+        new GetRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'partitionKey')
       }).toThrow()
     })
   })
@@ -25,17 +24,12 @@ describe('GetRequest', () => {
     let request: GetRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
-      request = new GetRequest(
-        <any>null,
-        SimpleWithPartitionKeyModel,
-        getTableName(SimpleWithPartitionKeyModel),
-        'partitionKeyValue',
-      )
+      request = new GetRequest(<any>null, SimpleWithPartitionKeyModel, 'partitionKeyValue')
     })
 
     it('default params', () => {
       const params: GetItemInput = request.params
-      expect(params.TableName).toBe('simple-with-partition-key-models')
+      expect(params.TableName).toBe(getTableName(SimpleWithPartitionKeyModel))
       expect(params.Key).toEqual({ id: { S: 'partitionKeyValue' } })
       expect(Object.keys(params).length).toBe(2)
     })
@@ -58,7 +52,6 @@ describe('GetRequest', () => {
       request.returnConsumedCapacity('TOTAL')
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
-
   })
 
   describe('maps response item', () => {
@@ -71,13 +64,13 @@ describe('GetRequest', () => {
 
     beforeEach(() => {
       getItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
-      req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), 'my-id')
+      req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, 'my-id')
     })
     it('exec', async () => {
       expect(await req.exec().toPromise()).toEqual(jsItem)
     })
     it('execFullResponse', async () => {
-      expect(await req.execFullResponse().toPromise()).toEqual({ 'Item': jsItem })
+      expect(await req.execFullResponse().toPromise()).toEqual({ Item: jsItem })
     })
   })
 
@@ -91,7 +84,7 @@ describe('GetRequest', () => {
       logReceiverSpy = jasmine.createSpy()
       getItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverSpy })
-      req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, getTableName(SimpleWithPartitionKeyModel), 'partitionKeyValue')
+      req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, 'partitionKeyValue')
     })
 
     it('exec should log params and response', async () => {
@@ -109,6 +102,5 @@ describe('GetRequest', () => {
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
-
   })
 })

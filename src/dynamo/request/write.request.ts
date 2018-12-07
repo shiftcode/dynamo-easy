@@ -13,27 +13,27 @@ import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
 import { BaseRequest } from './base.request'
 
-export abstract class WriteRequest<
-  R extends BaseRequest<T, I>,
+export abstract class WriteRequest<R extends BaseRequest<T, I>,
   T,
-  I extends DeleteItemInput | PutItemInput | UpdateItemInput
-> extends BaseRequest<T, I> {
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string) {
-    super(dynamoRx, modelClazz, tableName)
+  I extends DeleteItemInput | PutItemInput | UpdateItemInput> extends BaseRequest<T, I> {
+
+
+  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+    super(dynamoRx, modelClazz)
   }
 
   returnConsumedCapacity(level: ReturnConsumedCapacity): R {
     this.params.ReturnConsumedCapacity = level
-    return <R>(<any>this)
+    return <R><any>this
   }
 
   returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): R {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return <R>(<any>this)
+    return <R><any>this
   }
 
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
-    return addCondition('ConditionExpression', <string>attributePath, <R>(<any>this), this.metadata)
+    return addCondition<R>('ConditionExpression', <string>attributePath, <any>this, this.metadata)
   }
 
   /**
@@ -42,7 +42,7 @@ export abstract class WriteRequest<
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
-    return <R>(<any>this)
+    return <any>this
   }
 
   /*

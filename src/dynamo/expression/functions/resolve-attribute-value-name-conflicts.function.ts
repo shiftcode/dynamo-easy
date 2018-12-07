@@ -1,5 +1,5 @@
-import { QueryInput, ScanInput, UpdateItemInput } from 'aws-sdk/clients/dynamodb'
 import { Attributes } from '../../../mapper'
+import { ConditionalParams } from '../../operation-params.type'
 import { Expression } from '../type/expression.type'
 import { uniqAttributeValueName } from './unique-attribute-value-name.function'
 
@@ -11,7 +11,7 @@ import { uniqAttributeValueName } from './unique-attribute-value-name.function'
  */
 export function resolveAttributeValueNameConflicts(
   expression: Expression,
-  params: QueryInput | ScanInput | UpdateItemInput,
+  params: ConditionalParams,
 ): Expression {
   let attributeValues: Attributes<any> = {}
   let statement: string = expression.statement

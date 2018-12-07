@@ -1,64 +1,36 @@
-import { ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
-import { hasSortKey } from '../../../decorator/metadata'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, fromDb, toDbOne } from '../../../mapper'
+import { Attributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
+import { createKeyAttributes } from '../../create-ket-attributes.function'
 import { DynamoRx } from '../../dynamo-rx'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
+import { getTableName } from '../../get-table-name.function'
 import { BaseRequest } from '../base.request'
 import { GetResponse } from './get.response'
 
 export class GetRequest<T> extends BaseRequest<T, any> {
+  readonly params: DynamoDB.GetItemInput
   private readonly logger: Logger
 
-  constructor(
-    dynamoRx: DynamoRx,
-    modelClazz: ModelConstructor<T>,
-    tableName: string,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
-
-    if (hasSortKey(this.metadata) && (sortKey === null || sortKey === undefined)) {
-      throw new Error(`please provide the sort key for attribute ${this.metadata.getSortKey()}`)
+    this.params = {
+      TableName: getTableName(this.metadata),
+      Key: createKeyAttributes(this.metadata, partitionKey, sortKey),
     }
-
-    const keyAttributeMap: Attributes<T> = <any>{}
-
-    // partition key
-    const partitionKeyValue = toDbOne(partitionKey, this.metadata.forProperty(this.metadata.getPartitionKey()))
-
-    if (partitionKeyValue === null) {
-      throw new Error('please provide an acutal value for partition key, got null')
-    }
-
-    keyAttributeMap[this.metadata.getPartitionKey()] = partitionKeyValue
-
-    // sort key
-    if (hasSortKey(this.metadata)) {
-      const sortKeyValue = toDbOne(sortKey, this.metadata.forProperty(this.metadata.getSortKey()))
-
-      if (sortKeyValue === null) {
-        throw new Error('please provide an actual value for sort key, got null')
-      }
-
-      keyAttributeMap[this.metadata.getSortKey()] = sortKeyValue
-    }
-
-    this.params.Key = keyAttributeMap
   }
 
-  consistentRead(consistendRead: boolean): GetRequest<T> {
-    this.params.ConsistentRead = consistendRead
+  consistentRead(consistentRead: boolean): GetRequest<T> {
+    this.params.ConsistentRead = consistentRead
     return this
   }
 
-  returnConsumedCapacity(level: ReturnConsumedCapacity): GetRequest<T> {
+  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): GetRequest<T> {
     this.params.ReturnConsumedCapacity = level
     return this
   }
