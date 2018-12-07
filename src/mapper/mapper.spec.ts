@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-string-literal
-import { AttributeMap, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
   organization1CreatedAt,
   organization1Employee1CreatedAt,
@@ -523,7 +523,7 @@ describe('Mapper', () => {
             expect((<StringAttribute>employee1.createdAt).S).toBe(createdAtDateEmployee1.toISOString())
 
             // test employee2
-            const employee2: MapAttributeValue = (<MapAttribute>employeesL[1]).M
+            const employee2: DynamoDB.MapAttributeValue = (<MapAttribute>employeesL[1]).M
             expect(employee2['name']).toBeDefined()
             expect(employee2['name'].S).toBeDefined()
             expect(employee2['name'].S).toBe('anna')
@@ -674,13 +674,16 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDbVal: AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          const toDbVal: DynamoDB.AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
           expect(toDbVal.startDate.S).toBeDefined()
           expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })
         it('should accept date as HASH or RANGE key on GSI', () => {
           const now = new Date()
-          const toDbVal: AttributeMap = toDb(new ModelWithDateAsIndexHashKey(0, now), ModelWithDateAsIndexHashKey)
+          const toDbVal: DynamoDB.AttributeMap = toDb(
+            new ModelWithDateAsIndexHashKey(0, now),
+            ModelWithDateAsIndexHashKey,
+          )
           expect(toDbVal.creationDate.S).toBeDefined()
           expect(toDbVal.creationDate.S).toEqual(now.toISOString())
         })
