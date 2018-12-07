@@ -1,0 +1,7 @@
+version: 2
+plugins:
+  fixme:
+    enabled: true
+exclude_patterns:
+  - "test"
+  - "**/*.spec.ts"
