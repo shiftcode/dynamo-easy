@@ -5,27 +5,28 @@ import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { BaseRequest } from './base.request'
 
-describe('standard request', () => {
-  describe('constructor', () => {
-    class TestRequest<T> extends BaseRequest<T, any> {
-      constructor(modelClazz: ModelConstructor<T>) {
-        super(<any>null, modelClazz)
-      }
-
-      exec() {
-        return of(null).pipe(
-          map(() => {
-            return
-          }),
-        )
-      }
-
-      execFullResponse() {
-        return of(null)
-      }
+describe('base request', () => {
+  class TestRequest<T> extends BaseRequest<T, any, BaseRequest<T, any, any>> {
+    constructor(modelClazz: ModelConstructor<T>) {
+      super(<any>null, modelClazz)
     }
 
-    let request: TestRequest<SimpleWithPartitionKeyModel>
+    exec() {
+      return of(null).pipe(
+        map(() => {
+          return
+        }),
+      )
+    }
+
+    execFullResponse() {
+      return of(null)
+    }
+  }
+
+  let request: TestRequest<SimpleWithPartitionKeyModel>
+
+  describe('constructor', () => {
     beforeEach(() => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
     })
@@ -54,6 +55,19 @@ describe('standard request', () => {
 
     it('should create empty params object', () => {
       expect(request.params).toEqual({})
+    })
+  })
+
+  describe('returnConsumedCapacity', () => {
+    beforeEach(() => {
+      request = new TestRequest(SimpleWithPartitionKeyModel)
+    })
+    it('should set param', () => {
+      request.returnConsumedCapacity('TOTAL')
+      expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
+    })
+    it('should return request instance', () => {
+      expect(request.returnConsumedCapacity('TOTAL')).toBe(request)
     })
   })
 })

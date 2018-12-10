@@ -24,19 +24,6 @@ describe('TransactGetSingleTableRequest', () => {
     })
   })
 
-  describe('returnConsumedCapacity', () => {
-    beforeEach(() => {
-      req = new TransactGetSingleTableRequest(<any>null, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
-    })
-    it('should set param', () => {
-      req.returnConsumedCapacity('TOTAL')
-      expect(req.params.ReturnConsumedCapacity).toBe('TOTAL')
-    })
-    it('should return request instance', () => {
-      expect(req.returnConsumedCapacity('TOTAL')).toBe(req)
-    })
-  })
-
   describe('exec, execFullResponse', () => {
     const response: DynamoDB.TransactGetItemsOutput = {
       Responses: [

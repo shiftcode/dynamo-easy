@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
+import { tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
@@ -12,7 +12,7 @@ import { WriteRequest } from '../write.request'
 
 export type SortedUpdateExpressions = { [key in UpdateActionKeyword]: UpdateExpression[] }
 
-export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, DynamoDB.UpdateItemInput> {
+export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, UpdateRequest<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
@@ -31,11 +31,5 @@ export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, DynamoDB
     return this.dynamoRx.updateItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
-  exec(): Observable<void> {
-    return this.execFullResponse().pipe(
-      map(response => {
-        return
-      }),
-    )
-  }
+
 }

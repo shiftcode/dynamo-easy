@@ -14,7 +14,7 @@ import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 const MAX_REQUEST_ITEM_COUNT = 100
 const DEFAULT_TIME_SLOT = 1000
 
-export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemInput> {
+export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemInput, BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {

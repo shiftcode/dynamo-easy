@@ -1,10 +1,6 @@
-import {
-  DeleteItemInput,
-  PutItemInput,
-  ReturnConsumedCapacity,
-  ReturnItemCollectionMetrics,
-  UpdateItemInput,
-} from 'aws-sdk/clients/dynamodb'
+import { DeleteItemInput, PutItemInput, ReturnItemCollectionMetrics, UpdateItemInput } from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { ModelConstructor } from '../../model'
 import { DynamoRx } from '../dynamo-rx'
 import { and } from '../expression/logical-operator'
@@ -14,17 +10,12 @@ import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from 
 import { StandardRequest } from './standard.request'
 
 export abstract class WriteRequest<
-  R extends StandardRequest<T, I>,
   T,
-  I extends DeleteItemInput | PutItemInput | UpdateItemInput
-> extends StandardRequest<T, I> {
+  I extends DeleteItemInput | PutItemInput | UpdateItemInput,
+  R extends WriteRequest<T, I, R>
+> extends StandardRequest<T, I, R> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
-  }
-
-  returnConsumedCapacity(level: ReturnConsumedCapacity): R {
-    this.params.ReturnConsumedCapacity = level
-    return <R>(<any>this)
   }
 
   returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): R {
@@ -52,5 +43,13 @@ export abstract class WriteRequest<
   returnValues(returnValues: 'NONE' | 'ALL_OLD'): R {
     this.params.ReturnValues = returnValues
     return <R>(<any>this)
+  }
+
+  exec(): Observable<void> {
+    return this.execFullResponse().pipe(
+      map(response => {
+        return
+      }),
+    )
   }
 }

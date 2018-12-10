@@ -1,10 +1,25 @@
+import {
+  BatchGetItemInput,
+  BatchWriteItemInput,
+  DeleteItemInput,
+  GetItemInput,
+  PutItemInput,
+  QueryInput,
+  ReturnConsumedCapacity,
+  ScanInput,
+  TransactGetItemsInput,
+  TransactWriteItemsInput,
+  UpdateItemInput,
+} from 'aws-sdk/clients/dynamodb'
 import { metadataForClass } from '../../decorator/metadata'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
 import { getTableName } from '../get-table-name.function'
 
-export abstract class BaseRequest<T, I extends {}> {
+export abstract class BaseRequest<T,
+  I extends DeleteItemInput | GetItemInput | PutItemInput | UpdateItemInput | QueryInput | ScanInput | BatchGetItemInput | BatchWriteItemInput | TransactGetItemsInput | TransactWriteItemsInput,
+  R extends BaseRequest<T, I, any>> {
   readonly dynamoRx: DynamoRx
   readonly modelClazz: ModelConstructor<T>
   readonly metadata: Metadata<T>
@@ -28,5 +43,10 @@ export abstract class BaseRequest<T, I extends {}> {
     this.tableName = getTableName(this.metadata)
 
     this.params = <I>{}
+  }
+
+  returnConsumedCapacity(level: ReturnConsumedCapacity): R {
+    this.params.ReturnConsumedCapacity = level
+    return <R><any>this
   }
 }

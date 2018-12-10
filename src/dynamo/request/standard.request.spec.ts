@@ -5,7 +5,7 @@ import { getTableName } from '../get-table-name.function'
 import { StandardRequest } from './standard.request'
 
 describe('StandardRequest', () => {
-  class MyStandardRequest<T> extends StandardRequest<T, any> {
+  class MyStandardRequest<T> extends StandardRequest<T, any, MyStandardRequest<T>> {
     constructor(c: ModelConstructor<T>) {
       super(<any>null, c)
     }
