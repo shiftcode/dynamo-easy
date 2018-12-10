@@ -4,8 +4,6 @@ export * from './collection/typed-set.decorator'
 export * from './collection/typed-array.decorator'
 // date
 export * from './date/date.decorator'
-// enum
-export * from './enum/enum.decorator'
 // index
 export * from './index/secondary-index'
 export * from './index/gsi-partition-key.decorator'

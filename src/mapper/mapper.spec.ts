@@ -26,6 +26,7 @@ import {
   ProductNested,
   SimpleWithCompositePartitionKeyModel,
   SimpleWithPartitionKeyModel,
+  StringType,
   Type,
 } from '../../test/models'
 import { IdMapper } from '../../test/models/model-with-custom-mapper.model'
@@ -49,7 +50,6 @@ import {
   StringAttribute,
   StringSetAttribute,
 } from './type/attribute.type'
-import { EnumType } from './type/enum.type'
 
 describe('Mapper', () => {
   describe('should map single values', () => {
@@ -87,11 +87,18 @@ describe('Mapper', () => {
         expect(attrValue.NULL).toBe(true)
       })
 
-      it('enum (no enum decorator)', () => {
+      it('enum (number)', () => {
         const attrValue = <NumberAttribute>toDbOne(Type.FirstType)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('N')
         expect(attrValue.N).toBe('0')
+      })
+
+      it('enum (string)', () => {
+        const attrValue = <StringAttribute>toDbOne(StringType.FirstType)!
+        expect(attrValue).toBeDefined()
+        expect(keyOf(attrValue)).toBe('S')
+        expect(attrValue.S).toBe('first')
       })
 
       it('enum (propertyMetadata -> no enum decorator)', () => {
@@ -101,15 +108,6 @@ describe('Mapper', () => {
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('M')
         expect(attrValue.M).toEqual({})
-      })
-
-      it('enum (with decorator)', () => {
-        const attrValue = <NumberAttribute>toDbOne(Type.FirstType, <any>{
-          typeInfo: { type: EnumType, isCustom: true },
-        })!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('N')
-        expect(attrValue.N).toBe('0')
       })
 
       it('array -> SS (homogen, no duplicates)', () => {

@@ -13,13 +13,11 @@ import {
   ModelWithABunchOfIndexes,
   ModelWithCustomMapperModel,
   ModelWithEnum,
-  ModelWithEnumDeclared,
   ModelWithGSI,
   NestedObject,
   SimpleModel,
 } from '../../test/models'
 import { Form } from '../../test/models/real-world'
-import { EnumType } from '../mapper'
 import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortedSet, SortKey, Transient } from './impl'
 import { Model } from './impl/model/model.decorator'
 import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
@@ -333,20 +331,6 @@ describe('Decorators should add correct metadata', () => {
       const strEnumPropertyMetadata = metadata.forProperty('strType')!
       expect(strEnumPropertyMetadata.typeInfo).toBeDefined()
       expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String, isCustom: false })
-    })
-  })
-
-  describe('enum', () => {
-    let metadata: Metadata<ModelWithEnumDeclared>
-
-    beforeEach(() => {
-      metadata = metadataForClass(ModelWithEnumDeclared)
-    })
-
-    it('should add enum type to property', () => {
-      const enumPropertyMetadata = metadata.forProperty('type')!
-      expect(enumPropertyMetadata.typeInfo).toBeDefined()
-      expect(enumPropertyMetadata.typeInfo).toEqual({ type: EnumType, isCustom: true })
     })
   })
 

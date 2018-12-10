@@ -4,7 +4,7 @@ import { createLogger, Logger } from '../../../logger/logger'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
 import { addSortKeyCondition } from '../../expression/request-expression-builder'
-import { RequestSortKeyConditionFunction } from '../../expression/type'
+import { SortKeyConditionFunction } from '../../expression/type'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryResponse } from './query.response'
 
@@ -34,7 +34,7 @@ export class QueryRequest<T> extends ReadManyRequest<T, QueryInput, QueryOutput,
    * used to define some condition for the sort key, use the secondary index to query based on a custom index
    * @returns {RequestConditionFunction<T>}
    */
-  whereSortKey(): RequestSortKeyConditionFunction<QueryRequest<T>> {
+  whereSortKey(): SortKeyConditionFunction<QueryRequest<T>> {
     let sortKey: keyof T | null
     if (this.secondaryIndex) {
       if (!this.secondaryIndex.sortKey) {
