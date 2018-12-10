@@ -13,6 +13,7 @@ import {
   PutRequest,
   QueryRequest,
   ScanRequest,
+  TransactGetSingleTableRequest,
   UpdateRequest,
 } from './request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
@@ -52,15 +53,6 @@ export class DynamoStore<T> {
     return new DeleteRequest(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
   }
 
-  /**
-   * This is a special implementation of batchWriteItem request, because it only supports one table,
-   * if you wish to write items to multiple tables
-   * create an instance of BatchWriteItemInput and use store.makeRequest with it.
-   */
-  batchWrite(): BatchWriteSingleTableRequest<T> {
-    return new BatchWriteSingleTableRequest<T>(this.dynamoRx, this.modelClazz)
-  }
-
   scan(): ScanRequest<T> {
     return new ScanRequest<T>(this.dynamoRx, this.modelClazz)
   }
@@ -74,8 +66,21 @@ export class DynamoStore<T> {
    * if you wish to retrieve items from multiple tables
    * create an instance of BatchGetItemInput and use store.makeRequest with it.
    */
-  batchGetItem(keys: any[]): BatchGetSingleTableRequest<T> {
+  batchGet(keys: Array<Partial<T>>): BatchGetSingleTableRequest<T> {
     return new BatchGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
+  }
+
+  /**
+   * This is a special implementation of batchWriteItem request, because it only supports one table,
+   * if you wish to write items to multiple tables
+   * create an instance of BatchWriteItemInput and use store.makeRequest with it.
+   */
+  batchWrite(): BatchWriteSingleTableRequest<T> {
+    return new BatchWriteSingleTableRequest<T>(this.dynamoRx, this.modelClazz)
+  }
+
+  transactGet(keys: Array<Partial<T>>): TransactGetSingleTableRequest<T> {
+    return new TransactGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
   }
 
   makeRequest<Z>(operation: DynamoApiOperations, params?: { [key: string]: any }): Observable<Z> {
