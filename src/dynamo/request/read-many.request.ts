@@ -152,7 +152,7 @@ export abstract class ReadManyRequest<T,
   }
 
   protected mapFromDb = (output: O) => {
-    const response: Z = <any>{ ...<any>output }
+    const response: Z = { ...<any>output }
     response.Items = (output.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
 
     return response
