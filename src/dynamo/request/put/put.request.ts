@@ -4,8 +4,8 @@ import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
 import { toDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { createIfNotExistsCondition } from '../../create-if-not-exists-condition.function'
 import { DynamoRx } from '../../dynamo-rx'
+import { createIfNotExistsCondition } from '../../expression/create-if-not-exists-condition.function'
 import { WriteRequest } from '../write.request'
 
 export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, DynamoDB.PutItemInput> {

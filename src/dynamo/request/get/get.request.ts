@@ -3,16 +3,15 @@ import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, fromDb } from '../../../mapper'
+import { Attributes, createKeyAttributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { createKeyAttributes } from '../../create-ket-attributes.function'
 import { DynamoRx } from '../../dynamo-rx'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 import { getTableName } from '../../get-table-name.function'
-import { BaseRequest } from '../base.request'
+import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
 
-export class GetRequest<T> extends BaseRequest<T, any> {
+export class GetRequest<T> extends StandardRequest<T, any> {
   readonly params: DynamoDB.GetItemInput
   private readonly logger: Logger
 

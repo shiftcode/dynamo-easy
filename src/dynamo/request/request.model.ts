@@ -8,16 +8,18 @@ import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
 import { getTableName } from '../get-table-name.function'
-import { BaseRequest } from './base.request'
 import { QueryRequest } from './query/query.request'
 import { QueryResponse } from './query/query.response'
 import { ScanRequest } from './scan/scan.request'
 import { ScanResponse } from './scan/scan.response'
+import { StandardRequest } from './standard.request'
 
-export abstract class Request<T,
+export abstract class Request<
+  T,
   R extends QueryRequest<T> | ScanRequest<T>,
   I extends QueryInput | ScanInput,
-  Z extends QueryResponse<T> | ScanResponse<T>> extends BaseRequest<T, I> {
+  Z extends QueryResponse<T> | ScanResponse<T>
+> extends StandardRequest<T, I> {
   static DEFAULT_LIMIT = 10
   static INFINITE_LIMIT = -1
 
@@ -100,6 +102,6 @@ export abstract class Request<T,
    * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
    */
   execFetchAll(): Observable<T[]> {
-    return fetchAll(<R><any>this)
+    return fetchAll(<R>(<any>this))
   }
 }

@@ -1,9 +1,11 @@
+// tslint:disable:max-classes-per-file
 import { of } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { BaseRequest } from './base.request'
 
-describe('base request', () => {
+describe('standard request', () => {
   describe('constructor', () => {
     class TestRequest<T> extends BaseRequest<T, any> {
       constructor(modelClazz: ModelConstructor<T>) {
@@ -11,7 +13,11 @@ describe('base request', () => {
       }
 
       exec() {
-        return of(null)
+        return of(null).pipe(
+          map(() => {
+            return
+          }),
+        )
       }
 
       execFullResponse() {
@@ -19,20 +25,35 @@ describe('base request', () => {
       }
     }
 
-    it('should throw when model class is null or undefined', () => {
+    let request: TestRequest<SimpleWithPartitionKeyModel>
+    beforeEach(() => {
+      request = new TestRequest(SimpleWithPartitionKeyModel)
+    })
+
+    it('should throw when node ModelConstructor was provided', () => {
       expect(() => new TestRequest(<any>null)).toThrow()
     })
 
-    it('should store model class', () => {
-      const i = new TestRequest(SimpleWithPartitionKeyModel)
-      expect(i.modelClazz).toBe(SimpleWithPartitionKeyModel)
+    it('should throw when ModelConstructor is not @Model decorated', () => {
+      class NoModel {
+        prop: any
+      }
+
+      expect(() => new TestRequest(NoModel)).toThrow()
     })
 
     it('should store model class', () => {
-      const i = new TestRequest(SimpleWithPartitionKeyModel)
-      expect(i.metadata).toBeDefined()
-      expect(i.metadata.modelOptions).toBeDefined()
-      expect(i.metadata.modelOptions.clazz).toBe(SimpleWithPartitionKeyModel)
+      expect(request.modelClazz).toBe(SimpleWithPartitionKeyModel)
+    })
+
+    it('should create metadata of given modelConstructor', () => {
+      expect(request.metadata).toBeDefined()
+      expect(request.metadata.modelOptions).toBeDefined()
+      expect(request.metadata.modelOptions.clazz).toBe(SimpleWithPartitionKeyModel)
+    })
+
+    it('should create empty params object', () => {
+      expect(request.params).toEqual({})
     })
   })
 })

@@ -11,25 +11,25 @@ import { and } from '../expression/logical-operator'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
-import { BaseRequest } from './base.request'
+import { StandardRequest } from './standard.request'
 
-export abstract class WriteRequest<R extends BaseRequest<T, I>,
+export abstract class WriteRequest<
+  R extends StandardRequest<T, I>,
   T,
-  I extends DeleteItemInput | PutItemInput | UpdateItemInput> extends BaseRequest<T, I> {
-
-
+  I extends DeleteItemInput | PutItemInput | UpdateItemInput
+> extends StandardRequest<T, I> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
 
   returnConsumedCapacity(level: ReturnConsumedCapacity): R {
     this.params.ReturnConsumedCapacity = level
-    return <R><any>this
+    return <R>(<any>this)
   }
 
   returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): R {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return <R><any>this
+    return <R>(<any>this)
   }
 
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
