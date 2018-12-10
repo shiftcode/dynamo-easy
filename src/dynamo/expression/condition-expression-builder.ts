@@ -228,7 +228,7 @@ function buildDefaultConditionExpression(
     let attribute: Attribute | null
     switch (operator) {
       case 'contains':
-        // TODO think about validation
+        // TODO LOW:VALIDATION think about concept
         // validateValueForContains(values[0], propertyMetadata)
         attribute = toDbOne(values[0], propertyMetadata)
         break
@@ -300,14 +300,14 @@ function validateValues(operator: ConditionOperator, values?: any[]) {
   }
 }
 
-// TODO should we support other types than String, Number, Binary (can we search a boolean set for example with boolean as string?)
+// TODO LOW:VALIDATION should we support other types than String, Number, Binary (can we search a boolean set for example with boolean as string?)
 // private static validateValueForContains(value: any, propertyMetadata?: PropertyMetadata<any>): { S: string } {
 //   let finalValue: { S: string }
 //   if (propertyMetadata && propertyMetadata.typeInfo) {
 //     switch (propertyMetadata.typeInfo.type) {
 //       case Array:
 //       case Set:
-//         // FIXME REVIEW the validation logic
+//         // TODO LOW:VALIDATION REVIEW the validation logic
 //         // const genericType = propertyMetadata.typeInfo.genericType
 //         // if ((!genericType && (typeof value === 'number' || typeof value === 'string' || typeof value === '')) || (
 //         //   genericType &&
