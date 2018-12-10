@@ -1,4 +1,4 @@
-import {v4 as uuidv4} from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { Metadata } from '../decorator/metadata/metadata'
 import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
 import { Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
@@ -6,7 +6,6 @@ import { ModelConstructor } from '../model'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
 import { CollectionMapper } from './for-type/collection.mapper'
-import { EnumMapper } from './for-type/enum.mapper'
 import { NullMapper } from './for-type/null.mapper'
 import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
@@ -14,7 +13,6 @@ import { StringMapper } from './for-type/string.mapper'
 import { AttributeValueType } from './type/attribute-value-type.type'
 import { Attribute, Attributes } from './type/attribute.type'
 import { Binary } from './type/binary.type'
-import { EnumType } from './type/enum.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 import { typeOf, typeOfFromDb } from './util'
@@ -48,7 +46,6 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
     let attributeValue: Attribute | undefined | null
 
-    // TODO concept maybe make this configurable how to map undefined & null values
     if (propertyValue === undefined || propertyValue === null) {
       // noop ignore because we can't map it
     } else {
@@ -159,8 +156,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
           throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
         }
 
-        // fixme: typings
-        ;(<any>key)[propMeta.name] = <Attribute>toDbOne(propertyValue, propMeta)
+        key[propMeta.name] = <Attribute>toDbOne(propertyValue, propMeta)
         return key
       },
       <Attributes<T>>{},
@@ -257,9 +253,6 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
       case Boolean:
         mapper = BooleanMapper
         break
-      case EnumType:
-        mapper = EnumMapper
-        break
       case Map:
         // Maps support complex types as keys, we only support String & Number as Keys, otherwise a .toString() method should be implemented,
         // so we now how to save a  key
@@ -278,7 +271,6 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
         mapper = NullMapper
         break
       case Binary:
-        // TODO LOW:BINARY add binary mapper
         throw new Error('no mapper for binary type implemented yet')
       case UndefinedType:
         mapper = ObjectMapper

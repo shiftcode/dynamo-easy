@@ -50,11 +50,6 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   transient?: boolean
 }
 
-// todo: fixme
-// export function hasSortKey(propertyMetadata: PropertyMetadata<any, any>): propertyMetadata is PropertyMetadata<any, any> & {} {
-//   return propertyMetadata.getSortKey() !== null
-// }
-
 export function hasGenericType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { genericType: ModelConstructor<any> } } {

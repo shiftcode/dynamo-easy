@@ -12,7 +12,7 @@ import { ConditionOperator } from './type/condition-operator.type'
 import { ExpressionType } from './type/expression-type.type'
 import { Expression } from './type/expression.type'
 import { RequestConditionFunction } from './type/request-condition-function'
-import { RequestSortKeyConditionFunction } from './type/sort-key-condition-function'
+import { SortKeyConditionFunction } from './type/sort-key-condition-function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
 import {
@@ -44,19 +44,19 @@ export function addCondition<R extends ConditionalParamsHost>(
 export function addSortKeyCondition<R extends ConditionalParamsHost>(
   keyName: keyof any,
   request: R,
-): RequestSortKeyConditionFunction<R>
+): SortKeyConditionFunction<R>
 
 export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata: Metadata<T>,
-): RequestSortKeyConditionFunction<R>
+): SortKeyConditionFunction<R>
 
 export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata?: Metadata<T>,
-): RequestSortKeyConditionFunction<R> {
+): SortKeyConditionFunction<R> {
   const f = (operator: ConditionOperator) => {
     return (...values: any[]): R => {
       return doAddCondition('KeyConditionExpression', <string>keyName, request, metadata, operator, ...values)

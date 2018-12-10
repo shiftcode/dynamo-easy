@@ -25,14 +25,13 @@ export function buildUpdateExpression(
   existingValueNames: string[] | undefined,
   metadata: Metadata<any> | undefined,
 ): UpdateExpression {
-  // TODO LOW:INVESTIGATE is there a use case for undefined desired to be a value
-  // metadata rid of undefined values
+  // metadata get rid of undefined values
   values = deepFilter(values, value => value !== undefined)
 
-  // TODO check if provided values are valid for given operation
+  // TODO LOW:VALIDATION check if provided values are valid for given operation
   // validateValues(operation, values)
 
-  // load property metadat if model metadata was provided
+  // load property metadata if model metadata was provided
   let propertyMetadata: PropertyMetadata<any> | undefined
   if (metadata) {
     propertyMetadata = metadata.forProperty(attributePath)
@@ -107,9 +106,9 @@ function buildDefaultExpression(
       statement = values.map(pos => `${namePlaceholder}[${pos}]`).join(', ')
       break
     case 'add':
-      // TODO add validation to make sure expressionAttributeValue to be N(umber) or S(et)
+      // TODO LOW:VALIDATION add validation to make sure expressionAttributeValue to be N(umber) or S(et)
       statement = `${namePlaceholder} ${valuePlaceholder}`
-      // TODO won't work for numbers, is always gonna be mapped to a collection type
+      // TODO LOW:VALIDATION won't work for numbers, is always gonna be mapped to a collection type
       if ((values.length === 1 && Array.isArray(values[0])) || isSet(values[0])) {
         // dealing with arr | set as single argument
       } else {
@@ -118,7 +117,7 @@ function buildDefaultExpression(
       }
       break
     case 'removeFromSet':
-      // TODO add validation to make sure expressionAttributeValue to be S(et)
+      // TODO LOW:VALIDATION add validation to make sure expressionAttributeValue to be S(et)
       statement = `${namePlaceholder} ${valuePlaceholder}`
       if ((values.length === 1 && Array.isArray(values[0])) || isSet(values[0])) {
         // dealing with arr | set as single argument

@@ -48,7 +48,7 @@ export class ScanRequest<T> extends Request<T, ScanRequest<T>, ScanInput, ScanRe
     }
 
     this.logger.debug('single request', params)
-    return this.dynamoRx.scan(this.params).pipe(
+    return this.dynamoRx.scan(params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(this.mapFromDb),
       map(r => r.Items && r.Items.length ? r.Items[0] : null),

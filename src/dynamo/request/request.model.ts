@@ -74,7 +74,7 @@ export abstract class Request<T,
     return <any>this
   }
 
-  // TODO TYPING how can we improve the typing to define the accepted value for condition function (see
+  // TODO LOW:TYPING how can we improve the typing to define the accepted value for condition function (see
   // update2.function)
   whereAttribute(attributePath: keyof T): RequestConditionFunction<R> {
     return addCondition('FilterExpression', <string>attributePath, <any>this, this.metadata)
