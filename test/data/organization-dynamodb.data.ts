@@ -6,7 +6,6 @@ export const organization1LastUpdated = new Date('2017-07-25')
 export const organization1Employee1CreatedAt = new Date('2015-02-15')
 export const organization1Employee2CreatedAt = new Date('2015-07-03')
 
-// FIXME: transient should not be included in Attributes, make use of Transient Marker Type and build new type
 export const organizationFromDb: Attributes<Organization> = {
   name: { S: 'myOrganization' },
   id: { S: 'myId' },
