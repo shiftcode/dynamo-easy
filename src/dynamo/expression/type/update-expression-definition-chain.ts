@@ -1,5 +1,12 @@
 import { UpdateExpressionDefinitionFunction } from './update-expression-definition-function'
 
+type ExtractListType<T> =
+  T extends Array<(infer A)> ? A :
+    T extends Set<(infer B)> ? B :
+      T;
+
+
+
 /**
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html for full documentation
  */
@@ -21,7 +28,7 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
   /**
    * appends one or more values to the start or end of a list, value must be of type L(ist)
    */
-  appendToList: (value: T[K], position?: 'START' | 'END') => UpdateExpressionDefinitionFunction
+  appendToList: (value: Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>, position?: 'START' | 'END') => UpdateExpressionDefinitionFunction
 
   /* ----------------------------------------------------------------
       REMOVE operation
@@ -35,11 +42,10 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
       ADD operation (only supports number and set type)
       AWS generally recommends to use SET rather than ADD
    ---------------------------------------------------------------- */
-
   /**
    * adds or manipulates a value to an attribute of type N(umber) or S(et), manipulation behaviour differs based on attribute type
    *
-   * @param values {multiple values as vararg | Array | Set}
+   * @param values {multiple values as Array | Set}
    *
    * --update-expression "ADD QuantityOnHand :q" \
    * --expression-attribute-values '{":q": {"N": "5"}}' \
@@ -47,19 +53,19 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
    *  --update-expression "ADD Color :c" \
    *  --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
    */
-  add: (values: T[K]) => UpdateExpressionDefinitionFunction
+  add: (values: Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>) => UpdateExpressionDefinitionFunction
 
   /* ----------------------------------------------------------------
       DELETE operation (only supports set type)
    ---------------------------------------------------------------- */
   /**
-   * @param values {multiple values as vararg | Array | Set}
+   * @param values {multiple values as Array | Set}
    * @returns {UpdateExpressionDefinitionFunction}
    *
    * --update-expression "DELETE Color :p" \
    * --expression-attribute-values '{":p": {"SS": ["Yellow", "Purple"]}}'
    */
-  removeFromSet: (...values: any[]) => UpdateExpressionDefinitionFunction
+  removeFromSet: (values: Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>) => UpdateExpressionDefinitionFunction
 }
 
 /**
