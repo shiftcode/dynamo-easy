@@ -24,6 +24,8 @@ import {
   OrganizationEvent,
   Product,
   ProductNested,
+  SimpleWithCompositePartitionKeyModel,
+  SimpleWithPartitionKeyModel,
   StringType,
   Type,
 } from '../../test/models'
@@ -34,6 +36,8 @@ import {
 } from '../../test/models/model-with-nested-model-with-custom-mapper.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
 import { PropertyMetadata } from '../decorator'
+import { metadataForClass } from '../decorator/metadata'
+import { createKeyAttributes } from './index'
 import { fromDb, fromDbOne, toDb, toDbOne } from './mapper'
 import {
   Attribute,
@@ -867,6 +871,28 @@ describe('Mapper', () => {
           expect(event.participants).toBe(125)
         })
       })
+    })
+  })
+
+  describe('createKeyAttributes', () => {
+    it('PartitionKey only', () => {
+      const attrs = createKeyAttributes(metadataForClass(SimpleWithPartitionKeyModel), 'myId')
+      expect(attrs).toEqual({
+        id: { S: 'myId' },
+      })
+    })
+
+    it('PartitionKey + SortKey', () => {
+      const now = new Date()
+      const attrs = createKeyAttributes(metadataForClass(SimpleWithCompositePartitionKeyModel), 'myId', now)
+      expect(attrs).toEqual({
+        id: { S: 'myId' },
+        creationDate: { S: now.toISOString() },
+      })
+    })
+
+    it('should throw when required sortKey is missing', () => {
+      expect(() => createKeyAttributes(metadataForClass(SimpleWithCompositePartitionKeyModel), 'myId')).toThrow()
     })
   })
 })

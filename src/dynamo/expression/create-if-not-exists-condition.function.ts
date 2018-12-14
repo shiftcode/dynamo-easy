@@ -1,7 +1,6 @@
-import { hasSortKey, Metadata } from '../decorator/metadata'
-import { attribute } from './expression/logical-operator'
-import { ConditionExpressionDefinitionFunction } from './expression/type'
-
+import { hasSortKey, Metadata } from '../../decorator/metadata/index'
+import { attribute } from './logical-operator/index'
+import { ConditionExpressionDefinitionFunction } from './type/index'
 
 export function createIfNotExistsCondition<T>(metadata: Metadata<T>): ConditionExpressionDefinitionFunction[] {
   const conditionDefFns: ConditionExpressionDefinitionFunction[] = [

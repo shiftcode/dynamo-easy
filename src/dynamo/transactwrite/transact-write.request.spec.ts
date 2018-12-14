@@ -1,6 +1,5 @@
-import { of } from 'rxjs'
-
 // tslint:disable:no-non-null-assertion
+import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { update } from '../expression/logical-operator/update.function'
@@ -9,8 +8,8 @@ import { TransactConditionCheck } from './transact-condition-check'
 import { TransactDelete } from './transact-delete'
 import { TransactOperation } from './transact-operation.type'
 import { TransactPut } from './transact-put'
-import { TransactWriteRequest } from './transact-write.request'
 import { TransactUpdate } from './transact-update'
+import { TransactWriteRequest } from './transact-write.request'
 
 describe('TransactWriteRequest', () => {
   describe('constructor', () => {
