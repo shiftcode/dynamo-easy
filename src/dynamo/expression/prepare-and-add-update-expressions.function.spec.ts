@@ -1,13 +1,13 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Address, UpdateModel } from '../../test/models'
-import { FormId, FormType, Order, OrderId } from '../../test/models/real-world'
-import { Metadata, metadataForClass } from '../decorator/metadata'
-import { createKeyAttributes } from './create-ket-attributes.function'
-import { and, not, update2 } from './expression/logical-operator'
-import { attribute } from './expression/logical-operator/attribute.function'
-import { update } from './expression/logical-operator/update.function'
-import { addExpression } from './expression/param-util'
-import { getTableName } from './get-table-name.function'
+import { Address, UpdateModel } from '../../../test/models/index'
+import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world/index'
+import { Metadata, metadataForClass } from '../../decorator/metadata/index'
+import { createKeyAttributes } from '../../mapper'
+import { and, not, update2 } from './logical-operator/index'
+import { attribute } from './logical-operator/attribute.function'
+import { update } from './logical-operator/update.function'
+import { addExpression } from './param-util'
+import { getTableName } from '../get-table-name.function'
 import { prepareAndAddUpdateExpressions } from './prepare-and-add-update-expressions.function'
 
 describe('PrepareExpressions function', () => {
@@ -45,6 +45,19 @@ describe('PrepareExpressions function', () => {
         prepareAndAddUpdateExpressions(metadata, params, [update<UpdateModel>('lastUpdated').set(now)])
 
         expect(params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
+        expect(params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
+        expect(params.ExpressionAttributeValues).toEqual({
+          ':lastUpdated': {
+            S: now.toISOString(),
+          },
+        })
+      })
+
+      it('set (ifNotExists)', () => {
+        const now = new Date()
+
+        prepareAndAddUpdateExpressions(metadata, params, [update<UpdateModel>('lastUpdated').set(now, true)])
+        expect(params.UpdateExpression).toBe('SET #lastUpdated = if_not_exists(#lastUpdated, :lastUpdated)')
         expect(params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
         expect(params.ExpressionAttributeValues).toEqual({
           ':lastUpdated': {

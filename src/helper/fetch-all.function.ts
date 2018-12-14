@@ -1,7 +1,7 @@
 import { Key } from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { concatMap, map } from 'rxjs/operators'
-import { QueryRequest, QueryResponse, Request, ScanRequest, ScanResponse } from '../dynamo/request'
+import { QueryRequest, QueryResponse, ReadManyRequest, ScanRequest, ScanResponse } from '../dynamo/request'
 
 /**
  * When we cant load all the items of a table with one request, we will fetch as long as there is more data
@@ -9,7 +9,7 @@ import { QueryRequest, QueryResponse, Request, ScanRequest, ScanResponse } from 
  */
 
 export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?: Key): Observable<T[]> {
-  request.limit(Request.INFINITE_LIMIT)
+  request.limit(ReadManyRequest.INFINITE_LIMIT)
   if (startKey) {
     request.exclusiveStartKey(startKey)
   }

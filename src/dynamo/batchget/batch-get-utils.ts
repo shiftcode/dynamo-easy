@@ -29,9 +29,11 @@ export function batchGetItemsFetchAll(
     )
 }
 
-export type ResponseWithUnprocessedKeys = DynamoDB.BatchGetItemOutput & { UnprocessedKeys: BatchGetRequestMap }
+export type BatchGetItemOutputWithUnprocessedKeys =
+  DynamoDB.BatchGetItemOutput
+  & { UnprocessedKeys: BatchGetRequestMap }
 
-export function hasUnprocessedKeys(response: DynamoDB.BatchGetItemOutput): response is ResponseWithUnprocessedKeys {
+export function hasUnprocessedKeys(response: DynamoDB.BatchGetItemOutput): response is BatchGetItemOutputWithUnprocessedKeys {
   if (!response.UnprocessedKeys) {
     return false
   }

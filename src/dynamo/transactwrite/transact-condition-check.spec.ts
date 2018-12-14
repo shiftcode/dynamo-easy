@@ -1,6 +1,6 @@
 import { UpdateModel } from '../../../test/models'
 import { Metadata, metadataForClass } from '../../decorator/metadata'
-import { createKeyAttributes } from '../create-ket-attributes.function'
+import { createKeyAttributes } from '../../mapper'
 import { getTableName } from '../get-table-name.function'
 import { TransactConditionCheck } from './transact-condition-check'
 

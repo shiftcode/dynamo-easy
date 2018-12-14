@@ -16,7 +16,7 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
    * - persons.age
    * - places[0].address.street
    */
-  set: (value: T[K]) => UpdateExpressionDefinitionFunction
+  set: (value: T[K], ifNotExists?: boolean) => UpdateExpressionDefinitionFunction
 
   /**
    * appends one or more values to the start or end of a list, value must be of type L(ist)
@@ -78,7 +78,7 @@ export interface UpdateExpressionDefinitionChain {
    * - persons.age
    * - places[0].address.street
    */
-  set: (value: any) => UpdateExpressionDefinitionFunction
+  set: (value: any, ifNotExists?: boolean) => UpdateExpressionDefinitionFunction
 
   /**
    * appends one or more values to the start or end of a list, value must be of type L(ist)

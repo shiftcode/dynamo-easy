@@ -33,16 +33,13 @@ export function addExpression(
     params.ExpressionAttributeValues = expressionAttributeValues
   }
 
-  const expression = Reflect.get(params, expressionType)
-  if (isString(expression)) {
+  const expression = params[expressionType]
+  if (isString(expression) && expression !== '') {
     switch (expressionType) {
       case 'UpdateExpression':
-        if (expression !== '') {
-          throw new Error(
-            'params.UpdateExpression is not empty, please use the UpdateRequest.operations() method to define all the update operations',
-          )
-        }
-        break
+        throw new Error(
+          'params.UpdateExpression is not empty, please use the UpdateRequest.operations() method to define all the update operations',
+        )
       default:
         ;(<any>params)[expressionType] = `${expression} AND ${nameSafeCondition.statement}`
     }

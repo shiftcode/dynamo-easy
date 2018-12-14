@@ -1,11 +1,10 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { forEach } from 'lodash'
-import { Metadata } from '../decorator/metadata'
-import { Attributes } from '../mapper'
-import { addUpdateExpression } from './expression/param-util'
-import { Expression, UpdateExpressionDefinitionFunction } from './expression/type'
-import { SortedUpdateExpressions } from './request/update/update.request'
-
+import { Metadata } from '../../decorator/metadata/index'
+import { Attributes } from '../../mapper/index'
+import { SortedUpdateExpressions } from '../request/update/update.request'
+import { addUpdateExpression } from './param-util'
+import { Expression, UpdateExpressionDefinitionFunction } from './type/index'
 
 export function prepareAndAddUpdateExpressions(
   metadata: Metadata<any>,

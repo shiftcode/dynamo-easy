@@ -11,8 +11,7 @@ import { ConditionalParamsHost } from '../../operation-params.type'
  *      begins_with ( sortKeyName, :sortkeyval ) - true if the sort key value begins with a particular operand.
  *      (You cannot use this function with a sort key that is of formType Number.) Note that the function name begins_with is case-sensitive.
  */
-
-export interface RequestSortKeyConditionFunction<R extends ConditionalParamsHost> {
+export interface SortKeyConditionFunction<R extends ConditionalParamsHost> {
   equals: (value: any) => R
   eq: (value: any) => R
   lt: (value: any) => R

@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
+// tslint:disable:max-classes-per-file
 
-import { QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import {
   ComplexModel,
@@ -8,15 +8,48 @@ import {
   INDEX_ACTIVE_CREATED_AT,
   ModelWithABunchOfIndexes,
   ModelWithCustomMapperForSortKeyModel,
+  ModelWithGSI,
   SimpleWithPartitionKeyModel,
 } from '../../../../test/models'
-import { updateDynamoEasyConfig } from '../../../config'
-import { Attributes } from '../../../mapper'
+import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
+import { GSISortKey, Model, PartitionKey } from '../../../decorator/impl'
+import { DynamoRx } from '../../dynamo-rx'
 import { attribute } from '../../expression'
+import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
 
 describe('query request', () => {
   let querySpy: jasmine.Spy
+
+  describe('constructor', () => {
+    class MyQueryRequest extends QueryRequest<ComplexModel> {
+      constructor(dynamoRx: DynamoRx) {
+        super(dynamoRx, ComplexModel)
+      }
+
+      get theLogger() {
+        return this.logger
+      }
+    }
+
+    let request: MyQueryRequest
+
+    beforeEach(() => {
+      querySpy = jasmine.createSpy().and.returnValue(of({ Count: 1 }))
+      request = new MyQueryRequest(<any>{ query: querySpy })
+    })
+
+    it('extends ReadManyRequest', () => {
+      expect(request instanceof ReadManyRequest).toBeTruthy()
+    })
+    it('creates logger', () => {
+      expect(request.theLogger).toBeDefined()
+    })
+    it('doRequest uses dynamoRx.query', async () => {
+      await request.exec().toPromise()
+      expect(querySpy).toHaveBeenCalled()
+    })
+  })
 
   describe('defines correct params', () => {
     let request: QueryRequest<ComplexModel>
@@ -34,6 +67,39 @@ describe('query request', () => {
     it('Limit', () => {
       request.limit(5)
       expect(request.params.Limit).toBe(5)
+    })
+  })
+
+  describe('wherePartitionKey', () => {
+    let request: QueryRequest<any>
+
+    @Model()
+    class ModelWithoutGsiPartitionKey {
+      @PartitionKey()
+      id: string
+      @GSISortKey('MY_GSI')
+      count: number
+    }
+
+    beforeEach(() => {
+      request = new QueryRequest(<any>null, ModelWithoutGsiPartitionKey)
+    })
+
+    it('throws when index has no partition key defined', () => {
+      expect(() => request.index('MY_GSI').wherePartitionKey('myId')).toThrow()
+    })
+  })
+
+  describe('whereSortKey', () => {
+    let request: QueryRequest<any>
+    beforeEach(() => {
+      request = new QueryRequest(<any>null, ModelWithGSI)
+    })
+    it('throws when no sortKey was defined', () => {
+      expect(() => request.whereSortKey()).toThrow()
+    })
+    it('throws when index has no sortKey', () => {
+      expect(() => request.index(INDEX_ACTIVE).whereSortKey()).toThrow()
     })
   })
 
@@ -112,90 +178,6 @@ describe('query request', () => {
     it('descending', () => {
       req.descending()
       expect(req.params.ScanIndexForward).toBeFalsy()
-    })
-  })
-
-  describe('exec functions', () => {
-    let queryRequest: QueryRequest<SimpleWithPartitionKeyModel>
-    const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 15 }
-    const dbItem: Attributes<SimpleWithPartitionKeyModel> = {
-      id: { S: `${jsItem.id}` },
-      age: { N: `${jsItem.age}` },
-    }
-    const queryOutput: QueryOutput = {
-      Count: 2,
-      Items: [dbItem, dbItem],
-    }
-    beforeEach(() => {
-      querySpy = jasmine.createSpy().and.returnValue(of(queryOutput))
-      queryRequest = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel)
-      queryRequest.wherePartitionKey('myId')
-    })
-
-    it('execFullResponse', async () => {
-      const res = await queryRequest.execFullResponse().toPromise()
-      expect(res).toEqual({ ...queryOutput, Items: [jsItem, jsItem] })
-    })
-
-    it('execNoMap', async () => {
-      const res = await queryRequest.execNoMap().toPromise()
-      expect(res).toEqual(queryOutput)
-    })
-
-    it('exec', async () => {
-      const res = await queryRequest.exec().toPromise()
-      expect(res).toEqual([jsItem, jsItem])
-    })
-
-    it('execSingle', async () => {
-      const res = await queryRequest.execSingle().toPromise()
-      expect(querySpy).toHaveBeenCalled()
-      expect(querySpy.calls.mostRecent().args[0]).toBeDefined()
-      expect(querySpy.calls.mostRecent().args[0].Limit).toBe(1)
-      expect(res).toEqual(jsItem)
-    })
-
-    it('execCount', async () => {
-      const res = await queryRequest.execCount().toPromise()
-      expect(querySpy).toHaveBeenCalled()
-      expect(querySpy.calls.mostRecent().args[0]).toBeDefined()
-      expect(querySpy.calls.mostRecent().args[0].Select).toBe('COUNT')
-      expect(res).toBe(queryOutput.Count)
-    })
-
-    it('execFetchAll', async () => {
-      const res = await queryRequest.execFetchAll().toPromise()
-      expect(res).toEqual([jsItem, jsItem])
-    })
-  })
-
-  describe('logger', () => {
-    const sampleResponse: QueryOutput = { Items: [] }
-    let logReceiver: jasmine.Spy
-    let req: QueryRequest<SimpleWithPartitionKeyModel>
-
-    beforeEach(() => {
-      logReceiver = jasmine.createSpy()
-      querySpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
-      updateDynamoEasyConfig({ logReceiver })
-      req = new QueryRequest(<any>{ query: querySpy }, SimpleWithPartitionKeyModel)
-      req.wherePartitionKey('id')
-    })
-
-    it('exec should log params and response', async () => {
-      await req.exec().toPromise()
-      expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
-      expect(logInfoData.includes(req.params)).toBeTruthy()
-      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
-    })
-
-    it('execFullResponse should log params and response', async () => {
-      await req.execFullResponse().toPromise()
-      expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
-      expect(logInfoData.includes(req.params)).toBeTruthy()
-      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
   })
 })

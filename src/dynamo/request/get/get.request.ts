@@ -3,35 +3,25 @@ import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, fromDb } from '../../../mapper'
+import { Attributes, createKeyAttributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { createKeyAttributes } from '../../create-ket-attributes.function'
 import { DynamoRx } from '../../dynamo-rx'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
-import { getTableName } from '../../get-table-name.function'
-import { BaseRequest } from '../base.request'
+import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
 
-export class GetRequest<T> extends BaseRequest<T, any> {
-  readonly params: DynamoDB.GetItemInput
+export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, GetRequest<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
-    this.params = {
-      TableName: getTableName(this.metadata),
-      Key: createKeyAttributes(this.metadata, partitionKey, sortKey),
-    }
+    this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
+
   }
 
   consistentRead(consistentRead: boolean): GetRequest<T> {
     this.params.ConsistentRead = consistentRead
-    return this
-  }
-
-  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): GetRequest<T> {
-    this.params.ReturnConsumedCapacity = level
     return this
   }
 
