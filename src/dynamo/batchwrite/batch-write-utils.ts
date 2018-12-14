@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { delay, mergeMap } from 'rxjs/operators'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoRx } from '../dynamo-rx'
 
 
 export function batchWriteItemsWriteAll(

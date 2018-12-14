@@ -7,12 +7,11 @@ import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
+import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget/batch-get.const'
 import { DynamoRx } from '../../dynamo-rx'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
-const MAX_REQUEST_ITEM_COUNT = 100
-const DEFAULT_TIME_SLOT = 1000
 
 export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemInput, BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
@@ -21,8 +20,8 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
 
-    if (keys.length > MAX_REQUEST_ITEM_COUNT) {
-      throw new Error(`you can request at max ${MAX_REQUEST_ITEM_COUNT} items per request`)
+    if (keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) {
+      throw new Error(`you can request at max ${BATCH_GET_MAX_REQUEST_ITEM_COUNT} items per request`)
     }
 
     this.params.RequestItems = {
@@ -39,14 +38,14 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
 
   execNoMap(
     backoffTimer = randomExponentialBackoffTimer,
-    throttleTimeSlot = DEFAULT_TIME_SLOT,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
   ): Observable<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
-    throttleTimeSlot = DEFAULT_TIME_SLOT,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
   ): Observable<BatchGetSingleTableResponse<T>> {
     return this.fetch(backoffTimer, throttleTimeSlot).pipe(
       map(this.mapResponse),
@@ -54,7 +53,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
     )
   }
 
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<T[]> {
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<T[]> {
     return this.fetch(backoffTimer, throttleTimeSlot).pipe(
       map(this.mapResponse),
       map(r => r.Items),
@@ -77,7 +76,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
     }
   }
 
-  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT) {
+  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
     return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot).pipe(
       tap(response => this.logger.debug('response', response)),
