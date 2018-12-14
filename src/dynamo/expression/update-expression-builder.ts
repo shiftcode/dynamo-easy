@@ -84,7 +84,12 @@ function buildDefaultExpression(
       statement = `${namePlaceholder} = ${namePlaceholder} - ${valuePlaceholder}`
       break
     case 'set':
-      statement = `${namePlaceholder} = ${valuePlaceholder}`
+      const ifNotExists = values.length > 1 && !!values[values.length - 1] || false
+      if (ifNotExists) {
+        statement = `${namePlaceholder} = if_not_exists(${namePlaceholder}, ${valuePlaceholder})`
+      } else {
+        statement = `${namePlaceholder} = ${valuePlaceholder}`
+      }
       break
     case 'appendToList':
       const position = values.length > 1 ? values[values.length - 1] || 'END' : 'END'

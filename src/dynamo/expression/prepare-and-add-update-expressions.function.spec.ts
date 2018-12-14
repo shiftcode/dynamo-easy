@@ -53,6 +53,19 @@ describe('PrepareExpressions function', () => {
         })
       })
 
+      it('set (ifNotExists)', () => {
+        const now = new Date()
+
+        prepareAndAddUpdateExpressions(metadata, params, [update<UpdateModel>('lastUpdated').set(now, true)])
+        expect(params.UpdateExpression).toBe('SET #lastUpdated = if_not_exists(#lastUpdated, :lastUpdated)')
+        expect(params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
+        expect(params.ExpressionAttributeValues).toEqual({
+          ':lastUpdated': {
+            S: now.toISOString(),
+          },
+        })
+      })
+
       it('set (nested map)', () => {
         prepareAndAddUpdateExpressions(metadata, params, [update('info.details').set('the new detail')])
         expect(params.UpdateExpression).toBe('SET #info.#details = :info__details')
