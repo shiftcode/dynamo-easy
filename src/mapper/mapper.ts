@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Metadata } from '../decorator/metadata/metadata'
+import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
 import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
 import { Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model'
@@ -165,6 +165,28 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
 
 export function toKey<T>(item: T, modelConstructor: ModelConstructor<T>): Attributes<T> {
   return createToKeyFn(modelConstructor)(item)
+}
+
+export function createKeyAttributes<T>(
+  metadata: Metadata<T>,
+  partitionKey: any,
+  sortKey?: any,
+): Attributes<Partial<T>> {
+  const partitionKeyProp = metadata.getPartitionKey()
+
+  const keyAttributeMap = <Attributes<T>>{
+    [partitionKeyProp]: toDbOne(partitionKey, metadata.forProperty(partitionKeyProp)),
+  }
+
+  if (hasSortKey(metadata)) {
+    if (sortKey === null || sortKey === undefined) {
+      throw new Error(`please provide the sort key for attribute ${metadata.getSortKey()}`)
+    }
+    const sortKeyProp = metadata.getSortKey()
+    keyAttributeMap[sortKeyProp] = <Attribute>toDbOne(sortKey, metadata.forProperty(sortKeyProp))
+  }
+
+  return keyAttributeMap
 }
 
 export function fromDb<T>(attributeMap: Attributes<T>, modelClass?: ModelConstructor<T>): T {

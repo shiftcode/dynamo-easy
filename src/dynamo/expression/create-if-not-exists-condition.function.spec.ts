@@ -1,11 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../test/models'
-import { Metadata, metadataForClass } from '../decorator/metadata'
-import { toDb } from '../mapper'
+import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models/index'
+import { Metadata, metadataForClass } from '../../decorator/metadata/index'
+import { toDb } from '../../mapper/index'
 import { createIfNotExistsCondition } from './create-if-not-exists-condition.function'
-import { and } from './expression/logical-operator'
-import { addExpression } from './expression/param-util'
-import { getTableName } from './get-table-name.function'
+import { and } from './logical-operator/index'
+import { addExpression } from './param-util'
+import { getTableName } from '../get-table-name.function'
 
 describe('create ifNotExistsCondition', () => {
   const jsItemSimple: SimpleWithPartitionKeyModel = { id: 'myId-S', age: 20 }

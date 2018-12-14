@@ -1,7 +1,7 @@
 import { curry } from 'lodash'
 import { Metadata } from '../../decorator/metadata'
 import { ConditionalParamsHost } from '../operation-params.type'
-import { BaseRequest } from '../request/base.request'
+import { StandardRequest } from '../request/standard.request'
 import { buildFilterExpression } from './condition-expression-builder'
 import { addExpression } from './param-util'
 import { ConditionExpressionDefinitionChain } from './type/condition-expression-definition-chain'
@@ -85,20 +85,20 @@ export function doAddCondition<T, R extends ConditionalParamsHost>(
   return request
 }
 
-export function addPartitionKeyCondition<R extends BaseRequest<any, any>>(
+export function addPartitionKeyCondition<R extends StandardRequest<any, any, any>>(
   keyName: keyof any,
   keyValue: any,
   request: R,
 ): R
 
-export function addPartitionKeyCondition<T, R extends BaseRequest<T, any>>(
+export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, any>>(
   keyName: keyof T,
   keyValue: any,
   request: R,
   metadata: Metadata<T>,
 ): R
 
-export function addPartitionKeyCondition<T, R extends BaseRequest<T, any>>(
+export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, any>>(
   keyName: keyof T,
   keyValue: any,
   request: R,
@@ -121,14 +121,12 @@ export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpre
   const f = (operation: UpdateActionDef) => {
     return (...values: any[]): UpdateExpressionDefinitionFunction => {
       const copy = [...values]
-      const curried = curry<
-        string,
+      const curried = curry<string,
         UpdateActionDef,
         any[],
         string[] | undefined,
         Metadata<any> | undefined,
-        UpdateExpression
-      >(buildUpdateExpression)
+        UpdateExpression>(buildUpdateExpression)
 
       return curried(<string>attributePath, operation, copy)
     }

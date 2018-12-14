@@ -14,6 +14,7 @@ import {
   PutRequest,
   QueryRequest,
   ScanRequest,
+  TransactGetSingleTableRequest,
   UpdateRequest,
 } from './request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
@@ -77,8 +78,9 @@ describe('dynamo store', () => {
     it('batchWrite', () => expect(store.batchWrite() instanceof BatchWriteSingleTableRequest).toBeTruthy())
     it('scan', () => expect(store.scan() instanceof ScanRequest).toBeTruthy())
     it('query', () => expect(store.query() instanceof QueryRequest).toBeTruthy())
-    it('batchGetItem', () =>
-      expect(store.batchGetItem([{ id: 'id' }]) instanceof BatchGetSingleTableRequest).toBeTruthy())
+    it('batchGet', () => expect(store.batchGet([{ id: 'id' }]) instanceof BatchGetSingleTableRequest).toBeTruthy())
+    it('transactGet', () =>
+      expect(store.transactGet([{ id: 'myId' }]) instanceof TransactGetSingleTableRequest).toBeTruthy())
   })
 
   describe('should enable custom requests', () => {
