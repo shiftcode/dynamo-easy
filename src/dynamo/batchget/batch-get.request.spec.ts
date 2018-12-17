@@ -71,8 +71,8 @@ describe('batch get', () => {
     })
 
     it('should throw when more than 100 items are added', () => {
-      const items55: Array<Partial<SimpleWithPartitionKeyModel>> = new Array(55).map((x, i) => ({ id: `id-${i}` }))
-      const items60: Array<Partial<Organization>> = new Array(60).map((x, i) => ({
+      const items55: Array<Partial<SimpleWithPartitionKeyModel>> = [...new Array(55)].map((x, i) => ({ id: `id-${i}` }))
+      const items60: Array<Partial<Organization>> = [...new Array(60)].map((x, i) => ({
         id: `id-${i}`,
         createdAtDate: new Date(),
       }))

@@ -6,15 +6,11 @@ import { attribute } from '../expression/logical-operator/attribute.function'
 import { WriteRequest } from './write.request'
 
 describe('write request', () => {
-  class TestWriteRequest<T> extends WriteRequest<TestWriteRequest<T>, T, any> {
+  class TestWriteRequest<T> extends WriteRequest<T, any, TestWriteRequest<T>> {
     readonly params: any = {}
 
     constructor(modelClazz: ModelConstructor<T>) {
       super(<any>null, modelClazz)
-    }
-
-    exec() {
-      return of(null)
     }
 
     execFullResponse() {
@@ -22,16 +18,29 @@ describe('write request', () => {
     }
   }
 
-  describe('params', () => {
-    let req: TestWriteRequest<SimpleWithPartitionKeyModel>
+  let req: TestWriteRequest<SimpleWithPartitionKeyModel>
 
+  describe('exec', () => {
+    let execFullResponseSpy: jasmine.Spy
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
+      execFullResponseSpy = jasmine.createSpy().and.returnValue(of({ myValue: true }))
+      Object.assign(req, { execFullResponse: execFullResponseSpy })
     })
 
-    it('should set ReturnConsumedCapacity', () => {
-      req.returnConsumedCapacity('INDEXES')
-      expect(req.params.ReturnConsumedCapacity).toBe('INDEXES')
+    it('should call execFullResponse', async () => {
+      await req.exec().toPromise()
+      expect(execFullResponseSpy).toHaveBeenCalled()
+    })
+
+    it('should return void', async () => {
+      expect(await req.exec().toPromise()).toBeUndefined()
+    })
+  })
+
+  describe('params', () => {
+    beforeEach(() => {
+      req = new TestWriteRequest(SimpleWithPartitionKeyModel)
     })
 
     it('should set returnItemCollectionMetrics', () => {

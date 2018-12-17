@@ -11,14 +11,9 @@ import { BatchGetSingleTableRequest } from './batch-get-single-table.request'
 
 describe('batch get', () => {
   describe('constructor', () => {
-    it('should throw when no class was given', () => {
-      expect(() => new BatchGetSingleTableRequest(<any>null, <any>null, [])).toThrow()
-    })
-
-    it('should throw when a class without metadata was given', () => {
-      class NoModelClass {}
-
-      expect(() => new BatchGetSingleTableRequest(<any>null, NoModelClass, [])).toThrow()
+    it('should throw too many items are provided', () => {
+      const keys: SimpleWithPartitionKeyModel[] = new Array(200).map((_, ix) => ({ id: `id-${ix}`, age: ix }))
+      expect(() => new BatchGetSingleTableRequest(<any>null, SimpleWithPartitionKeyModel, keys)).toThrow()
     })
 
     it('should throw when adding a key without partition key', () => {

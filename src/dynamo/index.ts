@@ -1,4 +1,5 @@
 export * from './batchget'
+export * from './batchwrite'
 export * from './expression'
 export * from './request'
 export * from './dynamo-rx'

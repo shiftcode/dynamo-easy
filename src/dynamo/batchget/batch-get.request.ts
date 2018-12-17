@@ -10,10 +10,10 @@ import { DynamoRx } from '../dynamo-rx'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetFullResponse } from './batch-get-full.response'
 import { batchGetItemsFetchAll } from './batch-get-utils'
+import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from './batch-get.const'
 import { BatchGetResponse } from './batch-get.response'
 
-const MAX_REQUEST_ITEM_COUNT = 100
-const DEFAULT_TIME_SLOT = 1000
+
 
 export class BatchGetRequest {
   readonly params: DynamoDB.BatchGetItemInput
@@ -46,7 +46,7 @@ export class BatchGetRequest {
     this.tables.set(tableName, modelClazz)
 
     // check if keys to add do not exceed max count
-    if (this.itemCounter + keys.length > MAX_REQUEST_ITEM_COUNT) { throw new Error(`you can request at max ${MAX_REQUEST_ITEM_COUNT} items per request`)}
+    if (this.itemCounter + keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) { throw new Error(`you can request at max ${BATCH_GET_MAX_REQUEST_ITEM_COUNT} items per request`)}
 
     this.params.RequestItems[tableName] = {
       Keys: keys.map(createToKeyFn(modelClazz)),
@@ -58,18 +58,18 @@ export class BatchGetRequest {
     return this
   }
 
-  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
+  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
-  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<BatchGetFullResponse> {
+  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<BatchGetFullResponse> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .pipe(
         map(this.mapResponse),
       )
   }
 
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT): Observable<BatchGetResponse> {
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<BatchGetResponse> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .pipe(
         map(this.mapResponse),
@@ -77,7 +77,7 @@ export class BatchGetRequest {
       )
   }
 
-  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = DEFAULT_TIME_SLOT) {
+  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 

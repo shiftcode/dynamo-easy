@@ -1,17 +1,15 @@
 import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
 import { addSortKeyCondition } from '../../expression/request-expression-builder'
 import { SortKeyConditionFunction } from '../../expression/type'
-import { Request } from '../request.model'
+import { ReadManyRequest } from '../read-many.request'
 import { QueryResponse } from './query.response'
 
-export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, QueryResponse<T>> {
-  private readonly logger: Logger
+export class QueryRequest<T> extends ReadManyRequest<T, QueryInput, QueryOutput, QueryResponse<T>, QueryRequest<T>> {
+  protected readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
@@ -20,16 +18,11 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
 
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
     let partitionKey: keyof T
-    if (this.params.IndexName) {
-      const index = this.metadata.getIndex(this.params.IndexName)
-      if (index) {
-        partitionKey = index.partitionKey
-        if (!partitionKey) {
-          throw new Error(`there is no parition key defined for index <${this.params.IndexName}>`)
-        }
-      } else {
-        throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
+    if (this.secondaryIndex) {
+      if (!this.secondaryIndex.partitionKey) {
+        throw new Error(`there is no partition key defined for index '${this.params.IndexName}'`)
       }
+      partitionKey = this.secondaryIndex.partitionKey
     } else {
       partitionKey = this.metadata.getPartitionKey()
     }
@@ -43,17 +36,11 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
    */
   whereSortKey(): SortKeyConditionFunction<QueryRequest<T>> {
     let sortKey: keyof T | null
-    if (this.params.IndexName) {
-      const index = this.metadata.getIndex(this.params.IndexName)
-      if (index) {
-        if (index.sortKey) {
-          sortKey = index.sortKey
-        } else {
-          throw new Error(`there is no sort key defined for index <${this.params.IndexName}>`)
-        }
-      } else {
-        throw new Error(`the index <${this.params.IndexName}> does not exist on model ${this.modelClazz.name}`)
+    if (this.secondaryIndex) {
+      if (!this.secondaryIndex.sortKey) {
+        throw new Error(`there is no sort key defined for index '${this.params.IndexName}'`)
       }
+      sortKey = this.secondaryIndex.sortKey
     } else {
       sortKey = this.metadata.getSortKey()
     }
@@ -75,65 +62,8 @@ export class QueryRequest<T> extends Request<T, QueryRequest<T>, QueryInput, Que
     return this
   }
 
-  execNoMap(): Observable<QueryOutput> {
-    this.logger.debug('request (noMap)', this.params)
-    return this.dynamoRx.query(this.params).pipe(tap(response => this.logger.debug('response', response)))
-  }
-
-  execFullResponse(): Observable<QueryResponse<T>> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.query(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(this.mapFromDb),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
-  }
-
-  exec(): Observable<T[]> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.query(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(this.mapFromDb),
-      map(r => r.Items),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
-  }
-
-  execSingle(): Observable<T | null> {
-    const params = {
-      ...this.params,
-      Limit: 1
-    }
-
-    this.logger.debug('single request', params)
+  protected doRequest(params: QueryInput): Observable<QueryOutput> {
     return this.dynamoRx.query(params)
-      .pipe(
-        tap(response => this.logger.debug('response', response)),
-        map(this.mapFromDb),
-        map(r => r.Items && r.Items.length ? r.Items[0] : null),
-        tap(item => this.logger.debug('mapped item', item)),
-      )
-  }
-
-  execCount(): Observable<number> {
-    const params = {
-      ...this.params,
-      Select: 'COUNT',
-    }
-
-    this.logger.debug('count request', params)
-    return this.dynamoRx.query(params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => response.Count || 0),
-      tap(count => this.logger.debug('count', count)),
-    )
-  }
-
-  private mapFromDb = (queryResponse: QueryOutput) => {
-    const response: QueryResponse<T> = <any>{ ...queryResponse }
-    response.Items = (queryResponse.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
-
-    return response
   }
 
 }

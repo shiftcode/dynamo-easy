@@ -8,10 +8,11 @@ import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from 
 import { getTableName } from '../get-table-name.function'
 import { ConditionalParamsHost } from '../operation-params.type'
 
-export abstract class TransactBaseOperation<T,
+export abstract class TransactBaseOperation<
+  T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
-  R extends TransactBaseOperation<T, I, any>> implements ConditionalParamsHost {
-
+  R extends TransactBaseOperation<T, I, any>
+> implements ConditionalParamsHost {
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>
@@ -34,9 +35,8 @@ export abstract class TransactBaseOperation<T,
     }
   }
 
-
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
-    return addCondition('ConditionExpression', <string>attributePath, <R><any>this, this.metadata)
+    return addCondition('ConditionExpression', <string>attributePath, <R>(<any>this), this.metadata)
   }
 
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
@@ -45,8 +45,8 @@ export abstract class TransactBaseOperation<T,
     return <R>(<any>this)
   }
 
-  returnValuesOnConditionCheckFailure(value: DynamoDB.ReturnValuesOnConditionCheckFailure) {
+  returnValuesOnConditionCheckFailure(value: DynamoDB.ReturnValuesOnConditionCheckFailure): R {
     this.params.ReturnValuesOnConditionCheckFailure = value
+    return <R>(<any>this)
   }
-
 }

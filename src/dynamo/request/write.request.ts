@@ -1,35 +1,26 @@
-import {
-  DeleteItemInput,
-  PutItemInput,
-  ReturnConsumedCapacity,
-  ReturnItemCollectionMetrics,
-  UpdateItemInput,
-} from 'aws-sdk/clients/dynamodb'
+import { DeleteItemInput, PutItemInput, ReturnItemCollectionMetrics, UpdateItemInput } from 'aws-sdk/clients/dynamodb'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { ModelConstructor } from '../../model'
 import { DynamoRx } from '../dynamo-rx'
 import { and } from '../expression/logical-operator'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
-import { BaseRequest } from './base.request'
+import { StandardRequest } from './standard.request'
 
-export abstract class WriteRequest<R extends BaseRequest<T, I>,
+export abstract class WriteRequest<
   T,
-  I extends DeleteItemInput | PutItemInput | UpdateItemInput> extends BaseRequest<T, I> {
-
-
+  I extends DeleteItemInput | PutItemInput | UpdateItemInput,
+  R extends WriteRequest<T, I, R>
+> extends StandardRequest<T, I, R> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
 
-  returnConsumedCapacity(level: ReturnConsumedCapacity): R {
-    this.params.ReturnConsumedCapacity = level
-    return <R><any>this
-  }
-
   returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): R {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return <R><any>this
+    return <R>(<any>this)
   }
 
   onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
@@ -52,5 +43,13 @@ export abstract class WriteRequest<R extends BaseRequest<T, I>,
   returnValues(returnValues: 'NONE' | 'ALL_OLD'): R {
     this.params.ReturnValues = returnValues
     return <R>(<any>this)
+  }
+
+  exec(): Observable<void> {
+    return this.execFullResponse().pipe(
+      map(response => {
+        return
+      }),
+    )
   }
 }
