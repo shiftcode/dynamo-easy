@@ -7,7 +7,7 @@ import { Logger } from '../../logger/logger'
 import { Attributes, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
-import { and, RequestConditionFunctionTyped } from '../expression'
+import { and, RequestConditionFunction } from '../expression'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../expression/type'
@@ -78,7 +78,7 @@ export abstract class ReadManyRequest<T,
     return <any>this
   }
 
-  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K> {
+  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
     return addCondition('FilterExpression', attributePath, <any>this, this.metadata)
   }
 

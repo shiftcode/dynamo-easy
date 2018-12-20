@@ -3,6 +3,7 @@ import { isEmpty, isString } from 'lodash'
 import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type'
+import { UpdateActionKeyword } from './type/update-action-keyword.type'
 
 export function addUpdateExpression(updateExpression: Expression, params: UpdateItemInput) {
   addExpression('UpdateExpression', updateExpression, params)
@@ -37,13 +38,37 @@ export function addExpression(
   if (isString(expression) && expression !== '') {
     switch (expressionType) {
       case 'UpdateExpression':
-        throw new Error(
-          'params.UpdateExpression is not empty, please use the UpdateRequest.operations() method to define all the update operations',
-        )
+        const a = splitUpdateExpressionToActionKeyword(expression)
+        const b = splitUpdateExpressionToActionKeyword(nameSafeCondition.statement)
+        ;(<any>params)[expressionType] = Array.from(new Set(<UpdateActionKeyword[]>[...Object.keys(a), ... Object.keys(b)]))
+        .map(clause => `${clause} ` + (!a[clause] ? b[clause] : !b[clause] ? a[clause] : `${a[clause]}, ${b[clause]}`))
+        .join(' ')
+        break
       default:
         ;(<any>params)[expressionType] = `${expression} AND ${nameSafeCondition.statement}`
     }
   } else {
     ;(<any>params)[expressionType] = nameSafeCondition.statement
   }
+}
+
+
+type UpdateExpressionsByKeyword = {
+  [key in UpdateActionKeyword]: string
+}
+
+
+function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {
+  return updateExpression
+    .split(/\s?(SET|REMOVE|ADD|DELETE)\s/g)
+    .reduce((u, e, i, arr) => {
+      if (isUpdateActionKeyword(e)) {
+        u[e] = arr[i + 1]
+      }
+      return u
+    }, <UpdateExpressionsByKeyword>{})
+}
+
+function isUpdateActionKeyword(val: string): val is UpdateActionKeyword {
+  return /^(SET|REMOVE|ADD|DELETE)$/.test(val)
 }

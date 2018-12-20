@@ -63,17 +63,4 @@ describe('ParamUtils', () => {
       },
     })
   })
-
-  it('should throw when trying to combine two update expressions', () => {
-    params = {
-      UpdateExpression: '#b = :b',
-      ExpressionAttributeNames: { '#b': 'b' },
-      ExpressionAttributeValues: { ':b': { N: '3' } },
-    }
-
-    expect(() => {
-      const updt = update2(FooBar, 'c').set(3)(undefined, metadata)
-      addExpression('UpdateExpression', updt, params)
-    }).toThrow()
-  })
 })

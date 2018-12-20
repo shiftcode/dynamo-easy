@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata, metadataForClass } from '../../decorator/metadata/index'
 import { ModelConstructor } from '../../model/model-constructor'
-import { RequestConditionFunctionTyped } from '../expression'
+import { RequestConditionFunction } from '../expression'
 import { and } from '../expression/logical-operator/index'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -34,7 +34,7 @@ export abstract class TransactBaseOperation<T,
     }
   }
 
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K> {
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
     return addCondition('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
   }
 

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ModelConstructor } from '../../model'
 import { DynamoRx } from '../dynamo-rx'
-import { RequestConditionFunctionTyped } from '../expression'
+import { RequestConditionFunction } from '../expression'
 import { and } from '../expression/logical-operator'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -22,7 +22,7 @@ export abstract class WriteRequest<T,
     return <R>(<any>this)
   }
 
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K> {
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
     return addCondition<R, T, K>('ConditionExpression', attributePath, <any>this, this.metadata)
   }
 

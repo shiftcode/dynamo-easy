@@ -9,3 +9,8 @@ export interface ConditionalParams {
   expressionAttributeValues?: DynamoDB.ExpressionAttributeValueMap
   [key: string]: any
 }
+
+
+export interface UpdateParamsHost {
+  readonly params: DynamoDB.UpdateItemInput | DynamoDB.Update
+}
