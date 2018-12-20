@@ -4,14 +4,17 @@ import { ConditionalParamsHost } from '../operation-params.type'
 import { StandardRequest } from '../request/standard.request'
 import { buildFilterExpression } from './condition-expression-builder'
 import { addExpression } from './param-util'
-import { ConditionExpressionDefinitionChain } from './type/condition-expression-definition-chain'
+import {
+  ConditionExpressionDefinitionChain,
+  ConditionExpressionDefinitionChainTyped,
+} from './type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from './type/condition-expression-definition-function'
 import { OperatorAlias } from './type/condition-operator-alias.type'
 import { OPERATOR_TO_ALIAS_MAP } from './type/condition-operator-to-alias-map.const'
 import { ConditionOperator } from './type/condition-operator.type'
 import { ExpressionType } from './type/expression-type.type'
 import { Expression } from './type/expression.type'
-import { RequestConditionFunction } from './type/request-condition-function'
+import { RequestConditionFunctionTyped } from './type/request-condition-function'
 import { SortKeyConditionFunction } from './type/sort-key-condition-function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
@@ -26,19 +29,18 @@ import { buildUpdateExpression } from './update-expression-builder'
 /**
  * Adds a condition to the given query.
  */
-export function addCondition<R extends ConditionalParamsHost>(
+export function addCondition<R extends ConditionalParamsHost, T, K extends keyof T>(
   expressionType: ExpressionType,
-  attributePath: string,
+  attributePath: K,
   request: R,
-  metadata?: Metadata<any>,
-): RequestConditionFunction<R> {
+  metadata?: Metadata<T>,
+): RequestConditionFunctionTyped<R, T, K> {
   const f = (operator: ConditionOperator) => {
     return (...values: any[]): R => {
-      return doAddCondition(expressionType, attributePath, request, metadata, operator, ...values)
+      return doAddCondition(expressionType, <string>attributePath, request, metadata, operator, ...values)
     }
   }
-
-  return createConditionFunctions<RequestConditionFunction<R>>(f)
+  return createConditionFunctions<RequestConditionFunctionTyped<R, T, any>>(f)
 }
 
 export function addSortKeyCondition<R extends ConditionalParamsHost>(
@@ -113,10 +115,7 @@ export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, an
 
 export function updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain
 export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
-export function updateDefinitionFunction<T, K extends keyof T>(
-  attributePath: K,
-): UpdateExpressionDefinitionChainTyped<T, K>
-
+export function updateDefinitionFunction<T, K extends keyof T>(attributePath: K): UpdateExpressionDefinitionChainTyped<T, K>
 export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain {
   const f = (operation: UpdateActionDef) => {
     return (...values: any[]): UpdateExpressionDefinitionFunction => {
@@ -135,6 +134,8 @@ export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpre
   return createUpdateFunctions<UpdateExpressionDefinitionChain>(f)
 }
 
+export function propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
+export function propertyDefinitionFunction<T, K extends keyof T>(attributePath: K): ConditionExpressionDefinitionChainTyped<T, K>
 export function propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain {
   const f = (operator: ConditionOperator) => {
     return (...values: any[]): ConditionExpressionDefinitionFunction => {

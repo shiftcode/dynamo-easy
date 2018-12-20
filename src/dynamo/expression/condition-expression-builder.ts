@@ -1,4 +1,4 @@
-import { curryRight, forEach, isPlainObject } from 'lodash'
+import { curry, forEach, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { toDbOne, typeOf } from '../../mapper'
@@ -10,6 +10,17 @@ import { operatorParameterArity } from './functions/operator-parameter-arity.fun
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { ConditionOperator } from './type/condition-operator.type'
 import { Expression } from './type/expression.type'
+import { validateAttributeValue } from './update-expression-builder'
+
+type BuildFilterFn = (
+  attributePath: string,
+  namePlaceholder: string,
+  valuePlaceholder: string,
+  attributeNames: { [key: string]: string },
+  values: any[],
+  existingValueNames: string[] | undefined,
+  propertyMetadata: PropertyMetadata<any> | undefined,
+) => Expression
 
 /**
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html
@@ -22,7 +33,7 @@ import { Expression } from './type/expression.type'
  * @param {(value: any) => boolean} filterFn
  * @returns {any}
  */
-export function deepFilter(obj: any, filterFn: (value: any) => boolean): any | null {
+export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
   if (Array.isArray(obj)) {
     const returnArr: any[] = []
     obj.forEach(i => {
@@ -107,17 +118,17 @@ export function buildFilterExpression(
   /*
    * build the statement
    */
-  let buildFilterFn: any
+  let buildFilterFn: BuildFilterFn
+
   switch (operator) {
     case 'IN':
-      buildFilterFn = curryRight(buildInConditionExpression)
+      buildFilterFn = buildInConditionExpression
       break
     case 'BETWEEN':
-      buildFilterFn = curryRight(buildBetweenConditionExpression)
+      buildFilterFn = buildBetweenConditionExpression
       break
     default:
-      buildFilterFn = curryRight(buildDefaultConditionExpression)
-      buildFilterFn = buildFilterFn(operator)
+      buildFilterFn = curry(buildDefaultConditionExpression)(operator)
   }
 
   return buildFilterFn(
@@ -154,6 +165,7 @@ function buildInConditionExpression(
     .reduce(
       (result, mappedValue: Attribute | null, index: number) => {
         if (mappedValue !== null) {
+          validateAttributeValue('IN condition', mappedValue, 'S', 'N', 'B')
           result[`${valuePlaceholder}_${index}`] = mappedValue
         }
         return result
@@ -161,7 +173,9 @@ function buildInConditionExpression(
       <Attributes<any>>{},
     )
 
-  const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
+  const inStatement = (<any[]>values[0])
+    .map((value: any, index: number) => `${valuePlaceholder}_${index}`)
+    .join(', ')
 
   return {
     statement: `${namePlaceholder} IN (${inStatement})`,
@@ -179,28 +193,31 @@ function buildBetweenConditionExpression(
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
 ): Expression {
-  const attributes: Attributes<any> = {}
+  const attributeValues: Attributes<any> = {}
   const mappedValue1 = toDbOne(values[0], propertyMetadata)
   const mappedValue2 = toDbOne(values[1], propertyMetadata)
 
   if (mappedValue1 === null || mappedValue2 === null) {
     throw new Error('make sure to provide an actual value for te BETWEEN operator')
   }
+  [mappedValue1, mappedValue2]
+    .forEach(mv => validateAttributeValue('between', mv, 'S', 'N', 'B'))
 
   const value2Placeholder = uniqAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
   const statement = `${namePlaceholder} BETWEEN ${valuePlaceholder} AND ${value2Placeholder}`
-  attributes[valuePlaceholder] = mappedValue1
-  attributes[value2Placeholder] = mappedValue2
+  attributeValues[valuePlaceholder] = mappedValue1
+  attributeValues[value2Placeholder] = mappedValue2
 
   return {
     statement,
     attributeNames,
-    attributeValues: attributes,
+    attributeValues,
   }
 }
 
 function buildDefaultConditionExpression(
+  operator: ConditionOperator,
   attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
@@ -208,7 +225,6 @@ function buildDefaultConditionExpression(
   values: any[],
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
-  operator: ConditionOperator,
 ): Expression {
   let statement: string
   let hasValue = true
@@ -223,28 +239,31 @@ function buildDefaultConditionExpression(
     statement = [namePlaceholder, operator, valuePlaceholder].join(' ')
   }
 
-  const attributes: Attributes<any> = {}
+  const attributeValues: Attributes<any> = {}
   if (hasValue) {
-    let attribute: Attribute | null
+    const attribute: Attribute | null = toDbOne(values[0], propertyMetadata)
     switch (operator) {
-      case 'contains':
-        // TODO LOW:VALIDATION think about concept
-        // validateValueForContains(values[0], propertyMetadata)
-        attribute = toDbOne(values[0], propertyMetadata)
+      case 'begins_with':
+        validateAttributeValue(`${operator} condition`, attribute, 'S', 'B')
         break
-      default:
-        attribute = toDbOne(values[0], propertyMetadata)
+      case 'contains':
+      case '<':
+      case '<=':
+      case '>':
+      case '>=':
+        validateAttributeValue(`${operator} condition`, attribute, 'N', 'S', 'B')
+        break
     }
 
     if (attribute) {
-      attributes[valuePlaceholder] = attribute
+      attributeValues[valuePlaceholder] = attribute
     }
   }
 
   return {
     statement,
     attributeNames,
-    attributeValues: attributes,
+    attributeValues,
   }
 }
 
@@ -300,45 +319,3 @@ function validateValues(operator: ConditionOperator, values?: any[]) {
   }
 }
 
-// TODO LOW:VALIDATION should we support other types than String, Number, Binary (can we search a boolean set for example with boolean as string?)
-// private static validateValueForContains(value: any, propertyMetadata?: PropertyMetadata<any>): { S: string } {
-//   let finalValue: { S: string }
-//   if (propertyMetadata && propertyMetadata.typeInfo) {
-//     switch (propertyMetadata.typeInfo.type) {
-//       case Array:
-//       case Set:
-//         // TODO LOW:VALIDATION REVIEW the validation logic
-//         // const genericType = propertyMetadata.typeInfo.genericType
-//         // if ((!genericType && (typeof value === 'number' || typeof value === 'string' || typeof value === '')) || (
-//         //   genericType &&
-//         //   genericType !== String &&
-//         //   genericType !== Number &&
-//         //   genericType !== Binary)
-//         // ) {
-//         finalValue = { S: value.toString() }
-//         // } else {
-//         //   throw new Error(
-//         //     'either generic type info is not defined or the generic type is not one of String, Number, Binary',
-//         //   )
-//         // }
-//         break
-//       case String:
-//       case Number:
-//       case Binary:
-//         finalValue = { S: value.toString() }
-//         break
-//       default:
-//         throw new Error(`contains expression is not supported for type ${propertyMetadata.typeInfo.type}`)
-//     }
-//   } else {
-//     // no explicit type defined -> try to detect the type from value
-//     const type = Util.typeOf(value)
-//     if (type === String || type === Number || type === Binary) {
-//       finalValue = { S: value.toString() }
-//     } else {
-//       throw new Error(`contains expression is not supported for type ${type}`)
-//     }
-//   }
-//
-//   return finalValue
-// }

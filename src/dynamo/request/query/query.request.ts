@@ -32,7 +32,7 @@ export class QueryRequest<T> extends ReadManyRequest<T, QueryInput, QueryOutput,
 
   /**
    * used to define some condition for the sort key, use the secondary index to query based on a custom index
-   * @returns {RequestConditionFunction<T>}
+   * @returns {SortKeyConditionFunction<QueryRequest<T>>}
    */
   whereSortKey(): SortKeyConditionFunction<QueryRequest<T>> {
     let sortKey: keyof T | null

@@ -1,5 +1,5 @@
 import { Metadata, PropertyMetadata } from '../../decorator/metadata'
-import { Attribute, Attributes, isSet, toDbOne } from '../../mapper'
+import { Attribute, Attributes, AttributeType, toDbOne } from '../../mapper'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
@@ -26,10 +26,7 @@ export function buildUpdateExpression(
   metadata: Metadata<any> | undefined,
 ): UpdateExpression {
   // metadata get rid of undefined values
-  values = deepFilter(values, value => value !== undefined)
-
-  // TODO LOW:VALIDATION check if provided values are valid for given operation
-  // validateValues(operation, values)
+  values = deepFilter(values, value => value !== undefined) || []
 
   // load property metadata if model metadata was provided
   let propertyMetadata: PropertyMetadata<any> | undefined
@@ -51,8 +48,6 @@ export function buildUpdateExpression(
   /*
    * build the statement
    */
-  // const buildFilterFn: any = curryRight()
-
   return buildDefaultExpression(
     attributePath,
     resolvedAttributeNames.placeholder,
@@ -75,33 +70,39 @@ function buildDefaultExpression(
   propertyMetadata: PropertyMetadata<any> | undefined,
   operator: UpdateActionDef,
 ): UpdateExpression {
+
+  const attributeValues: Attributes<any> = {}
+  let attribute: Attribute | null = null
+
+  if (!isNoAttributeValueAction(operator.action)) {
+    attribute = toDbOne(values[0], propertyMetadata)
+    if (attribute) {
+      attributeValues[valuePlaceholder] = attribute
+    }
+  }
+
   let statement: string
   switch (operator.action) {
     case 'incrementBy':
+      validateAttributeValue(operator.action, attribute, 'N')
       statement = `${namePlaceholder} = ${namePlaceholder} + ${valuePlaceholder}`
       break
     case 'decrementBy':
+      validateAttributeValue(operator.action, attribute, 'N')
       statement = `${namePlaceholder} = ${namePlaceholder} - ${valuePlaceholder}`
       break
     case 'set':
-      const ifNotExists = values.length > 1 && !!values[values.length - 1] || false
-      if (ifNotExists) {
+      if (values.length > 1 && !!values[values.length - 1] === true) {
         statement = `${namePlaceholder} = if_not_exists(${namePlaceholder}, ${valuePlaceholder})`
       } else {
         statement = `${namePlaceholder} = ${valuePlaceholder}`
       }
       break
     case 'appendToList':
-      const position = values.length > 1 ? values[values.length - 1] || 'END' : 'END'
-      switch (position) {
-        case 'END':
-          statement = `${namePlaceholder} = list_append(${namePlaceholder}, ${valuePlaceholder})`
-          break
-        case 'START':
-          statement = `${namePlaceholder} = list_append(${valuePlaceholder}, ${namePlaceholder})`
-          break
-        default:
-          throw new Error("make sure to provide either 'START' or 'END' as value for position argument")
+      if (values.length > 1 && values[values.length - 1] === 'START') {
+        statement = `${namePlaceholder} = list_append(${valuePlaceholder}, ${namePlaceholder})`
+      } else {
+        statement = `${namePlaceholder} = list_append(${namePlaceholder}, ${valuePlaceholder})`
       }
       break
     case 'remove':
@@ -111,53 +112,39 @@ function buildDefaultExpression(
       statement = values.map(pos => `${namePlaceholder}[${pos}]`).join(', ')
       break
     case 'add':
-      // TODO LOW:VALIDATION add validation to make sure expressionAttributeValue to be N(umber) or S(et)
+      validateAttributeValue(operator.action, attribute, 'N', 'SS', 'NS', 'BS')
       statement = `${namePlaceholder} ${valuePlaceholder}`
-      // TODO LOW:VALIDATION won't work for numbers, is always gonna be mapped to a collection type
-      if ((values.length === 1 && Array.isArray(values[0])) || isSet(values[0])) {
-        // dealing with arr | set as single argument
-      } else {
-        // dealing with vararg
-        values[0] = [...values]
-      }
       break
     case 'removeFromSet':
-      // TODO LOW:VALIDATION add validation to make sure expressionAttributeValue to be S(et)
+      validateAttributeValue(operator.action, attribute, 'SS', 'NS', 'BS')
       statement = `${namePlaceholder} ${valuePlaceholder}`
-      if ((values.length === 1 && Array.isArray(values[0])) || isSet(values[0])) {
-        // dealing with arr | set as single argument
-      } else {
-        // dealing with vararg
-        values[0] = [...values]
-      }
       break
     default:
       throw new Error(`no implementation for action ${operator.action}`)
-  }
-
-  const hasValue = !isNoValueAction(operator.action)
-
-  const attributes: Attributes<any> = {}
-  if (hasValue) {
-    const attribute: Attribute | null = toDbOne(values[0], propertyMetadata)
-
-    if (attribute) {
-      attributes[valuePlaceholder] = attribute
-    }
   }
 
   return {
     type: operator.actionKeyword,
     statement,
     attributeNames,
-    attributeValues: attributes,
+    attributeValues,
   }
 }
 
-function isNoValueAction(action: UpdateAction) {
+function isNoAttributeValueAction(action: UpdateAction) {
   return (
     action === 'remove' ||
     // special cases: values are used in statement instead of expressionValues
     action === 'removeFromListAt'
   )
+}
+
+export function validateAttributeValue(name: string, attributeValue: Attribute | null, ...allowedTypes: AttributeType[]) {
+  if (attributeValue === null || attributeValue === undefined) {
+    throw new Error(`${name} requires an attributeValue of ${allowedTypes.join(', ')} but non was given`)
+  }
+  const key = <AttributeType>Object.keys(attributeValue)[0]
+  if (!allowedTypes.includes(key)) {
+    throw new Error(`Type ${key} of ${JSON.stringify(attributeValue)} is not allowed for ${name}. Valid types are: ${allowedTypes.join('. ')}`)
+  }
 }

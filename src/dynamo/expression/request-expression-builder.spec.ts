@@ -35,12 +35,12 @@ describe('request expression builder', () => {
 
     it('non key', () => {
       const queryRequest = new QueryRequest(DYNAMO_RX_MOCK, Organization)
-      addCondition('FilterExpression', 'age', queryRequest).lte(45)
+      addCondition<any, Organization, 'count'>('FilterExpression', 'count', queryRequest).lte(45)
 
       const params = queryRequest.params
-      expect(params.FilterExpression).toBe('#age <= :age')
-      expect(params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
-      expect(params.ExpressionAttributeValues).toEqual({ ':age': { N: '45' } })
+      expect(params.FilterExpression).toBe('#count <= :count')
+      expect(params.ExpressionAttributeNames).toEqual({ '#count': 'count' })
+      expect(params.ExpressionAttributeValues).toEqual({ ':count': { N: '45' } })
     })
   })
 })

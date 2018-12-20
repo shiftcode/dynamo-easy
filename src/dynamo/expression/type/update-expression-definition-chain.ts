@@ -1,21 +1,23 @@
+import { ExtractListType } from '../../../helper'
 import { UpdateExpressionDefinitionFunction } from './update-expression-definition-function'
-
-type ExtractListType<T> =
-  T extends Array<(infer A)> ? A :
-    T extends Set<(infer B)> ? B :
-      T;
-
 
 
 /**
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html for full documentation
  */
 export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
-  /* ----------------------------------------------------------------
-      SET operation TODO add support for ifNotExists (#16)
-   ---------------------------------------------------------------- */
-  incrementBy: (value: number) => UpdateExpressionDefinitionFunction
-  decrementBy: (value: number) => UpdateExpressionDefinitionFunction
+
+  /**
+   * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   * @param value which maps to NumberAttribute
+   */
+  incrementBy: (value: T[K]) => UpdateExpressionDefinitionFunction
+
+  /**
+   * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   * @param value which maps to NumberAttribute
+   */
+  decrementBy: (value: T[K]) => UpdateExpressionDefinitionFunction
 
   /**
    * will update the item at the path, path can be a top level attribute or a nested attribute.
@@ -28,7 +30,7 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
   /**
    * appends one or more values to the start or end of a list, value must be of type L(ist)
    */
-  appendToList: (value: Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>, position?: 'START' | 'END') => UpdateExpressionDefinitionFunction
+  appendToList: (value: T[K] | Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>, position?: 'START' | 'END') => UpdateExpressionDefinitionFunction
 
   /* ----------------------------------------------------------------
       REMOVE operation
@@ -53,7 +55,7 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
    *  --update-expression "ADD Color :c" \
    *  --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
    */
-  add: (values: Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>) => UpdateExpressionDefinitionFunction
+  add: (values: T[K] | Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>) => UpdateExpressionDefinitionFunction
 
   /* ----------------------------------------------------------------
       DELETE operation (only supports set type)
@@ -65,18 +67,25 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
    * --update-expression "DELETE Color :p" \
    * --expression-attribute-values '{":p": {"SS": ["Yellow", "Purple"]}}'
    */
-  removeFromSet: (values: Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>) => UpdateExpressionDefinitionFunction
+  removeFromSet: (values: T[K] | Array<ExtractListType<T[K]>> | Set<ExtractListType<T[K]>>) => UpdateExpressionDefinitionFunction
 }
 
 /**
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html for full documentation
  */
 export interface UpdateExpressionDefinitionChain {
-  /* ----------------------------------------------------------------
-      SET operation TODO add support for ifNotExists (#16)
-   ---------------------------------------------------------------- */
-  incrementBy: (value: number) => UpdateExpressionDefinitionFunction
-  decrementBy: (value: number) => UpdateExpressionDefinitionFunction
+
+  /**
+   * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   * @param value which maps to NumberAttribute
+   */
+  incrementBy: (value: any) => UpdateExpressionDefinitionFunction
+
+  /**
+   * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   * @param value which maps to NumberAttribute
+   */
+  decrementBy: (value: any) => UpdateExpressionDefinitionFunction
 
   /**
    * will update the item at the path, path can be a top level attribute or a nested attribute.
@@ -115,7 +124,7 @@ export interface UpdateExpressionDefinitionChain {
    *  --update-expression "ADD Color :c" \
    *  --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
    */
-  add: (...values: any[]) => UpdateExpressionDefinitionFunction
+  add: (values: any | any[] | Set<any>) => UpdateExpressionDefinitionFunction
 
   /* ----------------------------------------------------------------
       DELETE operation (only supports set type)
@@ -127,5 +136,5 @@ export interface UpdateExpressionDefinitionChain {
    * --update-expression "DELETE Color :p" \
    * --expression-attribute-values '{":p": {"SS": ["Yellow", "Purple"]}}'
    */
-  removeFromSet: (...values: any[]) => UpdateExpressionDefinitionFunction
+  removeFromSet: (values: any | any[] | Set<any>) => UpdateExpressionDefinitionFunction
 }

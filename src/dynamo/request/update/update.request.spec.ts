@@ -6,6 +6,8 @@ import {
   SimpleWithPartitionKeyModel,
   UpdateModel,
 } from '../../../../test/models'
+import { Duration } from '../../../../test/models/duration.model'
+import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
 import { updateDynamoEasyConfig } from '../../../config'
 import { update2 } from '../../expression'
 import { update } from '../../expression/logical-operator/update.function'
@@ -55,6 +57,24 @@ describe('update request', () => {
       expect(request.params.ExpressionAttributeValues).toEqual({
         ':lastUpdated': { S: now.toISOString() },
       })
+    })
+
+    it('should allow ops with custom mappers (1)', () => {
+      const request = new UpdateRequest(<any>null, SpecialCasesModel, 'myId')
+      request.operations(update2(SpecialCasesModel, 'myChars').removeFromSet('abc'))
+      expect(request.params).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':myChars': { SS: ['a', 'b', 'c'] } })
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#myChars': 'myChars' })
+      expect(request.params.UpdateExpression).toEqual('DELETE #myChars :myChars')
+    })
+
+    it('should allow ops with custom mappers (2)', () => {
+      const request = new UpdateRequest(<any>null, SpecialCasesModel, 'myId')
+      request.operations(update2(SpecialCasesModel, 'duration').add(new Duration(30)))
+      expect(request.params).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':duration': { N: '30' } })
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#duration': 'duration' })
+      expect(request.params.UpdateExpression).toEqual('ADD #duration :duration')
     })
   })
 
