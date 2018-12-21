@@ -34,18 +34,14 @@ export function addExpression(
     params.ExpressionAttributeValues = expressionAttributeValues
   }
 
-  const expression = params[expressionType]
-  if (isString(expression) && expression !== '') {
+  const statement = params[expressionType]
+  if (isString(statement) && statement !== '') {
     switch (expressionType) {
       case 'UpdateExpression':
-        const a = splitUpdateExpressionToActionKeyword(expression)
-        const b = splitUpdateExpressionToActionKeyword(nameSafeCondition.statement)
-        ;(<any>params)[expressionType] = Array.from(new Set(<UpdateActionKeyword[]>[...Object.keys(a), ... Object.keys(b)]))
-        .map(clause => `${clause} ` + (!a[clause] ? b[clause] : !b[clause] ? a[clause] : `${a[clause]}, ${b[clause]}`))
-        .join(' ')
+        ;(<any>params)[expressionType] = mergeUpdateExpressions(statement, nameSafeCondition.statement)
         break
       default:
-        ;(<any>params)[expressionType] = `${expression} AND ${nameSafeCondition.statement}`
+        ;(<any>params)[expressionType] = `${statement} AND ${nameSafeCondition.statement}`
     }
   } else {
     ;(<any>params)[expressionType] = nameSafeCondition.statement
@@ -57,6 +53,13 @@ type UpdateExpressionsByKeyword = {
   [key in UpdateActionKeyword]: string
 }
 
+export function mergeUpdateExpressions(expression1: string, expression2: string): string {
+  const a = splitUpdateExpressionToActionKeyword(expression1)
+  const b = splitUpdateExpressionToActionKeyword(expression2)
+  return Array.from(new Set(<UpdateActionKeyword[]>[...Object.keys(a), ... Object.keys(b)]))
+    .map(clause => `${clause} ` + (!a[clause] ? b[clause] : !b[clause] ? a[clause] : `${a[clause]}, ${b[clause]}`))
+    .join(' ')
+}
 
 function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {
   return updateExpression
