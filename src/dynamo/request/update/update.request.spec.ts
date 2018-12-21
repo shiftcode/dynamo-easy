@@ -6,6 +6,8 @@ import {
   SimpleWithPartitionKeyModel,
   UpdateModel,
 } from '../../../../test/models'
+import { Duration } from '../../../../test/models/duration.model'
+import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
 import { updateDynamoEasyConfig } from '../../../config'
 import { update2 } from '../../expression'
 import { update } from '../../expression/logical-operator/update.function'
@@ -46,14 +48,107 @@ describe('update request', () => {
 
     it('should add operations', () => {
       const now = new Date()
-
-      const request = new UpdateRequest(<any>null, UpdateModel, 'myId', now)
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
       request.operations(update<UpdateModel>('lastUpdated').set(now))
 
       expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
       expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
       expect(request.params.ExpressionAttributeValues).toEqual({
         ':lastUpdated': { S: now.toISOString() },
+      })
+    })
+
+    it('should allow to add multiple operations', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
+        update2(UpdateModel, 'addresses').appendToList([{ place: 'PLACE', street: 'STREET', zip: 9999 }]),
+        update2(UpdateModel, 'name').set('simon'),
+        update2(UpdateModel, 'counter').add(20),
+      )
+
+      expect(request.params.UpdateExpression).toEqual(
+        'SET #addresses = list_append(#addresses, :addresses), #name = :name ADD #counter :counter',
+      )
+      expect(request.params.ExpressionAttributeNames).toEqual({
+        '#addresses': 'addresses',
+        '#counter': 'counter',
+        '#name': 'name',
+      })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':addresses': {
+          L: [
+            {
+              M: {
+                place: { S: 'PLACE' },
+                street: { S: 'STREET' },
+                zip: { N: '9999' },
+              },
+            },
+          ],
+        },
+        ':counter': { N: '20' },
+        ':name': { S: 'simon' },
+      })
+    })
+
+    it('should allow ops with custom mappers (1)', () => {
+      const request = new UpdateRequest(<any>null, SpecialCasesModel, 'myId')
+      request.operations(update2(SpecialCasesModel, 'myChars').removeFromSet('abc'))
+      expect(request.params).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':myChars': { SS: ['a', 'b', 'c'] } })
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#myChars': 'myChars' })
+      expect(request.params.UpdateExpression).toEqual('DELETE #myChars :myChars')
+    })
+
+    it('should allow ops with custom mappers (2)', () => {
+      const request = new UpdateRequest(<any>null, SpecialCasesModel, 'myId')
+      request.operations(update2(SpecialCasesModel, 'duration').add(new Duration(30)))
+      expect(request.params).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':duration': { N: '30' } })
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#duration': 'duration' })
+      expect(request.params.UpdateExpression).toEqual('ADD #duration :duration')
+    })
+  })
+
+  describe('updateAttribute', () => {
+    it('should add params and return the request', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').updateAttribute('counter').set(25, true)
+
+      expect(request).toBeDefined()
+      expect(request instanceof UpdateRequest).toBeTruthy()
+      expect(request.params.UpdateExpression).toBe('SET #counter = if_not_exists(#counter, :counter)')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#counter': 'counter' })
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':counter': { N: '25' } })
+    })
+
+    it('should allow to add multiple update operations and conditions chained', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
+        .updateAttribute('name')
+        .set('simon')
+        .updateAttribute('addresses')
+        .appendToList([{ place: 'PLACE', street: 'STREET', zip: 9999 }])
+        .updateAttribute('topics')
+        .add(['myNewTopic'])
+        .updateAttribute('counter')
+        .remove()
+        .onlyIfAttribute('topics')
+        .contains('myOldTopic')
+
+      expect(request).toBeDefined()
+      expect(request instanceof UpdateRequest).toBeTruthy()
+      expect(request.params.UpdateExpression).toBe(
+        'SET #name = :name, #addresses = list_append(#addresses, :addresses) ADD #topics :topics REMOVE #counter',
+      )
+      expect(request.params.ExpressionAttributeNames).toEqual({
+        '#name': 'name',
+        '#addresses': 'addresses',
+        '#topics': 'topics',
+        '#counter': 'counter',
+      })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':name': { S: 'simon' },
+        ':addresses': { L: [{ M: { place: { S: 'PLACE' }, street: { S: 'STREET' }, zip: { N: '9999' } } }] },
+        ':topics': { SS: ['myNewTopic'] },
+        ':topics_2': { S: 'myOldTopic' },
       })
     })
   })

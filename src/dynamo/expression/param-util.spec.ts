@@ -3,7 +3,7 @@ import { Metadata, metadataForClass } from '../../decorator/metadata'
 import { ConditionalParams } from '../operation-params.type'
 import { and, or, update2 } from './logical-operator'
 import { attribute } from './logical-operator/attribute.function'
-import { addExpression } from './param-util'
+import { addExpression, mergeUpdateExpressions } from './param-util'
 
 describe('ParamUtils', () => {
   @Model()
@@ -64,16 +64,32 @@ describe('ParamUtils', () => {
     })
   })
 
-  it('should throw when trying to combine two update expressions', () => {
-    params = {
-      UpdateExpression: '#b = :b',
-      ExpressionAttributeNames: { '#b': 'b' },
-      ExpressionAttributeValues: { ':b': { N: '3' } },
-    }
+  describe('mergeUpdateExpressions', () => {
+    it('should correctly merge', () => {
+      expect(
+        mergeUpdateExpressions(
+          'SET a, b REMOVE e, f ADD i, j DELETE m, n',
+          'SET c, d REMOVE g, h ADD k, l DELETE o, p',
+        ),
+      ).toBe('SET a, b, c, d REMOVE e, f, g, h ADD i, j, k, l DELETE m, n, o, p')
 
-    expect(() => {
-      const updt = update2(FooBar, 'c').set(3)(undefined, metadata)
-      addExpression('UpdateExpression', updt, params)
-    }).toThrow()
+      expect(mergeUpdateExpressions('DELETE a', 'SET b REMOVE c')).toBe('DELETE a SET b REMOVE c')
+
+      expect(mergeUpdateExpressions('ADD a SET b', 'REMOVE c, d')).toBe('ADD a SET b REMOVE c, d')
+
+      expect(mergeUpdateExpressions('SET #doRemove = :doRemove, #doAdd = :doAdd', 'REMOVE c, d')).toBe(
+        'SET #doRemove = :doRemove, #doAdd = :doAdd REMOVE c, d',
+      )
+    })
+    it('should work correctly even if a property is named DELETE', () => {
+      expect(
+        mergeUpdateExpressions(
+          'DELETE #myProp, #myProp2, #DELETE ADD #myOtherProp :myOtherVal',
+          'SET #addresses = list_append(#addresses, :addresses), #name = :name',
+        ),
+      ).toBe(
+        'DELETE #myProp, #myProp2, #DELETE ADD #myOtherProp :myOtherVal SET #addresses = list_append(#addresses, :addresses), #name = :name',
+      )
+    })
   })
 })

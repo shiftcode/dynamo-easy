@@ -1,18 +1,17 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata, metadataForClass } from '../../decorator/metadata/index'
 import { ModelConstructor } from '../../model/model-constructor'
+import { RequestConditionFunction } from '../expression'
 import { and } from '../expression/logical-operator/index'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type/index'
+import { ConditionExpressionDefinitionFunction } from '../expression/type/index'
 import { getTableName } from '../get-table-name.function'
 import { ConditionalParamsHost } from '../operation-params.type'
 
-export abstract class TransactBaseOperation<
-  T,
+export abstract class TransactBaseOperation<T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
-  R extends TransactBaseOperation<T, I, any>
-> implements ConditionalParamsHost {
+  R extends TransactBaseOperation<T, I, any>> implements ConditionalParamsHost {
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>
@@ -35,8 +34,8 @@ export abstract class TransactBaseOperation<
     }
   }
 
-  onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
-    return addCondition('ConditionExpression', <string>attributePath, <R>(<any>this), this.metadata)
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
+    return addCondition('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
   }
 
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {

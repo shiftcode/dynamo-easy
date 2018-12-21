@@ -6,7 +6,8 @@ import { createKeyAttributes } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
 import { prepareAndAddUpdateExpressions } from '../../expression/prepare-and-add-update-expressions.function'
-import { UpdateExpression, UpdateExpressionDefinitionFunction } from '../../expression/type'
+import { addUpdate } from '../../expression/request-expression-builder'
+import { RequestUpdateFunction, UpdateExpression, UpdateExpressionDefinitionFunction } from '../../expression/type'
 import { UpdateActionKeyword } from '../../expression/type/update-action-keyword.type'
 import { WriteRequest } from '../write.request'
 
@@ -19,6 +20,10 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
+  }
+
+  updateAttribute<K extends keyof T>(attributePath:K): RequestUpdateFunction<UpdateRequest<T>, T, K> {
+    return addUpdate(attributePath, this, this.metadata)
   }
 
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {

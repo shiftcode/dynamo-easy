@@ -1,19 +1,25 @@
+import { SimpleWithPartitionKeyModel } from '../../../../test/models'
+import { Expression } from '../type'
 import { and } from './and.function'
-import { attribute } from './attribute.function'
+import { attribute, attribute2 } from './attribute.function'
 import { not } from './not.function'
 import { or } from './or.function'
 
 describe('chained conditions', () => {
+  let condition: Expression
+
+  it('strictly typed', () => {
+    condition = attribute2(SimpleWithPartitionKeyModel, 'age').attributeExists()(undefined, undefined)
+    expect(condition.statement).toBe('attribute_exists (#age)')
+  })
+
   it('not', () => {
-    const condition = not(attribute('name').contains('SortedUpdateExpressions'))(undefined, undefined)
+    condition = not(attribute('name').contains('SortedUpdateExpressions'))(undefined, undefined)
     expect(condition.statement).toBe('NOT contains (#name, :name)')
   })
 
   it('and & not', () => {
-    const condition = and(not(attribute('name').contains('z')), attribute('name').beginsWith('Sta'))(
-      undefined,
-      undefined,
-    )
+    condition = and(not(attribute('name').contains('z')), attribute('name').beginsWith('Sta'))(undefined, undefined)
 
     expect(condition.attributeNames).toBeDefined()
     expect(Object.keys(condition.attributeNames).length).toBe(1)
@@ -27,16 +33,13 @@ describe('chained conditions', () => {
   })
 
   it('or', () => {
-    const condition = or(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
-      undefined,
-      undefined,
-    )
+    condition = or(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(undefined, undefined)
 
     expect(condition.statement).toBe('(#age > :age OR contains (#name, :name))')
   })
 
   it('and', () => {
-    const condition = and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
+    condition = and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions'))(
       undefined,
       undefined,
     )
@@ -45,7 +48,7 @@ describe('chained conditions', () => {
   })
 
   it('mixed', () => {
-    const condition = or(
+    condition = or(
       and(attribute('age').gt(10), attribute('name').contains('SortedUpdateExpressions')),
       attribute('doAddCondition').beginsWith('Start'),
     )(undefined, undefined)

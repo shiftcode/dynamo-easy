@@ -24,6 +24,7 @@ import {
   OrganizationEvent,
   Product,
   ProductNested,
+  SimpleModel,
   SimpleWithCompositePartitionKeyModel,
   SimpleWithPartitionKeyModel,
   StringType,
@@ -37,7 +38,7 @@ import {
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
 import { PropertyMetadata } from '../decorator'
 import { metadataForClass } from '../decorator/metadata'
-import { createKeyAttributes } from './index'
+import { createKeyAttributes, createToKeyFn, toKey } from './index'
 import { fromDb, fromDbOne, toDb, toDbOne } from './mapper'
 import {
   Attribute,
@@ -229,6 +230,7 @@ describe('Mapper', () => {
           age: NumberAttribute
           children: ListAttribute
         }
+
         const attrValue = <MapAttribute<ObjType>>toDbOne({
           name: 'Max',
           age: 35,
@@ -893,6 +895,38 @@ describe('Mapper', () => {
 
     it('should throw when required sortKey is missing', () => {
       expect(() => createKeyAttributes(metadataForClass(SimpleWithCompositePartitionKeyModel), 'myId')).toThrow()
+    })
+  })
+
+  describe('createToKeyFn, toKey', () => {
+    it('should throw when model has no defined properties', () => {
+      expect(() => createToKeyFn(SimpleModel)).toThrow()
+    })
+    it('should throw when given partial has undefined key properties', () => {
+      expect(() => toKey({}, SimpleWithPartitionKeyModel)).toThrow()
+      expect(() => toKey({ id: 'myId' }, SimpleWithCompositePartitionKeyModel)).toThrow()
+      expect(() => toKey({ creationDate: new Date() }, SimpleWithCompositePartitionKeyModel)).toThrow()
+    })
+    it('should create key attributes of simple key', () => {
+      const key = toKey({ id: 'myId' }, SimpleWithPartitionKeyModel)
+      expect(key).toEqual({
+        id: { S: 'myId' },
+      })
+    })
+    it('should create key attributes of composite key', () => {
+      const partial: Partial<SimpleWithCompositePartitionKeyModel> = { id: 'myId', creationDate: new Date() }
+      const key = toKey(partial, SimpleWithCompositePartitionKeyModel)
+      expect(key).toEqual({
+        id: { S: partial.id! },
+        creationDate: { S: partial.creationDate!.toISOString() },
+      })
+    })
+    it('should create key with custom mapper', () => {
+      const partial: ModelWithCustomMapperModel = { id: new Id(7, 2018) }
+      const key = toKey(partial, ModelWithCustomMapperModel)
+      expect(key).toEqual({
+        id: { S: Id.unparse(partial.id) },
+      })
     })
   })
 })
