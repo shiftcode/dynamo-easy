@@ -30,6 +30,7 @@ describe('buildUpdateExpression', () => {
       expect(() => buildUpdateExpression('age', op, ['notANumber'], [], metaDataS)).toThrow()
     })
   })
+
   describe('decrementBy', () => {
     const op = new UpdateActionDef('SET', 'decrementBy')
     it('should build expression', () => {
@@ -80,6 +81,7 @@ describe('buildUpdateExpression', () => {
     it('should throw when not number or a set value', () => {
       expect(() => buildUpdateExpression('age', op, ['notANumber'], [], metaDataS)).toThrow()
     })
+
     it('should throw when no value for attributeValue was given', () => {
       expect(() => buildUpdateExpression('age', op, [], [], metaDataS)).toThrow()
     })

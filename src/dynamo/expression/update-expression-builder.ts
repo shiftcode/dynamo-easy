@@ -81,14 +81,15 @@ function buildDefaultExpression(
     }
   }
 
+  // see update-expression-definition-chain.ts for action definitions
   let statement: string
   switch (operator.action) {
     case 'incrementBy':
-      validateAttributeValue(operator.action, attribute, 'N')
+      validateAttributeType(operator.action, attribute, 'N')
       statement = `${namePlaceholder} = ${namePlaceholder} + ${valuePlaceholder}`
       break
     case 'decrementBy':
-      validateAttributeValue(operator.action, attribute, 'N')
+      validateAttributeType(operator.action, attribute, 'N')
       statement = `${namePlaceholder} = ${namePlaceholder} - ${valuePlaceholder}`
       break
     case 'set':
@@ -112,11 +113,11 @@ function buildDefaultExpression(
       statement = values.map(pos => `${namePlaceholder}[${pos}]`).join(', ')
       break
     case 'add':
-      validateAttributeValue(operator.action, attribute, 'N', 'SS', 'NS', 'BS')
+      validateAttributeType(operator.action, attribute, 'N', 'SS', 'NS', 'BS')
       statement = `${namePlaceholder} ${valuePlaceholder}`
       break
     case 'removeFromSet':
-      validateAttributeValue(operator.action, attribute, 'SS', 'NS', 'BS')
+      validateAttributeType(operator.action, attribute, 'SS', 'NS', 'BS')
       statement = `${namePlaceholder} ${valuePlaceholder}`
       break
     default:
@@ -139,12 +140,12 @@ function isNoAttributeValueAction(action: UpdateAction) {
   )
 }
 
-export function validateAttributeValue(name: string, attributeValue: Attribute | null, ...allowedTypes: AttributeType[]) {
-  if (attributeValue === null || attributeValue === undefined) {
+export function validateAttributeType(name: string, attribute: Attribute | null, ...allowedTypes: AttributeType[]) {
+  if (attribute === null || attribute === undefined) {
     throw new Error(`${name} requires an attributeValue of ${allowedTypes.join(', ')} but non was given`)
   }
-  const key = <AttributeType>Object.keys(attributeValue)[0]
+  const key = <AttributeType>Object.keys(attribute)[0]
   if (!allowedTypes.includes(key)) {
-    throw new Error(`Type ${key} of ${JSON.stringify(attributeValue)} is not allowed for ${name}. Valid types are: ${allowedTypes.join('. ')}`)
+    throw new Error(`Type ${key} of ${JSON.stringify(attribute)} is not allowed for ${name}. Valid types are: ${allowedTypes.join('. ')}`)
   }
 }

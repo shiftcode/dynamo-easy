@@ -81,5 +81,15 @@ describe('ParamUtils', () => {
         'SET #doRemove = :doRemove, #doAdd = :doAdd REMOVE c, d',
       )
     })
+    it('should work correctly even if a property is named DELETE', () => {
+      expect(
+        mergeUpdateExpressions(
+          'DELETE #myProp, #myProp2, #DELETE ADD #myOtherProp :myOtherVal',
+          'SET #addresses = list_append(#addresses, :addresses), #name = :name',
+        ),
+      ).toBe(
+        'DELETE #myProp, #myProp2, #DELETE ADD #myOtherProp :myOtherVal SET #addresses = list_append(#addresses, :addresses), #name = :name',
+      )
+    })
   })
 })
