@@ -4,6 +4,14 @@ import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap } from 'rxjs/operators'
 import { DynamoRx } from '../dynamo-rx'
 
+/**
+ * Function which executes batchGetItem operations until all given items (as params) are processed (fetched).
+ * Between each follow-up request (in case of unprocessed items) a delay is interposed calculated by the given backoffTime and throttleTimeSlot.
+ * @param dynamoRx
+ * @param params containing the keys per table to create the batchGet operation
+ * @param backoffTimer used to determine how many time slots the follow-up request should be delayed
+ * @param throttleTimeSlot used to calculate the effective wait time
+ */
 export function batchGetItemsFetchAll(
   dynamoRx: DynamoRx,
   params: DynamoDB.BatchGetItemInput,
@@ -14,16 +22,21 @@ export function batchGetItemsFetchAll(
     .pipe(
       mergeMap(response => {
         if (hasUnprocessedKeys(response)) {
+          // in case of unprocessedItems do a follow-up requests
           return of(response.UnprocessedKeys)
             .pipe(
+              // delay before doing the follow-up request
               delay(backoffTimer.next().value * throttleTimeSlot),
+
               mergeMap((UnprocessedKeys: DynamoDB.BatchGetRequestMap) => {
                 const nextParams = { ...params, RequestItems: UnprocessedKeys }
+                // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
                 return batchGetItemsFetchAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
               }),
               map(combineBatchGetResponses(response)),
             )
         }
+        // no follow-up request necessary, return result
         return of(response)
       }),
     )
