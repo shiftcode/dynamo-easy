@@ -16,7 +16,7 @@ type BuildFilterFn = (
   attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
-  attributeNames: { [key: string]: string },
+  attributeNames: Record<string, string>,
   values: any[],
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
@@ -55,7 +55,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
 
     return returnArr.length ? new Set(returnArr) : null
   } else if (isPlainObject(obj)) {
-    const returnObj: { [key: string]: any } = {}
+    const returnObj: Record<string, any> = {}
 
     forEach(obj, (value: any, key: string) => {
       const item = deepFilter(value, filterFn)
@@ -155,7 +155,7 @@ function buildInConditionExpression(
   attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
-  attributeNames: { [key: string]: string },
+  attributeNames: Record<string, string>,
   values: any[],
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
@@ -188,7 +188,7 @@ function buildBetweenConditionExpression(
   attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
-  attributeNames: { [key: string]: string },
+  attributeNames: Record<string, string>,
   values: string[],
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
@@ -221,7 +221,7 @@ function buildDefaultConditionExpression(
   attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
-  attributeNames: { [key: string]: string },
+  attributeNames: Record<string, string>,
   values: any[],
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,

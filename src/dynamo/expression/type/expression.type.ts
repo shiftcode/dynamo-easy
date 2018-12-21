@@ -1,7 +1,7 @@
 import { Attributes } from '../../../mapper/type/attribute.type'
 
 export interface Expression {
-  attributeNames: { [key: string]: string }
+  attributeNames: Record<string, string>
   attributeValues: Attributes<any>
   statement: string
 }

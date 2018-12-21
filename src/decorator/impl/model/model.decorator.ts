@@ -57,7 +57,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
 
 function testForGSI<T>(
   property: PropertyMetadata<T>,
-): property is PropertyMetadata<T> & { keyForGSI: { [key: string]: KeyType } } {
+): property is PropertyMetadata<T> & { keyForGSI: Record<string, KeyType> } {
   return !!(property.keyForGSI && Object.keys(property.keyForGSI).length)
 }
 
@@ -82,7 +82,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
               throw new Error(
                 `there is already a partition key defined for global secondary index ${indexName} (property name: ${
                   property.nameDb
-                })`,
+                  })`,
               )
             }
 
@@ -93,7 +93,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
               throw new Error(
                 `there is already a sort key defined for global secondary index ${indexName} (property name: ${
                   property.nameDb
-                })`,
+                  })`,
               )
             }
 
@@ -133,7 +133,7 @@ function getLocalSecondaryIndexes(
           throw new Error(
             `only one sort key can be defined for the same local secondary index, ${
               property.nameDb
-            } is already defined as sort key for index ${indexName}`,
+              } is already defined as sort key for index ${indexName}`,
           )
         }
 

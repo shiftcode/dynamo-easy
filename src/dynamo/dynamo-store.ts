@@ -83,7 +83,7 @@ export class DynamoStore<T> {
     return new TransactGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
   }
 
-  makeRequest<Z>(operation: DynamoApiOperations, params?: { [key: string]: any }): Observable<Z> {
+  makeRequest<Z>(operation: DynamoApiOperations, params?: Record<string, any>): Observable<Z> {
     this.logger.debug('request', params)
     return this.dynamoRx.makeRequest(operation, params).pipe(tap(response => this.logger.debug('response', response)))
   }

@@ -34,7 +34,7 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
   initOrUpdateProperty(propertyMetadata, target, propertyKey)
 }
 
-function initOrUpdateGSI(indexes: { [key: string]: KeyType }, indexData: IndexData): Partial<PropertyMetadata<any>> {
+function initOrUpdateGSI(indexes: Record<string, KeyType>, indexData: IndexData): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
     // TODO LOW:INVESTIGATE when we throw an error we have a problem where multiple different classes extend one base class, this will be executed by multiple times
     // throw new Error(
