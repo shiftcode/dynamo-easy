@@ -171,6 +171,11 @@ describe('ReadManyRequest', () => {
       expect(res).toEqual(jsItem)
     })
 
+    it('execSingle should not alter request params', async () => {
+      await request.execSingle().toPromise()
+      expect(request.params.Limit).toBe(ReadManyRequest.DEFAULT_LIMIT)
+    })
+
     it('execSingle empty response', async () => {
       // ignore first call which has results
       await request.execSingle().toPromise()
@@ -185,6 +190,11 @@ describe('ReadManyRequest', () => {
       expect(doRequestSpy.calls.mostRecent().args[0]).toBeDefined()
       expect(doRequestSpy.calls.mostRecent().args[0].Select).toBe('COUNT')
       expect(res).toBe(output.Count)
+    })
+
+    it('execCount should not alter request params', async () => {
+      await request.execCount().toPromise()
+      expect(request.params.Select).toBeUndefined()
     })
 
     it('execCount empty response', async () => {
