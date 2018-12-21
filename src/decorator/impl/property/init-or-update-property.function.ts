@@ -46,7 +46,6 @@ function createNewProperty(
     name: propertyKey,
     nameDb: propertyKey,
     typeInfo,
-    // ...mapperOpts,
     ...propertyOptions,
   }
 

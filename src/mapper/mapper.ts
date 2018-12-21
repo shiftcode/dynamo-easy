@@ -267,9 +267,6 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
       case Set:
         mapper = CollectionMapper
         break
-      case Object:
-        mapper = ObjectMapper
-        break
       case NullType:
         mapper = NullMapper
         break
@@ -278,9 +275,11 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
       case UndefinedType:
         mapper = ObjectMapper
         break
+      case Object:
       default:
+        // return ObjectMapper as default to support nested @Model decorated classes (nested complex classes)
+        // just note that the property still needs @Property decoration to get the metadata of the complex type
         mapper = ObjectMapper
-      // throw new Error('no mapper defined for type ' + JSON.stringify(type))
     }
     mapperForType.set(type, mapper)
   }
