@@ -7,7 +7,7 @@ import { resolveAttributeNames } from './functions/attribute-names.function'
 import { isFunctionOperator } from './functions/is-function-operator.function'
 import { isNoParamFunctionOperator } from './functions/is-no-param-function-operator.function'
 import { operatorParameterArity } from './functions/operator-parameter-arity.function'
-import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
+import { uniqueAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { ConditionOperator } from './type/condition-operator.type'
 import { Expression } from './type/expression.type'
 import { validateAttributeType } from './update-expression-builder'
@@ -114,7 +114,7 @@ export function buildFilterExpression(
    * person.age
    */
   const resolvedAttributeNames = resolveAttributeNames(attributePath, propertyMetadata)
-  const valuePlaceholder = uniqAttributeValueName(attributePath, existingValueNames)
+  const valuePlaceholder = uniqueAttributeValueName(attributePath, existingValueNames)
 
   /*
    * build the statement
@@ -204,7 +204,7 @@ function buildBetweenConditionExpression(
   [mappedValue1, mappedValue2]
     .forEach(mv => validateAttributeType('between', mv, 'S', 'N', 'B'))
 
-  const value2Placeholder = uniqAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
+  const value2Placeholder = uniqueAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
   const statement = `${namePlaceholder} BETWEEN ${valuePlaceholder} AND ${value2Placeholder}`
   attributeValues[valuePlaceholder] = mappedValue1
