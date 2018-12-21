@@ -234,7 +234,7 @@ describe('PrepareExpressions function', () => {
 
       it('add (multiple set)', () => {
         prepareAndAddUpdateExpressions(metadata, params, [
-          update<UpdateModel>('topics').add(new Set(['newTopic', 'newTopic2'])),
+          update2(UpdateModel, 'topics').add(new Set(['newTopic', 'newTopic2'])),
         ])
 
         expect(params.UpdateExpression).toBe('ADD #topics :topics')
@@ -246,52 +246,14 @@ describe('PrepareExpressions function', () => {
         })
       })
 
-      it('add (multiple vararg)', () => {
-        prepareAndAddUpdateExpressions(metadata, params, [update<UpdateModel>('topics').add('newTopic', 'newTopic2')])
+      it('add number', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update2(UpdateModel, 'counter').add(4)])
 
-        expect(params.UpdateExpression).toBe('ADD #topics :topics')
-        expect(params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
+        expect(params.UpdateExpression).toBe('ADD #counter :counter')
+        expect(params.ExpressionAttributeNames).toEqual({ '#counter': 'counter' })
         expect(params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
-
-      it('add (single)', () => {
-        prepareAndAddUpdateExpressions(metadata, params, [update<UpdateModel>('topics').add('newTopic')])
-
-        expect(params.UpdateExpression).toBe('ADD #topics :topics')
-        expect(params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic'],
-          },
-        })
-      })
-
-      it('remove from set (single)', () => {
-        prepareAndAddUpdateExpressions(metadata, params, [update<UpdateModel>('topics').removeFromSet('newTopic')])
-
-        expect(params.UpdateExpression).toBe('DELETE #topics :topics')
-        expect(params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic'],
-          },
-        })
-      })
-
-      it('remove from set (multiple vararg)', () => {
-        prepareAndAddUpdateExpressions(metadata, params, [
-          update<UpdateModel>('topics').removeFromSet('newTopic', 'newTopic2'),
-        ])
-
-        expect(params.UpdateExpression).toBe('DELETE #topics :topics')
-        expect(params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
+          ':counter': {
+            N: '4',
           },
         })
       })
@@ -355,7 +317,7 @@ describe('PrepareExpressions function', () => {
         prepareAndAddUpdateExpressions(metadata, params, [
           update<UpdateModel>('active').set(true),
           update<UpdateModel>('name').set('newName'),
-          update<UpdateModel>('topics').add('myTopic'),
+          update<UpdateModel>('topics').add(['myTopic']),
         ])
 
         expect(params.UpdateExpression).toBe('SET #active = :active, #name = :name ADD #topics :topics')
@@ -397,7 +359,7 @@ describe('PrepareExpressions function', () => {
         prepareAndAddUpdateExpressions(metadata, params, [
           update<UpdateModel>('active').set(true),
           update<UpdateModel>('name').set('newName'),
-          update<UpdateModel>('topics').add('myTopic'),
+          update<UpdateModel>('topics').add(['myTopic']),
         ])
         const condition = and(not(attribute('topics').contains('otherTopic')))(undefined, metadata)
         addExpression('ConditionExpression', condition, params)

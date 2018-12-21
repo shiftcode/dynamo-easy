@@ -37,7 +37,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
     }
   }
 
-  const propertyNames: Array<keyof T> = <Array<keyof T>>Object.getOwnPropertyNames(item) || []
+  const propertyNames = <Array<keyof T>>Object.getOwnPropertyNames(item) || []
   propertyNames.forEach(propertyKey => {
     /*
      * 1) get the value of the property
@@ -60,31 +60,14 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
-          // skip transient property
-          // logger.log('transient property -> skip')
+          /* 3a_1) skip transient property */
         } else {
-          /*
-           * 3a) property metadata is defined
-           */
+          /* 3a_2) property metadata is defined and not transient */
           attributeValue = toDbOne(propertyValue, propertyMetadata)
         }
       } else {
-        /*
-         * 3b) no metadata found
-         */
-        // let typeByConvention = typeByConvention(propertyKey);
-        // if (typeByConvention) {
-        /*
-         * 4a) matches a convention
-         */
-        // attributeValue = mapperForConvention(typeByConvention).toDb(propertyValue);
-        // } else {
-        //   /*
-        //    * 4b) no naming convention matches
-        //    */
-
+        /* 3b) no metadata found */
         attributeValue = toDbOne(propertyValue)
-        // }
       }
 
       if (attributeValue === undefined) {
@@ -150,12 +133,10 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
   return (item: Partial<T>) =>
     keyProperties.reduce(
       (key, propMeta) => {
-        const propertyValue = getPropertyValue(item, propMeta.name)
-
-        if (propertyValue === null || propertyValue === undefined) {
+        if (item[propMeta.name] === null || item[propMeta.name] === undefined) {
           throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
         }
-
+        const propertyValue = getPropertyValue(item, propMeta.name)
         key[propMeta.name] = <Attribute>toDbOne(propertyValue, propMeta)
         return key
       },

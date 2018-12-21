@@ -3,7 +3,7 @@ import { isFunctionOperator } from './is-function-operator.function'
 import { isNoParamFunctionOperator } from './is-no-param-function-operator.function'
 
 /**
- * Every expression condition operator has a predefined arity (amount) of function paramers, this method
+ * Every expression condition operator has a predefined arity (amount) of function parameters, this method
  * returns this value
  *
  * @returns {number} The amount of required method parameters when calling an operator function
@@ -27,7 +27,7 @@ export function operatorParameterArity(operator: ConditionOperator): number {
       case 'BETWEEN':
         return 2
       default:
-        throw new Error(`no parameter arity defined for opererator ${operator}`)
+        throw new Error(`no parameter arity defined for operator ${operator}`)
     }
   }
 }

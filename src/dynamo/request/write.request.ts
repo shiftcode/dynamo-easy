@@ -3,17 +3,16 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ModelConstructor } from '../../model'
 import { DynamoRx } from '../dynamo-rx'
+import { RequestConditionFunction } from '../expression'
 import { and } from '../expression/logical-operator'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction, RequestConditionFunction } from '../expression/type'
+import { ConditionExpressionDefinitionFunction } from '../expression/type'
 import { StandardRequest } from './standard.request'
 
-export abstract class WriteRequest<
-  T,
+export abstract class WriteRequest<T,
   I extends DeleteItemInput | PutItemInput | UpdateItemInput,
-  R extends WriteRequest<T, I, R>
-> extends StandardRequest<T, I, R> {
+  R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
@@ -23,8 +22,8 @@ export abstract class WriteRequest<
     return <R>(<any>this)
   }
 
-  onlyIfAttribute(attributePath: keyof T): RequestConditionFunction<R> {
-    return addCondition<R>('ConditionExpression', <string>attributePath, <any>this, this.metadata)
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
+    return addCondition<R, T, K>('ConditionExpression', attributePath, <any>this, this.metadata)
   }
 
   /**

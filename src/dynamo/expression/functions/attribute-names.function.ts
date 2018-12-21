@@ -6,10 +6,10 @@ const NESTED_ATTR_PATH_REGEX = /^.+((\[(\d+)])|(\.)).*$/
 export function resolveAttributeNames(
   attributePath: string,
   propertyMetadata?: PropertyMetadata<any>,
-): { placeholder: string; attributeNames: { [key: string]: string } } {
+): { placeholder: string; attributeNames: Record<string, string> } {
   let placeholder: string
   // tslint:disable-next-line:no-shadowed-variable
-  const attributeNames: { [key: string]: string } = {}
+  const attributeNames: Record<string, string> = {}
   if (NESTED_ATTR_PATH_REGEX.test(attributePath)) {
     // nested attribute with document path (map or list)
     let re

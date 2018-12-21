@@ -2,7 +2,18 @@ import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
 import { Model, PartitionKey, Property } from '../../decorator/impl'
 import { metadataForClass } from '../../decorator/metadata'
-import { buildFilterExpression, deepFilter } from './condition-expression-builder'
+import { typeOf } from '../../mapper'
+import {
+  buildFilterExpression,
+  deepFilter,
+  ERR_ARITY_DEFAULT,
+  ERR_ARITY_IN,
+  ERR_VALUES_BETWEEN_TYPE,
+  ERR_VALUES_IN,
+} from './condition-expression-builder'
+import { operatorParameterArity } from './functions/operator-parameter-arity.function'
+import { ConditionOperator } from './type'
+import { dynamicTemplate } from './util'
 
 @Model()
 class MyModel {
@@ -264,24 +275,6 @@ describe('expressions', () => {
       expect(has(condition.attributeValues, ':creationDate_2')).toBeTruthy()
       expect(condition.attributeValues[':creationDate_2']).toEqual({ S: date2.toISOString() })
     })
-
-    it('should throw error for wrong value arity', () => {
-      expect(() => buildFilterExpression('age', 'attribute_type', [], undefined, undefined)).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
-      )
-    })
-
-    it('should throw error for wrong value arity', () => {
-      expect(() => buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined)).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
-      )
-    })
-
-    it('should throw error for wrong value type', () => {
-      expect(() => buildFilterExpression('age', 'IN', ['myValue', 'mySecondValue'], undefined, undefined)).toThrowError(
-        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)',
-      )
-    })
   })
 
   describe('operator nested attributes', () => {
@@ -310,6 +303,40 @@ describe('expressions', () => {
       expect(condition.statement).toBe('#person.#birthdays[5].#year = :person__birthdays_at_5__year')
       expect(condition.attributeNames).toEqual({ '#person': 'person', '#birthdays': 'birthdays', '#year': 'year' })
       expect(condition.attributeValues).toEqual({ ':person__birthdays_at_5__year': { N: '2016' } })
+    })
+  })
+
+  describe('validation', () => {
+    describe('arity', () => {
+      it('should throw default error for wrong arity', () => {
+        const operator: ConditionOperator = 'attribute_type'
+        expect(() => buildFilterExpression('age', operator, [], undefined, undefined)).toThrow(
+          dynamicTemplate(ERR_ARITY_DEFAULT, { parameterArity: operatorParameterArity(operator), operator }),
+        )
+      })
+
+      it('should throw error for wrong IN arity', () => {
+        const operator: ConditionOperator = 'IN'
+        expect(() =>
+          buildFilterExpression('age', operator, ['myValue', 'mySecondValue'], undefined, undefined),
+        ).toThrowError(dynamicTemplate(ERR_ARITY_IN, { parameterArity: operatorParameterArity(operator), operator }))
+      })
+    })
+
+    describe('operator values', () => {
+      it('should throw error for wrong IN values', () => {
+        const operator: ConditionOperator = 'IN'
+        expect(() => buildFilterExpression('age', operator, ['myValue'], undefined, undefined)).toThrowError(
+          ERR_VALUES_IN,
+        )
+      })
+
+      it('should throw error for wrong value type', () => {
+        const operator: ConditionOperator = 'BETWEEN'
+        expect(() => buildFilterExpression('age', operator, ['myValue', 2], undefined, undefined)).toThrowError(
+          dynamicTemplate(ERR_VALUES_BETWEEN_TYPE, { value1: typeOf('myValue'), value2: typeOf(2) }),
+        )
+      })
     })
   })
 })
