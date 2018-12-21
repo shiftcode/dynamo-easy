@@ -17,6 +17,9 @@ import { ScanRequest } from './scan/scan.request'
 import { ScanResponse } from './scan/scan.response'
 import { StandardRequest } from './standard.request'
 
+/**
+ * Base class for query and scan request classes.
+ */
 export abstract class ReadManyRequest<T,
   I extends QueryInput | ScanInput,
   O extends QueryOutput | ScanOutput,
@@ -29,6 +32,10 @@ export abstract class ReadManyRequest<T,
 
   protected abstract readonly logger: Logger
 
+  /**
+   * method that executes the actual call on dynamoRx with the given params.
+   * @param params
+   */
   protected abstract doRequest(params: I): Observable<O>
 
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
