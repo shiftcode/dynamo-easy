@@ -15,7 +15,7 @@ export type Attribute =
  * names @Property({name: 'myOtherName'}) and the value is one of Attribute
  * (we can't narrow the type of Attribute)
  */
-export type Attributes<T = {}> = { [key in keyof T | string]: Attribute }
+export type Attributes<T = {}> = Record<keyof T | string, Attribute>
 
 /**
  * An attribute of type String. For example:  "S": "Hello"

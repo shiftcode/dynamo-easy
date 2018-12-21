@@ -11,7 +11,7 @@ import { RequestUpdateFunction, UpdateExpression, UpdateExpressionDefinitionFunc
 import { UpdateActionKeyword } from '../../expression/type/update-action-keyword.type'
 import { WriteRequest } from '../write.request'
 
-export type SortedUpdateExpressions = { [key in UpdateActionKeyword]: UpdateExpression[] }
+export type SortedUpdateExpressions = Record<UpdateActionKeyword, UpdateExpression[]>
 
 export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, UpdateRequest<T>> {
   private readonly logger: Logger

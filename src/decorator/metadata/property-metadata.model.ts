@@ -41,7 +41,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   mapper?: () => MapperForType<any, R>
 
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
-  keyForGSI?: { [key: string]: KeyType }
+  keyForGSI?: Record<string, KeyType>
 
   // holds all the the index names for which this property describes the sort key attribute
   sortKeyForLSI?: string[]
