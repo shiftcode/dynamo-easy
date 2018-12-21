@@ -10,7 +10,8 @@ import { operatorParameterArity } from './functions/operator-parameter-arity.fun
 import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { ConditionOperator } from './type/condition-operator.type'
 import { Expression } from './type/expression.type'
-import { validateAttributeValue } from './update-expression-builder'
+import { validateAttributeType } from './update-expression-builder'
+import { dynamicTemplate } from './util'
 
 type BuildFilterFn = (
   attributePath: string,
@@ -96,7 +97,7 @@ export function buildFilterExpression(
   values = deepFilter(values, value => value !== undefined)
 
   // check if provided values are valid for given operator
-  validateValues(operator, values)
+  validateForOperator(operator, values)
 
   // load property metadata if model metadata was provided
   let propertyMetadata: PropertyMetadata<any> | undefined
@@ -165,7 +166,7 @@ function buildInConditionExpression(
     .reduce(
       (result, mappedValue: Attribute | null, index: number) => {
         if (mappedValue !== null) {
-          validateAttributeValue('IN condition', mappedValue, 'S', 'N', 'B')
+          validateAttributeType('IN condition', mappedValue, 'S', 'N', 'B')
           result[`${valuePlaceholder}_${index}`] = mappedValue
         }
         return result
@@ -201,7 +202,7 @@ function buildBetweenConditionExpression(
     throw new Error('make sure to provide an actual value for te BETWEEN operator')
   }
   [mappedValue1, mappedValue2]
-    .forEach(mv => validateAttributeValue('between', mv, 'S', 'N', 'B'))
+    .forEach(mv => validateAttributeType('between', mv, 'S', 'N', 'B'))
 
   const value2Placeholder = uniqAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
@@ -244,14 +245,14 @@ function buildDefaultConditionExpression(
     const attribute: Attribute | null = toDbOne(values[0], propertyMetadata)
     switch (operator) {
       case 'begins_with':
-        validateAttributeValue(`${operator} condition`, attribute, 'S', 'B')
+        validateAttributeType(`${operator} condition`, attribute, 'S', 'B')
         break
       case 'contains':
       case '<':
       case '<=':
       case '>':
       case '>=':
-        validateAttributeValue(`${operator} condition`, attribute, 'N', 'S', 'B')
+        validateAttributeType(`${operator} condition`, attribute, 'N', 'S', 'B')
         break
     }
 
@@ -271,51 +272,85 @@ function buildDefaultConditionExpression(
  * Every operator requires a predefined arity of parameters, this method checks for the correct arity and throws an Error
  * if not correct
  *
- * @param {any[]} values The values which will be applied to the operator function implementation
+ * @param operator
+ * @param values The values which will be applied to the operator function implementation, not every operator requires values
  * @throws {Error} error Throws an error if the amount of values won't match the operator function parameter arity or
  * the given values is not an array
  */
-function validateValues(operator: ConditionOperator, values?: any[]) {
-  const parameterArity = operatorParameterArity(operator)
+function validateForOperator(operator: ConditionOperator, values?: any[]) {
+  validateArity(operator, values)
+
+  /*
+   * validate values if operator supports values
+   */
+  if (!isFunctionOperator(operator) || isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
+    if (values && Array.isArray(values) && values.length) {
+      validateValues(operator, values)
+    } else {
+      // TODO
+      throw new Error('blub')
+    }
+  }
+}
+
+// tslint:disable:no-invalid-template-strings
+/*
+ * error messages for arity issues
+ */
+export const ERR_ARITY_IN = 'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
+export const ERR_ARITY_DEFAULT = 'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator'
+
+// tslint:enable:no-invalid-template-strings
+
+function validateArity(operator: ConditionOperator, values?: any[]) {
   if (values === null || values === undefined) {
     if (isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
       // the operator needs some values to work
-      throw new Error(
-        `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`,
-      )
+      throw new Error(dynamicTemplate(ERR_ARITY_DEFAULT, {parameterArity: operatorParameterArity(operator), operator}))
     }
   } else if (values && Array.isArray(values)) {
+    const parameterArity = operatorParameterArity(operator)
     // check for correct amount of values
     if (values.length !== parameterArity) {
       switch (operator) {
         case 'IN':
-          throw new Error(
-            `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)`,
-          )
+          throw new Error(dynamicTemplate(ERR_ARITY_IN, { parameterArity, operator }))
         default:
-          throw new Error(
-            `expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator`,
-          )
+          throw new Error(dynamicTemplate(ERR_ARITY_DEFAULT, { parameterArity, operator }))
       }
     }
+  }
+}
 
-    // some additional operator dependent validation
-    switch (operator) {
-      case 'BETWEEN':
-        // values must be the same type
-        if (typeOf(values[0]) !== typeOf(values[1])) {
-          throw new Error(
-            `both values for operator BETWEEN must have the same type, got ${typeOf(values[0])} and ${typeOf(
-              values[1],
-            )}`,
-          )
-        }
-        break
-      case 'IN':
-        if (!Array.isArray(values[0])) {
-          throw new Error('the provided value for IN operator must be an array')
-        }
-    }
+
+/*
+ * error message for wrong operator values
+ */
+// tslint:disable:no-invalid-template-strings
+export const ERR_VALUES_BETWEEN_TYPE = 'both values for operator BETWEEN must have the same type, got ${value1} and ${value2}'
+export const ERR_VALUES_IN = 'the provided value for IN operator must be an array'
+// tslint:enable:no-invalid-template-strings
+
+/**
+ * Every operator has some constraints about the values it supports, this method makes sure everything is fine for given
+ * operator and values
+ */
+function validateValues(operator: ConditionOperator, values: any[]) {
+  // some additional operator dependent validation
+  switch (operator) {
+    case 'BETWEEN':
+      // values must be the same type
+      if (typeOf(values[0]) !== typeOf(values[1])) {
+        throw new Error(dynamicTemplate(
+          ERR_VALUES_BETWEEN_TYPE,
+          { value1: typeOf(values[0]), value2: typeOf(values[1]) }
+        ))
+      }
+      break
+    case 'IN':
+      if (!Array.isArray(values[0])) {
+        throw new Error(ERR_VALUES_IN)
+      }
   }
 }
 
