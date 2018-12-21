@@ -25,11 +25,13 @@ export interface UpdateFunctions<T, R> {
    * samples:
    * - persons.age
    * - places[0].address.street
+   *
+   * specify ifNotExists to only execute if the property does not exist
    */
   set: (value: T, ifNotExists?: boolean) => R
 
   /**
-   * appends one or more values to the start or end of a list, value must be of type L(ist)
+   * appends one or more values to the start or end of a list, value must map to ListAttribute
    */
   appendToList: (value: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>, position?: 'START' | 'END') => R
 
@@ -45,7 +47,7 @@ export interface UpdateFunctions<T, R> {
 
   /**
    * adds or manipulates a value to an attribute of type N(umber) or S(et), manipulation behaviour differs based on attribute type
-   * for numbers AWS generally recommends to use SET rather than ADD. See incrementBy and decrementBy
+   * for numbers AWS generally recommends to use SET rather than ADD. See incrementBy and decrementBy.
    *
    * @param values {multiple values as Array | Set}
    *
