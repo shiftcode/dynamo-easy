@@ -62,8 +62,11 @@ export function mergeUpdateExpressions(expression1: string, expression2: string)
 }
 
 function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {
-  return updateExpression
-    .split(/\s?(SET|REMOVE|ADD|DELETE)\s/g)
+  // add a whitespace at the beginning of the expression to be able to work with a more stricter regex
+  return ` ${updateExpression}`
+  // the regex ensures a whitespace at the beginning of the ActionWord
+  // -> to not have problems with properties named exactly as an ActionKeyword
+    .split(/\s(SET|REMOVE|ADD|DELETE)\s/g)
     .reduce((u, e, i, arr) => {
       if (isUpdateActionKeyword(e)) {
         u[e] = arr[i + 1]
