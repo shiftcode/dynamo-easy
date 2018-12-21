@@ -30,7 +30,7 @@ export function prepareAndAddUpdateExpressions(
 
     const actionStatements: string[] = []
     let attributeValues: Attributes = {}
-    let attributeNames: { [key: string]: string } = {}
+    let attributeNames: Record<string, string> = {}
 
     forEach(sortedByActionKeyWord, (value, key) => {
       const statements: string[] = []

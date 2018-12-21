@@ -64,7 +64,7 @@ function buildDefaultExpression(
   attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
-  attributeNames: { [key: string]: string },
+  attributeNames: Record<string, string>,
   values: any[],
   existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
