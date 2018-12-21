@@ -1,6 +1,7 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-non-null-assertion
+// tslint:disable:no-unused-variable
 import { getMetaDataProperty } from '../../test/helper'
 import {
   ComplexModel,
@@ -522,5 +523,20 @@ describe('Decorators should add correct metadata', () => {
       const meta = metadata.forProperty('id')
       expect(meta).toBeDefined()
     })
+  })
+
+  describe('should throw when more than one partitionKey was defined in a model', () => {
+    expect(() => {
+      @Model()
+      class InvalidModel {
+        @PartitionKey()
+        partKeyA: string
+
+        @PartitionKey()
+        partKeyB: string
+      }
+
+      return new InvalidModel()
+    }).toThrow()
   })
 })
