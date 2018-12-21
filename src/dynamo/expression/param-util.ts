@@ -5,7 +5,7 @@ import { resolveAttributeValueNameConflicts } from './functions/resolve-attribut
 import { Expression } from './type'
 import { UpdateActionKeyword } from './type/update-action-keyword.type'
 
-export function addUpdateExpression(updateExpression: Expression, params: UpdateItemInput) {
+export function addUpdateExpression(updateExpression: Expression, params: UpdateItemInput): void {
   addExpression('UpdateExpression', updateExpression, params)
 }
 
@@ -48,11 +48,23 @@ export function addExpression(
   }
 }
 
+type UpdateExpressionsByKeyword = Record<UpdateActionKeyword, string>
 
-type UpdateExpressionsByKeyword = {
-  [key in UpdateActionKeyword]: string
-}
 
+/**
+ * Will merge two update expressions into one, one action keyword can only appear once in an update expression
+ *
+ * ```
+ * const merged = mergeUpdateExpressions(
+ *                    'SET a, b REMOVE e, f ADD i, j DELETE m, n',
+ *                    'SET c, d REMOVE g, h ADD k, l DELETE o, p',
+ *                )
+ * console.log(merged) -> 'SET a, b, c, d REMOVE e, f, g, h ADD i, j, k, l DELETE m, n, o, p'
+ * ```
+ *
+ * @param expression1
+ * @param expression2
+ */
 export function mergeUpdateExpressions(expression1: string, expression2: string): string {
   const a = splitUpdateExpressionToActionKeyword(expression1)
   const b = splitUpdateExpressionToActionKeyword(expression2)
@@ -61,6 +73,9 @@ export function mergeUpdateExpressions(expression1: string, expression2: string)
     .join(' ')
 }
 
+/**
+ * Will return an object containing all the update statements mapped to an update action keyword
+ */
 function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {
   // add a whitespace at the beginning of the expression to be able to work with a more stricter regex
   return ` ${updateExpression}`
@@ -70,7 +85,10 @@ function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateE
     .reduce((u, e, i, arr) => {
       if (isUpdateActionKeyword(e)) {
         u[e] = arr[i + 1]
+      } else {
+        throw new Error(`unknown action keyword ${e}`)
       }
+
       return u
     }, <UpdateExpressionsByKeyword>{})
 }

@@ -287,8 +287,7 @@ function validateForOperator(operator: ConditionOperator, values?: any[]) {
     if (values && Array.isArray(values) && values.length) {
       validateValues(operator, values)
     } else {
-      // TODO
-      throw new Error('blub')
+      throw new Error(dynamicTemplate(ERR_ARITY_DEFAULT, {parameterArity: operatorParameterArity(operator), operator}))
     }
   }
 }
