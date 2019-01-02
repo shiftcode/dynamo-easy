@@ -2,7 +2,7 @@ import { Metadata, PropertyMetadata } from '../../decorator/metadata'
 import { Attribute, Attributes, AttributeType, toDbOne } from '../../mapper'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
-import { uniqAttributeValueName } from './functions/unique-attribute-value-name.function'
+import { uniqueAttributeValueName } from './functions/unique-attribute-value-name.function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UpdateAction } from './type/update-action.type'
 import { UpdateExpression } from './type/update-expression.type'
@@ -43,7 +43,7 @@ export function buildUpdateExpression(
    * person.age
    */
   const resolvedAttributeNames = resolveAttributeNames(attributePath, propertyMetadata)
-  const valuePlaceholder = uniqAttributeValueName(attributePath, existingValueNames)
+  const valuePlaceholder = uniqueAttributeValueName(attributePath, existingValueNames)
 
   /*
    * build the statement

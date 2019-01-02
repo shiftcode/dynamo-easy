@@ -10,6 +10,9 @@ import { addCondition } from '../expression/request-expression-builder'
 import { ConditionExpressionDefinitionFunction } from '../expression/type'
 import { StandardRequest } from './standard.request'
 
+/**
+ * base class for all basic write request classes (DeleteItem, PutItem, UpdateItem
+ */
 export abstract class WriteRequest<T,
   I extends DeleteItemInput | PutItemInput | UpdateItemInput,
   R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
@@ -28,6 +31,8 @@ export abstract class WriteRequest<T,
 
   /**
    * @param conditionDefFns
+   * @example writeRequest.onlyIf( attribute('age').eq(23) )
+   * @example writeRequest.onlyIf( or( attribute('age').lt(18), attribute('age').gt(65) ) )
    */
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
     const condition = and(...conditionDefFns)(undefined, this.metadata)

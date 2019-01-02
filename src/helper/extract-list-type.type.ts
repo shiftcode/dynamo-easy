@@ -1,5 +1,5 @@
 /**
- * extracts the type of an Array or Set
+ * extracts the type of an Array or Set. if neither array nor set, never is returned
  *
  * ExtractListType<string[]> => string
  * ExtractListType<Set<string>> => string

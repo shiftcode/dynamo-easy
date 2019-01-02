@@ -1,73 +1,115 @@
 // tslint:disable:no-empty
 // tslint:disable:no-unnecessary-callback-wrapper
 
-import { Config, Credentials, DynamoDB } from 'aws-sdk'
-import { EMPTY, Observable } from 'rxjs'
+import { Config, Credentials } from 'aws-sdk'
+import { of } from 'rxjs'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config'
 import { DynamoRx } from './dynamo-rx'
-import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 
 describe('dynamo rx', () => {
-  describe('should call the validity ensurer before each call and return an observable', () => {
+  describe('should call the validity ensurer before each call and call the correct dynamoDB method', () => {
     let dynamoRx: DynamoRx
-    let spyValidityEnsurer: SessionValidityEnsurer
+    let sessionValidityEnsurerSpy: jasmine.Spy
+    let dynamoDbSpy: jasmine.Spy
+    let pseudoParams: any
 
     beforeEach(() => {
-      spyValidityEnsurer = jasmine.createSpy().and.returnValue(EMPTY)
-      updateDynamoEasyConfig({ sessionValidityEnsurer: spyValidityEnsurer })
+      pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
+      sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(of(true))
+      updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
       dynamoRx = new DynamoRx()
     })
 
-    afterEach(resetDynamoEasyConfig)
+    afterEach(() => {
+      resetDynamoEasyConfig()
+      expect(sessionValidityEnsurerSpy).toHaveBeenCalled()
+      expect(dynamoDbSpy).toHaveBeenCalledTimes(1)
+      expect(dynamoDbSpy).toHaveBeenCalledWith(pseudoParams)
+    })
 
-    it('putItem', () => {
-      expect(dynamoRx.putItem(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+    it('putItem', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'putItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.putItem(pseudoParams).toPromise()
     })
-    it('getItem', () => {
-      expect(dynamoRx.getItem(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('getItem', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'getItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.getItem(pseudoParams).toPromise()
     })
-    it('updateItem', () => {
-      expect(dynamoRx.updateItem(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('updateItem', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'updateItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.updateItem(pseudoParams).toPromise()
     })
-    it('deleteItem', () => {
-      expect(dynamoRx.deleteItem(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('deleteItem', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'deleteItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.deleteItem(pseudoParams).toPromise()
     })
-    it('batchWriteItem', () => {
-      expect(dynamoRx.batchWriteItem(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('batchWriteItem', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'batchWriteItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.batchWriteItem(pseudoParams).toPromise()
     })
-    it('batchGetItems', () => {
-      expect(dynamoRx.batchGetItems(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('batchGetItems', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'batchGetItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.batchGetItems(pseudoParams).toPromise()
     })
-    it('transactWriteItem', () => {
-      expect(dynamoRx.transactWriteItems(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('transactWriteItems', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'transactWriteItems').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.transactWriteItems(pseudoParams).toPromise()
     })
-    it('transactGetItems', () => {
-      expect(dynamoRx.transactGetItems(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('transactGetItems', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'transactGetItems').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.transactGetItems(pseudoParams).toPromise()
     })
-    it('scan', () => {
-      expect(dynamoRx.scan(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+
+    it('scan', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'scan').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.scan(pseudoParams).toPromise()
     })
-    it('query', () => {
-      const params: DynamoDB.QueryInput = {
-        TableName: 'tableName',
-      }
-      expect(dynamoRx.query({ ...params, KeyConditionExpression: 'blub' }) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
-      expect(() => dynamoRx.query(params)).toThrow()
+
+    it('query', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'query').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.query(pseudoParams).toPromise()
     })
-    it('makeRequest', () => {
-      expect(dynamoRx.makeRequest(<any>null) instanceof Observable).toBeTruthy()
-      expect(spyValidityEnsurer).toHaveBeenCalled()
+  })
+
+  describe('makeRequest', async () => {
+    let dynamoRx: DynamoRx
+    let sessionValidityEnsurerSpy: jasmine.Spy
+    let dynamoDbSpy: jasmine.Spy
+    let pseudoParams: any
+
+    beforeEach(() => {
+      pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
+      sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(of(true))
+      updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
+      dynamoRx = new DynamoRx()
+    })
+
+    afterEach(() => {
+      resetDynamoEasyConfig()
+      expect(sessionValidityEnsurerSpy).toHaveBeenCalled()
+      expect(dynamoDbSpy).toHaveBeenCalledTimes(1)
+      expect(dynamoDbSpy).toHaveBeenCalledWith('pseudoOperation', pseudoParams)
+    })
+
+    it('should call the validity ensurer before each call and call the correct dynamoDB method', async () => {
+      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'makeRequest').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoRx.makeRequest('pseudoOperation', pseudoParams).toPromise()
+    })
+  })
+
+  describe('query', () => {
+    beforeEach(() => {})
+    it('should throw when no KeyConditionExpression was given', () => {
+      const dynamoRx = new DynamoRx()
+      expect(() => dynamoRx.query({ TableName: 'tableName' })).toThrow()
     })
   })
 

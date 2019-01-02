@@ -1,6 +1,6 @@
 import { mapKeys } from 'lodash'
 import { Metadata } from '../../../decorator/metadata/metadata'
-import { uniqAttributeValueName } from '../functions/unique-attribute-value-name.function'
+import { uniqueAttributeValueName } from '../functions/unique-attribute-value-name.function'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
 import { Expression } from '../type/expression.type'
 
@@ -23,7 +23,7 @@ export function mergeConditions(
 
       // we need to make sure the value variable name is unique
       const attributeValues = mapKeys(condition.attributeValues, (value, key) => {
-        const unique = uniqAttributeValueName(key.replace(':', ''), Object.keys(mergedCondition.attributeValues))
+        const unique = uniqueAttributeValueName(key.replace(':', ''), Object.keys(mergedCondition.attributeValues))
         if (key !== unique) {
           condition.statement = condition.statement.replace(key, unique)
         }

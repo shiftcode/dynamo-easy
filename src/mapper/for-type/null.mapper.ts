@@ -5,11 +5,11 @@ function nullFromDb(value: NullAttribute): null {
   if (value.NULL) {
     return null
   } else {
-    throw new Error(`there is no NULL value defiend on given attribute value ${value}`)
+    throw new Error(`there is no NULL value defined on given attribute value ${value}`)
   }
 }
 
-function nullToDb(value: null): NullAttribute | null {
+function nullToDb(value: null): NullAttribute {
   if (value !== null) {
     throw new Error(`null mapper only supports null value, got ${value}`)
   }

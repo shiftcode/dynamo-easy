@@ -17,6 +17,9 @@ import { ScanRequest } from './scan/scan.request'
 import { ScanResponse } from './scan/scan.response'
 import { StandardRequest } from './standard.request'
 
+/**
+ * Base class for query and scan request classes.
+ */
 export abstract class ReadManyRequest<T,
   I extends QueryInput | ScanInput,
   O extends QueryOutput | ScanOutput,
@@ -29,6 +32,10 @@ export abstract class ReadManyRequest<T,
 
   protected abstract readonly logger: Logger
 
+  /**
+   * method that executes the actual call on dynamoRx with the given params.
+   * @param params
+   */
   protected abstract doRequest(params: I): Observable<O>
 
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
@@ -95,6 +102,8 @@ export abstract class ReadManyRequest<T,
   }
 
   execSingle(): Observable<T | null> {
+    // do not alter the params on the instance but add the additional 'Limit' param to a copy.
+    // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
       ...<any>this.params,
       Limit: 1,
@@ -110,6 +119,8 @@ export abstract class ReadManyRequest<T,
   }
 
   execCount(): Observable<number> {
+    // do not alter the params on the instance but add the additional 'Limit' param to a copy.
+    // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
       ...<any>this.params,
       Select: 'COUNT',

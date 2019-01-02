@@ -14,7 +14,7 @@ function numberFromDb(attributeValue: NumberAttribute): number {
   }
 }
 
-function numberToDb(modelValue: number): NumberAttribute | null {
+function numberToDb(modelValue: number): NumberAttribute {
   if (!isNumber(modelValue)) {
     throw new Error('this mapper only support values of type number')
   }

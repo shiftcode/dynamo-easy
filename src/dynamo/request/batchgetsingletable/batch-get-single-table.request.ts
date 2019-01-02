@@ -36,6 +36,11 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
     return this
   }
 
+  /**
+   * fetch all entries and return an the raw response (no mapping of items)
+   * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
   execNoMap(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
@@ -43,6 +48,11 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
+  /**
+   * fetch all entries and return an object containing the mapped items and the other response data
+   * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
@@ -53,6 +63,11 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemIn
     )
   }
 
+  /**
+   * fetch all entries and return the mapped entries as an array
+   * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<T[]> {
     return this.fetch(backoffTimer, throttleTimeSlot).pipe(
       map(this.mapResponse),

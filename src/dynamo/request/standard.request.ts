@@ -12,6 +12,10 @@ import { DynamoRx } from '../dynamo-rx'
 import { getTableName } from '../get-table-name.function'
 import { BaseRequest } from './base.request'
 
+/**
+ * base class for all requests types that operate on exactly one dynamo table.
+ * basically just sets the TableName info on input params.
+ */
 export abstract class StandardRequest<T,
   I extends DeleteItemInput | GetItemInput | PutItemInput | UpdateItemInput | QueryInput | ScanInput,
   R extends StandardRequest<T, I, any>> extends BaseRequest<T, I, R> {

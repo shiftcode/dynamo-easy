@@ -43,9 +43,9 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T, DynamoDB.Bat
   }
 
   /**
-   *
-   * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
-   * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
+   * write all given items
+   * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
    */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Observable<void> {
     this.logger.debug('starting batchWriteItem')
