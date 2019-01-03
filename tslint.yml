@@ -45,3 +45,6 @@ rules:
   no-unnecessary-class: true
   no-unnecessary-type-assertion: true
   no-unused-variable: true
+  # introduced with v5.12.0
+  unnecessary-constructor: true
+  unnecessary-bind: true
