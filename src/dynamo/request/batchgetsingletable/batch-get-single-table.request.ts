@@ -1,5 +1,4 @@
-import { DynamoDB } from 'aws-sdk'
-import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { randomExponentialBackoffTimer } from '../../../helper'
@@ -13,7 +12,7 @@ import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
 
-export class BatchGetSingleTableRequest<T> extends BaseRequest<T, BatchGetItemInput, BatchGetSingleTableRequest<T>> {
+export class BatchGetSingleTableRequest<T> extends BaseRequest<T, DynamoDB.BatchGetItemInput, BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {

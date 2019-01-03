@@ -1,5 +1,4 @@
-import { DynamoDB } from 'aws-sdk'
-import { BatchGetRequestMap } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { delay, map, mergeMap } from 'rxjs/operators'
 import { DynamoRx } from '../dynamo-rx'
@@ -44,7 +43,7 @@ export function batchGetItemsFetchAll(
 
 export type BatchGetItemOutputWithUnprocessedKeys =
   DynamoDB.BatchGetItemOutput
-  & { UnprocessedKeys: BatchGetRequestMap }
+  & { UnprocessedKeys: DynamoDB.BatchGetRequestMap }
 
 export function hasUnprocessedKeys(response: DynamoDB.BatchGetItemOutput): response is BatchGetItemOutputWithUnprocessedKeys {
   if (!response.UnprocessedKeys) {
