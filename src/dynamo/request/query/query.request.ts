@@ -1,4 +1,4 @@
-import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { createLogger, Logger } from '../../../logger/logger'
 import { ModelConstructor } from '../../../model'
@@ -8,7 +8,7 @@ import { SortKeyConditionFunction } from '../../expression/type'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryResponse } from './query.response'
 
-export class QueryRequest<T> extends ReadManyRequest<T, QueryInput, QueryOutput, QueryResponse<T>, QueryRequest<T>> {
+export class QueryRequest<T> extends ReadManyRequest<T, DynamoDB.QueryInput, DynamoDB.QueryOutput, QueryResponse<T>, QueryRequest<T>> {
   protected readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
@@ -62,7 +62,7 @@ export class QueryRequest<T> extends ReadManyRequest<T, QueryInput, QueryOutput,
     return this
   }
 
-  protected doRequest(params: QueryInput): Observable<QueryOutput> {
+  protected doRequest(params: DynamoDB.QueryInput): Observable<DynamoDB.QueryOutput> {
     return this.dynamoRx.query(params)
   }
 

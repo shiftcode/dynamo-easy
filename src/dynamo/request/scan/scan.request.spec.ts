@@ -1,4 +1,4 @@
-import { ScanInput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { ComplexModel } from '../../../../test/models'
 import { DynamoRx } from '../../dynamo-rx'
@@ -29,7 +29,7 @@ describe('scan request', () => {
   })
 
   it('default params', () => {
-    const params: ScanInput = request.params
+    const params: DynamoDB.ScanInput = request.params
     expect(params.TableName).toBe('complex_model')
     expect(params.Limit).toBe(ReadManyRequest.DEFAULT_LIMIT)
     expect(Object.keys(params).length).toBe(2)

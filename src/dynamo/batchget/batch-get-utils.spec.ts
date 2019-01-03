@@ -1,29 +1,24 @@
-import { DynamoDB } from 'aws-sdk'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { DynamoRx } from '../dynamo-rx'
 import { batchGetItemsFetchAll, combineBatchGetResponses, hasUnprocessedKeys } from './batch-get-utils'
 
 describe('batch-get utils', () => {
-
   describe('hasUnprocessedKeys', () => {
     it('should return bool according to given object', () => {
       expect(hasUnprocessedKeys({})).toBeFalsy()
       expect(hasUnprocessedKeys({ Responses: {} })).toBeFalsy()
       expect(hasUnprocessedKeys({ UnprocessedKeys: {} })).toBeFalsy()
-      expect(hasUnprocessedKeys({ UnprocessedKeys: { 'aTableName': { Keys: [] } } })).toBeFalsy()
-      expect(hasUnprocessedKeys({ UnprocessedKeys: { 'aTableName': { Keys: [{ id: { S: 'id' } }] } } })).toBeTruthy()
+      expect(hasUnprocessedKeys({ UnprocessedKeys: { aTableName: { Keys: [] } } })).toBeFalsy()
+      expect(hasUnprocessedKeys({ UnprocessedKeys: { aTableName: { Keys: [{ id: { S: 'id' } }] } } })).toBeTruthy()
     })
   })
 
   describe('combineBatchGetResponses', () => {
     const resp1: DynamoDB.BatchGetItemOutput = {
       Responses: {
-        'tableA': [
-          { id: { S: 'id-a1' } },
-        ],
-        'tableB': [
-          { id: { S: 'id-b' } },
-        ],
+        tableA: [{ id: { S: 'id-a1' } }],
+        tableB: [{ id: { S: 'id-b' } }],
       },
       UnprocessedKeys: {
         'tableA:': { Keys: [{ id: { S: 'id-a2' } }] },
@@ -33,12 +28,8 @@ describe('batch-get utils', () => {
     }
     const resp2: DynamoDB.BatchGetItemOutput = {
       Responses: {
-        'tableA': [
-          { id: { S: 'id-a2' } },
-        ],
-        'tableC': [
-          { id: { S: 'id-c' } },
-        ],
+        tableA: [{ id: { S: 'id-a2' } }],
+        tableC: [{ id: { S: 'id-c' } }],
       },
       UnprocessedKeys: {
         'tableD:': { Keys: [{ id: { S: 'id-d' } }] },
@@ -46,16 +37,9 @@ describe('batch-get utils', () => {
     }
     const expectedOutput: DynamoDB.BatchGetItemOutput = {
       Responses: {
-        'tableA': [
-          { id: { S: 'id-a1' } },
-          { id: { S: 'id-a2' } },
-        ],
-        'tableB': [
-          { id: { S: 'id-b' } },
-        ],
-        'tableC': [
-          { id: { S: 'id-c' } },
-        ],
+        tableA: [{ id: { S: 'id-a1' } }, { id: { S: 'id-a2' } }],
+        tableB: [{ id: { S: 'id-b' } }],
+        tableC: [{ id: { S: 'id-c' } }],
       },
       UnprocessedKeys: {
         'tableD:': { Keys: [{ id: { S: 'id-d' } }] },
@@ -64,7 +48,6 @@ describe('batch-get utils', () => {
     it('should combine correctly', () => {
       expect(combineBatchGetResponses(resp1)(resp2)).toEqual(expectedOutput)
     })
-
   })
 
   describe('batchGetItemsFetchAll', () => {
@@ -74,17 +57,17 @@ describe('batch-get utils', () => {
 
     const output1: DynamoDB.BatchGetItemOutput = {
       Responses: {
-        'tableA': [{ id: { S: 'id-A' } }],
+        tableA: [{ id: { S: 'id-A' } }],
       },
       UnprocessedKeys: {
-        'tableA': {
+        tableA: {
           Keys: [{ id: { S: 'id-A' } }],
         },
       },
     }
     const output2: DynamoDB.BatchGetItemOutput = {
       Responses: {
-        'tableA': [{ id: { S: 'id-A' } }],
+        tableA: [{ id: { S: 'id-A' } }],
       },
     }
 
@@ -93,14 +76,8 @@ describe('batch-get utils', () => {
       dynamoRx = <any>{ batchGetItems: batchGetItemsSpy }
       backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
 
-      await batchGetItemsFetchAll(
-        dynamoRx,
-        <any>{},
-        <IterableIterator<number>><any>backoffTimerMock,
-        0,
-      ).toPromise()
+      await batchGetItemsFetchAll(dynamoRx, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0).toPromise()
     })
-
 
     it('should use UnprocessedKeys for next request', () => {
       expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
@@ -112,7 +89,5 @@ describe('batch-get utils', () => {
     it('should backoff when UnprocessedItems', () => {
       expect(backoffTimerMock.next).toHaveBeenCalledTimes(1)
     })
-
   })
-
 })

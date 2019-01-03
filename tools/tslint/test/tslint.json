@@ -1,0 +1,8 @@
+{
+  "rulesDirectory": [
+    "../"
+  ],
+  "rules": {
+    "no-dynamo-named-import": true
+  }
+}

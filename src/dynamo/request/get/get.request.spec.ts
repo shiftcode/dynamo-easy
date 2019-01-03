@@ -1,5 +1,5 @@
 // tslint:disable:no-unused-expression
-import { GetItemInput, GetItemOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
@@ -28,7 +28,7 @@ describe('GetRequest', () => {
     })
 
     it('default params', () => {
-      const params: GetItemInput = request.params
+      const params: DynamoDB.GetItemInput = request.params
       expect(params.TableName).toBe(getTableName(SimpleWithPartitionKeyModel))
       expect(params.Key).toEqual({ id: { S: 'partitionKeyValue' } })
       expect(Object.keys(params).length).toBe(2)
@@ -57,7 +57,7 @@ describe('GetRequest', () => {
   describe('maps response item', () => {
     const jsItem: SimpleWithPartitionKeyModel = { age: 20, id: 'my-id' }
     const dbItem: Attributes<SimpleWithPartitionKeyModel> = { age: { N: '20' }, id: { S: 'my-id' } }
-    const sampleResponse: GetItemOutput = { Item: dbItem }
+    const sampleResponse: DynamoDB.GetItemOutput = { Item: dbItem }
 
     let getItemSpy: jasmine.Spy
     let req: GetRequest<SimpleWithPartitionKeyModel>
@@ -75,7 +75,7 @@ describe('GetRequest', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: GetItemOutput = { Item: undefined }
+    const sampleResponse: DynamoDB.GetItemOutput = { Item: undefined }
     let logReceiverSpy: jasmine.Spy
     let getItemSpy: jasmine.Spy
     let req: GetRequest<SimpleWithPartitionKeyModel>

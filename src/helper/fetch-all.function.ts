@@ -1,4 +1,4 @@
-import { Key } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { concatMap, map } from 'rxjs/operators'
 import { QueryRequest, QueryResponse, ReadManyRequest, ScanRequest, ScanResponse } from '../dynamo/request'
@@ -8,7 +8,7 @@ import { QueryRequest, QueryResponse, ReadManyRequest, ScanRequest, ScanResponse
  * available. This can be used with scan and query requests.
  */
 
-export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?: Key): Observable<T[]> {
+export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?: DynamoDB.Key): Observable<T[]> {
   request.limit(ReadManyRequest.INFINITE_LIMIT)
   if (startKey) {
     request.exclusiveStartKey(startKey)

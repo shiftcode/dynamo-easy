@@ -1,6 +1,8 @@
 extends:
   - "tslint:latest"
   - "tslint-config-prettier"
+rulesDirectory:
+  - ./tools/tslint
 rules:
   #
   # override rules from tslint:recommended
@@ -45,6 +47,14 @@ rules:
   no-unnecessary-class: true
   no-unnecessary-type-assertion: true
   no-unused-variable: true
+  import-blacklist:
+    - true
+    - aws-sdk
   # introduced with v5.12.0
   unnecessary-constructor: true
   unnecessary-bind: true
+
+  #
+  # custom rules
+  #
+  no-dynamo-named-import: true

@@ -1,4 +1,4 @@
-import { DeleteItemInput, PutItemInput, ReturnItemCollectionMetrics, UpdateItemInput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { ModelConstructor } from '../../model'
@@ -14,13 +14,13 @@ import { StandardRequest } from './standard.request'
  * base class for all basic write request classes (DeleteItem, PutItem, UpdateItem
  */
 export abstract class WriteRequest<T,
-  I extends DeleteItemInput | PutItemInput | UpdateItemInput,
+  I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
   R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
 
-  returnItemCollectionMetrics(returnItemCollectionMetrics: ReturnItemCollectionMetrics): R {
+  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): R {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
     return <R>(<any>this)
   }

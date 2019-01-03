@@ -1,4 +1,4 @@
-import { DynamoDB } from 'aws-sdk'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'

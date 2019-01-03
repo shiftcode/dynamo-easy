@@ -1,4 +1,4 @@
-import { DynamoDB } from 'aws-sdk'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { DynamoRx } from '../dynamo-rx'
 import { batchWriteItemsWriteAll, hasUnprocessedItems } from './batch-write-utils'

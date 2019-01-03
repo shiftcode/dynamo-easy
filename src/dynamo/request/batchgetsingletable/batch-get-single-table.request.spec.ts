@@ -1,4 +1,4 @@
-import { DynamoDB } from 'aws-sdk'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression

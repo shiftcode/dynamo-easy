@@ -1,4 +1,4 @@
-import { Key, QueryInput, QueryOutput, ScanInput, ScanOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { SecondaryIndex } from '../../decorator/impl'
@@ -21,8 +21,8 @@ import { StandardRequest } from './standard.request'
  * Base class for query and scan request classes.
  */
 export abstract class ReadManyRequest<T,
-  I extends QueryInput | ScanInput,
-  O extends QueryOutput | ScanOutput,
+  I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
+  O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T> | ScanResponse<T>,
   R extends QueryRequest<T> | ScanRequest<T>> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
   static DEFAULT_LIMIT = 10
@@ -49,7 +49,7 @@ export abstract class ReadManyRequest<T,
    * startKey will be removed from params
    * @returns {Request}
    */
-  exclusiveStartKey(key: Key | null): R {
+  exclusiveStartKey(key: DynamoDB.Key | null): R {
     if (key) {
       this.params.ExclusiveStartKey = key
     } else {

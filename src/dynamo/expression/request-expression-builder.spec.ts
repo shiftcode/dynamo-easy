@@ -1,4 +1,4 @@
-import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import { Organization } from '../../../test/models'
 import { DynamoRx } from '../dynamo-rx'
@@ -6,7 +6,7 @@ import { QueryRequest } from '../request'
 import { addCondition, addPartitionKeyCondition, addSortKeyCondition } from './request-expression-builder'
 
 const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
-  query(params: QueryInput): Observable<QueryOutput> {
+  query(params: DynamoDB.QueryInput): Observable<DynamoDB.QueryOutput> {
     return of({})
   },
 }

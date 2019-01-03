@@ -1,7 +1,7 @@
 // tslint:disable:no-empty
 // tslint:disable:no-unnecessary-callback-wrapper
 
-import { Config, Credentials } from 'aws-sdk'
+import { Config, Credentials } from 'aws-sdk/global'
 import { of } from 'rxjs'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config'

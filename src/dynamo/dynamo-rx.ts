@@ -1,5 +1,5 @@
-import { Config } from 'aws-sdk'
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { Config } from 'aws-sdk/global'
 import { from, Observable } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
