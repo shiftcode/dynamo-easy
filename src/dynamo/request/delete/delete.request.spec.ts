@@ -1,4 +1,4 @@
-import { DeleteItemOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
@@ -39,7 +39,7 @@ describe('delete request', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: DeleteItemOutput = { Attributes: undefined }
+    const sampleResponse: DynamoDB.DeleteItemOutput = { Attributes: undefined }
     let logReceiver: jasmine.Spy
     let deleteItemSpy: jasmine.Spy
     let req: DeleteRequest<SimpleWithPartitionKeyModel>

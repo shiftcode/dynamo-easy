@@ -1,16 +1,4 @@
-import {
-  BatchGetItemInput,
-  BatchWriteItemInput,
-  DeleteItemInput,
-  GetItemInput,
-  PutItemInput,
-  QueryInput,
-  ReturnConsumedCapacity,
-  ScanInput,
-  TransactGetItemsInput,
-  TransactWriteItemsInput,
-  UpdateItemInput,
-} from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { metadataForClass } from '../../decorator/metadata'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { ModelConstructor } from '../../model/model-constructor'
@@ -23,7 +11,7 @@ import { getTableName } from '../get-table-name.function'
  * (even if the actual operation would allow to use multiple tables. e.g. BatchWriteSingleTable)
  */
 export abstract class BaseRequest<T,
-  I extends DeleteItemInput | GetItemInput | PutItemInput | UpdateItemInput | QueryInput | ScanInput | BatchGetItemInput | BatchWriteItemInput | TransactGetItemsInput | TransactWriteItemsInput,
+  I extends DynamoDB.DeleteItemInput | DynamoDB.GetItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput | DynamoDB.QueryInput | DynamoDB.ScanInput | DynamoDB.BatchGetItemInput |DynamoDB.BatchWriteItemInput | DynamoDB.TransactGetItemsInput | DynamoDB.TransactWriteItemsInput,
   R extends BaseRequest<T, I, any>> {
   readonly dynamoRx: DynamoRx
   readonly modelClazz: ModelConstructor<T>
@@ -50,7 +38,7 @@ export abstract class BaseRequest<T,
     this.params = <I>{}
   }
 
-  returnConsumedCapacity(level: ReturnConsumedCapacity): R {
+  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): R {
     this.params.ReturnConsumedCapacity = level
     return <R><any>this
   }

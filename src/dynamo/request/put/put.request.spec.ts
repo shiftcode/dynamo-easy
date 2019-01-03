@@ -1,4 +1,4 @@
-import { PutItemInput, PutItemOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
@@ -12,7 +12,7 @@ describe('put request', () => {
     })
 
     it('constructor', () => {
-      const params: PutItemInput = request.params
+      const params: DynamoDB.PutItemInput = request.params
 
       expect(params.TableName).toBe('simple-with-partition-key-models')
       expect(params.Item).toEqual({ id: { S: 'myId' }, age: { N: '45' } })
@@ -22,7 +22,7 @@ describe('put request', () => {
     it('ifNotExists', () => {
       request.ifNotExists()
 
-      const params: PutItemInput = request.params
+      const params: DynamoDB.PutItemInput = request.params
       expect(params.ConditionExpression).toBe('(attribute_not_exists (#id))')
       expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
       expect(params.ExpressionAttributeValues).toBeUndefined()
@@ -30,7 +30,7 @@ describe('put request', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: PutItemOutput = { Attributes: undefined }
+    const sampleResponse: DynamoDB.PutItemOutput = { Attributes: undefined }
     let logReceiver: jasmine.Spy
     let putItemSpy: jasmine.Spy
     let req: PutRequest<SimpleWithPartitionKeyModel>

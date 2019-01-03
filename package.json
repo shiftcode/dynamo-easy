@@ -38,6 +38,8 @@
     "test": "jest",
     "test:ci": "jest --coverage --no-cache",
     "test:watch": "jest --watch",
+    "tslint:custom-rule:build": "tsc ./tools/tslint/noDynamoNamedImportRule.ts",
+    "tslint:custom-rule:test": "tslint --test ./tools/tslint/test",
     "prettier": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'"
   },
   "devDependencies": {
@@ -69,6 +71,7 @@
     "tsc-watch": "^1.0.31",
     "tslint": "^5.12.0",
     "tslint-config-prettier": "^1.17.0",
+    "tsutils": "^3.6.0",
     "typedoc": "^0.13.0",
     "typescript": "^3.2.2",
     "uuid": "^3.3.2"

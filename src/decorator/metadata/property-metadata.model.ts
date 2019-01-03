@@ -1,7 +1,7 @@
 import { MapperForType } from '../../mapper/for-type/base.mapper'
 
 // def good
-import { KeyType } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Attribute } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 
@@ -13,7 +13,7 @@ export interface TypeInfo {
 }
 
 export interface Key {
-  type: KeyType
+  type: DynamoDB.KeyType
   uuid?: boolean
 }
 
@@ -41,7 +41,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   mapper?: () => MapperForType<any, R>
 
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
-  keyForGSI?: Record<string, KeyType>
+  keyForGSI?: Record<string, DynamoDB.KeyType>
 
   // holds all the the index names for which this property describes the sort key attribute
   sortKeyForLSI?: string[]

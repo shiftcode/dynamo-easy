@@ -1,4 +1,4 @@
-import { KeyType } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { kebabCase } from 'lodash'
 import { ModelMetadata } from '../../metadata'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
@@ -57,7 +57,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
 
 function testForGSI<T>(
   property: PropertyMetadata<T>,
-): property is PropertyMetadata<T> & { keyForGSI: Record<string, KeyType> } {
+): property is PropertyMetadata<T> & { keyForGSI: Record<string, DynamoDB.KeyType> } {
   return !!(property.keyForGSI && Object.keys(property.keyForGSI).length)
 }
 

@@ -1,4 +1,4 @@
-import { ScanOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Observable, of } from 'rxjs'
 import {
   ModelWithABunchOfIndexes,
@@ -137,7 +137,7 @@ describe('ReadManyRequest', () => {
       id: { S: `${jsItem.id}` },
       age: { N: `${jsItem.age}` },
     }
-    const output: ScanOutput = {
+    const output: DynamoDB.ScanOutput = {
       Items: [dbItem, dbItem],
       Count: 2,
       ConsumedCapacity: { TableName: getTableName(SimpleWithPartitionKeyModel) },
@@ -212,7 +212,7 @@ describe('ReadManyRequest', () => {
   })
 
   describe('logger', () => {
-    const output: ScanOutput = { Items: [] }
+    const output: DynamoDB.ScanOutput = { Items: [] }
     let logReceiver: jasmine.Spy
 
     beforeEach(() => {
