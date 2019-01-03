@@ -1,6 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 
-
 export interface ScanResponse<T> {
   /**
    * An array of item attributes that match the scan criteria. Each element in this array consists of an attribute name and the value for that attribute.

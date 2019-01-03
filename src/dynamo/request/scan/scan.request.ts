@@ -6,7 +6,13 @@ import { DynamoRx } from '../../dynamo-rx'
 import { ReadManyRequest } from '../read-many.request'
 import { ScanResponse } from './scan.response'
 
-export class ScanRequest<T> extends ReadManyRequest<T, DynamoDB.ScanInput, DynamoDB.ScanOutput, ScanResponse<T>, ScanRequest<T>> {
+export class ScanRequest<T> extends ReadManyRequest<
+  T,
+  DynamoDB.ScanInput,
+  DynamoDB.ScanOutput,
+  ScanResponse<T>,
+  ScanRequest<T>
+> {
   protected readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
@@ -17,5 +23,4 @@ export class ScanRequest<T> extends ReadManyRequest<T, DynamoDB.ScanInput, Dynam
   protected doRequest(params: DynamoDB.ScanInput): Observable<DynamoDB.ScanOutput> {
     return this.dynamoRx.scan(params)
   }
-
 }

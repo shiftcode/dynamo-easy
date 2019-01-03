@@ -20,5 +20,4 @@ export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, 
     this.logger.debug('request', this.params)
     return this.dynamoRx.deleteItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
-
 }

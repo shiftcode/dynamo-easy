@@ -174,9 +174,7 @@ function buildInConditionExpression(
       <Attributes<any>>{},
     )
 
-  const inStatement = (<any[]>values[0])
-    .map((value: any, index: number) => `${valuePlaceholder}_${index}`)
-    .join(', ')
+  const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
   return {
     statement: `${namePlaceholder} IN (${inStatement})`,
@@ -201,8 +199,7 @@ function buildBetweenConditionExpression(
   if (mappedValue1 === null || mappedValue2 === null) {
     throw new Error('make sure to provide an actual value for te BETWEEN operator')
   }
-  [mappedValue1, mappedValue2]
-    .forEach(mv => validateAttributeType('between', mv, 'S', 'N', 'B'))
+  ;[mappedValue1, mappedValue2].forEach(mv => validateAttributeType('between', mv, 'S', 'N', 'B'))
 
   const value2Placeholder = uniqueAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
@@ -283,11 +280,13 @@ function validateForOperator(operator: ConditionOperator, values?: any[]) {
   /*
    * validate values if operator supports values
    */
-  if (!isFunctionOperator(operator) || isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
+  if (!isFunctionOperator(operator) || (isFunctionOperator(operator) && !isNoParamFunctionOperator(operator))) {
     if (values && Array.isArray(values) && values.length) {
       validateValues(operator, values)
     } else {
-      throw new Error(dynamicTemplate(ERR_ARITY_DEFAULT, {parameterArity: operatorParameterArity(operator), operator}))
+      throw new Error(
+        dynamicTemplate(ERR_ARITY_DEFAULT, { parameterArity: operatorParameterArity(operator), operator }),
+      )
     }
   }
 }
@@ -296,8 +295,10 @@ function validateForOperator(operator: ConditionOperator, values?: any[]) {
 /*
  * error messages for arity issues
  */
-export const ERR_ARITY_IN = 'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
-export const ERR_ARITY_DEFAULT = 'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator'
+export const ERR_ARITY_IN =
+  'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
+export const ERR_ARITY_DEFAULT =
+  'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator'
 
 // tslint:enable:no-invalid-template-strings
 
@@ -305,7 +306,9 @@ function validateArity(operator: ConditionOperator, values?: any[]) {
   if (values === null || values === undefined) {
     if (isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
       // the operator needs some values to work
-      throw new Error(dynamicTemplate(ERR_ARITY_DEFAULT, {parameterArity: operatorParameterArity(operator), operator}))
+      throw new Error(
+        dynamicTemplate(ERR_ARITY_DEFAULT, { parameterArity: operatorParameterArity(operator), operator }),
+      )
     }
   } else if (values && Array.isArray(values)) {
     const parameterArity = operatorParameterArity(operator)
@@ -321,12 +324,12 @@ function validateArity(operator: ConditionOperator, values?: any[]) {
   }
 }
 
-
 /*
  * error message for wrong operator values
  */
 // tslint:disable:no-invalid-template-strings
-export const ERR_VALUES_BETWEEN_TYPE = 'both values for operator BETWEEN must have the same type, got ${value1} and ${value2}'
+export const ERR_VALUES_BETWEEN_TYPE =
+  'both values for operator BETWEEN must have the same type, got ${value1} and ${value2}'
 export const ERR_VALUES_IN = 'the provided value for IN operator must be an array'
 // tslint:enable:no-invalid-template-strings
 
@@ -340,10 +343,9 @@ function validateValues(operator: ConditionOperator, values: any[]) {
     case 'BETWEEN':
       // values must be the same type
       if (typeOf(values[0]) !== typeOf(values[1])) {
-        throw new Error(dynamicTemplate(
-          ERR_VALUES_BETWEEN_TYPE,
-          { value1: typeOf(values[0]), value2: typeOf(values[1]) }
-        ))
+        throw new Error(
+          dynamicTemplate(ERR_VALUES_BETWEEN_TYPE, { value1: typeOf(values[0]), value2: typeOf(values[1]) }),
+        )
       }
       break
     case 'IN':
@@ -352,4 +354,3 @@ function validateValues(operator: ConditionOperator, values: any[]) {
       }
   }
 }
-

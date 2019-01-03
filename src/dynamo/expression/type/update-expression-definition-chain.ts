@@ -7,7 +7,6 @@ import { UpdateExpressionDefinitionFunction } from './update-expression-definiti
  *
  */
 export interface UpdateFunctions<T, R> {
-
   /**
    * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
    * @param value which maps to NumberAttribute
@@ -70,7 +69,10 @@ export interface UpdateFunctions<T, R> {
   removeFromSet: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 }
 
-export type UpdateExpressionDefinitionChainTyped<T, K extends keyof T> = UpdateFunctions<T[K], UpdateExpressionDefinitionFunction>
+export type UpdateExpressionDefinitionChainTyped<T, K extends keyof T> = UpdateFunctions<
+  T[K],
+  UpdateExpressionDefinitionFunction
+>
 
 export type UpdateExpressionDefinitionChain = UpdateFunctions<any, UpdateExpressionDefinitionFunction>
 

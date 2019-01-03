@@ -27,8 +27,10 @@ import {
  * it can only be number, because the type of age is number too, this only works when not using a custom mapper.
  * The downside of the strict typing is the model constructor parameter which is only required for typing reasons
  */
-export function attribute2<T, K extends keyof T>(modelConstructor: ModelConstructor<T>, attributePath: K)
-  : ConditionExpressionDefinitionChainTyped<T, K> {
+export function attribute2<T, K extends keyof T>(
+  modelConstructor: ModelConstructor<T>,
+  attributePath: K,
+): ConditionExpressionDefinitionChainTyped<T, K> {
   return propertyDefinitionFunction<T, K>(attributePath)
 }
 
@@ -36,7 +38,6 @@ export function attribute2<T, K extends keyof T>(modelConstructor: ModelConstruc
  * Use this method when accessing a top level attribute of a model to have type checking of the attributePath
  */
 export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
-
 
 /**
  * Use this method when accessing a nested attribute of a model

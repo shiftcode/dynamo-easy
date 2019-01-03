@@ -46,7 +46,10 @@ export class BatchWriteRequest {
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
    * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
    */
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Observable<void> {
+  exec(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
+  ): Observable<void> {
     return this.write(backoffTimer, throttleTimeSlot).pipe(
       map(() => {
         return
@@ -54,7 +57,10 @@ export class BatchWriteRequest {
     )
   }
 
-  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchWriteItemOutput> {
+  execFullResponse(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
+  ): Observable<DynamoDB.BatchWriteItemOutput> {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 

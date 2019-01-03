@@ -17,7 +17,6 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
-
   }
 
   consistentRead(consistentRead: boolean): GetRequest<T> {

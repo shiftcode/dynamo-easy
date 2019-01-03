@@ -4,7 +4,6 @@ import { map } from 'rxjs/operators'
 import { DynamoRx } from '../dynamo-rx'
 import { TransactOperation } from './transact-operation.type'
 
-
 export class TransactWriteRequest {
   readonly params: DynamoDB.TransactWriteItemsInput
   private readonly dynamoRx: DynamoRx
@@ -30,7 +29,7 @@ export class TransactWriteRequest {
     if (!writeOperations || writeOperations.length === 0) {
       throw new Error('at least one transaction operation must be added')
     }
-    if ((this.params.TransactItems.length + writeOperations.length) > 10) {
+    if (this.params.TransactItems.length + writeOperations.length > 10) {
       throw new Error(`Each transaction can include up to 10 unique items, including conditions.\
        Given operations count: ${this.params.TransactItems.length + writeOperations.length}`)
     }

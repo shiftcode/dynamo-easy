@@ -20,11 +20,13 @@ import { StandardRequest } from './standard.request'
 /**
  * Base class for query and scan request classes.
  */
-export abstract class ReadManyRequest<T,
+export abstract class ReadManyRequest<
+  T,
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T> | ScanResponse<T>,
-  R extends QueryRequest<T> | ScanRequest<T>> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
+  R extends QueryRequest<T> | ScanRequest<T>
+> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
   static DEFAULT_LIMIT = 10
   static INFINITE_LIMIT = -1
 
@@ -97,15 +99,14 @@ export abstract class ReadManyRequest<T,
 
   execNoMap(): Observable<O> {
     this.logger.debug('request (noMap)', this.params)
-    return this.doRequest(this.params)
-      .pipe(tap(response => this.logger.debug('response', response)))
+    return this.doRequest(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
 
   execSingle(): Observable<T | null> {
     // do not alter the params on the instance but add the additional 'Limit' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
-      ...<any>this.params,
+      ...(<any>this.params),
       Limit: 1,
     }
 
@@ -113,7 +114,7 @@ export abstract class ReadManyRequest<T,
     return this.doRequest(params).pipe(
       tap(response => this.logger.debug('response', response)),
       map(this.mapFromDb),
-      map(r => r.Items && r.Items.length ? r.Items[0] : null),
+      map(r => (r.Items && r.Items.length ? r.Items[0] : null)),
       tap(item => this.logger.debug('mapped item', item)),
     )
   }
@@ -122,7 +123,7 @@ export abstract class ReadManyRequest<T,
     // do not alter the params on the instance but add the additional 'Limit' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
-      ...<any>this.params,
+      ...(<any>this.params),
       Select: 'COUNT',
     }
 
@@ -161,7 +162,7 @@ export abstract class ReadManyRequest<T,
   }
 
   protected mapFromDb = (output: O) => {
-    const response: Z = { ...<any>output }
+    const response: Z = { ...(<any>output) }
     response.Items = (output.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
 
     return response

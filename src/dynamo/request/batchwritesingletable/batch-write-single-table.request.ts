@@ -10,7 +10,11 @@ import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } fro
 import { DynamoRx } from '../../dynamo-rx'
 import { BaseRequest } from '../base.request'
 
-export class BatchWriteSingleTableRequest<T> extends BaseRequest<T, DynamoDB.BatchWriteItemInput, BatchWriteSingleTableRequest<T>> {
+export class BatchWriteSingleTableRequest<T> extends BaseRequest<
+  T,
+  DynamoDB.BatchWriteItemInput,
+  BatchWriteSingleTableRequest<T>
+> {
   private readonly logger: Logger
   private toKey = createToKeyFn(this.modelClazz)
 
@@ -47,7 +51,10 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T, DynamoDB.Bat
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Observable<void> {
+  exec(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
+  ): Observable<void> {
     this.logger.debug('starting batchWriteItem')
     return this.write(backoffTimer, throttleTimeSlot).pipe(
       map(() => {
@@ -56,7 +63,10 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T, DynamoDB.Bat
     )
   }
 
-  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchWriteItemOutput> {
+  execFullResponse(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
+  ): Observable<DynamoDB.BatchWriteItemOutput> {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 

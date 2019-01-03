@@ -17,40 +17,39 @@ export function batchGetItemsFetchAll(
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
 ): Observable<DynamoDB.BatchGetItemOutput> {
-  return dynamoRx.batchGetItems(params)
-    .pipe(
-      mergeMap(response => {
-        if (hasUnprocessedKeys(response)) {
-          // in case of unprocessedItems do a follow-up requests
-          return of(response.UnprocessedKeys)
-            .pipe(
-              // delay before doing the follow-up request
-              delay(backoffTimer.next().value * throttleTimeSlot),
+  return dynamoRx.batchGetItems(params).pipe(
+    mergeMap(response => {
+      if (hasUnprocessedKeys(response)) {
+        // in case of unprocessedItems do a follow-up requests
+        return of(response.UnprocessedKeys).pipe(
+          // delay before doing the follow-up request
+          delay(backoffTimer.next().value * throttleTimeSlot),
 
-              mergeMap((UnprocessedKeys: DynamoDB.BatchGetRequestMap) => {
-                const nextParams = { ...params, RequestItems: UnprocessedKeys }
-                // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
-                return batchGetItemsFetchAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
-              }),
-              map(combineBatchGetResponses(response)),
-            )
-        }
-        // no follow-up request necessary, return result
-        return of(response)
-      }),
-    )
+          mergeMap((UnprocessedKeys: DynamoDB.BatchGetRequestMap) => {
+            const nextParams = { ...params, RequestItems: UnprocessedKeys }
+            // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
+            return batchGetItemsFetchAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
+          }),
+          map(combineBatchGetResponses(response)),
+        )
+      }
+      // no follow-up request necessary, return result
+      return of(response)
+    }),
+  )
 }
 
-export type BatchGetItemOutputWithUnprocessedKeys =
-  DynamoDB.BatchGetItemOutput
-  & { UnprocessedKeys: DynamoDB.BatchGetRequestMap }
+export type BatchGetItemOutputWithUnprocessedKeys = DynamoDB.BatchGetItemOutput & {
+  UnprocessedKeys: DynamoDB.BatchGetRequestMap
+}
 
-export function hasUnprocessedKeys(response: DynamoDB.BatchGetItemOutput): response is BatchGetItemOutputWithUnprocessedKeys {
+export function hasUnprocessedKeys(
+  response: DynamoDB.BatchGetItemOutput,
+): response is BatchGetItemOutputWithUnprocessedKeys {
   if (!response.UnprocessedKeys) {
     return false
   }
-  return Object.values(response.UnprocessedKeys)
-    .some(t => !!t && t.Keys && t.Keys.length > 0)
+  return Object.values(response.UnprocessedKeys).some(t => !!t && t.Keys && t.Keys.length > 0)
 }
 
 /**
@@ -65,14 +64,16 @@ export function combineBatchGetResponses(response1: DynamoDB.BatchGetItemOutput)
       .filter(tn => !tableNames.includes(tn))
       .forEach(tn => tableNames.push(tn))
 
-    const Responses = tableNames
-      .reduce((u, tableName) => ({
+    const Responses = tableNames.reduce(
+      (u, tableName) => ({
         ...u,
         [tableName]: [
-          ...(response1.Responses && response1.Responses[tableName] || []),
-          ...(response2.Responses && response2.Responses[tableName] || []),
+          ...((response1.Responses && response1.Responses[tableName]) || []),
+          ...((response2.Responses && response2.Responses[tableName]) || []),
         ],
-      }), {})
+      }),
+      {},
+    )
     return {
       ...response2,
       Responses,

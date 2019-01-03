@@ -7,8 +7,11 @@ import { DynamoRx } from '../../dynamo-rx'
 import { BaseRequest } from '../base.request'
 import { TransactGetResponse } from './transact-get-single-table.response'
 
-export class TransactGetSingleTableRequest<T> extends BaseRequest<T, DynamoDB.TransactGetItemsInput, TransactGetSingleTableRequest<T>> {
-
+export class TransactGetSingleTableRequest<T> extends BaseRequest<
+  T,
+  DynamoDB.TransactGetItemsInput,
+  TransactGetSingleTableRequest<T>
+> {
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoRx, modelClazz)
 

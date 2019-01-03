@@ -70,7 +70,6 @@ function buildDefaultExpression(
   propertyMetadata: PropertyMetadata<any> | undefined,
   operator: UpdateActionDef,
 ): UpdateExpression {
-
   const attributeValues: Attributes<any> = {}
   let attribute: Attribute | null = null
 
@@ -146,6 +145,10 @@ export function validateAttributeType(name: string, attribute: Attribute | null,
   }
   const key = <AttributeType>Object.keys(attribute)[0]
   if (!allowedTypes.includes(key)) {
-    throw new Error(`Type ${key} of ${JSON.stringify(attribute)} is not allowed for ${name}. Valid types are: ${allowedTypes.join('. ')}`)
+    throw new Error(
+      `Type ${key} of ${JSON.stringify(attribute)} is not allowed for ${name}. Valid types are: ${allowedTypes.join(
+        '. ',
+      )}`,
+    )
   }
 }

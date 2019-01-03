@@ -8,7 +8,13 @@ import { SortKeyConditionFunction } from '../../expression/type'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryResponse } from './query.response'
 
-export class QueryRequest<T> extends ReadManyRequest<T, DynamoDB.QueryInput, DynamoDB.QueryOutput, QueryResponse<T>, QueryRequest<T>> {
+export class QueryRequest<T> extends ReadManyRequest<
+  T,
+  DynamoDB.QueryInput,
+  DynamoDB.QueryOutput,
+  QueryResponse<T>,
+  QueryRequest<T>
+> {
   protected readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
@@ -65,5 +71,4 @@ export class QueryRequest<T> extends ReadManyRequest<T, DynamoDB.QueryInput, Dyn
   protected doRequest(params: DynamoDB.QueryInput): Observable<DynamoDB.QueryOutput> {
     return this.dynamoRx.query(params)
   }
-
 }

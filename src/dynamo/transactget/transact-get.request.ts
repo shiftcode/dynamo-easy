@@ -23,9 +23,7 @@ export class TransactGetRequest {
     }
   }
 
-
   forModel<T>(modelClazz: ModelConstructor<T>, key: Partial<T>): TransactGetRequest1<T> {
-
     // check if modelClazz is really an @Model() decorated class
     const metadata = metadataForClass(modelClazz)
     if (!metadata.modelOptions) {
@@ -37,19 +35,17 @@ export class TransactGetRequest {
     // check if table was already used in this request
     const tableName = getTableName(metadata)
 
-
     // check if keys to add do not exceed max count
     if (this.params.TransactItems.length + 1 > MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`you can request at max ${MAX_REQUEST_ITEM_COUNT} items per request`)
     }
 
     this.params.TransactItems.push({
-        Get: {
-          TableName: tableName,
-          Key: createToKeyFn(modelClazz)(key),
-        },
+      Get: {
+        TableName: tableName,
+        Key: createToKeyFn(modelClazz)(key),
       },
-    )
+    })
     return <any>this
   }
 
@@ -63,9 +59,7 @@ export class TransactGetRequest {
   }
 
   execFullResponse(): Observable<TransactGetFullResponse<[]>> {
-    return this.dynamoRx.transactGetItems(this.params).pipe(
-      map(this.mapResponse),
-    )
+    return this.dynamoRx.transactGetItems(this.params).pipe(map(this.mapResponse))
   }
 
   exec(): Observable<[]> {
@@ -75,15 +69,14 @@ export class TransactGetRequest {
     )
   }
 
-
   private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetFullResponse<[]> => {
-    const Items: any = response.Responses && Object.keys(response.Responses).length
-      ? response.Responses.map((item, ix) => fromDb(<Attributes>item.Item, this.tables[ix]))
-      : []
+    const Items: any =
+      response.Responses && Object.keys(response.Responses).length
+        ? response.Responses.map((item, ix) => fromDb(<Attributes>item.Item, this.tables[ix]))
+        : []
     return {
       ConsumedCapacity: response.ConsumedCapacity,
       Items,
     }
   }
 }
-

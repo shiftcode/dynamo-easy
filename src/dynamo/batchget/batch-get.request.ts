@@ -13,8 +13,6 @@ import { batchGetItemsFetchAll } from './batch-get-utils'
 import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from './batch-get.const'
 import { BatchGetResponse } from './batch-get.response'
 
-
-
 export class BatchGetRequest {
   readonly params: DynamoDB.BatchGetItemInput
   private readonly dynamoRx: DynamoRx
@@ -35,18 +33,23 @@ export class BatchGetRequest {
    * @returns {BatchGetSingleTableRequest}
    */
   forModel<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>, consistentRead = false): BatchGetRequest {
-
     // check if modelClazz is really an @Model() decorated class
     const metadata = metadataForClass(modelClazz)
-    if (!metadata.modelOptions) { throw new Error('given ModelConstructor has no @Model decorator')}
+    if (!metadata.modelOptions) {
+      throw new Error('given ModelConstructor has no @Model decorator')
+    }
 
     // check if table was already used in this request
     const tableName = getTableName(metadata)
-    if (this.tables.has(tableName)) { throw new Error('table name already exists, please provide all the keys for the same table at once') }
+    if (this.tables.has(tableName)) {
+      throw new Error('table name already exists, please provide all the keys for the same table at once')
+    }
     this.tables.set(tableName, modelClazz)
 
     // check if keys to add do not exceed max count
-    if (this.itemCounter + keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) { throw new Error(`you can request at max ${BATCH_GET_MAX_REQUEST_ITEM_COUNT} items per request`)}
+    if (this.itemCounter + keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) {
+      throw new Error(`you can request at max ${BATCH_GET_MAX_REQUEST_ITEM_COUNT} items per request`)
+    }
 
     this.params.RequestItems[tableName] = {
       Keys: keys.map(createToKeyFn(modelClazz)),
@@ -58,29 +61,33 @@ export class BatchGetRequest {
     return this
   }
 
-  execNoMap(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<DynamoDB.BatchGetItemOutput> {
+  execNoMap(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
+  ): Observable<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
-  execFullResponse(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<BatchGetFullResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot)
-      .pipe(
-        map(this.mapResponse),
-      )
+  execFullResponse(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
+  ): Observable<BatchGetFullResponse> {
+    return this.fetch(backoffTimer, throttleTimeSlot).pipe(map(this.mapResponse))
   }
 
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<BatchGetResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot)
-      .pipe(
-        map(this.mapResponse),
-        map(r => r.Responses),
-      )
+  exec(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
+  ): Observable<BatchGetResponse> {
+    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
+      map(this.mapResponse),
+      map(r => r.Responses),
+    )
   }
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
-
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput): BatchGetFullResponse => {
     let Responses: BatchGetResponse = {}
@@ -98,5 +105,4 @@ export class BatchGetRequest {
       Responses,
     }
   }
-
 }

@@ -81,7 +81,6 @@ export interface TransactGetRequest9<A, B, C, D, E, F, G, H, I> extends Transact
 }
 
 export interface TransactGetRequest10<A, B, C, D, E, F, G, H, I, J> extends TransactGetRequestBase {
-
   execFullResponse(): Observable<TransactGetFullResponse<[A, B, C, D, E, F, G, H, I, J]>>
 
   exec(): Observable<[A, B, C, D, E, F, G, H, I, J]>

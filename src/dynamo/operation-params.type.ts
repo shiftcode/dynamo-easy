@@ -10,7 +10,6 @@ export interface ConditionalParams {
   [key: string]: any
 }
 
-
 export interface UpdateParamsHost {
   readonly params: DynamoDB.UpdateItemInput | DynamoDB.Update
 }

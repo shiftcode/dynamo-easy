@@ -50,7 +50,6 @@ export function addExpression(
 
 type UpdateExpressionsByKeyword = Record<UpdateActionKeyword, string>
 
-
 /**
  * Will merge two update expressions into one, one action keyword can only appear once in an update expression
  *
@@ -78,17 +77,22 @@ export function mergeUpdateExpressions(expression1: string, expression2: string)
  */
 function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {
   // add a whitespace at the beginning of the expression to be able to work with a more stricter regex
-  return ` ${updateExpression}`
-  // the regex ensures a whitespace at the beginning of the ActionWord
-  // -> to not have problems with properties named exactly as an ActionKeyword
-    .split(/\s(SET|REMOVE|ADD|DELETE)\s/g)
-    .reduce((u, e, i, arr) => {
-      if (isUpdateActionKeyword(e)) {
-        u[e] = arr[i + 1]
-      }
+  return (
+    ` ${updateExpression}`
+      // the regex ensures a whitespace at the beginning of the ActionWord
+      // -> to not have problems with properties named exactly as an ActionKeyword
+      .split(/\s(SET|REMOVE|ADD|DELETE)\s/g)
+      .reduce(
+        (u, e, i, arr) => {
+          if (isUpdateActionKeyword(e)) {
+            u[e] = arr[i + 1]
+          }
 
-      return u
-    }, <UpdateExpressionsByKeyword>{})
+          return u
+        },
+        <UpdateExpressionsByKeyword>{},
+      )
+  )
 }
 
 function isUpdateActionKeyword(val: string): val is UpdateActionKeyword {

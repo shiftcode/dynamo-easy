@@ -11,8 +11,11 @@ import { DynamoRx } from '../../dynamo-rx'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
-
-export class BatchGetSingleTableRequest<T> extends BaseRequest<T, DynamoDB.BatchGetItemInput, BatchGetSingleTableRequest<T>> {
+export class BatchGetSingleTableRequest<T> extends BaseRequest<
+  T,
+  DynamoDB.BatchGetItemInput,
+  BatchGetSingleTableRequest<T>
+> {
   private readonly logger: Logger
 
   constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {

@@ -9,10 +9,7 @@ import { uniqueAttributeValueName } from './unique-attribute-value-name.function
  * @param params
  * @return safe-to-use Expression
  */
-export function resolveAttributeValueNameConflicts(
-  expression: Expression,
-  params: ConditionalParams,
-): Expression {
+export function resolveAttributeValueNameConflicts(expression: Expression, params: ConditionalParams): Expression {
   let attributeValues: Attributes<any> = {}
   let statement: string = expression.statement
 

@@ -1,10 +1,9 @@
 import { randomExponentialBackoffTimer } from './random-exponential-backoff-timer.generator'
 
 describe('random exponential backoff timer', () => {
-
   let g: IterableIterator<number>
 
-  beforeEach(() => g = randomExponentialBackoffTimer())
+  beforeEach(() => (g = randomExponentialBackoffTimer()))
 
   it('should generate randomly values that are getting larger', () => {
     expect(g.next().value).toBeLessThanOrEqual(0.5)
@@ -13,5 +12,4 @@ describe('random exponential backoff timer', () => {
     expect(g.next().value).toBeLessThanOrEqual(7.5)
     expect(g.next().done).toBe(false)
   })
-
 })

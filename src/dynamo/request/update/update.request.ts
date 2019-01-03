@@ -22,7 +22,7 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
-  updateAttribute<K extends keyof T>(attributePath:K): RequestUpdateFunction<UpdateRequest<T>, T, K> {
+  updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<UpdateRequest<T>, T, K> {
     return addUpdate(attributePath, this, this.metadata)
   }
 
@@ -35,6 +35,4 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
     this.logger.debug('request', this.params)
     return this.dynamoRx.updateItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
-
-
 }

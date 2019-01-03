@@ -10,9 +10,21 @@ import { getTableName } from '../get-table-name.function'
  * which means they have only one table they work with
  * (even if the actual operation would allow to use multiple tables. e.g. BatchWriteSingleTable)
  */
-export abstract class BaseRequest<T,
-  I extends DynamoDB.DeleteItemInput | DynamoDB.GetItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput | DynamoDB.QueryInput | DynamoDB.ScanInput | DynamoDB.BatchGetItemInput |DynamoDB.BatchWriteItemInput | DynamoDB.TransactGetItemsInput | DynamoDB.TransactWriteItemsInput,
-  R extends BaseRequest<T, I, any>> {
+export abstract class BaseRequest<
+  T,
+  I extends
+    | DynamoDB.DeleteItemInput
+    | DynamoDB.GetItemInput
+    | DynamoDB.PutItemInput
+    | DynamoDB.UpdateItemInput
+    | DynamoDB.QueryInput
+    | DynamoDB.ScanInput
+    | DynamoDB.BatchGetItemInput
+    | DynamoDB.BatchWriteItemInput
+    | DynamoDB.TransactGetItemsInput
+    | DynamoDB.TransactWriteItemsInput,
+  R extends BaseRequest<T, I, any>
+> {
   readonly dynamoRx: DynamoRx
   readonly modelClazz: ModelConstructor<T>
   readonly metadata: Metadata<T>
@@ -40,6 +52,6 @@ export abstract class BaseRequest<T,
 
   returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): R {
     this.params.ReturnConsumedCapacity = level
-    return <R><any>this
+    return <R>(<any>this)
   }
 }

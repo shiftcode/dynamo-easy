@@ -9,9 +9,10 @@ import { ModelConstructor } from '../model'
 const REGEX_TABLE_NAME = /^[a-zA-Z0-9_\-.]{3,255}$/
 
 export function getTableName(metaDataOrModelClazz: Metadata<any> | ModelConstructor<any>): string {
-  const modelOptions = metaDataOrModelClazz instanceof Metadata
-    ? metaDataOrModelClazz.modelOptions
-    : metadataForClass(metaDataOrModelClazz).modelOptions
+  const modelOptions =
+    metaDataOrModelClazz instanceof Metadata
+      ? metaDataOrModelClazz.modelOptions
+      : metadataForClass(metaDataOrModelClazz).modelOptions
 
   const tableName = dynamoEasyConfig.tableNameResolver(modelOptions.tableName)
 

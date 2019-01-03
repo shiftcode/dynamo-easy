@@ -14,13 +14,13 @@ export interface Config {
   /**
    * mapper used for {@link DateProperty} decorated properties
    */
-  dateMapper: MapperForType<any, any>,
+  dateMapper: MapperForType<any, any>
   /**
    * function used to create the table names
    */
-  tableNameResolver: TableNameResolver,
+  tableNameResolver: TableNameResolver
   /**
    * function called before calling dynamoDB api
    */
-  sessionValidityEnsurer: SessionValidityEnsurer,
+  sessionValidityEnsurer: SessionValidityEnsurer
 }

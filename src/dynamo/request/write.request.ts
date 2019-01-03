@@ -13,9 +13,11 @@ import { StandardRequest } from './standard.request'
 /**
  * base class for all basic write request classes (DeleteItem, PutItem, UpdateItem
  */
-export abstract class WriteRequest<T,
+export abstract class WriteRequest<
+  T,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
-  R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
+  R extends WriteRequest<T, I, R>
+> extends StandardRequest<T, I, R> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }

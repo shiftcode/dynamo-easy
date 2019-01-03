@@ -32,5 +32,4 @@ export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, PutReq
     this.logger.debug('request', this.params)
     return this.dynamoRx.putItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
   }
-
 }

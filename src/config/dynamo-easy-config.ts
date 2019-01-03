@@ -12,5 +12,5 @@ export const dynamoEasyConfig: Config = {
   dateMapper: DateToStringMapper,
   logReceiver: DEFAULT_LOG_RECEIVER,
   tableNameResolver: DEFAULT_TABLE_NAME_RESOLVER,
-  sessionValidityEnsurer: DEFAULT_SESSION_VALIDITY_ENSURER
+  sessionValidityEnsurer: DEFAULT_SESSION_VALIDITY_ENSURER,
 }

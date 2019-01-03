@@ -28,7 +28,6 @@ import { UpdateExpressionDefinitionFunction } from './type/update-expression-def
 import { UpdateExpression } from './type/update-expression.type'
 import { buildUpdateExpression } from './update-expression-builder'
 
-
 /**
  * return the update-functions which then can apply an updateDefinition to the given request.params
  * and afterwards will return the request object (which allows chaining)
@@ -46,12 +45,14 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
     // return the function the user will call in the end
     return (...values: any[]): R => {
       const copy = [...values]
-      const curried = curry<string,
+      const curried = curry<
+        string,
         UpdateActionDef,
         any[],
         string[] | undefined,
         Metadata<any> | undefined,
-        UpdateExpression>(buildUpdateExpression)
+        UpdateExpression
+      >(buildUpdateExpression)
       const updateDefFn: UpdateExpressionDefinitionFunction = curried(<string>attributePath, operator, copy)
       prepareAndAddUpdateExpressions(metadata, request.params, [updateDefFn])
       // return the request so the user can continue to chain
@@ -61,7 +62,6 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
   // let the update functions be created with f
   return createUpdateFunctions<RequestUpdateFunction<R, T, K>>(f)
 }
-
 
 /**
  * return the condition-functions which then can apply a conditionDefinition to the given request.params
@@ -160,19 +160,23 @@ export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, an
 
 export function updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain
 export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
-export function updateDefinitionFunction<T, K extends keyof T>(attributePath: K): UpdateExpressionDefinitionChainTyped<T, K>
+export function updateDefinitionFunction<T, K extends keyof T>(
+  attributePath: K,
+): UpdateExpressionDefinitionChainTyped<T, K>
 export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain {
   // f the function to create the update functions
   const f = (operation: UpdateActionDef) => {
     // return the function the user will call in the end
     return (...values: any[]): UpdateExpressionDefinitionFunction => {
       const copy = [...values]
-      const curried = curry<string,
+      const curried = curry<
+        string,
         UpdateActionDef,
         any[],
         string[] | undefined,
         Metadata<any> | undefined,
-        UpdateExpression>(buildUpdateExpression)
+        UpdateExpression
+      >(buildUpdateExpression)
       // return the UpdateExpressionDefinitionFunction which the request will execute
       return curried(<string>attributePath, operation, copy)
     }
@@ -182,7 +186,9 @@ export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpre
 }
 
 export function propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
-export function propertyDefinitionFunction<T, K extends keyof T>(attributePath: K): ConditionExpressionDefinitionChainTyped<T, K>
+export function propertyDefinitionFunction<T, K extends keyof T>(
+  attributePath: K,
+): ConditionExpressionDefinitionChainTyped<T, K>
 export function propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain {
   const f = (operator: ConditionOperator) => {
     return (...values: any[]): ConditionExpressionDefinitionFunction => {

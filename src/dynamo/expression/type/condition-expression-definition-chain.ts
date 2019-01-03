@@ -26,10 +26,14 @@ interface ConditionFunctions<T, R> {
   attributeNotExists: () => R
 }
 
-
 export type ConditionExpressionDefinitionChain = ConditionFunctions<any, ConditionExpressionDefinitionFunction>
 
-export type ConditionExpressionDefinitionChainTyped<T, K extends keyof T> = ConditionFunctions<T[K], ConditionExpressionDefinitionFunction>
+export type ConditionExpressionDefinitionChainTyped<T, K extends keyof T> = ConditionFunctions<
+  T[K],
+  ConditionExpressionDefinitionFunction
+>
 
-export type RequestConditionFunction<R extends ConditionalParamsHost, T, K extends keyof T> = ConditionFunctions<T[K], R>
-
+export type RequestConditionFunction<R extends ConditionalParamsHost, T, K extends keyof T> = ConditionFunctions<
+  T[K],
+  R
+>
