@@ -1,3 +1,1 @@
-export interface ModelConstructor<T> {
-  new (...args: any[]): T
-}
+export type ModelConstructor<T> = new (...args: any[]) => T
