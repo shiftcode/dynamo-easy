@@ -58,7 +58,6 @@
     "husky": "^1.3.1",
     "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
-    "lodash-es": "^4.17.11",
     "lodash.camelcase": "^4.3.0",
     "prettier": "^1.15.3",
     "reflect-metadata": "^0.1.12",

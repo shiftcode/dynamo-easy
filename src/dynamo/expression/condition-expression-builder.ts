@@ -1,4 +1,4 @@
-import { curry, isPlainObject } from 'lodash-es'
+import { curry, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { toDbOne, typeOf } from '../../mapper'

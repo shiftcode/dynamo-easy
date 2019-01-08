@@ -1,5 +1,5 @@
 import { NumberAttribute } from '../type/attribute.type'
-import { isNumber } from 'lodash-es'
+import { isNumber } from 'lodash'
 import { MapperForType } from './base.mapper'
 
 function numberFromDb(attributeValue: NumberAttribute): number {
