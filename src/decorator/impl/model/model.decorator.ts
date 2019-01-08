@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { kebabCase } from 'lodash'
+import { kebabCase } from 'lodash-es'
 import { ModelMetadata } from '../../metadata'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'

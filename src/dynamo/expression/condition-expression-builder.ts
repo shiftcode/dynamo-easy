@@ -1,4 +1,4 @@
-import { curry, forEach, isPlainObject } from 'lodash'
+import { curry, isPlainObject } from 'lodash-es'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { toDbOne, typeOf } from '../../mapper'
@@ -58,12 +58,15 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
   } else if (isPlainObject(obj)) {
     const returnObj: Record<string, any> = {}
 
-    forEach(obj, (value: any, key: string) => {
-      const item = deepFilter(value, filterFn)
-      if (item !== null) {
-        returnObj[key] = item
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const value = obj[key]
+        const item = deepFilter(value, filterFn)
+        if (item !== null) {
+          returnObj[key] = item
+        }
       }
-    })
+    }
 
     return Object.keys(returnObj).length ? returnObj : null
   } else {
@@ -331,6 +334,7 @@ function validateArity(operator: ConditionOperator, values?: any[]) {
 export const ERR_VALUES_BETWEEN_TYPE =
   'both values for operator BETWEEN must have the same type, got ${value1} and ${value2}'
 export const ERR_VALUES_IN = 'the provided value for IN operator must be an array'
+
 // tslint:enable:no-invalid-template-strings
 
 /**

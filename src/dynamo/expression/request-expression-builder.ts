@@ -1,4 +1,4 @@
-import { curry } from 'lodash'
+import { curry } from 'lodash-es'
 import { Metadata } from '../../decorator/metadata'
 import { ConditionalParamsHost, UpdateParamsHost } from '../operation-params.type'
 import { StandardRequest } from '../request/standard.request'

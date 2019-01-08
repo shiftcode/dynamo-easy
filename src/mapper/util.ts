@@ -1,4 +1,4 @@
-import { isNumber, isString } from 'lodash'
+import { isNumber, isString } from 'lodash-es'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
 import { Attribute } from './type/attribute.type'

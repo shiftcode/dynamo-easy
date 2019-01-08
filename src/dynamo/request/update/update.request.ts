@@ -7,11 +7,8 @@ import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
 import { prepareAndAddUpdateExpressions } from '../../expression/prepare-and-add-update-expressions.function'
 import { addUpdate } from '../../expression/request-expression-builder'
-import { RequestUpdateFunction, UpdateExpression, UpdateExpressionDefinitionFunction } from '../../expression/type'
-import { UpdateActionKeyword } from '../../expression/type/update-action-keyword.type'
+import { RequestUpdateFunction, UpdateExpressionDefinitionFunction } from '../../expression/type'
 import { WriteRequest } from '../write.request'
-
-export type SortedUpdateExpressions = Record<UpdateActionKeyword, UpdateExpression[]>
 
 export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, UpdateRequest<T>> {
   private readonly logger: Logger

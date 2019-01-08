@@ -42,12 +42,13 @@
     "tslint:custom-rule:test": "tslint --test ./tools/tslint/test",
     "prettier": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'"
   },
+  "dependencies": {},
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",
     "@commitlint/config-conventional": "^7.1.2",
     "@commitlint/prompt-cli": "^7.2.1",
     "@types/jest": "^23.3.11",
-    "@types/lodash": "^4.14.119",
+    "@types/lodash-es": "^4.14.119",
     "@types/node": "^8.10.39",
     "@types/uuid": "^3.4.4",
     "aws-sdk": "^2.382.0",
@@ -57,7 +58,7 @@
     "husky": "^1.3.1",
     "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
-    "lodash": "^4.17.11",
+    "lodash-es": "^4.17.11",
     "lodash.camelcase": "^4.3.0",
     "prettier": "^1.15.3",
     "reflect-metadata": "^0.1.12",
@@ -78,7 +79,7 @@
   },
   "peerDependencies": {
     "aws-sdk": "^2.382.0",
-    "lodash": "^4.17.10",
+    "lodash-es": "^4.17.11",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.3.3",
     "uuid": "^3.3.2"
