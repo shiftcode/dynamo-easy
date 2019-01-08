@@ -1,10 +1,9 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { forEach } from 'lodash'
 import { Metadata } from '../../decorator/metadata/index'
 import { Attributes } from '../../mapper/index'
-import { SortedUpdateExpressions } from '../request/update/update.request'
 import { addUpdateExpression } from './param-util'
-import { Expression, UpdateExpressionDefinitionFunction } from './type/index'
+import { Expression, UpdateExpression, UpdateExpressionDefinitionFunction } from './type/index'
+import { UpdateActionKeyword } from './type/update-action-keyword.type'
 
 export function prepareAndAddUpdateExpressions(
   metadata: Metadata<any>,
@@ -12,37 +11,37 @@ export function prepareAndAddUpdateExpressions(
   updateDefFns: UpdateExpressionDefinitionFunction[],
 ) {
   if (updateDefFns && updateDefFns.length) {
-    const sortedByActionKeyWord: SortedUpdateExpressions = updateDefFns
+    const sortedByActionKeyWord: Map<UpdateActionKeyword, UpdateExpression[]> = updateDefFns
       .map(updateDefFn => {
         return updateDefFn(<any>params.ExpressionAttributeNames, metadata)
       })
-      .reduce(
-        (result, expr) => {
-          if (!result[expr.type]) {
-            result[expr.type] = []
+      .reduce((result, expr) => {
+          const actionKeyword = expr.type
+          if (!result.has(actionKeyword)) {
+            result.set(actionKeyword, [])
           }
 
-          result[expr.type].push(expr)
+          result.get(actionKeyword).push(expr)
           return result
         },
-        <SortedUpdateExpressions>{},
+        new Map(),
       )
 
     const actionStatements: string[] = []
     let attributeValues: Attributes = {}
     let attributeNames: Record<string, string> = {}
 
-    forEach(sortedByActionKeyWord, (value, key) => {
+    for (const [actionKeyword, updateExpressions] of sortedByActionKeyWord) {
       const statements: string[] = []
-      if (value && value.length) {
-        value.forEach(updateExpression => {
+      if (updateExpressions && updateExpressions.length) {
+        updateExpressions.forEach(updateExpression => {
           statements.push(updateExpression.statement)
           attributeValues = { ...attributeValues, ...updateExpression.attributeValues }
           attributeNames = { ...attributeNames, ...updateExpression.attributeNames }
         })
-        actionStatements.push(`${key} ${statements.join(', ')}`)
+        actionStatements.push(`${actionKeyword} ${statements.join(', ')}`)
       }
-    })
+    }
 
     const expression: Expression = {
       statement: actionStatements.join(' '),

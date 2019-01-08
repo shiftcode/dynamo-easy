@@ -5,7 +5,7 @@ export const BRACED_INDEX_REGEX = /\[(\d+)]/g
 /**
  * Creates a unique attribute value placeholder name to use in the expression
  *
- * @returns {string} The unique attribute value placeholder name in respect to the given existing value names (no duplicates)
+ * @returns {string} The unique attribute value placeholder name in respect to the given existing value names (no duplicates allowed)
  */
 export function uniqueAttributeValueName(key: string, existingValueNames?: string[]): string {
   key = key.replace(/\./g, '__').replace(BRACED_INDEX_REGEX, attributeNameReplacer)

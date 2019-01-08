@@ -1,4 +1,4 @@
-import * as _ from 'lodash'
+import * as moment from 'moment'
 import * as DynamoDB from 'aws-sdk'
 import { Config } from 'aws-sdk'
 import { Key } from 'aws-sdk/clients/dynamodb'

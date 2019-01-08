@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { values as objValues } from 'lodash'
 import { Observable } from 'rxjs'
 import { map, tap } from 'rxjs/operators'
 import { createLogger, Logger } from '../../../logger/logger'
@@ -28,7 +27,7 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
     // tslint:disable-next-line:no-unnecessary-callback-wrapper
     const resolved = attributesToGet.map(a => resolveAttributeNames(a))
     this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
-    objValues(resolved).forEach(r => {
+    Object.values(resolved).forEach(r => {
       this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
     })
     return this
