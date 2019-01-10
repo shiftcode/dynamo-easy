@@ -10,9 +10,6 @@ import { ModelData } from './model-data.model'
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
-    // logger.debug('defining metadata for thing')
-    // Make sure everything is valid
-    // const classType = getMetadataType(constructor)
     const type = constructor as any
 
     // get all the properties with @Property() annotation (or @PartitionKey(),...)
