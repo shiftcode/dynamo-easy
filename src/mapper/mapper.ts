@@ -203,27 +203,12 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelClass?: ModelConstru
         }
       }
     } else {
-      /*
-       * 3b) no metadata found
-       */
-      // let typeByConvention = typeByConvention(propertyKey);
-      // if (typeByConvention) {
-      //   /*
-      //    * 4a) matches a convention
-      //    */
-      //   modelValue = mapperForConvention(typeByConvention).fromDb(attributeValue);
-      // } else {
-      /*
-       * 4b) no naming convention matches
-       */
       modelValue = fromDbOne(attributeValue)
-      // }
     }
 
-    if (modelValue) {
+    if (modelValue !== null && modelValue !== undefined) {
       Reflect.set(<any>model, propertyMetadata ? propertyMetadata.name : attributeName, modelValue)
     }
-    // throw new Error('don\'t know how to map without model class');
   })
 
   return model

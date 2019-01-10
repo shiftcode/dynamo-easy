@@ -12,3 +12,13 @@ export class ModelWithEnum {
   @Property()
   strType: StringType
 }
+
+@Model()
+export class ModelWithNonDecoratedEnum {
+  @PartitionKey()
+  id: string
+
+  type: Type
+
+  strType: StringType
+}

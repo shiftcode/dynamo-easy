@@ -18,6 +18,7 @@ import {
   ModelWithCustomMapperModel,
   ModelWithDateAsHashKey,
   ModelWithDateAsIndexHashKey,
+  ModelWithNonDecoratedEnum,
   ModelWithoutCustomMapper,
   ModelWithoutCustomMapperOnIndex,
   Organization,
@@ -743,6 +744,28 @@ describe('Mapper', () => {
           expect(nestedModel.M.id).toEqual(IdMapper.toDb(object.nestedModel.id))
         })
       })
+
+      describe('model with enums', () => {
+        const object = new ModelWithNonDecoratedEnum()
+        object.id = 'myId'
+        object.type = Type.FirstType
+        object.strType = StringType.FirstType
+
+        const toDbVal: Attributes<ModelWithNonDecoratedEnum> = toDb(object, ModelWithNonDecoratedEnum)
+
+        it('should map all properties', () => {
+          expect(toDbVal).toBeDefined()
+
+          expect(toDbVal.id).toBeDefined()
+          expect((<StringAttribute>toDbVal.id).S).toBe('myId')
+
+          expect(toDbVal.type).toBeDefined()
+          expect((<NumberAttribute>toDbVal.type).N).toBe('0')
+
+          expect(toDbVal.strType).toBeDefined()
+          expect((<StringAttribute>toDbVal.strType).S).toBe('first')
+        })
+      })
     })
 
     describe('from db', () => {
@@ -871,6 +894,29 @@ describe('Mapper', () => {
           expect(typeof event).toBe('object')
           expect(event.name).toBe('yearly get together')
           expect(event.participants).toBe(125)
+        })
+      })
+
+      describe('model with enums', () => {
+        const attributes: Attributes<ModelWithNonDecoratedEnum> = {
+          id: { S: 'myId' },
+          type: { N: Type.FirstType.toString() },
+          strType: { S: StringType.FirstType },
+        }
+
+        const fromDbVal: ModelWithNonDecoratedEnum = fromDb(attributes, ModelWithNonDecoratedEnum)
+
+        it('should map all properties', () => {
+          expect(fromDbVal).toBeDefined()
+
+          expect(fromDbVal.id).toBeDefined()
+          expect(fromDbVal.id).toBe('myId')
+
+          expect(fromDbVal.type).toBeDefined()
+          expect(fromDbVal.type).toBe(Type.FirstType)
+
+          expect(fromDbVal.strType).toBeDefined()
+          expect(fromDbVal.strType).toBe(StringType.FirstType)
         })
       })
     })
