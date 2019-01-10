@@ -347,6 +347,17 @@ describe('Decorators should add correct metadata', () => {
       expect(metaData.tableName).toBe('my-real-table-name')
     })
 
+    it('should not inherit the table name', () => {
+      @Model({ tableName: 'super-table-name' })
+      class A {}
+
+      @Model()
+      class B extends A {}
+
+      const metaData = metadataForModel(B)
+      expect(metaData.tableName).toBe('bs')
+    })
+
     it("should contain the super-class' and own properties", () => {
       @Model()
       class A {
