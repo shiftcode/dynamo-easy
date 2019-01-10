@@ -10,7 +10,7 @@ import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 export class DynamoRx {
   readonly dynamoDb: DynamoDB
 
-  constructor(awsRegion?: string) {
+  constructor() {
     // create the actual dynamo db client
     this.dynamoDb = new DynamoDB()
   }
