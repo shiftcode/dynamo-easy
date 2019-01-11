@@ -24,7 +24,7 @@ const BUFFER_TYPES = [
 ]
 
 /**
- * Detects the dynamodb type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
+ * Detects the dynamoDB type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
  * Collections of type array where all the values are either String | Number | Binary will be mapped to the corresponding S(et)
  * type. If the item types are heterogeneous or it is a non supported set type the returned type will be L(ist).
  * The logic for collection fo type Set is the same.

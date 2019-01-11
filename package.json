@@ -1,7 +1,7 @@
 {
   "name": "@shiftcoders/dynamo-easy",
   "version": "2.0.0",
-  "description": "Use the power of typescript to define your object mapping when using dynamodb. This library also provides a fluent api for easy interaction with dynamodb.",
+  "description": "Use the power of typescript to define your object mapping when using dynamoDB. This library also provides a fluent api for easy interaction with dynamoDB.",
   "keywords": [
     "api",
     "aws",

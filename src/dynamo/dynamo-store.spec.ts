@@ -91,8 +91,8 @@ describe('dynamo store', () => {
     expect(makeRequestSpy).toBeCalled()
   })
 
-  describe('allow to get dynamodb instance', () => {
+  describe('allow to get dynamoDB instance', () => {
     const store = new DynamoStore(SimpleWithPartitionKeyModel)
-    expect(store.dynamoDb).toBeDefined()
+    expect(store.dynamoDB).toBeDefined()
   })
 })

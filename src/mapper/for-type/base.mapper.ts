@@ -13,7 +13,7 @@ import {
 } from '../type/attribute.type'
 
 /**
- * Maps a js value to an attribute value so it can be stored in dynamodb, supported types are
+ * Maps a js value to an attribute value so it can be stored in dynamoDB, supported types are
  *
  * S(tring)
  * N(umber)
@@ -41,7 +41,7 @@ export type ToDbFn<
 > = (propertyValue: T, propertyMetadata?: PropertyMetadata<T, R>) => R | null
 
 /**
- * Maps an attribute value coming from dynamodb to an javascript type
+ * Maps an attribute value coming from dynamoDB to an javascript type
  */
 export type FromDbFn<
   T,
@@ -59,8 +59,8 @@ export type FromDbFn<
 > = (attributeValue: R, propertyMetadata?: PropertyMetadata<T, R>) => T
 
 /**
- * A Mapper is responsible to define how a specific type is mapped to an attribute value which can be stored in dynamodb and how to parse the value from
- * dynamodb back into the specific type
+ * A Mapper is responsible to define how a specific type is mapped to an attribute value which can be stored in dynamoDB and how to parse the value from
+ * dynamoDB back into the specific type
  */
 export interface MapperForType<
   T,

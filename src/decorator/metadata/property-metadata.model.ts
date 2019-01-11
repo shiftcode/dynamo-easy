@@ -24,7 +24,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   // name of the property on js side
   name: keyof T
 
-  // name of the dynamodb attribute, same as key by default
+  // name of the dynamoDB attribute, same as key by default
   nameDb: string
 
   /*
@@ -34,7 +34,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   typeInfo?: TypeInfo
 
   /*
-   * defines which dynamodb type should be used for storing collection data, only L(ist) preserves order (compared to Set types)
+   * defines which dynamoDB type should be used for storing collection data, only L(ist) preserves order (compared to Set types)
    */
   isSortedCollection?: boolean
 

@@ -19,8 +19,8 @@ import {
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
 
 export class DynamoStore<T> {
-  get dynamoDb(): DynamoDB {
-    return this.dynamoRx.dynamoDb
+  get dynamoDB(): DynamoDB {
+    return this.dynamoRx.dynamoDB
   }
 
   readonly tableName: string

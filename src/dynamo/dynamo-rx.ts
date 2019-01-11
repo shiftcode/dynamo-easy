@@ -5,18 +5,18 @@ import { switchMap } from 'rxjs/operators'
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 
 /**
- * Simply brings the standard dynamodb operations into the rx world by wrapping the node callbacks into observables
+ * Simply brings the standard dynamoDB operations into the rx world by wrapping the node callbacks into observables
  */
 export class DynamoRx {
-  readonly dynamoDb: DynamoDB
+  readonly dynamoDB: DynamoDB
 
   constructor() {
     // create the actual dynamo db client
-    this.dynamoDb = new DynamoDB()
+    this.dynamoDB = new DynamoDB()
   }
 
   updateAwsConfigCredentials(newConfig: Config): void {
-    this.dynamoDb.config.update({ credentials: newConfig.credentials })
+    this.dynamoDB.config.update({ credentials: newConfig.credentials })
   }
 
   /*
@@ -25,53 +25,53 @@ export class DynamoRx {
   putItem(params: DynamoDB.PutItemInput): Observable<DynamoDB.PutItemOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.putItem(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.putItem(params).promise())))
   }
 
   getItem(params: DynamoDB.GetItemInput): Observable<DynamoDB.GetItemOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.getItem(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.getItem(params).promise())))
   }
 
   updateItem(params: DynamoDB.UpdateItemInput): Observable<DynamoDB.UpdateItemOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.updateItem(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.updateItem(params).promise())))
   }
 
   deleteItem(params: DynamoDB.DeleteItemInput): Observable<DynamoDB.DeleteItemOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.deleteItem(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.deleteItem(params).promise())))
   }
 
   batchWriteItem(params: DynamoDB.BatchWriteItemInput): Observable<DynamoDB.BatchWriteItemOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.batchWriteItem(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.batchWriteItem(params).promise())))
   }
 
   batchGetItems(params: DynamoDB.BatchGetItemInput): Observable<DynamoDB.BatchGetItemOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.batchGetItem(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.batchGetItem(params).promise())))
   }
 
   transactWriteItems(params: DynamoDB.TransactWriteItemsInput): Observable<DynamoDB.TransactWriteItemsOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.transactWriteItems(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.transactWriteItems(params).promise())))
   }
 
   transactGetItems(params: DynamoDB.TransactGetItemsInput): Observable<DynamoDB.TransactGetItemsOutput> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.transactGetItems(params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.transactGetItems(params).promise())))
   }
 
   scan(params: DynamoDB.ScanInput): Observable<DynamoDB.ScanOutput> {
-    return dynamoEasyConfig.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDb.scan(params).promise())))
+    return dynamoEasyConfig.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDB.scan(params).promise())))
   }
 
   query(params: DynamoDB.QueryInput): Observable<DynamoDB.QueryOutput> {
@@ -79,12 +79,12 @@ export class DynamoRx {
       throw new Error('key condition expression must be defined')
     }
 
-    return dynamoEasyConfig.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDb.query(params).promise())))
+    return dynamoEasyConfig.sessionValidityEnsurer().pipe(switchMap(() => from(this.dynamoDB.query(params).promise())))
   }
 
   makeRequest(operation: string, params?: Record<string, any>): Observable<any> {
     return dynamoEasyConfig
       .sessionValidityEnsurer()
-      .pipe(switchMap(() => from(this.dynamoDb.makeRequest(operation, params).promise())))
+      .pipe(switchMap(() => from(this.dynamoDB.makeRequest(operation, params).promise())))
   }
 }

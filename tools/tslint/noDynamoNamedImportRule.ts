@@ -4,7 +4,7 @@ import { isNamedImports } from 'tsutils'
 
 /**
  * We prevent named imports from aws-sdk/clients/dynamodb, this is a design decision to be more obvious about where the
- * import is from, this is not common practice but because our code has a lot of code dependent on dynamodb we do this
+ * import is from, this is not common practice but because our code has a lot of code dependent on dynamoDB we do this
  * for easier reading and understanding
  */
 class NoDynamoDbWildcardImportWalker extends Lint.RuleWalker {

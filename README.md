@@ -135,7 +135,7 @@ There are two possibilities to change the name:
 
 ## Types
 
-We do the mapping from javascript objects to dynamodb types for you in requests and responses
+We do the mapping from javascript objects to dynamoDB types for you in requests and responses
 
 Simple Type (no decorators required to work)
 - String
@@ -223,7 +223,7 @@ Enum values are persisted as Numbers (index of enum or assigned value) or string
 
 # Request API
 To start making requests create an instance of [DynamoStore](https://shiftcode.github.io/dynamo-easy/classes/_dynamo_dynamo_store_.dynamostore.html) and execute the desired operation using the provided api.
-We support the following dynamodb operations with a fluent api:
+We support the following dynamoDB operations with a fluent api:
 
 - Put
 - Get
@@ -286,7 +286,7 @@ For conditions not involving a an item to write on, use the TransactConditionChe
 ```
 
 # Authentication
-In a real world scenario you'll have some kind of authentication to protect your dynamodb ressources. You can customize on how to authenticate when providing a custom
+In a real world scenario you'll have some kind of authentication to protect your dynamoDB ressources. You can customize on how to authenticate when providing a custom
 SessionValidityEnsurer function to the DynamoStore when creating a new instance.
 The default implementation is a no-op function.
 
@@ -317,7 +317,7 @@ function sessionValidityEnsurer(): Observable<boolean> {
 ```
 
 ## Expressions ([AWS Doc](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.html))
-By default we create a substitution placeholder for all the attributes, just to not implement a [blacklist](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html) with reserved words in the context of aws dynamodb.
+By default we create a substitution placeholder for all the attributes, just to not implement a [blacklist](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html) with reserved words in the context of aws dynamoDB.
 
 attributename: age
 

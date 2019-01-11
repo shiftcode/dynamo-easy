@@ -11,7 +11,7 @@ describe('dynamo rx', () => {
   describe('should call the validity ensurer before each call and call the correct dynamoDB method', () => {
     let dynamoRx: DynamoRx
     let sessionValidityEnsurerSpy: jasmine.Spy
-    let dynamoDbSpy: jasmine.Spy
+    let dynamoDBSpy: jasmine.Spy
     let pseudoParams: any
 
     beforeEach(() => {
@@ -24,57 +24,57 @@ describe('dynamo rx', () => {
     afterEach(() => {
       resetDynamoEasyConfig()
       expect(sessionValidityEnsurerSpy).toHaveBeenCalled()
-      expect(dynamoDbSpy).toHaveBeenCalledTimes(1)
-      expect(dynamoDbSpy).toHaveBeenCalledWith(pseudoParams)
+      expect(dynamoDBSpy).toHaveBeenCalledTimes(1)
+      expect(dynamoDBSpy).toHaveBeenCalledWith(pseudoParams)
     })
 
     it('putItem', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'putItem').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'putItem').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.putItem(pseudoParams).toPromise()
     })
 
     it('getItem', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'getItem').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'getItem').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.getItem(pseudoParams).toPromise()
     })
 
     it('updateItem', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'updateItem').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'updateItem').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.updateItem(pseudoParams).toPromise()
     })
 
     it('deleteItem', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'deleteItem').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'deleteItem').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.deleteItem(pseudoParams).toPromise()
     })
 
     it('batchWriteItem', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'batchWriteItem').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'batchWriteItem').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.batchWriteItem(pseudoParams).toPromise()
     })
 
     it('batchGetItems', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'batchGetItem').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'batchGetItem').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.batchGetItems(pseudoParams).toPromise()
     })
 
     it('transactWriteItems', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'transactWriteItems').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'transactWriteItems').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.transactWriteItems(pseudoParams).toPromise()
     })
 
     it('transactGetItems', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'transactGetItems').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'transactGetItems').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.transactGetItems(pseudoParams).toPromise()
     })
 
     it('scan', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'scan').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'scan').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.scan(pseudoParams).toPromise()
     })
 
     it('query', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'query').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'query').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.query(pseudoParams).toPromise()
     })
   })
@@ -82,7 +82,7 @@ describe('dynamo rx', () => {
   describe('makeRequest', async () => {
     let dynamoRx: DynamoRx
     let sessionValidityEnsurerSpy: jasmine.Spy
-    let dynamoDbSpy: jasmine.Spy
+    let dynamoDBSpy: jasmine.Spy
     let pseudoParams: any
 
     beforeEach(() => {
@@ -95,12 +95,12 @@ describe('dynamo rx', () => {
     afterEach(() => {
       resetDynamoEasyConfig()
       expect(sessionValidityEnsurerSpy).toHaveBeenCalled()
-      expect(dynamoDbSpy).toHaveBeenCalledTimes(1)
-      expect(dynamoDbSpy).toHaveBeenCalledWith('pseudoOperation', pseudoParams)
+      expect(dynamoDBSpy).toHaveBeenCalledTimes(1)
+      expect(dynamoDBSpy).toHaveBeenCalledWith('pseudoOperation', pseudoParams)
     })
 
     it('should call the validity ensurer before each call and call the correct dynamoDB method', async () => {
-      dynamoDbSpy = spyOn(dynamoRx.dynamoDb, 'makeRequest').and.returnValue({ promise: () => Promise.resolve() })
+      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'makeRequest').and.returnValue({ promise: () => Promise.resolve() })
       await dynamoRx.makeRequest('pseudoOperation', pseudoParams).toPromise()
     })
   })
@@ -116,7 +116,7 @@ describe('dynamo rx', () => {
   it('should call makeRequest with the given params', async () => {
     const dynamoRx = new DynamoRx()
     const makeRequest = jasmine.createSpy().and.returnValue({ promise: () => Promise.resolve(null) })
-    Object.assign(dynamoRx, { dynamoDb: { makeRequest } })
+    Object.assign(dynamoRx, { dynamoDB: { makeRequest } })
 
     await dynamoRx.makeRequest(<any>{ ok: true }).toPromise()
     expect(makeRequest).toHaveBeenCalled()
@@ -127,6 +127,6 @@ describe('dynamo rx', () => {
     const dynamoRx = new DynamoRx()
     const credentials = new Credentials({ secretAccessKey: '', sessionToken: '', accessKeyId: '' })
     dynamoRx.updateAwsConfigCredentials(new Config({ credentials }))
-    expect(dynamoRx.dynamoDb.config.credentials).toBe(credentials)
+    expect(dynamoRx.dynamoDB.config.credentials).toBe(credentials)
   })
 })

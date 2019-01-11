@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 
 /**
- * copied from aws-sdk/cliets/dynamoDb QueryOutput but added generics, because we process the items and map them
+ * copied from aws-sdk/clients/dynamoDb QueryOutput but added generics, because we process the items and map them
  * to an actual type
  */
 export interface QueryResponse<T> {
