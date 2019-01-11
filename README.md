@@ -21,5 +21,5 @@ dynamoStore
 {% endcode-tabs-item %}
 {% endcode-tabs %}
 
-## Developed with ❤ by [www.shiftcode.ch](www.shiftcode.ch)
+## Developed with ❤❤ by [www.shiftcode.ch](www.shiftcode.ch)
 
