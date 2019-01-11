@@ -24,7 +24,7 @@ const BUFFER_TYPES = [
 ]
 
 /**
- * Detects the dynamodb type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
+ * Detects the dynamoDB type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
  * Collections of type array where all the values are either String | Number | Binary will be mapped to the corresponding S(et)
  * type. If the item types are heterogeneous or it is a non supported set type the returned type will be L(ist).
  * The logic for collection fo type Set is the same.
@@ -32,7 +32,7 @@ const BUFFER_TYPES = [
  * @param {any[] | Set<any>} collection
  * @returns {AttributeCollectionType}
  */
-export function detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType {
+export function detectCollectionTypeFromValue(collection: any[] | Set<any>): AttributeCollectionType {
   if (Array.isArray(collection)) {
     if (collection.length) {
       if (collection.every(isString)) {
@@ -50,33 +50,52 @@ export function detectCollectionType(collection: any[] | Set<any>): AttributeCol
 
     return 'L'
   } else if (isSet(collection)) {
-    const firstValueType: AttributeType | null = collection.size ? detectType(collection.values().next().value) : null
-    let heterogeneous = false
-
-    for (const item of collection) {
-      const type: AttributeType = detectType(item)
-      if (type !== firstValueType) {
-        heterogeneous = true
-        break
+    if (collection.size) {
+      const {homogeneous, type} = isHomogeneous(collection)
+      if (homogeneous) {
+        switch (type) {
+          case 'S':
+            return 'SS'
+          case 'N':
+            return 'NS'
+          case 'B':
+            return 'BS'
+          default:
+            return 'L'
+        }
+      } else {
+        // sets can not contain items with different types (heterogeneous)
+        return 'L'
       }
-    }
-
-    if (heterogeneous) {
-      return 'L'
     } else {
-      switch (firstValueType) {
-        case 'S':
-          return 'SS'
-        case 'N':
-          return 'NS'
-        case 'B':
-          return 'BS'
-        default:
-          return 'L'
-      }
+      /*
+       * an empty Set will not be persisted so we just return a random Set type, it is only important that it is one of
+       * S(et)
+       */
+      return 'SS'
     }
   } else {
     throw new Error('given collection was no array or Set -> type could not be detected')
+  }
+}
+
+export function isHomogeneous(collection: Set<any> | any[]): { homogeneous: boolean, type?: AttributeType | null } {
+  const collectionAsArray = isSet(collection) ? Array.from(collection) : collection
+  const firstValueType: AttributeType | null = collectionAsArray.length ? detectType(collectionAsArray[0]) : null
+
+  let homogeneous = true
+  for (const item of collectionAsArray) {
+    const type: AttributeType = detectType(item)
+    if (type !== firstValueType) {
+      homogeneous = false
+      break
+    }
+  }
+
+  if (homogeneous) {
+    return { homogeneous: true, type: firstValueType }
+  } else {
+    return { homogeneous: false }
   }
 }
 
@@ -93,7 +112,7 @@ export function isSet(value: any): value is Set<any> {
 
 export function detectType(value: any): AttributeType {
   if (isCollection(value)) {
-    return detectCollectionType(value)
+    return detectCollectionTypeFromValue(value)
   } else {
     if (isString(value)) {
       return 'S'
@@ -124,25 +143,22 @@ export function detectType(value: any): AttributeType {
 }
 
 /**
- * Will resolve the type based on given data.
- *
- * @param data
- * @returns {AttributeModelTypeName}
+ * Will resolve the type based on given property value
  */
-export function typeOf(data: any): AttributeValueType {
-  if (data === null) {
+export function typeOf(propertyValue: any): AttributeValueType {
+  if (propertyValue === null) {
     return NullType
   } else {
-    if (Array.isArray(data)) {
+    if (Array.isArray(propertyValue)) {
       return Array
-    } else if (data instanceof Set) {
+    } else if (isSet(propertyValue)) {
       return Set
-    } else if (data instanceof Map) {
+    } else if (propertyValue instanceof Map) {
       return Map
-    } else if (isBinary(data)) {
+    } else if (isBinary(propertyValue)) {
       return Binary
     } else {
-      switch (typeof data) {
+      switch (typeof propertyValue) {
         case 'string':
           return String
         case 'number':
@@ -157,7 +173,7 @@ export function typeOf(data: any): AttributeValueType {
     }
   }
 
-  throw new Error(`typeof data ${data} could not be detected`)
+  throw new Error(`typeof data ${propertyValue} could not be detected`)
 }
 
 /*
