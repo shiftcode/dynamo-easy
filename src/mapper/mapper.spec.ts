@@ -32,6 +32,7 @@ import {
   Type,
 } from '../../test/models'
 import { IdMapper } from '../../test/models/model-with-custom-mapper.model'
+import { ModelWithEmptyValues } from '../../test/models/model-with-empty-values'
 import {
   ModelWithNestedModelWithCustomMapper,
   NestedModelWithCustomMapper,
@@ -65,7 +66,7 @@ describe('Mapper', () => {
 
       it('string (empty)', () => {
         const attrValue = <StringAttribute>toDbOne('')!
-        expect(attrValue).toBe(null)
+        expect(attrValue).toBeNull()
       })
 
       it('number', () => {
@@ -73,6 +74,11 @@ describe('Mapper', () => {
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('N')
         expect(attrValue.N).toBe('3')
+      })
+
+      it('number (NaN)', () => {
+        const attrValue = <NumberAttribute>toDbOne(NaN)!
+        expect(attrValue).toBeNull()
       })
 
       it('boolean', () => {
@@ -112,7 +118,7 @@ describe('Mapper', () => {
         expect(attrValue.M).toEqual({})
       })
 
-      it('array -> SS (homogen, no duplicates)', () => {
+      it('array -> S(tring)S(et) (homogeneous, no duplicates)', () => {
         const attrValue = <StringSetAttribute>toDbOne(['foo', 'bar'])!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('SS')
@@ -120,7 +126,7 @@ describe('Mapper', () => {
         expect(attrValue.SS[1]).toBe('bar')
       })
 
-      it('array -> L (homogen, no duplicates, explicit type)', () => {
+      it('array -> L(ist) (homogeneous, no duplicates, explicit type)', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
           typeInfo: { type: Array, isCustom: true },
         }
@@ -135,7 +141,7 @@ describe('Mapper', () => {
         expect((<StringAttribute>attrValue.L[1]).S).toBe('bar')
       })
 
-      it('array -> L (heterogen, no duplicates)', () => {
+      it('array -> L(ist) (heterogeneous, no duplicates)', () => {
         const attrValue = <ListAttribute>toDbOne(['foo', 56, true])!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
@@ -158,7 +164,7 @@ describe('Mapper', () => {
         expect(bool.BOOL).toBe(true)
       })
 
-      it('array -> L (homogen, complex type)', () => {
+      it('array -> L(ist) (homogeneous, complex type)', () => {
         const attrValue = <ListAttribute>(
           toDbOne([{ name: 'max', age: 25, sortedSet: null }, { name: 'anna', age: 65, sortedSet: null }])!
         )
@@ -179,7 +185,7 @@ describe('Mapper', () => {
         expect((<NumberAttribute>employee1.M.age).N).toBe('25')
       })
 
-      it('set', () => {
+      it('Set -> S(tring)S(et)', () => {
         const attrValue = <ListAttribute>toDbOne(new Set(['foo', 'bar', 25]))!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
@@ -188,12 +194,12 @@ describe('Mapper', () => {
         expect(attrValue.L[2]).toEqual({ N: '25' })
       })
 
-      it('set (empty)', () => {
+      it('Set (empty) -> null', () => {
         const attrValue = <NullAttribute>toDbOne(new Set())!
-        expect(attrValue).toBe(null)
+        expect(attrValue).toBeNull()
       })
 
-      it('set of objects', () => {
+      it('Set of objects -> L(ist)', () => {
         const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 56 }, { name: 'anna', age: 26 }]))!
 
         expect(attrValue).toBeDefined()
@@ -437,7 +443,7 @@ describe('Mapper', () => {
             new Birthday(birthday2Date, 'car', 'gin'),
           ])
 
-          organization.awards = new Set(['good, better, shiftcode', 'jus kiddin'])
+          organization.awards = new Set(['good, better, shiftcode', 'just kiddin'])
 
           const events = new Set()
           events.add(new OrganizationEvent('shift the web', 1520))
@@ -449,7 +455,7 @@ describe('Mapper', () => {
 
         describe('creates correct attribute map', () => {
           it('all properties are mapped', () => {
-            expect(Object.keys(organizationAttrMap).length).toBe(14)
+            expect(Object.keys(organizationAttrMap).length).toBe(13)
           })
 
           it('id', () => {
@@ -616,7 +622,7 @@ describe('Mapper', () => {
             expect((<StringAttribute>awards[0]).S).toBe('good, better, shiftcode')
 
             expect(keyOf(awards[1])).toBe('S')
-            expect((<StringAttribute>awards[1]).S).toBe('jus kiddin')
+            expect((<StringAttribute>awards[1]).S).toBe('just kiddin')
           })
 
           it('events', () => {
@@ -642,9 +648,10 @@ describe('Mapper', () => {
             expect(organizationAttrMap.transient).toBeUndefined()
           })
 
-          // an empty set is not a valid attribute value to be persisted either NULL:true or
+          // an empty set is not a valid attribute value to be persisted
           it('emptySet', () => {
-            expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
+            expect(organizationAttrMap.emptySet).toBeUndefined()
+            // expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
           })
         })
       })
@@ -765,6 +772,48 @@ describe('Mapper', () => {
           expect(toDbVal.strType).toBeDefined()
           expect((<StringAttribute>toDbVal.strType).S).toBe('first')
         })
+      })
+
+      describe('model with empty values', () => {
+        const model: ModelWithEmptyValues = {
+          // OK
+          id: 'myId',
+
+          // x -> empty strings are not valid
+          name: '',
+
+          // x -> empty set is not valid
+          roles: new Set(),
+
+          // OK ->empty L(ist) is valid
+          lastNames: [],
+
+          // OK -> depending on mapper
+          createdAt: new Date(),
+
+          // OK -> empty M(ap) is valid
+          details: {},
+        }
+
+        const toDbValue = toDb(model, ModelWithEmptyValues)
+        console.log(toDbValue)
+
+        // expect(Object.keys(toDbValue).length).toBe(4)
+
+        expect(toDbValue.id).toBeDefined()
+        expect(keyOf(toDbValue.id)).toBe('S')
+
+        expect(toDbValue.name).toBeUndefined()
+
+        expect(toDbValue.roles).toBeUndefined()
+
+        expect(toDbValue.lastNames).toBeDefined()
+        expect(keyOf(toDbValue.lastNames)).toBe('L')
+
+        expect(toDbValue.createdAt).toBeDefined()
+
+        expect(toDbValue.details).toBeDefined()
+        expect(keyOf(toDbValue.details)).toBe('M')
       })
     })
 

@@ -14,10 +14,15 @@ function numberFromDb(attributeValue: NumberAttribute): number {
   }
 }
 
-function numberToDb(modelValue: number): NumberAttribute {
+function numberToDb(modelValue: number): NumberAttribute | null {
   if (!isNumber(modelValue)) {
     throw new Error('this mapper only support values of type number')
   }
+
+  if(isNaN(modelValue)){
+    return null
+  }
+
   return { N: modelValue.toString() }
 }
 

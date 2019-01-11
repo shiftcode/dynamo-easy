@@ -60,20 +60,20 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
-          /* 3a_1) skip transient property */
+          // 3a_1) skip transient propert
         } else {
-          /* 3a_2) property metadata is defined and not transient */
+          // 3a_2) property metadata is defined and property is not marked not transient
           attributeValue = toDbOne(propertyValue, propertyMetadata)
         }
       } else {
-        /* 3b) no metadata found */
+        // 3b) no metadata found
         attributeValue = toDbOne(propertyValue)
       }
 
       if (attributeValue === undefined) {
         // no-op transient field, just ignore it
       } else if (attributeValue === null) {
-        // empty values (string, set, list) will be ignored too
+        // empty values will be ignored too
       } else {
         ;(<any>mapped)[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
       }
