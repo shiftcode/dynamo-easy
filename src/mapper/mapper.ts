@@ -170,7 +170,7 @@ export function createKeyAttributes<T>(
   return keyAttributeMap
 }
 
-export function fromDb<T>(attributeMap: Attributes<T>, modelClass?: ModelConstructor<T>): T {
+export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelConstructor<T>): T {
   const model: T = <T>{}
 
   Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {
@@ -184,8 +184,8 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelClass?: ModelConstru
      */
     let modelValue: T | undefined
     let propertyMetadata: PropertyMetadata<any, any> | null | undefined
-    if (modelClass) {
-      propertyMetadata = metadataForProperty(modelClass, attributeName)
+    if (modelConstructor) {
+      propertyMetadata = metadataForProperty(modelConstructor, attributeName)
     }
 
     if (propertyMetadata) {

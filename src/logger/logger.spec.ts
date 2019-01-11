@@ -18,6 +18,6 @@ describe('log receiver', () => {
     expect(store).toBeDefined()
     expect(logs.length).toBe(1)
     expect(logs[0].timestamp).toBeGreaterThanOrEqual(ts)
-    expect(logs[0].modelClass).toBe(Employee.name)
+    expect(logs[0].modelConstructor).toBe(Employee.name)
   })
 })
