@@ -51,7 +51,7 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
     return 'L'
   } else if (isSet(collection)) {
     if (collection.size) {
-      const {homogeneous, type} = isHomogeneous(collection)
+      const { homogeneous, type } = isHomogeneous(collection)
       if (homogeneous) {
         switch (type) {
           case 'S':
@@ -113,30 +113,18 @@ export function isSet(value: any): value is Set<any> {
 export function detectType(value: any): AttributeType {
   if (isCollection(value)) {
     return detectCollectionTypeFromValue(value)
-  } else {
-    if (isString(value)) {
-      return 'S'
-    }
-
-    if (isNumber(value)) {
-      return 'N'
-    }
-
-    if (isBinary(value)) {
-      return 'B'
-    }
-
-    if (value === null) {
-      return 'NULL'
-    }
-
-    if (typeof value === 'boolean') {
-      return 'BOOL'
-    }
-
-    if (typeof value === 'object') {
-      return 'M'
-    }
+  } else if (isString(value)) {
+    return 'S'
+  } else if (isNumber(value)) {
+    return 'N'
+  } else if (isBinary(value)) {
+    return 'B'
+  } else if (value === null) {
+    return 'NULL'
+  } else if (typeof value === 'boolean') {
+    return 'BOOL'
+  } else if (typeof value === 'object') {
+    return 'M'
   }
 
   throw new Error(`the type for value ${value} could not be detected`)
@@ -148,28 +136,26 @@ export function detectType(value: any): AttributeType {
 export function typeOf(propertyValue: any): AttributeValueType {
   if (propertyValue === null) {
     return NullType
+  } else if (Array.isArray(propertyValue)) {
+    return Array
+  } else if (isSet(propertyValue)) {
+    return Set
+  } else if (propertyValue instanceof Map) {
+    return Map
+  } else if (isBinary(propertyValue)) {
+    return Binary
   } else {
-    if (Array.isArray(propertyValue)) {
-      return Array
-    } else if (isSet(propertyValue)) {
-      return Set
-    } else if (propertyValue instanceof Map) {
-      return Map
-    } else if (isBinary(propertyValue)) {
-      return Binary
-    } else {
-      switch (typeof propertyValue) {
-        case 'string':
-          return String
-        case 'number':
-          return Number
-        case 'boolean':
-          return Boolean
-        case 'undefined':
-          return UndefinedType
-        case 'object':
-          return Object
-      }
+    switch (typeof propertyValue) {
+      case 'string':
+        return String
+      case 'number':
+        return Number
+      case 'boolean':
+        return Boolean
+      case 'undefined':
+        return UndefinedType
+      case 'object':
+        return Object
     }
   }
 
