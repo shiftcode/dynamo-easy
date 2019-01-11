@@ -221,12 +221,15 @@ export function isType(obj: any, type: any): boolean {
   return Object.prototype.toString.call(obj) === '[object ' + type + ']'
 }
 
+// tslint:disable-next-line:function-constructor
+const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
+
 export function isBrowser() {
-  return process && (<any>process).browser
+  return isGlobalScopeWindow
 }
 
 export function isNode() {
-  return !isBrowser()
+  return !isGlobalScopeWindow
 }
 
 /**
