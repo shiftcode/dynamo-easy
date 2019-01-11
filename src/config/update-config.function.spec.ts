@@ -1,7 +1,7 @@
 // tslint:disable:no-empty
 
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
-import { DateToNumberMapper } from '../mapper/custom'
+import { dateToNumberMapper } from '../mapper/custom'
 import { dynamoEasyConfig } from './dynamo-easy-config'
 import { updateDynamoEasyConfig } from './update-config.function'
 
@@ -43,7 +43,7 @@ describe('updateDynamoEasyConfig', () => {
 
   it('should work when providing valid stuff', () => {
     const myLogReceiver = () => {}
-    const myDateMapper = { ...DateToNumberMapper }
+    const myDateMapper = { ...dateToNumberMapper }
     updateDynamoEasyConfig({
       logReceiver: myLogReceiver,
       dateMapper: myDateMapper,

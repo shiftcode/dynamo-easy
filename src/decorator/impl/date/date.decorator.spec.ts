@@ -3,7 +3,7 @@ import { metadataForModel, Model, ModelMetadata } from '../..'
 import { getMetaDataProperty } from '../../../../test/helper'
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../../../config'
-import { DateToNumberMapper } from '../../../mapper/custom'
+import { dateToNumberMapper } from '../../../mapper/custom'
 import { DateProperty } from './date.decorator'
 
 @Model()
@@ -13,10 +13,10 @@ class ModelWithDate {
 }
 
 describe('Date decorators should allow to use a different date mapper', () => {
-  beforeEach(() => updateDynamoEasyConfig({ dateMapper: DateToNumberMapper }))
+  beforeEach(() => updateDynamoEasyConfig({ dateMapper: dateToNumberMapper }))
   afterEach(resetDynamoEasyConfig)
 
-  it('should define the DateToNumberMapper in metadata', () => {
+  it('should define the dateToNumberMapper in metadata', () => {
     const metaData: ModelMetadata<ModelWithDate> = metadataForModel(ModelWithDate)
 
     expect(metaData).toBeDefined()
@@ -28,6 +28,6 @@ describe('Date decorators should allow to use a different date mapper', () => {
     expect(nameProp).toBeDefined()
     expect(nameProp!.name).toBe('aDate')
     expect(nameProp!.mapper).toBeDefined()
-    expect(nameProp!.mapper!()).toBe(DateToNumberMapper)
+    expect(nameProp!.mapper!()).toBe(dateToNumberMapper)
   })
 })

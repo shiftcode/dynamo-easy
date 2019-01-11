@@ -1,12 +1,12 @@
 import { MapperForType } from '../for-type/base.mapper'
 import { NumberAttribute } from '../type/attribute.type'
-import { DateToNumberMapper } from './date-to-number.mapper'
+import { dateToNumberMapper } from './date-to-number.mapper'
 
 describe('date mapper', () => {
   let dateMapper: MapperForType<Date, NumberAttribute>
 
   beforeEach(() => {
-    dateMapper = DateToNumberMapper
+    dateMapper = dateToNumberMapper
   })
 
   describe('to db', () => {

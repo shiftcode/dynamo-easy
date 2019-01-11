@@ -22,7 +22,7 @@ function dateToDb(modelValue: Date): StringAttribute {
   }
 }
 
-export const DateToStringMapper: MapperForType<Date, StringAttribute> = {
+export const dateToStringMapper: MapperForType<Date, StringAttribute> = {
   fromDb: dateFromDb,
   toDb: dateToDb,
 }
