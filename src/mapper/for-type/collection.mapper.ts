@@ -1,7 +1,7 @@
 import { hasGenericType, PropertyMetadata } from '../../decorator'
 import { notNull } from '../../helper'
 import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'
-import { AttributeType } from '../type/attribute-type.type'
+import { AttributeCollectionType, AttributeType } from '../type/attribute-type.type'
 import {
   BinarySetAttribute,
   ListAttribute,
@@ -10,7 +10,7 @@ import {
   NumberSetAttribute,
   StringSetAttribute,
 } from '../type/attribute.type'
-import { detectCollectionType, isBufferType, isSet } from '../util'
+import { detectCollectionTypeFromValue, isBufferType, isSet } from '../util'
 import { MapperForType } from './base.mapper'
 
 type CollectionAttributeTypes =
@@ -61,94 +61,130 @@ function collectionToDb(
 ): CollectionAttributeTypes | null {
   if (Array.isArray(propertyValue) || isSet(propertyValue)) {
     let collectionType: AttributeType
+    // detect collection type
     if (propertyMetadata) {
-      const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
-      switch (explicitType) {
-        case Array:
-          collectionType = 'L'
-          break
-        case Set:
-          if (propertyMetadata.isSortedCollection) {
-            // only the L(ist) type preserves order
-            collectionType = 'L'
-          } else {
-            if ((<Set<any>>propertyValue).size === 0) {
-              // if the type is Set defined by propertyMetadata and the value is empty return null type, empty set is not allowed
-              return { NULL: true }
-            } else {
-              if (hasGenericType(propertyMetadata)) {
-                // generic type of Set is defined, so decide based on the generic type which db set type should be used
-                if (isBufferType(propertyMetadata.typeInfo.genericType)) {
-                  collectionType = 'BS'
-                } else {
-                  switch (propertyMetadata.typeInfo.genericType) {
-                    case String:
-                      collectionType = 'SS'
-                      break
-                    case Number:
-                      collectionType = 'NS'
-                      break
-                    default:
-                      // fallback to list if the type is not one of String or Number
-                      collectionType = 'L'
-                  }
-                }
-              } else {
-                // auto detect based on set item values
-                collectionType = detectCollectionType(propertyValue)
-              }
-            }
-          }
-          break
-        default:
-          throw new Error(`only 'Array' and 'Set' are valid values for explicit type, found ${explicitType}`)
-      }
+      // based on metadata
+      collectionType = detectCollectionTypeFromMetadata(propertyMetadata, propertyValue)
     } else {
-      // auto detect based on set item values
-      collectionType = detectCollectionType(propertyValue)
+      // based on value
+      collectionType = detectCollectionTypeFromValue(propertyValue)
     }
 
-    // convert to array if we deal with a set
-    if (isSet(propertyValue)) {
-      propertyValue = Array.from(propertyValue)
-    }
+    // convert to array if we deal with a set for same behaviour
+    propertyValue = isSet(propertyValue) ? Array.from(propertyValue) : propertyValue
 
-    // empty value is not allowed for S(et) (supported for L(ist))
-    if (propertyValue.length === 0) {
+    // empty values are not allowed for S(et) types only for L(ist)
+    if ((collectionType === 'SS' || collectionType === 'NS' || collectionType === 'BS') && propertyValue.length === 0) {
       return null
-    } else {
-      switch (collectionType) {
-        case 'SS':
-          return { SS: propertyValue }
-        case 'NS':
-          return { NS: propertyValue.map(num => num.toString()) }
-        case 'BS':
-          return { BS: propertyValue }
-        case 'L':
-          if (hasGenericType(propertyMetadata)) {
-            return {
-              L: propertyValue.map(value => ({
-                M: toDb(value, propertyMetadata.typeInfo.genericType),
-              })),
-            }
-          } else {
-            return {
-              L: propertyValue
-                // tslint:disable-next-line:no-unnecessary-callback-wrapper
-                .map(v => toDbOne(v))
-                .filter(notNull),
-            }
+    }
+
+    // do the mapping depending on type
+    switch (collectionType) {
+      case 'SS':
+        return { SS: propertyValue }
+      case 'NS':
+        return { NS: propertyValue.map(num => num.toString()) }
+      case 'BS':
+        return { BS: propertyValue }
+      case 'L':
+        if (hasGenericType(propertyMetadata)) {
+          return {
+            L: propertyValue.map(value => ({
+              M: toDb(value, propertyMetadata.typeInfo.genericType),
+            })),
           }
-        default:
-          throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
-      }
+        } else {
+          return {
+            L: propertyValue
+            // tslint:disable-next-line:no-unnecessary-callback-wrapper
+              .map(v => toDbOne(v))
+              .filter(notNull),
+          }
+        }
+      default:
+        throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
     }
   } else {
-    throw new Error(`given value is not an array ${propertyValue}`)
+    throw new Error(`Given value must be either Array or Set ${propertyValue}`)
   }
 }
 
 export const CollectionMapper: MapperForType<any[] | Set<any>, CollectionAttributeTypes> = {
   fromDb: collectionFromDb,
   toDb: collectionToDb,
+}
+
+
+function detectCollectionTypeFromMetadata(propertyMetadata: PropertyMetadata<any, CollectionAttributeTypes>, propertyValue: any): AttributeCollectionType {
+  let collectionType: AttributeType
+  const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
+  switch (explicitType) {
+    case Array:
+      collectionType = 'L'
+      break
+    case Set:
+      if (propertyMetadata.isSortedCollection) {
+        // only the L(ist) type preserves order
+        collectionType = 'L'
+      } else {
+        if (hasGenericType(propertyMetadata)) {
+          // generic type of Set is defined, so decide based on the generic type which db set type should be used
+          if (isBufferType(propertyMetadata.typeInfo.genericType)) {
+            collectionType = 'BS'
+          } else {
+            switch (propertyMetadata.typeInfo.genericType) {
+              case String:
+                collectionType = 'SS'
+                break
+              case Number:
+                collectionType = 'NS'
+                break
+              default:
+                // fallback to list if the type is not one of String or Number
+                collectionType = 'L'
+            }
+          }
+        } else {
+          // auto detect based on set item values
+          collectionType = detectCollectionTypeFromValue(propertyValue)
+        }
+      }
+      break
+    default:
+      throw new Error(`only 'Array' and 'Set' are valid values for explicit type, found ${explicitType}`)
+  }
+
+  return collectionType
+  // const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
+  // switch (explicitType) {
+  //   case Array:
+  //     return 'L'
+  //   case Set:
+  //     if (propertyMetadata.isSortedCollection) {
+  //       // only the L(ist) type preserves order
+  //       return 'L'
+  //     } else {
+  //       if (hasGenericType(propertyMetadata)) {
+  //         // generic type of Set is defined, so decide based on the generic type which db set type should be used
+  //         if (isBufferType(propertyMetadata.typeInfo.genericType)) {
+  //           return 'BS'
+  //         } else {
+  //           switch (propertyMetadata.typeInfo.genericType) {
+  //             case String:
+  //               return 'SS'
+  //             case Number:
+  //               return 'NS'
+  //             default:
+  //               // fallback to list if the type is not one of String or Number
+  //               return 'L'
+  //           }
+  //         }
+  //       } else {
+  //         // auto detect based on set item values
+  //         return detectCollectionTypeFromValue(propertyValue)
+  //       }
+  //     }
+  //   default:
+  //     throw new Error(`only 'Array' and 'Set' are valid values for explicit type, found ${explicitType}`)
+  // }
 }
