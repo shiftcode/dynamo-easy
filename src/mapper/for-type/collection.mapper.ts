@@ -155,36 +155,4 @@ function detectCollectionTypeFromMetadata(propertyMetadata: PropertyMetadata<any
   }
 
   return collectionType
-  // const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
-  // switch (explicitType) {
-  //   case Array:
-  //     return 'L'
-  //   case Set:
-  //     if (propertyMetadata.isSortedCollection) {
-  //       // only the L(ist) type preserves order
-  //       return 'L'
-  //     } else {
-  //       if (hasGenericType(propertyMetadata)) {
-  //         // generic type of Set is defined, so decide based on the generic type which db set type should be used
-  //         if (isBufferType(propertyMetadata.typeInfo.genericType)) {
-  //           return 'BS'
-  //         } else {
-  //           switch (propertyMetadata.typeInfo.genericType) {
-  //             case String:
-  //               return 'SS'
-  //             case Number:
-  //               return 'NS'
-  //             default:
-  //               // fallback to list if the type is not one of String or Number
-  //               return 'L'
-  //           }
-  //         }
-  //       } else {
-  //         // auto detect based on set item values
-  //         return detectCollectionTypeFromValue(propertyValue)
-  //       }
-  //     }
-  //   default:
-  //     throw new Error(`only 'Array' and 'Set' are valid values for explicit type, found ${explicitType}`)
-  // }
 }
