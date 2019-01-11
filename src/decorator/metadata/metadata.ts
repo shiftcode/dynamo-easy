@@ -17,8 +17,8 @@ export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSo
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata<T>
 
-  constructor(modelConstructor: ModelConstructor<T>) {
-    this.modelOptions = Reflect.getMetadata(KEY_MODEL, modelConstructor)
+  constructor(modelClass: ModelConstructor<T>) {
+    this.modelOptions = Reflect.getMetadata(KEY_MODEL, modelClass)
   }
 
   forProperty(propertyKey: keyof T | string): PropertyMetadata<T> | undefined {

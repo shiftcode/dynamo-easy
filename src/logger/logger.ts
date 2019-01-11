@@ -10,11 +10,11 @@ export interface Logger {
   debug: LogFn
 }
 
-function getLogFn(className: string, modelConstructor: string, level: LogLevel): LogFn {
+function getLogFn(className: string, modelClass: string, level: LogLevel): LogFn {
   return (message: string, data?: any) => {
     dynamoEasyConfig.logReceiver({
       className,
-      modelConstructor,
+      modelClass,
       level,
       message,
       data,
@@ -23,10 +23,10 @@ function getLogFn(className: string, modelConstructor: string, level: LogLevel):
   }
 }
 
-export function createLogger(className: string, modelConstructor: ModelConstructor<any>): Logger {
+export function createLogger(className: string, modelClass: ModelConstructor<any>): Logger {
   return {
-    warn: getLogFn(className, modelConstructor.name, 'warning'),
-    info: getLogFn(className, modelConstructor.name, 'info'),
-    debug: getLogFn(className, modelConstructor.name, 'debug'),
+    warn: getLogFn(className, modelClass.name, 'warning'),
+    info: getLogFn(className, modelClass.name, 'info'),
+    debug: getLogFn(className, modelClass.name, 'debug'),
   }
 }

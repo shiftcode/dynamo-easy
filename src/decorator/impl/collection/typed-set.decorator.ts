@@ -3,10 +3,10 @@ import { TypeInfo } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 
 /**
- * Makes sure the property will be mapped to a S(et) type. The modelConstructor is required if the collection items
+ * Makes sure the property will be marshalled to a S(et) type. The modelClass is required if the collection items
  * have some property decorators, so we can retrieve this information using the model class.
  */
-export function TypedSet(modelConstructor?: ModelConstructor<any>): PropertyDecorator {
+export function TypedSet(modelClass?: ModelConstructor<any>): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
       const typeInfo: TypeInfo = {
@@ -14,8 +14,8 @@ export function TypedSet(modelConstructor?: ModelConstructor<any>): PropertyDeco
         isCustom: true,
       }
 
-      if (modelConstructor) {
-        typeInfo.genericType = modelConstructor
+      if (modelClass) {
+        typeInfo.genericType = modelClass
       }
 
       initOrUpdateProperty({ typeInfo }, target, propertyKey)
