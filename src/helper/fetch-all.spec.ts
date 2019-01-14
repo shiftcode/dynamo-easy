@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
 import { DynamoRx, QueryRequest } from '../dynamo'
 import { ScanRequest } from '../dynamo/request'
@@ -25,10 +24,10 @@ describe('fetch all', () => {
 
     beforeEach(async () => {
       dynamoRx = new DynamoRx()
-      spyOn(dynamoRx, 'scan').and.returnValues(of(output1), of(output2))
+      spyOn(dynamoRx, 'scan').and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
       methodSpy = <jasmine.Spy>dynamoRx.scan
       req = new ScanRequest(dynamoRx, SimpleWithPartitionKeyModel)
-      result = await fetchAll(req).toPromise()
+      result = await fetchAll(req)
     })
 
     it('should scan until LastEvaluatedKey is undefined', async () => {
@@ -58,11 +57,11 @@ describe('fetch all', () => {
 
     beforeEach(async () => {
       dynamoRx = new DynamoRx()
-      spyOn(dynamoRx, 'query').and.returnValues(of(output1), of(output2))
+      spyOn(dynamoRx, 'query').and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
       methodSpy = <jasmine.Spy>dynamoRx.query
       req = new QueryRequest(dynamoRx, SimpleWithPartitionKeyModel)
       req.wherePartitionKey('id-0')
-      result = await fetchAll(req).toPromise()
+      result = await fetchAll(req)
     })
 
     it('should query until LastEvaluatedKey is undefined', async () => {

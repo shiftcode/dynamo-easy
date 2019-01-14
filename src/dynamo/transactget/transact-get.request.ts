@@ -1,6 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { Attributes, createToKeyFn, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
@@ -54,19 +52,19 @@ export class TransactGetRequest {
     return this
   }
 
-  execNoMap(): Observable<DynamoDB.TransactGetItemsOutput> {
+  execNoMap(): Promise<DynamoDB.TransactGetItemsOutput> {
     return this.dynamoRx.transactGetItems(this.params)
   }
 
-  execFullResponse(): Observable<TransactGetFullResponse<[]>> {
-    return this.dynamoRx.transactGetItems(this.params).pipe(map(this.mapResponse))
+  execFullResponse(): Promise<TransactGetFullResponse<[]>> {
+    return this.dynamoRx.transactGetItems(this.params)
+      .then(this.mapResponse)
   }
 
-  exec(): Observable<[]> {
-    return this.dynamoRx.transactGetItems(this.params).pipe(
-      map(this.mapResponse),
-      map(r => r.Items),
-    )
+  exec(): Promise<[]> {
+    return this.dynamoRx.transactGetItems(this.params)
+      .then(this.mapResponse)
+      .then(r => r.Items)
   }
 
   private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetFullResponse<[]> => {

@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoRx } from '../dynamo-rx'
 import { getTableName } from '../get-table-name.function'
@@ -25,7 +24,7 @@ export abstract class StandardRequest<
     this.params.TableName = getTableName(this.metadata)
   }
 
-  abstract execFullResponse(): Observable<any>
+  abstract execFullResponse(): Promise<any>
 
-  abstract exec(): Observable<T[] | T | null | void>
+  abstract exec(): Promise<T[] | T | null | void>
 }

@@ -1,6 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { ModelConstructor } from '../../model'
 import { DynamoRx } from '../dynamo-rx'
 import { RequestConditionFunction } from '../expression'
@@ -13,11 +11,9 @@ import { StandardRequest } from './standard.request'
 /**
  * base class for all basic write request classes (DeleteItem, PutItem, UpdateItem
  */
-export abstract class WriteRequest<
-  T,
+export abstract class WriteRequest<T,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
-  R extends WriteRequest<T, I, R>
-> extends StandardRequest<T, I, R> {
+  R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
   protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
@@ -51,11 +47,8 @@ export abstract class WriteRequest<
     return <R>(<any>this)
   }
 
-  exec(): Observable<void> {
-    return this.execFullResponse().pipe(
-      map(response => {
-        return
-      }),
-    )
+  exec(): Promise<void> {
+    return this.execFullResponse()
+      .then(response => {return})
   }
 }

@@ -1,4 +1,3 @@
-import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { or } from '../expression/logical-operator'
@@ -14,7 +13,7 @@ describe('write request', () => {
     }
 
     execFullResponse() {
-      return of(null)
+      return Promise.resolve(null)
     }
   }
 
@@ -24,17 +23,17 @@ describe('write request', () => {
     let execFullResponseSpy: jasmine.Spy
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
-      execFullResponseSpy = jasmine.createSpy().and.returnValue(of({ myValue: true }))
+      execFullResponseSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ myValue: true }))
       Object.assign(req, { execFullResponse: execFullResponseSpy })
     })
 
     it('should call execFullResponse', async () => {
-      await req.exec().toPromise()
+      await req.exec()
       expect(execFullResponseSpy).toHaveBeenCalled()
     })
 
     it('should return void', async () => {
-      expect(await req.exec().toPromise()).toBeUndefined()
+      expect(await req.exec()).toBeUndefined()
     })
   })
 

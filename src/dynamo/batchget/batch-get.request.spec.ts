@@ -1,6 +1,5 @@
 // tslint:disable:no-non-null-assertion
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { Organization, SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes, toDb } from '../../mapper'
 import { DynamoRx } from '../dynamo-rx'
@@ -117,7 +116,7 @@ describe('batch get', () => {
       request = new BatchGetRequest()
       request.forModel(SimpleWithPartitionKeyModel, [jsItem1, jsItem2])
 
-      batchGetItemsSpy = jasmine.createSpy().and.returnValues(of(output1), of(output2))
+      batchGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
       const dynamoRx: DynamoRx = <any>{ batchGetItems: batchGetItemsSpy }
 
       Object.assign(request, { dynamoRx })
@@ -126,7 +125,7 @@ describe('batch get', () => {
     })
 
     it('[execNoMap] should backoff and retry when UnprocessedItems are returned', async () => {
-      const result = await request.execNoMap(generatorMock).toPromise()
+      const result = await request.execNoMap(generatorMock)
       expect(nextSpyFn).toHaveBeenCalledTimes(1)
       expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
       expect(result).toBeDefined()
@@ -140,7 +139,7 @@ describe('batch get', () => {
     })
 
     it('[execFullResponse] should backoff and retry when UnprocessedItems are returned', async () => {
-      const result = await request.execFullResponse(generatorMock).toPromise()
+      const result = await request.execFullResponse(generatorMock)
       expect(nextSpyFn).toHaveBeenCalledTimes(1)
       expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
       expect(result).toBeDefined()
@@ -154,7 +153,7 @@ describe('batch get', () => {
     })
 
     it('[exec] should backoff and retry when UnprocessedItems are returned', async () => {
-      const result = await request.exec(generatorMock).toPromise()
+      const result = await request.exec(generatorMock)
       expect(nextSpyFn).toHaveBeenCalledTimes(1)
       expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
       expect(result).toBeDefined()
@@ -182,7 +181,7 @@ describe('batch get', () => {
     }
 
     beforeEach(() => {
-      batchGetItemsSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       const dynamoRx: DynamoRx = <any>{ batchGetItems: batchGetItemsSpy }
       request = new BatchGetRequest()
       Object.assign(request, { dynamoRx })
@@ -190,13 +189,13 @@ describe('batch get', () => {
     })
 
     it('exec', async () => {
-      const result = await request.exec().toPromise()
+      const result = await request.exec()
       expect(batchGetItemsSpy).toHaveBeenCalled()
       expect(result).toEqual({ [getTableName(SimpleWithPartitionKeyModel)]: [jsItem] })
     })
 
     it('execFullResponse', async () => {
-      const result = await request.execFullResponse().toPromise()
+      const result = await request.execFullResponse()
       expect(batchGetItemsSpy).toHaveBeenCalled()
       expect(result).toEqual({
         Responses: { [getTableName(SimpleWithPartitionKeyModel)]: [jsItem] },

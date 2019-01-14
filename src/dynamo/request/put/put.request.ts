@@ -1,6 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { toDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
@@ -28,8 +27,9 @@ export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, PutReq
     return this
   }
 
-  execFullResponse(): Observable<DynamoDB.PutItemOutput> {
+  execFullResponse(): Promise<DynamoDB.PutItemOutput> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.putItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
+    return this.dynamoRx.putItem(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }

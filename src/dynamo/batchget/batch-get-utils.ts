@@ -1,6 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable, of } from 'rxjs'
-import { delay, map, mergeMap } from 'rxjs/operators'
+import { promiseDelay } from '../../helper'
 import { DynamoRx } from '../dynamo-rx'
 
 /**
@@ -16,27 +15,25 @@ export function batchGetItemsFetchAll(
   params: DynamoDB.BatchGetItemInput,
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
-): Observable<DynamoDB.BatchGetItemOutput> {
-  return dynamoRx.batchGetItems(params).pipe(
-    mergeMap(response => {
-      if (hasUnprocessedKeys(response)) {
-        // in case of unprocessedItems do a follow-up requests
-        return of(response.UnprocessedKeys).pipe(
+): Promise<DynamoDB.BatchGetItemOutput> {
+  return dynamoRx.batchGetItems(params)
+    .then(response => {
+        if (hasUnprocessedKeys(response)) {
+          // in case of unprocessedKeys do a follow-up requests
+          return Promise.resolve(response.UnprocessedKeys)
           // delay before doing the follow-up request
-          delay(backoffTimer.next().value * throttleTimeSlot),
-
-          mergeMap((UnprocessedKeys: DynamoDB.BatchGetRequestMap) => {
-            const nextParams = { ...params, RequestItems: UnprocessedKeys }
-            // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
-            return batchGetItemsFetchAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
-          }),
-          map(combineBatchGetResponses(response)),
-        )
-      }
-      // no follow-up request necessary, return result
-      return of(response)
-    }),
-  )
+            .then(promiseDelay(backoffTimer.next().value * throttleTimeSlot))
+            .then(UnprocessedKeys => {
+              const nextParams = { ...params, RequestItems: UnprocessedKeys }
+              // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
+              return batchGetItemsFetchAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
+            })
+            .then(combineBatchGetResponses(response))
+        }
+        // no follow-up request necessary, return result
+        return response
+      },
+    )
 }
 
 export type BatchGetItemOutputWithUnprocessedKeys = DynamoDB.BatchGetItemOutput & {

@@ -1,6 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, fromDb } from '../../mapper'
@@ -64,25 +62,25 @@ export class BatchGetRequest {
   execNoMap(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<DynamoDB.BatchGetItemOutput> {
+  ): Promise<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<BatchGetFullResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(map(this.mapResponse))
+  ): Promise<BatchGetFullResponse> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
   }
 
   exec(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<BatchGetResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      map(r => r.Responses),
-    )
+  ): Promise<BatchGetResponse> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
+      .then(r => r.Responses)
   }
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {

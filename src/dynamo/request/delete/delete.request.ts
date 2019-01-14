@@ -1,6 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
@@ -16,8 +15,9 @@ export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, 
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
-  execFullResponse(): Observable<DynamoDB.DeleteItemOutput> {
+  execFullResponse(): Promise<DynamoDB.DeleteItemOutput> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.deleteItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
+    return this.dynamoRx.deleteItem(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }

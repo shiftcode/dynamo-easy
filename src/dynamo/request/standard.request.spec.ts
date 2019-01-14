@@ -1,4 +1,3 @@
-import { of } from 'rxjs'
 import { Organization } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { getTableName } from '../get-table-name.function'
@@ -11,11 +10,11 @@ describe('StandardRequest', () => {
     }
 
     exec() {
-      return of([])
+      return Promise.resolve([])
     }
 
     execFullResponse() {
-      return of({})
+      return Promise.resolve({})
     }
   }
 

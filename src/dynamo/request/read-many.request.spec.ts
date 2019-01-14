@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable, of } from 'rxjs'
 import {
   ModelWithABunchOfIndexes,
   SimpleWithCompositePartitionKeyModel,
@@ -23,8 +22,8 @@ class TestRequest<T> extends ReadManyRequest<T, any, any, any, any> {
 
   protected readonly logger: Logger
 
-  protected doRequest(params: any): Observable<any> {
-    return of({})
+  protected doRequest(params: any): Promise<any> {
+    return Promise.resolve({})
   }
 }
 
@@ -144,27 +143,27 @@ describe('ReadManyRequest', () => {
     }
     beforeEach(() => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
-      doRequestSpy = jasmine.createSpy().and.returnValues(of(output), of({}))
+      doRequestSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output), Promise.resolve({}))
       Object.assign(request, { doRequest: doRequestSpy })
     })
 
     it('execFullResponse', async () => {
-      const res = await request.execFullResponse().toPromise()
+      const res = await request.execFullResponse()
       expect(res).toEqual({ ...output, Items: [jsItem, jsItem] })
     })
 
     it('execNoMap', async () => {
-      const res = await request.execNoMap().toPromise()
+      const res = await request.execNoMap()
       expect(res).toEqual(output)
     })
 
     it('exec', async () => {
-      const res = await request.exec().toPromise()
+      const res = await request.exec()
       expect(res).toEqual([jsItem, jsItem])
     })
 
     it('execSingle', async () => {
-      const res = await request.execSingle().toPromise()
+      const res = await request.execSingle()
       expect(doRequestSpy).toHaveBeenCalled()
       expect(doRequestSpy.calls.mostRecent().args[0]).toBeDefined()
       expect(doRequestSpy.calls.mostRecent().args[0].Limit).toBe(1)
@@ -172,20 +171,20 @@ describe('ReadManyRequest', () => {
     })
 
     it('execSingle should not alter request params', async () => {
-      await request.execSingle().toPromise()
+      await request.execSingle()
       expect(request.params.Limit).toBe(ReadManyRequest.DEFAULT_LIMIT)
     })
 
     it('execSingle empty response', async () => {
       // ignore first call which has results
-      await request.execSingle().toPromise()
+      await request.execSingle()
 
-      const res = await request.execSingle().toPromise()
+      const res = await request.execSingle()
       expect(res).toBe(null)
     })
 
     it('execCount', async () => {
-      const res = await request.execCount().toPromise()
+      const res = await request.execCount()
       expect(doRequestSpy).toHaveBeenCalled()
       expect(doRequestSpy.calls.mostRecent().args[0]).toBeDefined()
       expect(doRequestSpy.calls.mostRecent().args[0].Select).toBe('COUNT')
@@ -193,20 +192,20 @@ describe('ReadManyRequest', () => {
     })
 
     it('execCount should not alter request params', async () => {
-      await request.execCount().toPromise()
+      await request.execCount()
       expect(request.params.Select).toBeUndefined()
     })
 
     it('execCount empty response', async () => {
       // ignore first call which has results
-      await request.execCount().toPromise()
+      await request.execCount()
 
-      const res = await request.execCount().toPromise()
+      const res = await request.execCount()
       expect(res).toBe(0)
     })
 
     it('execFetchAll', async () => {
-      const res = await request.execFetchAll().toPromise()
+      const res = await request.execFetchAll()
       expect(res).toEqual([jsItem, jsItem])
     })
   })
@@ -220,12 +219,12 @@ describe('ReadManyRequest', () => {
       updateDynamoEasyConfig({ logReceiver })
       request = new TestRequest(SimpleWithPartitionKeyModel)
 
-      doRequestSpy = jasmine.createSpy().and.returnValue(of(output))
+      doRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve(output))
       Object.assign(request, { doRequest: doRequestSpy })
     })
 
     it('exec should log params and response', async () => {
-      await request.exec().toPromise()
+      await request.exec()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(request.params)).toBeTruthy()
@@ -233,7 +232,7 @@ describe('ReadManyRequest', () => {
     })
 
     it('execFullResponse should log params and response', async () => {
-      await request.execFullResponse().toPromise()
+      await request.execFullResponse()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(request.params)).toBeTruthy()

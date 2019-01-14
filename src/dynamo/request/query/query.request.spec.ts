@@ -1,7 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:max-classes-per-file
 
-import { of } from 'rxjs'
 import {
   ComplexModel,
   CustomId,
@@ -35,7 +34,7 @@ describe('query request', () => {
     let request: MyQueryRequest
 
     beforeEach(() => {
-      querySpy = jasmine.createSpy().and.returnValue(of({ Count: 1 }))
+      querySpy = jasmine.createSpy().and.returnValue(Promise.resolve({ Count: 1 }))
       request = new MyQueryRequest(<any>{ query: querySpy })
     })
 
@@ -46,7 +45,7 @@ describe('query request', () => {
       expect(request.theLogger).toBeDefined()
     })
     it('doRequest uses dynamoRx.query', async () => {
-      await request.exec().toPromise()
+      await request.exec()
       expect(querySpy).toHaveBeenCalled()
     })
   })

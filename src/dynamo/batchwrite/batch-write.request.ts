@@ -1,6 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, toDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
@@ -49,18 +47,15 @@ export class BatchWriteRequest {
   exec(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Observable<void> {
-    return this.write(backoffTimer, throttleTimeSlot).pipe(
-      map(() => {
-        return
-      }),
-    )
+  ): Promise<void> {
+    return this.write(backoffTimer, throttleTimeSlot)
+      .then(() => { return })
   }
 
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Observable<DynamoDB.BatchWriteItemOutput> {
+  ): Promise<DynamoDB.BatchWriteItemOutput> {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 

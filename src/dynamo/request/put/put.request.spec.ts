@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { PutRequest } from './put.request'
@@ -42,13 +41,13 @@ describe('put request', () => {
 
     beforeEach(() => {
       logReceiver = jasmine.createSpy()
-      putItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      putItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
       req = new PutRequest(<any>{ putItem: putItemSpy }, SimpleWithPartitionKeyModel, jsItem)
     })
 
     it('exec should log params and response', async () => {
-      await req.exec().toPromise()
+      await req.exec()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
@@ -56,7 +55,7 @@ describe('put request', () => {
     })
 
     it('execFullResponse should log params and response', async () => {
-      await req.execFullResponse().toPromise()
+      await req.execFullResponse()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()

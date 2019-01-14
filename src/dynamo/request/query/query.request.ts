@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
 import { createLogger, Logger } from '../../../logger/logger'
 import { ModelConstructor } from '../../../model'
 import { DynamoRx } from '../../dynamo-rx'
@@ -68,7 +67,7 @@ export class QueryRequest<T> extends ReadManyRequest<
     return this
   }
 
-  protected doRequest(params: DynamoDB.QueryInput): Observable<DynamoDB.QueryOutput> {
+  protected doRequest(params: DynamoDB.QueryInput): Promise<DynamoDB.QueryOutput> {
     return this.dynamoRx.query(params)
   }
 }

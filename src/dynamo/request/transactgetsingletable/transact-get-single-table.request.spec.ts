@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { metadataForClass } from '../../../decorator/metadata'
 import { createKeyAttributes } from '../../../mapper'
@@ -33,7 +32,7 @@ describe('TransactGetSingleTableRequest', () => {
       ],
       ConsumedCapacity: [],
     }
-    let transactGetItemsSpy = jasmine.createSpy().and.returnValue(of(response))
+    let transactGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
 
     beforeEach(() => {
       const dynamoRxMock: DynamoRx = <any>{ transactGetItems: transactGetItemsSpy }
@@ -41,7 +40,7 @@ describe('TransactGetSingleTableRequest', () => {
     })
 
     it('exec should map items', async () => {
-      const resp = await req.exec().toPromise()
+      const resp = await req.exec()
       expect(resp).toBeDefined()
       expect(resp.length).toBe(1)
       expect(resp[0]).toEqual({
@@ -51,7 +50,7 @@ describe('TransactGetSingleTableRequest', () => {
     })
 
     it('execFullResponse should map items and potentially return consumed capacity', async () => {
-      const resp = await req.execFullResponse().toPromise()
+      const resp = await req.execFullResponse()
       expect(resp).toBeDefined()
       expect(resp.ConsumedCapacity).toEqual([])
       expect(resp.Items).toBeDefined()

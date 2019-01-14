@@ -2,7 +2,6 @@
 // tslint:disable:no-unnecessary-callback-wrapper
 
 import { Config, Credentials } from 'aws-sdk/global'
-import { of } from 'rxjs'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config'
 import { DynamoRx } from './dynamo-rx'
@@ -16,7 +15,7 @@ describe('dynamo rx', () => {
 
     beforeEach(() => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
-      sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(of(true))
+      sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
       dynamoRx = new DynamoRx()
     })
@@ -30,52 +29,52 @@ describe('dynamo rx', () => {
 
     it('putItem', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'putItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.putItem(pseudoParams).toPromise()
+      await dynamoRx.putItem(pseudoParams)
     })
 
     it('getItem', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'getItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.getItem(pseudoParams).toPromise()
+      await dynamoRx.getItem(pseudoParams)
     })
 
     it('updateItem', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'updateItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.updateItem(pseudoParams).toPromise()
+      await dynamoRx.updateItem(pseudoParams)
     })
 
     it('deleteItem', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'deleteItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.deleteItem(pseudoParams).toPromise()
+      await dynamoRx.deleteItem(pseudoParams)
     })
 
     it('batchWriteItem', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'batchWriteItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.batchWriteItem(pseudoParams).toPromise()
+      await dynamoRx.batchWriteItem(pseudoParams)
     })
 
     it('batchGetItems', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'batchGetItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.batchGetItems(pseudoParams).toPromise()
+      await dynamoRx.batchGetItems(pseudoParams)
     })
 
     it('transactWriteItems', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'transactWriteItems').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.transactWriteItems(pseudoParams).toPromise()
+      await dynamoRx.transactWriteItems(pseudoParams)
     })
 
     it('transactGetItems', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'transactGetItems').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.transactGetItems(pseudoParams).toPromise()
+      await dynamoRx.transactGetItems(pseudoParams)
     })
 
     it('scan', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'scan').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.scan(pseudoParams).toPromise()
+      await dynamoRx.scan(pseudoParams)
     })
 
     it('query', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'query').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.query(pseudoParams).toPromise()
+      await dynamoRx.query(pseudoParams)
     })
   })
 
@@ -87,7 +86,7 @@ describe('dynamo rx', () => {
 
     beforeEach(() => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
-      sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(of(true))
+      sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.resolve(true))
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
       dynamoRx = new DynamoRx()
     })
@@ -101,7 +100,7 @@ describe('dynamo rx', () => {
 
     it('should call the validity ensurer before each call and call the correct dynamoDB method', async () => {
       dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'makeRequest').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.makeRequest('pseudoOperation', pseudoParams).toPromise()
+      await dynamoRx.makeRequest('pseudoOperation', pseudoParams)
     })
   })
 
@@ -118,7 +117,7 @@ describe('dynamo rx', () => {
     const makeRequest = jasmine.createSpy().and.returnValue({ promise: () => Promise.resolve(null) })
     Object.assign(dynamoRx, { dynamoDB: { makeRequest } })
 
-    await dynamoRx.makeRequest(<any>{ ok: true }).toPromise()
+    await dynamoRx.makeRequest(<any>{ ok: true })
     expect(makeRequest).toHaveBeenCalled()
     expect(makeRequest.calls.mostRecent().args[0]).toEqual({ ok: true })
   })

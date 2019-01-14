@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression
 // tslint:disable:no-non-null-assertion
@@ -82,25 +81,25 @@ describe('batch get', () => {
     }
 
     beforeEach(() => {
-      batchGetItemsSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsSpy }, SimpleWithPartitionKeyModel, [
         jsItem,
       ])
     })
 
     it('execNoMap', async () => {
-      const result = await req.execNoMap().toPromise()
+      const result = await req.execNoMap()
       expect(result).toBeDefined()
       expect(result).toEqual(sampleResponse)
     })
     it('execFullResponse', async () => {
-      const result = await req.execFullResponse().toPromise()
+      const result = await req.execFullResponse()
       expect(result).toBeDefined()
       expect(result.Items).toBeDefined()
       expect(result.Items).toEqual([jsItem])
     })
     it('exec', async () => {
-      const result = await req.exec().toPromise()
+      const result = await req.exec()
       expect(result).toEqual([jsItem])
     })
   })
@@ -114,7 +113,7 @@ describe('batch get', () => {
 
     beforeEach(() => {
       logReceiverSpy = jasmine.createSpy()
-      batchGetItemsSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverSpy })
       req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsSpy }, SimpleWithPartitionKeyModel, [])
     })
@@ -122,7 +121,7 @@ describe('batch get', () => {
     afterEach(resetDynamoEasyConfig)
 
     it('execNoMap should log params and response', async () => {
-      await req.execNoMap().toPromise()
+      await req.execNoMap()
       expect(logReceiverSpy).toHaveBeenCalled()
       const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
@@ -130,7 +129,7 @@ describe('batch get', () => {
     })
 
     it('execFullResponse should log params and response', async () => {
-      await req.execFullResponse().toPromise()
+      await req.execFullResponse()
       expect(logReceiverSpy).toHaveBeenCalled()
       const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
@@ -138,7 +137,7 @@ describe('batch get', () => {
     })
 
     it('exec should log params and response', async () => {
-      await req.exec().toPromise()
+      await req.exec()
       expect(logReceiverSpy).toHaveBeenCalled()
       const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()

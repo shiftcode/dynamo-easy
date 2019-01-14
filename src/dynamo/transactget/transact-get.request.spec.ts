@@ -1,7 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-unnecessary-class
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes } from '../../mapper'
 import { getTableName } from '../get-table-name.function'
@@ -95,7 +94,7 @@ describe('TransactGetRequest', () => {
         ConsumedCapacity: [],
         Responses: [{ Item: dbItem }, { Item: dbItem2 }],
       }
-      transactGetItemsSpy = jasmine.createSpy().and.returnValues(of(output))
+      transactGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output))
       req2 = new TransactGetRequest()
         .forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
         .forModel(SimpleWithCompositePartitionKeyModel, { id: 'myId', creationDate })
@@ -103,7 +102,7 @@ describe('TransactGetRequest', () => {
     })
 
     it('exec should return the mapped item', async () => {
-      const result = await req2.exec().toPromise()
+      const result = await req2.exec()
       expect(Array.isArray(result)).toBeTruthy()
       expect(result.length).toBe(2)
       expect(result[0]).toEqual({
@@ -118,7 +117,7 @@ describe('TransactGetRequest', () => {
     })
 
     it('execFullResponse should return the mapped items', async () => {
-      const result = await req2.execFullResponse().toPromise()
+      const result = await req2.execFullResponse()
       expect(result).toBeDefined()
       expect(result.ConsumedCapacity).toEqual([])
       expect(result.Items).toBeDefined()
@@ -134,7 +133,7 @@ describe('TransactGetRequest', () => {
     })
 
     it('execNoMap should return the original response', async () => {
-      const result = await req2.execNoMap().toPromise()
+      const result = await req2.execNoMap()
       expect(result.ConsumedCapacity).toEqual([])
       expect(result.Responses).toBeDefined()
       expect(result.Responses![0]).toBeDefined()

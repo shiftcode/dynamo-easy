@@ -1,4 +1,3 @@
-import { of } from 'rxjs'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { getTableName } from '../get-table-name.function'
 import { BatchWriteRequest } from './batch-write.request'
@@ -133,18 +132,18 @@ describe('batchWriteRequest', () => {
       const output = {
         myResponse: true,
       }
-      batchWriteItemSpy = jasmine.createSpy().and.returnValue(of(output))
+      batchWriteItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(output))
       const dynamoRx = <any>{ batchWriteItem: batchWriteItemSpy }
       req = new BatchWriteRequest()
       Object.assign(req, { dynamoRx })
     })
 
     it('exec should return void', async () => {
-      expect(await req.exec().toPromise()).toBeUndefined()
+      expect(await req.exec()).toBeUndefined()
     })
 
     it('execFullResponse should return the full response', async () => {
-      expect(await req.execFullResponse().toPromise()).toEqual({ myResponse: true })
+      expect(await req.execFullResponse()).toEqual({ myResponse: true })
     })
   })
 })

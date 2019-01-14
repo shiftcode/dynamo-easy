@@ -1,6 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
+import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createKeyAttributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
@@ -33,11 +32,11 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
     return this
   }
 
-  execFullResponse(): Observable<GetResponse<T>> {
+  execFullResponse(): Promise<GetResponse<T>> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.getItem(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(getItemResponse => {
+    return this.dynamoRx.getItem(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(getItemResponse => {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
 
         if (getItemResponse.Item) {
@@ -47,23 +46,22 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
         }
 
         return response
-      }),
-      tap(response => this.logger.debug('mapped item', response.Item)),
-    )
+      })
+      .then(promiseTap(response => this.logger.debug('mapped item', response.Item)))
+
   }
 
-  exec(): Observable<T | null> {
+  exec(): Promise<T | null> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.getItem(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => {
+    return this.dynamoRx.getItem(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(response => {
         if (response.Item) {
           return fromDb(<Attributes<T>>response.Item, this.modelClazz)
         } else {
           return null
         }
-      }),
-      tap(item => this.logger.debug('mapped item', item)),
-    )
+      })
+      .then(promiseTap(item => this.logger.debug('mapped item', item)))
   }
 }
