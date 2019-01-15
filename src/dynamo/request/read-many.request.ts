@@ -4,7 +4,7 @@ import { fetchAll, promiseTap } from '../../helper'
 import { Logger } from '../../logger/logger'
 import { Attributes, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { and, RequestConditionFunction } from '../expression'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -36,7 +36,7 @@ export abstract class ReadManyRequest<T,
    */
   protected abstract doRequest(params: I): Promise<O>
 
-  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+  protected constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
     this.limit(ReadManyRequest.DEFAULT_LIMIT)
   }

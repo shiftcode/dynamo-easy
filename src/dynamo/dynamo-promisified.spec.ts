@@ -4,11 +4,11 @@
 import { Config, Credentials } from 'aws-sdk/global'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config'
-import { DynamoRx } from './dynamo-rx'
+import { DynamoPromisified } from './dynamo-promisified'
 
 describe('dynamo rx', () => {
   describe('should call the validity ensurer before each call and call the correct dynamoDB method', () => {
-    let dynamoRx: DynamoRx
+    let dynamoRx: DynamoPromisified
     let sessionValidityEnsurerSpy: jasmine.Spy
     let dynamoDBSpy: jasmine.Spy
     let pseudoParams: any
@@ -17,7 +17,7 @@ describe('dynamo rx', () => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
       sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
-      dynamoRx = new DynamoRx()
+      dynamoRx = new DynamoPromisified()
     })
 
     afterEach(() => {
@@ -79,7 +79,7 @@ describe('dynamo rx', () => {
   })
 
   describe('makeRequest', async () => {
-    let dynamoRx: DynamoRx
+    let dynamoRx: DynamoPromisified
     let sessionValidityEnsurerSpy: jasmine.Spy
     let dynamoDBSpy: jasmine.Spy
     let pseudoParams: any
@@ -88,7 +88,7 @@ describe('dynamo rx', () => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
       sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.resolve(true))
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
-      dynamoRx = new DynamoRx()
+      dynamoRx = new DynamoPromisified()
     })
 
     afterEach(() => {
@@ -107,13 +107,13 @@ describe('dynamo rx', () => {
   describe('query', () => {
     beforeEach(() => {})
     it('should throw when no KeyConditionExpression was given', () => {
-      const dynamoRx = new DynamoRx()
+      const dynamoRx = new DynamoPromisified()
       expect(() => dynamoRx.query({ TableName: 'tableName' })).toThrow()
     })
   })
 
   it('should call makeRequest with the given params', async () => {
-    const dynamoRx = new DynamoRx()
+    const dynamoRx = new DynamoPromisified()
     const makeRequest = jasmine.createSpy().and.returnValue({ promise: () => Promise.resolve(null) })
     Object.assign(dynamoRx, { dynamoDB: { makeRequest } })
 
@@ -123,7 +123,7 @@ describe('dynamo rx', () => {
   })
 
   it('should update the credentials', () => {
-    const dynamoRx = new DynamoRx()
+    const dynamoRx = new DynamoPromisified()
     const credentials = new Credentials({ secretAccessKey: '', sessionToken: '', accessKeyId: '' })
     dynamoRx.updateAwsConfigCredentials(new Config({ credentials }))
     expect(dynamoRx.dynamoDB.config.credentials).toBe(credentials)

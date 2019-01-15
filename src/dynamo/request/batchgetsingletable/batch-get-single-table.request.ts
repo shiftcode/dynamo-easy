@@ -5,7 +5,7 @@ import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
@@ -14,7 +14,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
   BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
 

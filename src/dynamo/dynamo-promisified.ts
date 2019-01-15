@@ -3,10 +3,10 @@ import { Config } from 'aws-sdk/global'
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 
 /**
- * Simply brings calls the sessionValidityEnsurer before each standard dynamoDB operations
+ * Simply calls the sessionValidityEnsurer before each standard dynamoDB operations and returns a promise for each
+ * request
  */
-// todo: rename
-export class DynamoRx {
+export class DynamoPromisified {
   readonly dynamoDB: DynamoDB
 
   constructor() {

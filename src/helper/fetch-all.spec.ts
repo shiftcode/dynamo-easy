@@ -1,11 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
-import { DynamoRx, QueryRequest } from '../dynamo'
+import { DynamoPromisified, QueryRequest } from '../dynamo'
 import { ScanRequest } from '../dynamo/request'
 import { fetchAll } from './fetch-all.function'
 
 describe('fetch all', () => {
-  let dynamoRx: DynamoRx
+  let dynamoRx: DynamoPromisified
   let methodSpy: jasmine.Spy
   let result: SimpleWithPartitionKeyModel[]
 
@@ -23,7 +23,7 @@ describe('fetch all', () => {
     let req: ScanRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(async () => {
-      dynamoRx = new DynamoRx()
+      dynamoRx = new DynamoPromisified()
       spyOn(dynamoRx, 'scan').and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
       methodSpy = <jasmine.Spy>dynamoRx.scan
       req = new ScanRequest(dynamoRx, SimpleWithPartitionKeyModel)
@@ -56,7 +56,7 @@ describe('fetch all', () => {
     let req: QueryRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(async () => {
-      dynamoRx = new DynamoRx()
+      dynamoRx = new DynamoPromisified()
       spyOn(dynamoRx, 'query').and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
       methodSpy = <jasmine.Spy>dynamoRx.query
       req = new QueryRequest(dynamoRx, SimpleWithPartitionKeyModel)

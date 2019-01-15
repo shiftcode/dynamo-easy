@@ -2,7 +2,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Organization, SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes, toDb } from '../../mapper'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetRequest } from './batch-get.request'
 
@@ -117,7 +117,7 @@ describe('batch get', () => {
       request.forModel(SimpleWithPartitionKeyModel, [jsItem1, jsItem2])
 
       batchGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      const dynamoRx: DynamoRx = <any>{ batchGetItems: batchGetItemsSpy }
+      const dynamoRx: DynamoPromisified = <any>{ batchGetItems: batchGetItemsSpy }
 
       Object.assign(request, { dynamoRx })
 
@@ -182,7 +182,7 @@ describe('batch get', () => {
 
     beforeEach(() => {
       batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
-      const dynamoRx: DynamoRx = <any>{ batchGetItems: batchGetItemsSpy }
+      const dynamoRx: DynamoPromisified = <any>{ batchGetItems: batchGetItemsSpy }
       request = new BatchGetRequest()
       Object.assign(request, { dynamoRx })
       request.forModel(SimpleWithPartitionKeyModel, [{ id: 'idVal' }])

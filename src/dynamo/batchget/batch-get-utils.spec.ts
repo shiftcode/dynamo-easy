@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { batchGetItemsFetchAll, combineBatchGetResponses, hasUnprocessedKeys } from './batch-get-utils'
 
 describe('batch-get utils', () => {
@@ -51,7 +51,7 @@ describe('batch-get utils', () => {
 
   describe('batchGetItemsFetchAll', () => {
     let batchGetItemsSpy: jasmine.Spy
-    let dynamoRx: DynamoRx
+    let dynamoRx: DynamoPromisified
     let backoffTimerMock: { next: jasmine.Spy }
 
     const output1: DynamoDB.BatchGetItemOutput = {

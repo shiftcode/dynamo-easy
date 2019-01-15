@@ -5,7 +5,7 @@ import { createToKeyFn, toDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { batchWriteItemsWriteAll } from '../../batchwrite/batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from '../../batchwrite/batch-write.const'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { BaseRequest } from '../base.request'
 
 export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
@@ -14,7 +14,7 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
   private readonly logger: Logger
   private toKey = createToKeyFn(this.modelClazz)
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.BatchWriteSingleTableRequest', modelClazz)
     this.params.RequestItems = {

@@ -4,7 +4,7 @@ import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, fromDb } from '../../mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetFullResponse } from './batch-get-full.response'
 import { batchGetItemsFetchAll } from './batch-get-utils'
@@ -13,12 +13,12 @@ import { BatchGetResponse } from './batch-get.response'
 
 export class BatchGetRequest {
   readonly params: DynamoDB.BatchGetItemInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
   private itemCounter = 0
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       RequestItems: {},
     }

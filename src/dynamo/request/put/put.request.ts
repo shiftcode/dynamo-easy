@@ -3,14 +3,14 @@ import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { toDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { createIfNotExistsCondition } from '../../expression/create-if-not-exists-condition.function'
 import { WriteRequest } from '../write.request'
 
 export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, PutRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, item: T) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, item: T) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
     this.params.Item = toDb(item, this.modelClazz)

@@ -2,18 +2,18 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, toDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { getTableName } from '../get-table-name.function'
 import { batchWriteItemsWriteAll } from './batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from './batch-write.const'
 
 export class BatchWriteRequest {
   readonly params: DynamoDB.BatchWriteItemInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
   private itemCount = 0
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       RequestItems: {},
     }

@@ -2,7 +2,7 @@
 
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Organization } from '../../../../test/models'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
 
@@ -14,7 +14,7 @@ describe('batch write single table request', () => {
     name: 'myOrg',
   }
 
-  let dynamoRx: DynamoRx
+  let dynamoRx: DynamoPromisified
   let request: BatchWriteSingleTableRequest<Organization>
 
   describe('constructor', () => {
@@ -139,7 +139,7 @@ describe('batch write single table request', () => {
         .createSpy()
         .and.returnValues(Promise.resolve(output), Promise.resolve(output), Promise.resolve({ MyResult: true }))
       nextFnSpy = jasmine.createSpy().and.returnValue({ value: 0 })
-      dynamoRx = <DynamoRx>(<any>{ batchWriteItem: batchWriteItemSpy })
+      dynamoRx = <DynamoPromisified>(<any>{ batchWriteItem: batchWriteItemSpy })
       generatorSpy = jasmine.createSpy().and.returnValue({ next: nextFnSpy })
 
       request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
@@ -174,7 +174,7 @@ describe('batch write single table request', () => {
 
   describe('exec / execFullResponse', () => {
     beforeEach(() => {
-      dynamoRx = <DynamoRx>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
+      dynamoRx = <DynamoPromisified>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
       request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
       request.delete([item])
     })

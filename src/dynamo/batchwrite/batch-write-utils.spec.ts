@@ -1,11 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { batchWriteItemsWriteAll, hasUnprocessedItems } from './batch-write-utils'
 
 describe('batch-write-utils', () => {
   describe('batchWriteItemsWriteAll', () => {
     let batchWriteItemSpy: jasmine.Spy
-    let dynamoRx: DynamoRx
+    let dynamoRx: DynamoPromisified
     let backoffTimerMock: { next: jasmine.Spy }
 
     const output1: DynamoDB.BatchWriteItemOutput = {

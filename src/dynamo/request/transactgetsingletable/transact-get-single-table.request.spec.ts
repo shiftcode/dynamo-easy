@@ -2,7 +2,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { metadataForClass } from '../../../decorator/metadata'
 import { createKeyAttributes } from '../../../mapper'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { getTableName } from '../../get-table-name.function'
 import { TransactGetSingleTableRequest } from './transact-get-single-table.request'
 
@@ -35,7 +35,7 @@ describe('TransactGetSingleTableRequest', () => {
     let transactGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
 
     beforeEach(() => {
-      const dynamoRxMock: DynamoRx = <any>{ transactGetItems: transactGetItemsSpy }
+      const dynamoRxMock: DynamoPromisified = <any>{ transactGetItems: transactGetItemsSpy }
       req = new TransactGetSingleTableRequest(dynamoRxMock, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
     })
 

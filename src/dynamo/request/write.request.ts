@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ModelConstructor } from '../../model'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { RequestConditionFunction } from '../expression'
 import { and } from '../expression/logical-operator'
 import { addExpression } from '../expression/param-util'
@@ -14,7 +14,7 @@ import { StandardRequest } from './standard.request'
 export abstract class WriteRequest<T,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
   R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
-  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+  protected constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
   }
 

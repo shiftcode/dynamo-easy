@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel } from '../../../../test/models'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { ReadManyRequest } from '../read-many.request'
 import { ScanRequest } from './scan.request'
 
@@ -9,7 +9,7 @@ describe('scan request', () => {
   let scanSpy: jasmine.Spy
 
   class MyScanRequest extends ScanRequest<ComplexModel> {
-    constructor(dynamoRx: DynamoRx) {
+    constructor(dynamoRx: DynamoPromisified) {
       super(dynamoRx, ComplexModel)
     }
 

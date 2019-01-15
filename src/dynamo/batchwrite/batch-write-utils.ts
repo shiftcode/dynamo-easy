@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseDelay } from '../../helper'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 
 /**
  * Function which executes batchWriteItem operations until all given items (as params) are processed (written).
@@ -11,7 +11,7 @@ import { DynamoRx } from '../dynamo-rx'
  * @param throttleTimeSlot used to calculate the effective wait time
  */
 export function batchWriteItemsWriteAll(
-  dynamoRx: DynamoRx,
+  dynamoRx: DynamoPromisified,
   params: DynamoDB.BatchWriteItemInput,
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,

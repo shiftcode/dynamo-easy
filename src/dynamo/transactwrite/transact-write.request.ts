@@ -1,13 +1,13 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { TransactOperation } from './transact-operation.type'
 
 export class TransactWriteRequest {
   readonly params: DynamoDB.TransactWriteItemsInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       TransactItems: [],
     }

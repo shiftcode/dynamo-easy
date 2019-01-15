@@ -1,14 +1,14 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { BaseRequest } from '../base.request'
 import { TransactGetResponse } from './transact-get-single-table.response'
 
 export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
   DynamoDB.TransactGetItemsInput,
   TransactGetSingleTableRequest<T>> {
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoRx, modelClazz)
 
     this.params.TransactItems = keys.map(key => ({

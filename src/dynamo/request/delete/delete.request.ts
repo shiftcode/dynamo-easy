@@ -3,13 +3,13 @@ import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { WriteRequest } from '../write.request'
 
 export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, DeleteRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)

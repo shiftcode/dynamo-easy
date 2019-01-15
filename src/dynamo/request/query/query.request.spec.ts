@@ -12,7 +12,7 @@ import {
 } from '../../../../test/models'
 import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
 import { GSISortKey, Model, PartitionKey } from '../../../decorator/impl'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { attribute } from '../../expression'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
@@ -22,7 +22,7 @@ describe('query request', () => {
 
   describe('constructor', () => {
     class MyQueryRequest extends QueryRequest<ComplexModel> {
-      constructor(dynamoRx: DynamoRx) {
+      constructor(dynamoRx: DynamoPromisified) {
         super(dynamoRx, ComplexModel)
       }
 

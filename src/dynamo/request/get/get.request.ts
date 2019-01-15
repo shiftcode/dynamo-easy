@@ -3,7 +3,7 @@ import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createKeyAttributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
@@ -11,7 +11,7 @@ import { GetResponse } from './get.response'
 export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, GetRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
