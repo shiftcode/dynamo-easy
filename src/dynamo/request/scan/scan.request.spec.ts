@@ -34,6 +34,13 @@ describe('scan request', () => {
     expect(Object.keys(params).length).toBe(2)
   })
 
+  it('execSingle', async () => {
+    await request.execSingle()
+    expect(scanSpy).toHaveBeenCalled()
+    expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
+    expect(scanSpy.calls.mostRecent().args[0].Limit).toBe(1)
+  })
+
   it('constructor creates logger', () => {
     expect(request.theLogger).toBeDefined()
   })

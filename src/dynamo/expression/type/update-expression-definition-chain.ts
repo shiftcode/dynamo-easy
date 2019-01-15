@@ -7,6 +7,9 @@ import { UpdateExpressionDefinitionFunction } from './update-expression-definiti
  *
  */
 export interface UpdateFunctions<T, R> {
+  /* ----------------------------------------------------------------
+      SET operations
+   ---------------------------------------------------------------- */
   /**
    * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
    * @param value which maps to NumberAttribute
@@ -34,6 +37,9 @@ export interface UpdateFunctions<T, R> {
    */
   appendToList: (value: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>, position?: 'START' | 'END') => R
 
+  /* ----------------------------------------------------------------
+      REMOVE operations
+   ---------------------------------------------------------------- */
   /**
    * removes the attribute from an item
    */
@@ -44,6 +50,10 @@ export interface UpdateFunctions<T, R> {
    */
   removeFromListAt: (...positions: number[]) => R
 
+  /* ----------------------------------------------------------------
+      ADD operations (only supports number and set type)
+      AWS generally recommends to use SET rather than ADD
+   ---------------------------------------------------------------- */
   /**
    * adds or manipulates a value to an attribute of type N(umber) or S(et), manipulation behaviour differs based on attribute type
    * for numbers AWS generally recommends to use SET rather than ADD. See incrementBy and decrementBy.
@@ -58,6 +68,9 @@ export interface UpdateFunctions<T, R> {
    */
   add: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 
+  /* ----------------------------------------------------------------
+      DELETE operation (only supports set type)
+   ---------------------------------------------------------------- */
   /**
    * delete items from sets
    * @param values {multiple values as Array | Set}
