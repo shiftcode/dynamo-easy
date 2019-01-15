@@ -1,7 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable, of } from 'rxjs'
-import { delay, mergeMap } from 'rxjs/operators'
-import { DynamoRx } from '../dynamo-rx'
+import { promiseDelay } from '../../helper'
+import { DynamoPromisified } from '../dynamo-promisified'
 
 /**
  * Function which executes batchWriteItem operations until all given items (as params) are processed (written).
@@ -12,31 +11,28 @@ import { DynamoRx } from '../dynamo-rx'
  * @param throttleTimeSlot used to calculate the effective wait time
  */
 export function batchWriteItemsWriteAll(
-  dynamoRx: DynamoRx,
+  dynamoRx: DynamoPromisified,
   params: DynamoDB.BatchWriteItemInput,
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
-): Observable<DynamoDB.BatchGetItemOutput> {
-  return dynamoRx.batchWriteItem(params).pipe(
-    mergeMap(response => {
+): Promise<DynamoDB.BatchGetItemOutput> {
+  return dynamoRx.batchWriteItem(params)
+    .then(response => {
       if (hasUnprocessedItems(response)) {
         // in case of unprocessedItems do a follow-up requests
-        return of(response.UnprocessedItems).pipe(
+        return Promise.resolve(response.UnprocessedItems)
           // delay before doing the follow-up request
-          delay(backoffTimer.next().value * throttleTimeSlot),
-
-          mergeMap((unprocessedKeys: DynamoDB.BatchWriteItemRequestMap) => {
+          .then(promiseDelay(backoffTimer.next().value * throttleTimeSlot))
+          .then(unprocessedKeys => {
             const nextParams: DynamoDB.BatchWriteItemInput = { ...params, RequestItems: unprocessedKeys }
             // call recursively batchWriteItemsWriteAll with the returned UnprocessedItems params
             return batchWriteItemsWriteAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
-          }),
-          // no combining of responses necessary, only the last response is returned
-        )
+          })
+        // no combining of responses necessary, only the last response is returned
       }
       // no follow-up request necessary, return result
-      return of(response)
-    }),
-  )
+      return response
+    })
 }
 
 export type BatchWriteItemOutputWithUnprocessedItems = DynamoDB.BatchWriteItemOutput & {

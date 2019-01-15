@@ -1,9 +1,8 @@
 // tslint:disable:no-unnecessary-class
 
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { Organization } from '../../../../test/models'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
 
@@ -15,7 +14,7 @@ describe('batch write single table request', () => {
     name: 'myOrg',
   }
 
-  let dynamoRx: DynamoRx
+  let dynamoRx: DynamoPromisified
   let request: BatchWriteSingleTableRequest<Organization>
 
   describe('constructor', () => {
@@ -136,9 +135,11 @@ describe('batch write single table request', () => {
     let batchWriteItemSpy: jasmine.Spy
 
     beforeEach(() => {
-      batchWriteItemSpy = jasmine.createSpy().and.returnValues(of(output), of(output), of({ MyResult: true }))
+      batchWriteItemSpy = jasmine
+        .createSpy()
+        .and.returnValues(Promise.resolve(output), Promise.resolve(output), Promise.resolve({ MyResult: true }))
       nextFnSpy = jasmine.createSpy().and.returnValue({ value: 0 })
-      dynamoRx = <DynamoRx>(<any>{ batchWriteItem: batchWriteItemSpy })
+      dynamoRx = <DynamoPromisified>(<any>{ batchWriteItem: batchWriteItemSpy })
       generatorSpy = jasmine.createSpy().and.returnValue({ next: nextFnSpy })
 
       request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
@@ -146,7 +147,7 @@ describe('batch write single table request', () => {
 
     it('should retry when unprocessed items are returned', async () => {
       request.put([item])
-      await request.exec(<any>generatorSpy).toPromise()
+      await request.exec(<any>generatorSpy)
 
       // only one instance of the generator should be created
       expect(generatorSpy).toHaveBeenCalledTimes(1)
@@ -160,7 +161,7 @@ describe('batch write single table request', () => {
       request.put([item])
       request.returnConsumedCapacity('TOTAL')
       request.returnItemCollectionMetrics('SIZE')
-      await request.exec(<any>generatorSpy).toPromise()
+      await request.exec(<any>generatorSpy)
 
       expect(batchWriteItemSpy).toHaveBeenCalledTimes(3)
       const paramsThirdCall = <DynamoDB.BatchWriteItemInput>batchWriteItemSpy.calls.all()[2].args[0]
@@ -173,18 +174,18 @@ describe('batch write single table request', () => {
 
   describe('exec / execFullResponse', () => {
     beforeEach(() => {
-      dynamoRx = <DynamoRx>(<any>{ batchWriteItem: () => of({ myResponse: true }) })
+      dynamoRx = <DynamoPromisified>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
       request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
       request.delete([item])
     })
 
     it('exec should return nothing', async () => {
-      const response = await request.exec().toPromise()
+      const response = await request.exec()
       expect(response).toBeUndefined()
     })
 
     it('execFullResponse should return BatchWriteItemOutput', async () => {
-      const response = await request.execFullResponse().toPromise()
+      const response = await request.execFullResponse()
       expect(response).toEqual({ myResponse: true })
     })
   })

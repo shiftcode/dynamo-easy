@@ -62,7 +62,6 @@
     "prettier": "^1.15.3",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.3",
-    "rxjs": "^6.3.3",
     "semantic-release": "^16.0.0-beta.16",
     "sort-package-json": "^1.16.0",
     "ts-jest": "^23.10.4",
@@ -80,7 +79,6 @@
     "aws-sdk": "^2.382.0",
     "lodash": "^4.17.11",
     "reflect-metadata": "^0.1.12",
-    "rxjs": "^6.3.3",
     "uuid": "^3.3.2"
   }
 }

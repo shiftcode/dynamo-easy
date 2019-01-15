@@ -1,21 +1,19 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, toDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { getTableName } from '../get-table-name.function'
 import { batchWriteItemsWriteAll } from './batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from './batch-write.const'
 
 export class BatchWriteRequest {
   readonly params: DynamoDB.BatchWriteItemInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
   private itemCount = 0
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       RequestItems: {},
     }
@@ -49,18 +47,15 @@ export class BatchWriteRequest {
   exec(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Observable<void> {
-    return this.write(backoffTimer, throttleTimeSlot).pipe(
-      map(() => {
-        return
-      }),
-    )
+  ): Promise<void> {
+    return this.write(backoffTimer, throttleTimeSlot)
+      .then(() => { return })
   }
 
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Observable<DynamoDB.BatchWriteItemOutput> {
+  ): Promise<DynamoDB.BatchWriteItemOutput> {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 

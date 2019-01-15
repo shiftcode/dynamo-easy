@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { DeleteRequest } from './delete.request'
@@ -46,13 +45,13 @@ describe('delete request', () => {
 
     beforeEach(() => {
       logReceiver = jasmine.createSpy()
-      deleteItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      deleteItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver })
       req = new DeleteRequest(<any>{ deleteItem: deleteItemSpy }, SimpleWithPartitionKeyModel, 'id')
     })
 
     it('exec should log params and response', async () => {
-      await req.exec().toPromise()
+      await req.exec()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
@@ -60,7 +59,7 @@ describe('delete request', () => {
     })
 
     it('execFullResponse should log params and response', async () => {
-      await req.execFullResponse().toPromise()
+      await req.execFullResponse()
       expect(logReceiver).toHaveBeenCalled()
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()

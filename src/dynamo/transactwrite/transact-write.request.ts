@@ -1,15 +1,13 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { TransactOperation } from './transact-operation.type'
 
 export class TransactWriteRequest {
   readonly params: DynamoDB.TransactWriteItemsInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       TransactItems: [],
     }
@@ -37,15 +35,12 @@ export class TransactWriteRequest {
     return this
   }
 
-  execFullResponse(): Observable<DynamoDB.TransactWriteItemsOutput> {
+  execFullResponse(): Promise<DynamoDB.TransactWriteItemsOutput> {
     return this.dynamoRx.transactWriteItems(this.params)
   }
 
-  exec(): Observable<void> {
-    return this.dynamoRx.transactWriteItems(this.params).pipe(
-      map(response => {
-        return
-      }),
-    )
+  exec(): Promise<void> {
+    return this.dynamoRx.transactWriteItems(this.params)
+      .then(response => { return })
   }
 }

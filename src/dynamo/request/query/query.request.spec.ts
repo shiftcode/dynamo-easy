@@ -1,7 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:max-classes-per-file
 
-import { of } from 'rxjs'
 import {
   ComplexModel,
   CustomId,
@@ -13,7 +12,7 @@ import {
 } from '../../../../test/models'
 import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
 import { GSISortKey, Model, PartitionKey } from '../../../decorator/impl'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { attribute } from '../../expression'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
@@ -23,7 +22,7 @@ describe('query request', () => {
 
   describe('constructor', () => {
     class MyQueryRequest extends QueryRequest<ComplexModel> {
-      constructor(dynamoRx: DynamoRx) {
+      constructor(dynamoRx: DynamoPromisified) {
         super(dynamoRx, ComplexModel)
       }
 
@@ -35,7 +34,7 @@ describe('query request', () => {
     let request: MyQueryRequest
 
     beforeEach(() => {
-      querySpy = jasmine.createSpy().and.returnValue(of({ Count: 1 }))
+      querySpy = jasmine.createSpy().and.returnValue(Promise.resolve({ Count: 1 }))
       request = new MyQueryRequest(<any>{ query: querySpy })
     })
 
@@ -46,7 +45,7 @@ describe('query request', () => {
       expect(request.theLogger).toBeDefined()
     })
     it('doRequest uses dynamoRx.query', async () => {
-      await request.exec().toPromise()
+      await request.exec()
       expect(querySpy).toHaveBeenCalled()
     })
   })

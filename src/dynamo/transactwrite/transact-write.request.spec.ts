@@ -1,5 +1,4 @@
 // tslint:disable:no-non-null-assertion
-import { of } from 'rxjs'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { update } from '../expression/logical-operator/update.function'
@@ -130,21 +129,21 @@ describe('TransactWriteRequest', () => {
     beforeEach(() => {
       req = new TransactWriteRequest()
 
-      transactWriteItemsSpy = jasmine.createSpy().and.returnValue(of({ myResponse: true }))
+      transactWriteItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ myResponse: true }))
       Object.assign(req, { dynamoRx: { transactWriteItems: transactWriteItemsSpy } })
 
       req.transact(new TransactDelete(SimpleWithPartitionKeyModel, 'myId'))
     })
 
     it('execFullResponse should call dynamoRx.transactWriteItems with the params and return the response', async () => {
-      const response = await req.execFullResponse().toPromise()
+      const response = await req.execFullResponse()
       expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
       expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
       expect(response).toEqual({ myResponse: true })
     })
 
     it('exec should call dynamoRx.transactWriteItems with the params and return void', async () => {
-      const response = await req.exec().toPromise()
+      const response = await req.exec()
       expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
       expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
       expect(response).toBeUndefined()

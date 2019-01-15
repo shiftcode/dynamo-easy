@@ -1,12 +1,10 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
 import { SecondaryIndex } from '../../decorator/impl'
-import { fetchAll } from '../../helper'
+import { fetchAll, promiseTap } from '../../helper'
 import { Logger } from '../../logger/logger'
 import { Attributes, fromDb } from '../../mapper'
-import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoRx } from '../dynamo-rx'
+import { ModelConstructor } from '../../model'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { and, RequestConditionFunction } from '../expression'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -20,13 +18,11 @@ import { StandardRequest } from './standard.request'
 /**
  * Base class for query and scan request classes.
  */
-export abstract class ReadManyRequest<
-  T,
+export abstract class ReadManyRequest<T,
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T> | ScanResponse<T>,
-  R extends QueryRequest<T> | ScanRequest<T>
-> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
+  R extends QueryRequest<T> | ScanRequest<T>> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
   static DEFAULT_LIMIT = 10
   static INFINITE_LIMIT = -1
 
@@ -38,9 +34,9 @@ export abstract class ReadManyRequest<
    * method that executes the actual call on dynamoRx with the given params.
    * @param params
    */
-  protected abstract doRequest(params: I): Observable<O>
+  protected abstract doRequest(params: I): Promise<O>
 
-  protected constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>) {
+  protected constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
     super(dynamoRx, modelClazz)
     this.limit(ReadManyRequest.DEFAULT_LIMIT)
   }
@@ -97,12 +93,13 @@ export abstract class ReadManyRequest<
     return <any>this
   }
 
-  execNoMap(): Observable<O> {
+  execNoMap() {
     this.logger.debug('request (noMap)', this.params)
-    return this.doRequest(this.params).pipe(tap(response => this.logger.debug('response', response)))
+    return this.doRequest(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
   }
 
-  execSingle(): Observable<T | null> {
+  execSingle(): Promise<T | null> {
     // do not alter the params on the instance but add the additional 'Limit' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
@@ -111,15 +108,15 @@ export abstract class ReadManyRequest<
     }
 
     this.logger.debug('single request', params)
-    return this.doRequest(params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(this.mapFromDb),
-      map(r => (r.Items && r.Items.length ? r.Items[0] : null)),
-      tap(item => this.logger.debug('mapped item', item)),
-    )
+    return this.doRequest(params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(this.mapFromDb)
+      .then(r => (r.Items && r.Items.length ? r.Items[0] : null))
+      .then(promiseTap(item => this.logger.debug('mapped item', item)))
+
   }
 
-  execCount(): Observable<number> {
+  execCount(): Promise<number> {
     // do not alter the params on the instance but add the additional 'Limit' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
@@ -128,36 +125,34 @@ export abstract class ReadManyRequest<
     }
 
     this.logger.debug('count request', params)
-    return this.doRequest(params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => response.Count || 0),
-      tap(count => this.logger.debug('count', count)),
-    )
+    return this.doRequest(params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(response => response.Count || 0)
+      .then(promiseTap(count => this.logger.debug('count', count)))
+
   }
 
-  exec(): Observable<T[]> {
+  exec(): Promise<T[]> {
     this.logger.debug('request', this.params)
-    return this.doRequest(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(this.mapFromDb),
-      map(r => r.Items),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
+    return this.doRequest(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(this.mapFromDb)
+      .then(r => r.Items)
+      .then(promiseTap(items => this.logger.debug('mapped items', items)))
   }
 
-  execFullResponse(): Observable<Z> {
+  execFullResponse(): Promise<Z> {
     this.logger.debug('request', this.params)
-    return this.doRequest(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(this.mapFromDb),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
+    return this.doRequest(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(this.mapFromDb)
+      .then(promiseTap(response => this.logger.debug('mapped items', response.Items)))
   }
 
   /**
    * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
    */
-  execFetchAll(): Observable<T[]> {
+  execFetchAll(): Promise<T[]> {
     return fetchAll(<R>(<any>this))
   }
 

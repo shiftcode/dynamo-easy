@@ -1,24 +1,20 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
-import { randomExponentialBackoffTimer } from '../../../helper'
+import { promiseTap, randomExponentialBackoffTimer } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
+import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
-import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget/batch-get.const'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
-export class BatchGetSingleTableRequest<T> extends BaseRequest<
-  T,
+export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
   DynamoDB.BatchGetItemInput,
-  BatchGetSingleTableRequest<T>
-> {
+  BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoRx, modelClazz)
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
 
@@ -46,7 +42,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
   execNoMap(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<DynamoDB.BatchGetItemOutput> {
+  ): Promise<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
@@ -58,11 +54,10 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<BatchGetSingleTableResponse<T>> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
+  ): Promise<BatchGetSingleTableResponse<T>> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
+      .then(promiseTap(response => this.logger.debug('mapped items', response.Items)))
   }
 
   /**
@@ -70,12 +65,11 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Observable<T[]> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      map(r => r.Items),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Promise<T[]> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
+      .then(r => r.Items)
+      .then(promiseTap(items => this.logger.debug('mapped items', items)))
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
@@ -95,8 +89,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
-    return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot).pipe(
-      tap(response => this.logger.debug('response', response)),
-    )
+    return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
+      .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }

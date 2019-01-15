@@ -1,10 +1,8 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { Attributes, createToKeyFn, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { getTableName } from '../get-table-name.function'
 import { TransactGetFullResponse } from './transact-get-full.response'
 import { TransactGetRequest1 } from './transact-get.request.type'
@@ -13,11 +11,11 @@ const MAX_REQUEST_ITEM_COUNT = 10
 
 export class TransactGetRequest {
   readonly params: DynamoDB.TransactGetItemsInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
   private readonly tables: Array<ModelConstructor<any>> = []
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       TransactItems: [],
     }
@@ -54,19 +52,19 @@ export class TransactGetRequest {
     return this
   }
 
-  execNoMap(): Observable<DynamoDB.TransactGetItemsOutput> {
+  execNoMap(): Promise<DynamoDB.TransactGetItemsOutput> {
     return this.dynamoRx.transactGetItems(this.params)
   }
 
-  execFullResponse(): Observable<TransactGetFullResponse<[]>> {
-    return this.dynamoRx.transactGetItems(this.params).pipe(map(this.mapResponse))
+  execFullResponse(): Promise<TransactGetFullResponse<[]>> {
+    return this.dynamoRx.transactGetItems(this.params)
+      .then(this.mapResponse)
   }
 
-  exec(): Observable<[]> {
-    return this.dynamoRx.transactGetItems(this.params).pipe(
-      map(this.mapResponse),
-      map(r => r.Items),
-    )
+  exec(): Promise<[]> {
+    return this.dynamoRx.transactGetItems(this.params)
+      .then(this.mapResponse)
+      .then(r => r.Items)
   }
 
   private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetFullResponse<[]> => {

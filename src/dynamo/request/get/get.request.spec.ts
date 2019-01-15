@@ -1,6 +1,5 @@
 // tslint:disable:no-unused-expression
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config'
 import { Attributes } from '../../../mapper'
@@ -63,14 +62,14 @@ describe('GetRequest', () => {
     let req: GetRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
-      getItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      getItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, 'my-id')
     })
     it('exec', async () => {
-      expect(await req.exec().toPromise()).toEqual(jsItem)
+      expect(await req.exec()).toEqual(jsItem)
     })
     it('execFullResponse', async () => {
-      expect(await req.execFullResponse().toPromise()).toEqual({ Item: jsItem })
+      expect(await req.execFullResponse()).toEqual({ Item: jsItem })
     })
   })
 
@@ -82,13 +81,13 @@ describe('GetRequest', () => {
 
     beforeEach(() => {
       logReceiverSpy = jasmine.createSpy()
-      getItemSpy = jasmine.createSpy().and.returnValue(of(sampleResponse))
+      getItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverSpy })
       req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, 'partitionKeyValue')
     })
 
     it('exec should log params and response', async () => {
-      await req.exec().toPromise()
+      await req.exec()
       expect(logReceiverSpy).toHaveBeenCalled()
       const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
@@ -96,7 +95,7 @@ describe('GetRequest', () => {
     })
 
     it('execFullResponse should log params and response', async () => {
-      await req.execFullResponse().toPromise()
+      await req.execFullResponse()
       expect(logReceiverSpy).toHaveBeenCalled()
       const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()

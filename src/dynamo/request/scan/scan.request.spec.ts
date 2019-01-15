@@ -1,7 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
 import { ComplexModel } from '../../../../test/models'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoPromisified } from '../../dynamo-promisified'
 import { ReadManyRequest } from '../read-many.request'
 import { ScanRequest } from './scan.request'
 
@@ -10,7 +9,7 @@ describe('scan request', () => {
   let scanSpy: jasmine.Spy
 
   class MyScanRequest extends ScanRequest<ComplexModel> {
-    constructor(dynamoRx: DynamoRx) {
+    constructor(dynamoRx: DynamoPromisified) {
       super(dynamoRx, ComplexModel)
     }
 
@@ -20,7 +19,7 @@ describe('scan request', () => {
   }
 
   beforeEach(() => {
-    scanSpy = jasmine.createSpy().and.returnValue(of({ Count: 1 }))
+    scanSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ Count: 1 }))
     request = new MyScanRequest(<any>{ scan: scanSpy })
   })
 
@@ -40,7 +39,7 @@ describe('scan request', () => {
   })
 
   it('doRequest uses dynamoRx.scan', async () => {
-    await request.exec().toPromise()
+    await request.exec()
     expect(scanSpy).toHaveBeenCalled()
   })
 })

@@ -1,7 +1,6 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression
-import { EMPTY } from 'rxjs'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
 import { updateDynamoEasyConfig } from '../config'
@@ -35,8 +34,10 @@ describe('dynamo store', () => {
 
   describe('session validity ensurer', () => {
     let validityEnsurerSpy: jasmine.Spy
+
     beforeEach(() => {
-      validityEnsurerSpy = jasmine.createSpy().and.returnValue(EMPTY)
+      // Promise.reject to not reach the actual call to the aws sdk
+      validityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.reject())
       updateDynamoEasyConfig({ sessionValidityEnsurer: validityEnsurerSpy })
     })
 
@@ -44,10 +45,11 @@ describe('dynamo store', () => {
 
     it('custom session validity ensurer is used', async () => {
       const store = new DynamoStore(DynamoStoreModel)
-      await store
-        .scan()
-        .exec()
-        .toPromise()
+      try {
+        await store.scan().exec()
+      } catch (error) {
+        // ignore
+      }
       expect(validityEnsurerSpy).toHaveBeenCalled()
     })
   })
@@ -84,7 +86,7 @@ describe('dynamo store', () => {
   })
 
   describe('should enable custom requests', () => {
-    const makeRequestSpy = jasmine.createSpy().and.returnValue(EMPTY)
+    const makeRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
     const store = new DynamoStore(SimpleWithPartitionKeyModel)
     Object.assign(store, { dynamoRx: { makeRequest: makeRequestSpy } })
     store.makeRequest('updateTimeToLive', {})

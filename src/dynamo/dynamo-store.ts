@@ -1,10 +1,9 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { promiseTap } from '../helper'
 import { createLogger, Logger } from '../logger/logger'
 import { ModelConstructor } from '../model'
 import { DynamoApiOperations } from './dynamo-api-operations.type'
-import { DynamoRx } from './dynamo-rx'
+import { DynamoPromisified } from './dynamo-promisified'
 import { getTableName } from './get-table-name.function'
 import {
   BatchGetSingleTableRequest,
@@ -25,11 +24,11 @@ export class DynamoStore<T> {
 
   readonly tableName: string
   private readonly logger: Logger
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
 
   constructor(private modelClazz: ModelConstructor<T>) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.tableName = getTableName(modelClazz)
     this.logger.debug('instance created')
   }
@@ -80,8 +79,10 @@ export class DynamoStore<T> {
     return new TransactGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
   }
 
-  makeRequest<Z>(operation: DynamoApiOperations, params?: Record<string, any>): Observable<Z> {
+  makeRequest<Z>(operation: DynamoApiOperations, params?: Record<string, any>): Promise<Z> {
     this.logger.debug('request', params)
-    return this.dynamoRx.makeRequest(operation, params).pipe(tap(response => this.logger.debug('response', response)))
+    return this.dynamoRx.makeRequest(operation, params)
+      .then(promiseTap((r: Z) => this.logger.debug('response', r)))
   }
 }
+

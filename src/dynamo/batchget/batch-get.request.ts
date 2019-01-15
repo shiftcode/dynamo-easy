@@ -1,12 +1,10 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, fromDb } from '../../mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoRx } from '../dynamo-rx'
+import { DynamoPromisified } from '../dynamo-promisified'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetFullResponse } from './batch-get-full.response'
 import { batchGetItemsFetchAll } from './batch-get-utils'
@@ -15,12 +13,12 @@ import { BatchGetResponse } from './batch-get.response'
 
 export class BatchGetRequest {
   readonly params: DynamoDB.BatchGetItemInput
-  private readonly dynamoRx: DynamoRx
+  private readonly dynamoRx: DynamoPromisified
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
   private itemCounter = 0
 
   constructor() {
-    this.dynamoRx = new DynamoRx()
+    this.dynamoRx = new DynamoPromisified()
     this.params = {
       RequestItems: {},
     }
@@ -64,25 +62,25 @@ export class BatchGetRequest {
   execNoMap(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<DynamoDB.BatchGetItemOutput> {
+  ): Promise<DynamoDB.BatchGetItemOutput> {
     return this.fetch(backoffTimer, throttleTimeSlot)
   }
 
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<BatchGetFullResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(map(this.mapResponse))
+  ): Promise<BatchGetFullResponse> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
   }
 
   exec(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Observable<BatchGetResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot).pipe(
-      map(this.mapResponse),
-      map(r => r.Responses),
-    )
+  ): Promise<BatchGetResponse> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
+      .then(r => r.Responses)
   }
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {

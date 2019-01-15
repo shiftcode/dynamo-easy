@@ -1,3 +1,1 @@
-import { Observable } from 'rxjs'
-
-export type SessionValidityEnsurer = () => Observable<void>
+export type SessionValidityEnsurer = () => Promise<void>

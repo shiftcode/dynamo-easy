@@ -1,6 +1,4 @@
 // tslint:disable:max-classes-per-file
-import { of } from 'rxjs'
-import { map } from 'rxjs/operators'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model'
 import { BaseRequest } from './base.request'
@@ -12,15 +10,11 @@ describe('base request', () => {
     }
 
     exec() {
-      return of(null).pipe(
-        map(() => {
-          return
-        }),
-      )
+      return Promise.resolve()
     }
 
     execFullResponse() {
-      return of(null)
+      return Promise.resolve(null)
     }
   }
 
