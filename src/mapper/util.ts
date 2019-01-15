@@ -218,7 +218,7 @@ export function isType(obj: any, type: any): boolean {
     type = typeName(type)
   }
 
-  return Object.prototype.toString.call(obj) === '[object ' + type + ']'
+  return Object.prototype.toString.call(obj) === `[object ${type}]`
 }
 
 // tslint:disable-next-line:function-constructor
