@@ -130,19 +130,19 @@ describe('TransactWriteRequest', () => {
       req = new TransactWriteRequest()
 
       transactWriteItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ myResponse: true }))
-      Object.assign(req, { dynamoRx: { transactWriteItems: transactWriteItemsSpy } })
+      Object.assign(req, { dynamoDBWrapper: { transactWriteItems: transactWriteItemsSpy } })
 
       req.transact(new TransactDelete(SimpleWithPartitionKeyModel, 'myId'))
     })
 
-    it('execFullResponse should call dynamoRx.transactWriteItems with the params and return the response', async () => {
+    it('execFullResponse should call dynamoDBWrapper.transactWriteItems with the params and return the response', async () => {
       const response = await req.execFullResponse()
       expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
       expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
       expect(response).toEqual({ myResponse: true })
     })
 
-    it('exec should call dynamoRx.transactWriteItems with the params and return void', async () => {
+    it('exec should call dynamoDBWrapper.transactWriteItems with the params and return void', async () => {
       const response = await req.exec()
       expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
       expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)

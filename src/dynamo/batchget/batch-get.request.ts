@@ -4,7 +4,7 @@ import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, fromDb } from '../../mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetFullResponse } from './batch-get-full.response'
 import { batchGetItemsFetchAll } from './batch-get-utils'
@@ -13,12 +13,12 @@ import { BatchGetResponse } from './batch-get.response'
 
 export class BatchGetRequest {
   readonly params: DynamoDB.BatchGetItemInput
-  private readonly dynamoRx: DynamoPromisified
+  private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
   private itemCounter = 0
 
   constructor() {
-    this.dynamoRx = new DynamoPromisified()
+    this.dynamoDBWrapper = new DynamoDbWrapper()
     this.params = {
       RequestItems: {},
     }
@@ -84,7 +84,7 @@ export class BatchGetRequest {
   }
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
-    return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
+    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput): BatchGetFullResponse => {

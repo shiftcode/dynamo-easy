@@ -2,7 +2,7 @@
 
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Organization } from '../../../../test/models'
-import { DynamoPromisified } from '../../dynamo-promisified'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
 
@@ -14,7 +14,7 @@ describe('batch write single table request', () => {
     name: 'myOrg',
   }
 
-  let dynamoRx: DynamoPromisified
+  let dynamoDBWrapper: DynamoDbWrapper
   let request: BatchWriteSingleTableRequest<Organization>
 
   describe('constructor', () => {
@@ -38,7 +38,7 @@ describe('batch write single table request', () => {
 
   describe('correct params', () => {
     beforeEach(() => {
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
+      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
     })
 
     it('returnConsumedCapacity', () => {
@@ -139,10 +139,10 @@ describe('batch write single table request', () => {
         .createSpy()
         .and.returnValues(Promise.resolve(output), Promise.resolve(output), Promise.resolve({ MyResult: true }))
       nextFnSpy = jasmine.createSpy().and.returnValue({ value: 0 })
-      dynamoRx = <DynamoPromisified>(<any>{ batchWriteItem: batchWriteItemSpy })
+      dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: batchWriteItemSpy })
       generatorSpy = jasmine.createSpy().and.returnValue({ next: nextFnSpy })
 
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
+      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
     })
 
     it('should retry when unprocessed items are returned', async () => {
@@ -174,8 +174,8 @@ describe('batch write single table request', () => {
 
   describe('exec / execFullResponse', () => {
     beforeEach(() => {
-      dynamoRx = <DynamoPromisified>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization)
+      dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
+      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
       request.delete([item])
     })
 

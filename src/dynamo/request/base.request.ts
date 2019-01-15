@@ -2,7 +2,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { metadataForClass } from '../../decorator/metadata'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 
 /**
@@ -25,14 +25,14 @@ export abstract class BaseRequest<
     | DynamoDB.TransactWriteItemsInput,
   R extends BaseRequest<T, I, any>
 > {
-  readonly dynamoRx: DynamoPromisified
+  readonly dynamoDBWrapper: DynamoDbWrapper
   readonly modelClazz: ModelConstructor<T>
   readonly metadata: Metadata<T>
   readonly tableName: string
   readonly params: I
 
-  protected constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
-    this.dynamoRx = dynamoRx
+  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
+    this.dynamoDBWrapper = dynamoDBWrapper
 
     if (modelClazz === null || modelClazz === undefined) {
       throw new Error(`please provide the ModelConstructor for the request, won't work otherwise`)

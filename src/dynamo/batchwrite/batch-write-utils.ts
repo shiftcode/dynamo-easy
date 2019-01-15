@@ -1,22 +1,22 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseDelay } from '../../helper'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 
 /**
  * Function which executes batchWriteItem operations until all given items (as params) are processed (written).
  * Between each follow-up request (in case of unprocessed items) a delay is interposed calculated by the given backoffTime and throttleTimeSlot.
- * @param dynamoRx
+ * @param dynamoDBWrapper
  * @param params containing the items per table to create the batchWrite operation
  * @param backoffTimer used to determine how many time slots the follow-up request should be delayed
  * @param throttleTimeSlot used to calculate the effective wait time
  */
 export function batchWriteItemsWriteAll(
-  dynamoRx: DynamoPromisified,
+  dynamoDBWrapper: DynamoDbWrapper,
   params: DynamoDB.BatchWriteItemInput,
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
 ): Promise<DynamoDB.BatchGetItemOutput> {
-  return dynamoRx.batchWriteItem(params)
+  return dynamoDBWrapper.batchWriteItem(params)
     .then(response => {
       if (hasUnprocessedItems(response)) {
         // in case of unprocessedItems do a follow-up requests
@@ -26,7 +26,7 @@ export function batchWriteItemsWriteAll(
           .then(unprocessedKeys => {
             const nextParams: DynamoDB.BatchWriteItemInput = { ...params, RequestItems: unprocessedKeys }
             // call recursively batchWriteItemsWriteAll with the returned UnprocessedItems params
-            return batchWriteItemsWriteAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
+            return batchWriteItemsWriteAll(dynamoDBWrapper, nextParams, backoffTimer, throttleTimeSlot)
           })
         // no combining of responses necessary, only the last response is returned
       }

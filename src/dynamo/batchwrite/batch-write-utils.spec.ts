@@ -1,11 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { batchWriteItemsWriteAll, hasUnprocessedItems } from './batch-write-utils'
 
 describe('batch-write-utils', () => {
   describe('batchWriteItemsWriteAll', () => {
     let batchWriteItemSpy: jasmine.Spy
-    let dynamoRx: DynamoPromisified
+    let dynamoDBWrapper: DynamoDbWrapper
     let backoffTimerMock: { next: jasmine.Spy }
 
     const output1: DynamoDB.BatchWriteItemOutput = {
@@ -21,10 +21,10 @@ describe('batch-write-utils', () => {
 
     beforeEach(async () => {
       batchWriteItemSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      dynamoRx = <any>{ batchWriteItem: batchWriteItemSpy }
+      dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemSpy }
       backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
 
-      await batchWriteItemsWriteAll(dynamoRx, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
+      await batchWriteItemsWriteAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
     })
 
     it('should use UnprocessedKeys for next request', () => {

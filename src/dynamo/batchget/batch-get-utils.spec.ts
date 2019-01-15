@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { batchGetItemsFetchAll, combineBatchGetResponses, hasUnprocessedKeys } from './batch-get-utils'
 
 describe('batch-get utils', () => {
@@ -51,7 +51,7 @@ describe('batch-get utils', () => {
 
   describe('batchGetItemsFetchAll', () => {
     let batchGetItemsSpy: jasmine.Spy
-    let dynamoRx: DynamoPromisified
+    let dynamoDBWrapper: DynamoDbWrapper
     let backoffTimerMock: { next: jasmine.Spy }
 
     const output1: DynamoDB.BatchGetItemOutput = {
@@ -72,10 +72,10 @@ describe('batch-get utils', () => {
 
     beforeEach(async () => {
       batchGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      dynamoRx = <any>{ batchGetItems: batchGetItemsSpy }
+      dynamoDBWrapper = <any>{ batchGetItems: batchGetItemsSpy }
       backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
 
-      await batchGetItemsFetchAll(dynamoRx, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
+      await batchGetItemsFetchAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
     })
 
     it('should use UnprocessedKeys for next request', () => {

@@ -12,7 +12,7 @@ import {
 } from '../../../../test/models'
 import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
 import { GSISortKey, Model, PartitionKey } from '../../../decorator/impl'
-import { DynamoPromisified } from '../../dynamo-promisified'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { attribute } from '../../expression'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
@@ -22,8 +22,8 @@ describe('query request', () => {
 
   describe('constructor', () => {
     class MyQueryRequest extends QueryRequest<ComplexModel> {
-      constructor(dynamoRx: DynamoPromisified) {
-        super(dynamoRx, ComplexModel)
+      constructor(dynamoDBWrapper: DynamoDbWrapper) {
+        super(dynamoDBWrapper, ComplexModel)
       }
 
       get theLogger() {
@@ -44,7 +44,7 @@ describe('query request', () => {
     it('creates logger', () => {
       expect(request.theLogger).toBeDefined()
     })
-    it('doRequest uses dynamoRx.query', async () => {
+    it('doRequest uses dynamoDBWrapper.query', async () => {
       await request.exec()
       expect(querySpy).toHaveBeenCalled()
     })

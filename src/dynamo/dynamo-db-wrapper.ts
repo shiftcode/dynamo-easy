@@ -6,11 +6,11 @@ import { dynamoEasyConfig } from '../config/dynamo-easy-config'
  * Simply calls the sessionValidityEnsurer before each standard dynamoDB operations and returns a promise for each
  * request
  */
-export class DynamoPromisified {
+export class DynamoDbWrapper {
   readonly dynamoDB: DynamoDB
 
   constructor() {
-    // create the actual dynamo db client
+    // create the actual dynamoDB client
     this.dynamoDB = new DynamoDB()
   }
 

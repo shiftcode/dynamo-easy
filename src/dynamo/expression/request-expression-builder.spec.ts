@@ -1,10 +1,10 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Organization } from '../../../test/models'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { QueryRequest } from '../request'
 import { addCondition, addPartitionKeyCondition, addSortKeyCondition } from './request-expression-builder'
 
-const DYNAMO_RX_MOCK: DynamoPromisified = <DynamoPromisified>{
+const DYNAMO_RX_MOCK: DynamoDbWrapper = <DynamoDbWrapper>{
   query(params: DynamoDB.QueryInput): Promise<DynamoDB.QueryOutput> {
     return Promise.resolve({})
   },

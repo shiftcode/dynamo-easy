@@ -1,22 +1,22 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseDelay } from '../../helper'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 
 /**
  * Function which executes batchGetItem operations until all given items (as params) are processed (fetched).
  * Between each follow-up request (in case of unprocessed items) a delay is interposed calculated by the given backoffTime and throttleTimeSlot.
- * @param dynamoRx
+ * @param dynamoDBWrapper
  * @param params containing the keys per table to create the batchGet operation
  * @param backoffTimer used to determine how many time slots the follow-up request should be delayed
  * @param throttleTimeSlot used to calculate the effective wait time
  */
 export function batchGetItemsFetchAll(
-  dynamoRx: DynamoPromisified,
+  dynamoDBWrapper: DynamoDbWrapper,
   params: DynamoDB.BatchGetItemInput,
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
 ): Promise<DynamoDB.BatchGetItemOutput> {
-  return dynamoRx.batchGetItems(params)
+  return dynamoDBWrapper.batchGetItems(params)
     .then(response => {
         if (hasUnprocessedKeys(response)) {
           // in case of unprocessedKeys do a follow-up requests
@@ -26,7 +26,7 @@ export function batchGetItemsFetchAll(
             .then(UnprocessedKeys => {
               const nextParams = { ...params, RequestItems: UnprocessedKeys }
               // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
-              return batchGetItemsFetchAll(dynamoRx, nextParams, backoffTimer, throttleTimeSlot)
+              return batchGetItemsFetchAll(dynamoDBWrapper, nextParams, backoffTimer, throttleTimeSlot)
             })
             .then(combineBatchGetResponses(response))
         }

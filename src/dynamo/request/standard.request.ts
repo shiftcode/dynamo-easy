@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { BaseRequest } from './base.request'
 
@@ -19,8 +19,8 @@ export abstract class StandardRequest<
     | DynamoDB.ScanInput,
   R extends StandardRequest<T, I, any>
 > extends BaseRequest<T, I, R> {
-  protected constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
-    super(dynamoRx, modelClazz)
+  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
+    super(dynamoDBWrapper, modelClazz)
     this.params.TableName = getTableName(this.metadata)
   }
 

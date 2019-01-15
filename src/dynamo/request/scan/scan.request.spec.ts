@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel } from '../../../../test/models'
-import { DynamoPromisified } from '../../dynamo-promisified'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { ReadManyRequest } from '../read-many.request'
 import { ScanRequest } from './scan.request'
 
@@ -9,8 +9,8 @@ describe('scan request', () => {
   let scanSpy: jasmine.Spy
 
   class MyScanRequest extends ScanRequest<ComplexModel> {
-    constructor(dynamoRx: DynamoPromisified) {
-      super(dynamoRx, ComplexModel)
+    constructor(dynamoDBWrapper: DynamoDbWrapper) {
+      super(dynamoDBWrapper, ComplexModel)
     }
 
     get theLogger() {
@@ -45,7 +45,7 @@ describe('scan request', () => {
     expect(request.theLogger).toBeDefined()
   })
 
-  it('doRequest uses dynamoRx.scan', async () => {
+  it('doRequest uses dynamoDBWrapper.scan', async () => {
     await request.exec()
     expect(scanSpy).toHaveBeenCalled()
   })

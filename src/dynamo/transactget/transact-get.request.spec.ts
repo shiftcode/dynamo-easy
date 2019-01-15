@@ -98,7 +98,7 @@ describe('TransactGetRequest', () => {
       req2 = new TransactGetRequest()
         .forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
         .forModel(SimpleWithCompositePartitionKeyModel, { id: 'myId', creationDate })
-      Object.assign(req2, { dynamoRx: { transactGetItems: transactGetItemsSpy } })
+      Object.assign(req2, { dynamoDBWrapper: { transactGetItems: transactGetItemsSpy } })
     })
 
     it('exec should return the mapped item', async () => {

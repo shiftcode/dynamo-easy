@@ -3,7 +3,7 @@ import { promiseTap } from '../../../helper'
 import { createLogger, Logger } from '../../../logger/logger'
 import { Attributes, createKeyAttributes, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { DynamoPromisified } from '../../dynamo-promisified'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
@@ -11,8 +11,8 @@ import { GetResponse } from './get.response'
 export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, GetRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
-    super(dynamoRx, modelClazz)
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
@@ -34,7 +34,7 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
 
   execFullResponse(): Promise<GetResponse<T>> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.getItem(this.params)
+    return this.dynamoDBWrapper.getItem(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(getItemResponse => {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
@@ -53,7 +53,7 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
 
   exec(): Promise<T | null> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.getItem(this.params)
+    return this.dynamoDBWrapper.getItem(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(response => {
         if (response.Item) {

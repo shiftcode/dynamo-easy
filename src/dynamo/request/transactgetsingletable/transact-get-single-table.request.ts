@@ -1,15 +1,15 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
-import { DynamoPromisified } from '../../dynamo-promisified'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 import { TransactGetResponse } from './transact-get-single-table.response'
 
 export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
   DynamoDB.TransactGetItemsInput,
   TransactGetSingleTableRequest<T>> {
-  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
-    super(dynamoRx, modelClazz)
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+    super(dynamoDBWrapper, modelClazz)
 
     this.params.TransactItems = keys.map(key => ({
       Get: {
@@ -20,12 +20,12 @@ export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
   }
 
   execFullResponse(): Promise<TransactGetResponse<T>> {
-    return this.dynamoRx.transactGetItems(this.params)
+    return this.dynamoDBWrapper.transactGetItems(this.params)
       .then(this.mapResponse)
   }
 
   exec(): Promise<T[]> {
-    return this.dynamoRx.transactGetItems(this.params)
+    return this.dynamoDBWrapper.transactGetItems(this.params)
       .then(this.mapResponse)
       .then(r => r.Items)
 

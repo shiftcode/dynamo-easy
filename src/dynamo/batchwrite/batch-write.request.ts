@@ -2,18 +2,18 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../helper'
 import { createToKeyFn, toDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { batchWriteItemsWriteAll } from './batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from './batch-write.const'
 
 export class BatchWriteRequest {
   readonly params: DynamoDB.BatchWriteItemInput
-  private readonly dynamoRx: DynamoPromisified
+  private readonly dynamoDBWrapper: DynamoDbWrapper
   private itemCount = 0
 
   constructor() {
-    this.dynamoRx = new DynamoPromisified()
+    this.dynamoDBWrapper = new DynamoDbWrapper()
     this.params = {
       RequestItems: {},
     }
@@ -70,7 +70,7 @@ export class BatchWriteRequest {
   }
 
   private write(backoffTimer: () => IterableIterator<number>, throttleTimeSlot: number) {
-    return batchWriteItemsWriteAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
+    return batchWriteItemsWriteAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
   private createDeleteRequest = <T>(modelClazz: ModelConstructor<T>) => {

@@ -133,9 +133,9 @@ describe('batchWriteRequest', () => {
         myResponse: true,
       }
       batchWriteItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(output))
-      const dynamoRx = <any>{ batchWriteItem: batchWriteItemSpy }
+      const dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemSpy }
       req = new BatchWriteRequest()
-      Object.assign(req, { dynamoRx })
+      Object.assign(req, { dynamoDBWrapper })
     })
 
     it('exec should return void', async () => {

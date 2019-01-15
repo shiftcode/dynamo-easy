@@ -2,7 +2,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { Attributes, createToKeyFn, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { TransactGetFullResponse } from './transact-get-full.response'
 import { TransactGetRequest1 } from './transact-get.request.type'
@@ -11,11 +11,11 @@ const MAX_REQUEST_ITEM_COUNT = 10
 
 export class TransactGetRequest {
   readonly params: DynamoDB.TransactGetItemsInput
-  private readonly dynamoRx: DynamoPromisified
+  private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Array<ModelConstructor<any>> = []
 
   constructor() {
-    this.dynamoRx = new DynamoPromisified()
+    this.dynamoDBWrapper = new DynamoDbWrapper()
     this.params = {
       TransactItems: [],
     }
@@ -53,16 +53,16 @@ export class TransactGetRequest {
   }
 
   execNoMap(): Promise<DynamoDB.TransactGetItemsOutput> {
-    return this.dynamoRx.transactGetItems(this.params)
+    return this.dynamoDBWrapper.transactGetItems(this.params)
   }
 
   execFullResponse(): Promise<TransactGetFullResponse<[]>> {
-    return this.dynamoRx.transactGetItems(this.params)
+    return this.dynamoDBWrapper.transactGetItems(this.params)
       .then(this.mapResponse)
   }
 
   exec(): Promise<[]> {
-    return this.dynamoRx.transactGetItems(this.params)
+    return this.dynamoDBWrapper.transactGetItems(this.params)
       .then(this.mapResponse)
       .then(r => r.Items)
   }

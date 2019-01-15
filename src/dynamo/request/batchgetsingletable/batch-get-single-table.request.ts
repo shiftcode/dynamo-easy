@@ -5,7 +5,7 @@ import { Attributes, createToKeyFn, fromDb } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
-import { DynamoPromisified } from '../../dynamo-promisified'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
@@ -14,8 +14,8 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
   BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
 
-  constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
-    super(dynamoRx, modelClazz)
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+    super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
 
     if (keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) {
@@ -89,7 +89,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
-    return batchGetItemsFetchAll(this.dynamoRx, { ...this.params }, backoffTimer(), throttleTimeSlot)
+    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
       .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }

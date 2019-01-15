@@ -4,11 +4,11 @@
 import { Config, Credentials } from 'aws-sdk/global'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config'
-import { DynamoPromisified } from './dynamo-promisified'
+import { DynamoDbWrapper } from './dynamo-db-wrapper'
 
 describe('dynamo rx', () => {
   describe('should call the validity ensurer before each call and call the correct dynamoDB method', () => {
-    let dynamoRx: DynamoPromisified
+    let dynamoDBWrapper: DynamoDbWrapper
     let sessionValidityEnsurerSpy: jasmine.Spy
     let dynamoDBSpy: jasmine.Spy
     let pseudoParams: any
@@ -17,7 +17,7 @@ describe('dynamo rx', () => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
       sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
-      dynamoRx = new DynamoPromisified()
+      dynamoDBWrapper = new DynamoDbWrapper()
     })
 
     afterEach(() => {
@@ -28,58 +28,66 @@ describe('dynamo rx', () => {
     })
 
     it('putItem', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'putItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.putItem(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'putItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.putItem(pseudoParams)
     })
 
     it('getItem', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'getItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.getItem(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'getItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.getItem(pseudoParams)
     })
 
     it('updateItem', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'updateItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.updateItem(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'updateItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.updateItem(pseudoParams)
     })
 
     it('deleteItem', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'deleteItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.deleteItem(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'deleteItem').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.deleteItem(pseudoParams)
     })
 
     it('batchWriteItem', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'batchWriteItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.batchWriteItem(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'batchWriteItem').and.returnValue({
+        promise: () => Promise.resolve(),
+      })
+      await dynamoDBWrapper.batchWriteItem(pseudoParams)
     })
 
     it('batchGetItems', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'batchGetItem').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.batchGetItems(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'batchGetItem').and.returnValue({
+        promise: () => Promise.resolve(),
+      })
+      await dynamoDBWrapper.batchGetItems(pseudoParams)
     })
 
     it('transactWriteItems', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'transactWriteItems').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.transactWriteItems(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'transactWriteItems').and.returnValue({
+        promise: () => Promise.resolve(),
+      })
+      await dynamoDBWrapper.transactWriteItems(pseudoParams)
     })
 
     it('transactGetItems', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'transactGetItems').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.transactGetItems(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'transactGetItems').and.returnValue({
+        promise: () => Promise.resolve(),
+      })
+      await dynamoDBWrapper.transactGetItems(pseudoParams)
     })
 
     it('scan', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'scan').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.scan(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'scan').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.scan(pseudoParams)
     })
 
     it('query', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'query').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.query(pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'query').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.query(pseudoParams)
     })
   })
 
   describe('makeRequest', async () => {
-    let dynamoRx: DynamoPromisified
+    let dynamoDBWrapper: DynamoDbWrapper
     let sessionValidityEnsurerSpy: jasmine.Spy
     let dynamoDBSpy: jasmine.Spy
     let pseudoParams: any
@@ -88,7 +96,7 @@ describe('dynamo rx', () => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
       sessionValidityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.resolve(true))
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerSpy })
-      dynamoRx = new DynamoPromisified()
+      dynamoDBWrapper = new DynamoDbWrapper()
     })
 
     afterEach(() => {
@@ -99,33 +107,33 @@ describe('dynamo rx', () => {
     })
 
     it('should call the validity ensurer before each call and call the correct dynamoDB method', async () => {
-      dynamoDBSpy = spyOn(dynamoRx.dynamoDB, 'makeRequest').and.returnValue({ promise: () => Promise.resolve() })
-      await dynamoRx.makeRequest('pseudoOperation', pseudoParams)
+      dynamoDBSpy = spyOn(dynamoDBWrapper.dynamoDB, 'makeRequest').and.returnValue({ promise: () => Promise.resolve() })
+      await dynamoDBWrapper.makeRequest('pseudoOperation', pseudoParams)
     })
   })
 
   describe('query', () => {
     beforeEach(() => {})
     it('should throw when no KeyConditionExpression was given', () => {
-      const dynamoRx = new DynamoPromisified()
-      expect(() => dynamoRx.query({ TableName: 'tableName' })).toThrow()
+      const dynamoDBWrapper = new DynamoDbWrapper()
+      expect(() => dynamoDBWrapper.query({ TableName: 'tableName' })).toThrow()
     })
   })
 
   it('should call makeRequest with the given params', async () => {
-    const dynamoRx = new DynamoPromisified()
+    const dynamoDBWrapper = new DynamoDbWrapper()
     const makeRequest = jasmine.createSpy().and.returnValue({ promise: () => Promise.resolve(null) })
-    Object.assign(dynamoRx, { dynamoDB: { makeRequest } })
+    Object.assign(dynamoDBWrapper, { dynamoDB: { makeRequest } })
 
-    await dynamoRx.makeRequest(<any>{ ok: true })
+    await dynamoDBWrapper.makeRequest(<any>{ ok: true })
     expect(makeRequest).toHaveBeenCalled()
     expect(makeRequest.calls.mostRecent().args[0]).toEqual({ ok: true })
   })
 
   it('should update the credentials', () => {
-    const dynamoRx = new DynamoPromisified()
+    const dynamoDBWrapper = new DynamoDbWrapper()
     const credentials = new Credentials({ secretAccessKey: '', sessionToken: '', accessKeyId: '' })
-    dynamoRx.updateAwsConfigCredentials(new Config({ credentials }))
-    expect(dynamoRx.dynamoDB.config.credentials).toBe(credentials)
+    dynamoDBWrapper.updateAwsConfigCredentials(new Config({ credentials }))
+    expect(dynamoDBWrapper.dynamoDB.config.credentials).toBe(credentials)
   })
 })

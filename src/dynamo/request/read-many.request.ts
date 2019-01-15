@@ -4,7 +4,7 @@ import { fetchAll, promiseTap } from '../../helper'
 import { Logger } from '../../logger/logger'
 import { Attributes, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model'
-import { DynamoPromisified } from '../dynamo-promisified'
+import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and, RequestConditionFunction } from '../expression'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -31,13 +31,13 @@ export abstract class ReadManyRequest<T,
   protected abstract readonly logger: Logger
 
   /**
-   * method that executes the actual call on dynamoRx with the given params.
+   * method that executes the actual call on dynamoDBWrapper with the given params.
    * @param params
    */
   protected abstract doRequest(params: I): Promise<O>
 
-  protected constructor(dynamoRx: DynamoPromisified, modelClazz: ModelConstructor<T>) {
-    super(dynamoRx, modelClazz)
+  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
+    super(dynamoDBWrapper, modelClazz)
     this.limit(ReadManyRequest.DEFAULT_LIMIT)
   }
 

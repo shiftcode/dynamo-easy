@@ -88,7 +88,7 @@ describe('dynamo store', () => {
   describe('should enable custom requests', () => {
     const makeRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
     const store = new DynamoStore(SimpleWithPartitionKeyModel)
-    Object.assign(store, { dynamoRx: { makeRequest: makeRequestSpy } })
+    Object.assign(store, { dynamoDBWrapper: { makeRequest: makeRequestSpy } })
     store.makeRequest('updateTimeToLive', {})
     expect(makeRequestSpy).toBeCalled()
   })

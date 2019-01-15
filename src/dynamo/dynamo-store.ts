@@ -3,7 +3,7 @@ import { promiseTap } from '../helper'
 import { createLogger, Logger } from '../logger/logger'
 import { ModelConstructor } from '../model'
 import { DynamoApiOperations } from './dynamo-api-operations.type'
-import { DynamoPromisified } from './dynamo-promisified'
+import { DynamoDbWrapper } from './dynamo-db-wrapper'
 import { getTableName } from './get-table-name.function'
 import {
   BatchGetSingleTableRequest,
@@ -19,42 +19,42 @@ import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/ba
 
 export class DynamoStore<T> {
   get dynamoDB(): DynamoDB {
-    return this.dynamoRx.dynamoDB
+    return this.dynamoDBWrapper.dynamoDB
   }
 
   readonly tableName: string
   private readonly logger: Logger
-  private readonly dynamoRx: DynamoPromisified
+  private readonly dynamoDBWrapper: DynamoDbWrapper
 
   constructor(private modelClazz: ModelConstructor<T>) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
-    this.dynamoRx = new DynamoPromisified()
+    this.dynamoDBWrapper = new DynamoDbWrapper()
     this.tableName = getTableName(modelClazz)
     this.logger.debug('instance created')
   }
 
   put(item: T): PutRequest<T> {
-    return new PutRequest(this.dynamoRx, this.modelClazz, item)
+    return new PutRequest(this.dynamoDBWrapper, this.modelClazz, item)
   }
 
   get(partitionKey: any, sortKey?: any): GetRequest<T> {
-    return new GetRequest<T>(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
+    return new GetRequest<T>(this.dynamoDBWrapper, this.modelClazz, partitionKey, sortKey)
   }
 
   update(partitionKey: any, sortKey?: any): UpdateRequest<T> {
-    return new UpdateRequest(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
+    return new UpdateRequest(this.dynamoDBWrapper, this.modelClazz, partitionKey, sortKey)
   }
 
   delete(partitionKey: any, sortKey?: any): DeleteRequest<T> {
-    return new DeleteRequest(this.dynamoRx, this.modelClazz, partitionKey, sortKey)
+    return new DeleteRequest(this.dynamoDBWrapper, this.modelClazz, partitionKey, sortKey)
   }
 
   scan(): ScanRequest<T> {
-    return new ScanRequest<T>(this.dynamoRx, this.modelClazz)
+    return new ScanRequest<T>(this.dynamoDBWrapper, this.modelClazz)
   }
 
   query(): QueryRequest<T> {
-    return new QueryRequest(this.dynamoRx, this.modelClazz)
+    return new QueryRequest(this.dynamoDBWrapper, this.modelClazz)
   }
 
   /**
@@ -63,7 +63,7 @@ export class DynamoStore<T> {
    * create an instance of BatchGetItemInput and use store.makeRequest with it.
    */
   batchGet(keys: Array<Partial<T>>): BatchGetSingleTableRequest<T> {
-    return new BatchGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
+    return new BatchGetSingleTableRequest(this.dynamoDBWrapper, this.modelClazz, keys)
   }
 
   /**
@@ -72,16 +72,16 @@ export class DynamoStore<T> {
    * create an instance of BatchWriteItemInput and use store.makeRequest with it.
    */
   batchWrite(): BatchWriteSingleTableRequest<T> {
-    return new BatchWriteSingleTableRequest<T>(this.dynamoRx, this.modelClazz)
+    return new BatchWriteSingleTableRequest<T>(this.dynamoDBWrapper, this.modelClazz)
   }
 
   transactGet(keys: Array<Partial<T>>): TransactGetSingleTableRequest<T> {
-    return new TransactGetSingleTableRequest(this.dynamoRx, this.modelClazz, keys)
+    return new TransactGetSingleTableRequest(this.dynamoDBWrapper, this.modelClazz, keys)
   }
 
   makeRequest<Z>(operation: DynamoApiOperations, params?: Record<string, any>): Promise<Z> {
     this.logger.debug('request', params)
-    return this.dynamoRx.makeRequest(operation, params)
+    return this.dynamoDBWrapper.makeRequest(operation, params)
       .then(promiseTap((r: Z) => this.logger.debug('response', r)))
   }
 }
