@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-string-literal
-import { AttributeMap, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDb from 'aws-sdk/clients/dynamodb'
 import {
   organization1CreatedAt,
   organization1Employee1CreatedAt,
@@ -118,27 +118,28 @@ describe('Mapper', () => {
         expect(attrValue.M).toEqual({})
       })
 
-      it('array -> S(tring)S(et) (homogeneous, no duplicates)', () => {
-        const attrValue = <StringSetAttribute>toDbOne(['foo', 'bar'])!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('SS')
-        expect(attrValue.SS[0]).toBe('foo')
-        expect(attrValue.SS[1]).toBe('bar')
+      it('array -> L(ist) (no explicit type)', () => {
+        const attrValue = <ListAttribute<StringAttribute>>toDbOne(['foo', 'bar'])!
+        expect(attrValue).toEqual({ L: [{ S: 'foo' }, { S: 'bar' }] })
       })
 
       it('array -> L(ist) (homogeneous, no duplicates, explicit type)', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, isCustom: true },
+          isSortedCollection: true,
+          typeInfo: {
+            type: Array,
+            isCustom: true,
+          },
         }
-        const attrValue = <ListAttribute>toDbOne(['foo', 'bar'], <any>propertyMetadata)!
+        const attrValue = <ListAttribute<StringAttribute>>toDbOne(['foo', 'bar'], <any>propertyMetadata)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
 
         expect(keyOf(attrValue.L[0])).toBe('S')
-        expect((<StringAttribute>attrValue.L[0]).S).toBe('foo')
+        expect(attrValue.L[0].S).toBe('foo')
 
         expect(keyOf(attrValue.L[1])).toBe('S')
-        expect((<StringAttribute>attrValue.L[1]).S).toBe('bar')
+        expect(attrValue.L[1].S).toBe('bar')
       })
 
       it('array -> L(ist) (heterogeneous, no duplicates)', () => {
@@ -185,13 +186,19 @@ describe('Mapper', () => {
         expect((<NumberAttribute>employee1.M.age).N).toBe('25')
       })
 
-      it('Set -> S(tring)S(et)', () => {
-        const attrValue = <ListAttribute>toDbOne(new Set(['foo', 'bar', 25]))!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('L')
-        expect(attrValue.L[0]).toEqual({ S: 'foo' })
-        expect(attrValue.L[1]).toEqual({ S: 'bar' })
-        expect(attrValue.L[2]).toEqual({ N: '25' })
+      it('heterogenous Set without decorator should throw', () => {
+        expect(() => toDbOne(new Set(['foo', 'bar', 25]))).toThrow()
+      })
+
+      it('heterogenous Set with decorator to L(ist)', () => {
+        const meta: PropertyMetadata<any, any> = <any>{
+          typeInfo: {
+            type: Set,
+            isCustom: true,
+          },
+        }
+        const attrValue = toDbOne(new Set(['foo', 'bar', 25]), meta)
+        expect(attrValue).toEqual({ L: [{ S: 'foo' }, { S: 'bar' }, { N: '25' }] })
       })
 
       it('Set (empty) -> null', () => {
@@ -199,18 +206,22 @@ describe('Mapper', () => {
         expect(attrValue).toBeNull()
       })
 
-      it('Set of objects -> L(ist)', () => {
-        const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 56 }, { name: 'anna', age: 26 }]))!
+      it('Set of objects without decorator should throw', () => {
+        expect(() => toDbOne(new Set([{ name: 'foo', age: 7 }, { name: 'bar', age: 42 }]))).toThrow()
+      })
 
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('L')
-        expect(attrValue.L.length).toBe(2)
-        expect((<MapAttribute>attrValue.L[0]).M).toBeDefined()
+      it('Set of objects with decorator -> L(ist)', () => {
+        const meta: PropertyMetadata<any> = <any>{
+          typeInfo: {
+            isCustom: true,
+            type: Set,
+          },
+        }
+        const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 7 }, { name: 'bar', age: 42 }]), meta)
 
-        const objFromDb = <MapAttribute<{ name: StringAttribute }>>attrValue.L[0]
-        expect(objFromDb.M.name).toBeDefined()
-        expect(keyOf(objFromDb.M.name)).toBe('S')
-        expect((<StringAttribute>objFromDb.M.name).S).toBe('foo')
+        expect(attrValue).toEqual({
+          L: [{ M: { name: { S: 'foo' }, age: { N: '7' } } }, { M: { name: { S: 'bar' }, age: { N: '42' } } }],
+        })
       })
 
       it('simple object', () => {
@@ -313,9 +324,7 @@ describe('Mapper', () => {
         const set: Set<string> = fromDbOne(attrValue)
         // noinspection SuspiciousInstanceOfGuard
         expect(set instanceof Set).toBeTruthy()
-        expect(set.size).toBe(2)
-        expect(Array.from(set)[0]).toBe('foo')
-        expect(Array.from(set)[1]).toBe('bar')
+        expect([...set]).toEqual(['foo', 'bar'])
       })
 
       it('SS -> array', () => {
@@ -325,9 +334,7 @@ describe('Mapper', () => {
         const attrValue = { SS: ['foo', 'bar'] }
         const arr = fromDbOne<string[]>(attrValue, <any>propertyMetadata)
         expect(Array.isArray(arr)).toBeTruthy()
-        expect(arr.length).toBe(2)
-        expect(arr[0]).toBe('foo')
-        expect(arr[1]).toBe('bar')
+        expect(arr).toEqual(['foo', 'bar'])
       })
 
       it('NS -> set', () => {
@@ -426,13 +433,13 @@ describe('Mapper', () => {
           organization.domains = ['shiftcode.ch', 'shiftcode.io', 'shiftcode.it']
           organization.randomDetails = ['sample', 26, true]
 
-          const employees: Employee[] = []
           createdAtDateEmployee1 = new Date('2017-03-05')
           createdAtDateEmployee2 = new Date()
 
-          employees.push(new Employee('max', 50, createdAtDateEmployee1, []))
-          employees.push(new Employee('anna', 27, createdAtDateEmployee2, []))
-          organization.employees = employees
+          organization.employees = [
+            new Employee('max', 50, createdAtDateEmployee1, []),
+            new Employee('anna', 27, createdAtDateEmployee2, []),
+          ]
 
           organization.cities = new Set(['zürich', 'bern'])
 
@@ -485,15 +492,9 @@ describe('Mapper', () => {
           })
 
           it('domains', () => {
-            expect(organizationAttrMap.domains).toBeDefined()
-
-            const domains = (<StringSetAttribute>organizationAttrMap.domains).SS
-            expect(domains).toBeDefined()
-            expect(domains.length).toBe(3)
-
-            expect(domains[0]).toBe('shiftcode.ch')
-            expect(domains[1]).toBe('shiftcode.io')
-            expect(domains[2]).toBe('shiftcode.it')
+            expect(organizationAttrMap.domains).toEqual({
+              L: ['shiftcode.ch', 'shiftcode.io', 'shiftcode.it'].map(v => ({ S: v })),
+            })
           })
 
           it('random details', () => {
@@ -534,7 +535,7 @@ describe('Mapper', () => {
             expect((<StringAttribute>employee1.createdAt).S).toBe(createdAtDateEmployee1.toISOString())
 
             // test employee2
-            const employee2: MapAttributeValue = (<MapAttribute>employeesL[1]).M
+            const employee2: DynamoDb.MapAttributeValue = (<MapAttribute>employeesL[1]).M
             expect(employee2['name']).toBeDefined()
             expect(employee2['name'].S).toBeDefined()
             expect(employee2['name'].S).toBe('anna')
@@ -686,13 +687,16 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDbVal: AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          const toDbVal: DynamoDb.AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
           expect(toDbVal.startDate.S).toBeDefined()
           expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })
         it('should accept date as HASH or RANGE key on GSI', () => {
           const now = new Date()
-          const toDbVal: AttributeMap = toDb(new ModelWithDateAsIndexHashKey(0, now), ModelWithDateAsIndexHashKey)
+          const toDbVal: DynamoDb.AttributeMap = toDb(
+            new ModelWithDateAsIndexHashKey(0, now),
+            ModelWithDateAsIndexHashKey,
+          )
           expect(toDbVal.creationDate.S).toBeDefined()
           expect(toDbVal.creationDate.S).toEqual(now.toISOString())
         })

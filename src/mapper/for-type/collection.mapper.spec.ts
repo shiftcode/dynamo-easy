@@ -1,3 +1,6 @@
+import { NestedObject } from '../../../test/models'
+import { ModelWithCollections } from '../../../test/models/model-with-collections.model'
+import { Metadata, metadataForClass } from '../../decorator/metadata'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { ListAttribute, NumberSetAttribute, StringSetAttribute } from '../type/attribute.type'
 import { CollectionMapper } from './collection.mapper'
@@ -8,20 +11,14 @@ describe('collection mapper', () => {
       /*
        * Arrays
        */
-      it('arr (homogeneous string)', () => {
-        const attributeValue = <StringSetAttribute>CollectionMapper.toDb(['value1', 'value2', 'value3'])
-        expect(Object.keys(attributeValue)[0]).toBe('SS')
-        expect(Array.isArray(attributeValue.SS)).toBeTruthy()
-        expect(attributeValue.SS.length).toBe(3)
-        expect(attributeValue.SS).toEqual(['value1', 'value2', 'value3'])
+      it('arr (homogeneous string) => L', () => {
+        const attributeValue = CollectionMapper.toDb(['value1', 'value2', 'value3'])
+        expect(attributeValue).toEqual({ L: [{ S: 'value1' }, { S: 'value2' }, { S: 'value3' }] })
       })
 
-      it('arr (homogeneous number)', () => {
-        const attributeValue = <NumberSetAttribute>CollectionMapper.toDb([5, 10])
-        expect(Object.keys(attributeValue)[0]).toBe('NS')
-        expect(Array.isArray(attributeValue.NS)).toBeTruthy()
-        expect(attributeValue.NS.length).toBe(2)
-        expect(attributeValue.NS).toEqual(['5', '10'])
+      it('arr (homogeneous number) => L', () => {
+        const attributeValue = CollectionMapper.toDb([5, 10])
+        expect(attributeValue).toEqual({ L: [{ N: '5' }, { N: '10' }] })
       })
 
       it('arr (homogeneous objects)', () => {
@@ -59,24 +56,16 @@ describe('collection mapper', () => {
         expect(attributeValue.NS).toEqual(['5', '10'])
       })
 
-      it('set (homogeneous objects)', () => {
-        const attributeValue = <ListAttribute>CollectionMapper.toDb(new Set([{ name: 'name1' }, { name: 'name2' }]))
-        expect(Object.keys(attributeValue)[0]).toBe('L')
-        expect(Array.isArray(attributeValue.L)).toBeTruthy()
-        expect(attributeValue.L.length).toBe(2)
-        expect(attributeValue.L).toEqual([{ M: { name: { S: 'name1' } } }, { M: { name: { S: 'name2' } } }])
+      it('set with objects should throw', () => {
+        expect(() => CollectionMapper.toDb(new Set([{ name: 'name1' }, { name: 'name2' }]))).toThrow()
       })
 
-      it('set (heterogeneous)', () => {
-        const attributeValue = <ListAttribute>CollectionMapper.toDb(new Set(['value1', 10]))
-        expect(Object.keys(attributeValue)[0]).toBe('L')
-        expect(Array.isArray(attributeValue.L)).toBeTruthy()
-        expect(attributeValue.L.length).toBe(2)
-        expect(attributeValue.L).toEqual([{ S: 'value1' }, { N: '10' }])
+      it('heterogeneous set should throw', () => {
+        expect(() => CollectionMapper.toDb(new Set(['value1', 10]))).toThrow()
       })
     })
 
-    describe('metadata', () => {
+    describe('with metadata', () => {
       const metadata: PropertyMetadata<any> = <any>{
         typeInfo: {
           type: Array,
@@ -126,6 +115,63 @@ describe('collection mapper', () => {
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
         expect(attributeValue.L).toEqual([{ N: '5' }, { N: '10' }])
+      })
+    })
+
+    describe('with CollectionProperty decorator', () => {
+      let metadata: Metadata<ModelWithCollections>
+      let aDate: Date
+      let aStringArray: string[]
+      let aNestedObject: NestedObject
+
+      beforeEach(() => {
+        metadata = metadataForClass(ModelWithCollections)
+        aDate = new Date()
+        aStringArray = ['Hello', 'World']
+        aNestedObject = { id: 'myId' }
+      })
+
+      it('array to (L)ist (itemType)', () => {
+        const propMeta = metadata.forProperty('arrayOfNestedModelToList')
+        const val: ModelWithCollections['arrayOfNestedModelToList'] = [{ updated: aDate }]
+
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({
+          L: [{ M: { updated: { S: aDate.toISOString() } } }],
+        })
+      })
+      it('set to (L)ist (itemType)', () => {
+        const propMeta = metadata.forProperty('setOfNestedModelToList')
+        const val: ModelWithCollections['setOfNestedModelToList'] = new Set([{ updated: aDate }])
+
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({
+          L: [{ M: { updated: { S: aDate.toISOString() } } }],
+        })
+      })
+
+      it('array to (L)ist (nested object)', () => {
+        const propMeta = metadata.forProperty('arrayOfObjectsToList')
+        const val: ModelWithCollections['arrayOfObjectsToList'] = [aNestedObject]
+
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({ L: [{ M: { id: { S: aNestedObject.id } } }] })
+      })
+      it('set to (L)ist (nested object)', () => {
+        const propMeta = metadata.forProperty('setOfObjectsToList')
+        const val: ModelWithCollections['setOfObjectsToList'] = new Set([aNestedObject])
+
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({ L: [{ M: { id: { S: aNestedObject.id } } }] })
+      })
+
+      it('array to List ', () => {
+        const propMeta = metadata.forProperty('arrayOfStringToSet')
+        const val: ModelWithCollections['arrayOfStringToSet'] = aStringArray
+
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({ L: aStringArray.map(t => ({ S: t })) })
+      })
+      it('set to (S)et (primitive type)', () => {
+        const propMeta = metadata.forProperty('setOfStringToSet')
+        const val: ModelWithCollections['setOfStringToSet'] = new Set(aStringArray)
+
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({ SS: aStringArray })
       })
     })
   })

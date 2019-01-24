@@ -27,7 +27,7 @@ export class OrderId {
   }
 }
 
-export const OrderIdMapper: MapperForType<OrderId, StringAttribute> = {
+export const orderIdMapper: MapperForType<OrderId, StringAttribute> = {
   fromDb: (attributeValue: StringAttribute) => OrderId.parse(attributeValue.S),
   toDb: (propertyValue: OrderId) => ({ S: OrderId.unparse(propertyValue) }),
 }

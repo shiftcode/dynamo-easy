@@ -19,7 +19,8 @@ import {
   SimpleModel,
 } from '../../test/models'
 import { Form } from '../../test/models/real-world'
-import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortedSet, SortKey, Transient } from './impl'
+import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortKey, Transient } from './impl'
+import { CollectionProperty } from './impl/collection/collection-property.decorator'
 import { Model } from './impl/model/model.decorator'
 import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
 import { metadataForProperty } from './metadata'
@@ -370,7 +371,7 @@ describe('Decorators should add correct metadata', () => {
 
       @Model()
       class B extends A {
-        @SortedSet()
+        @CollectionProperty({ sorted: true })
         myOwnProp: string[]
       }
 

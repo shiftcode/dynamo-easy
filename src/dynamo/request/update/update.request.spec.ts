@@ -1,4 +1,4 @@
-import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
   ComplexModel,
   SimpleWithCompositePartitionKeyModel,
@@ -153,7 +153,7 @@ describe('update request', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: UpdateItemOutput = { Attributes: undefined }
+    const sampleResponse: DynamoDB.UpdateItemOutput = { Attributes: undefined }
     let logReceiver: jasmine.Spy
     let updateItemSpy: jasmine.Spy
     let req: UpdateRequest<SimpleWithPartitionKeyModel>

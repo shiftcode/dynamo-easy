@@ -1,7 +1,6 @@
-import { MapperForType } from '../../mapper/for-type/base.mapper'
-
 // def good
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { MapperForType } from '../../mapper/for-type/base.mapper'
 import { Attribute } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 
@@ -40,6 +39,8 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
 
   mapper?: () => MapperForType<any, R>
 
+  mapperForSingleItem?: () => MapperForType<any, any>
+
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
   keyForGSI?: Record<string, DynamoDB.KeyType>
 
@@ -54,4 +55,17 @@ export function hasGenericType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { genericType: ModelConstructor<any> } } {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType)
+}
+
+export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: PropertyMetadata<T> | null): PropertyMetadata<T> | undefined {
+  if (!propertyMeta) {
+    return
+  }
+  if (propertyMeta.mapper && propertyMeta.mapperForSingleItem) {
+    return { ...propertyMeta, mapper: propertyMeta.mapperForSingleItem }
+  }
+  if (propertyMeta.typeInfo && (propertyMeta.typeInfo.type === Set || propertyMeta.typeInfo.type === Array)) {
+    return
+  }
+  return { ...propertyMeta }
 }

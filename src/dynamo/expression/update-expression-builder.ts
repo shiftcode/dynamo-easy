@@ -1,5 +1,5 @@
 import { Metadata, PropertyMetadata } from '../../decorator/metadata'
-import { Attribute, Attributes, AttributeType, toDbOne } from '../../mapper'
+import { Attribute, Attributes, AttributeType, isSet, toDbOne } from '../../mapper'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { uniqueAttributeValueName } from './functions/unique-attribute-value-name.function'
@@ -74,6 +74,15 @@ function buildDefaultExpression(
   let attribute: Attribute | null = null
 
   if (!isNoAttributeValueAction(operator.action)) {
+    // special cases: appendToList, add, removeFromSet
+    // we allow to provide arrays or sets for those methods.
+    // so it's necessary to make sure appendToList receives Arrays, add & removeFromSet receive Sets
+    if (['removeFromSet', 'add'].includes(operator.action) && Array.isArray(values[0])) {
+      values[0] = new Set(values[0])
+    } else if( ['appendToList'].includes(operator.action) && isSet(values[0])) {
+      values[0] = [...values[0]]
+    }
+
     attribute = toDbOne(values[0], propertyMetadata)
     if (attribute) {
       attributeValues[valuePlaceholder] = attribute

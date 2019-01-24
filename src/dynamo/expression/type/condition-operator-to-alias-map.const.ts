@@ -18,6 +18,7 @@ export const OPERATOR_TO_ALIAS_MAP: AliasedOperatorMapEntry = {
   attribute_exists: ['attributeExists', 'notNull'],
   attribute_type: 'type',
   contains: 'contains',
+  not_contains: 'not_contains',
   IN: 'in',
   begins_with: 'beginsWith',
   BETWEEN: 'between',

@@ -56,7 +56,7 @@ describe('Util', () => {
     })
   })
 
-  describe('detect collection type', () => {
+  describe('detect collection type without property metadata', () => {
     it('set (empty)', () => {
       const collection: Set<string> = new Set()
       expect(detectCollectionTypeFromValue(collection)).toBe('SS')
@@ -72,19 +72,19 @@ describe('Util', () => {
       expect(detectCollectionTypeFromValue(collection)).toBe('NS')
     })
 
-    it('set with object values', () => {
-      const collection: Set<any> = new Set([{ foo: 'foo' }, { bar: 'bar' }])
-      expect(detectCollectionTypeFromValue(collection)).toBe('L')
-    })
-
-    it('set with values of different type', () => {
-      const collection: Set<any> = new Set(['foo', 5])
-      expect(detectCollectionTypeFromValue(collection)).toBe('L')
-    })
-
     it('set with no values', () => {
       const collection: Set<any> = new Set()
       expect(detectCollectionTypeFromValue(collection)).toBe('SS')
+    })
+
+    it('set with object values should throw', () => {
+      const collection: Set<any> = new Set([{ foo: 'foo' }, { bar: 'bar' }])
+      expect(() => detectCollectionTypeFromValue(collection)).toThrow()
+    })
+
+    it('set with values of different type should throw', () => {
+      const collection: Set<any> = new Set(['foo', 5])
+      expect(() => detectCollectionTypeFromValue(collection)).toThrow()
     })
   })
 
