@@ -9,6 +9,7 @@ import {
   StringAttribute,
   StringSetAttribute,
 } from './type/attribute.type'
+import { isSet } from './util'
 
 export type SetAttributeOf<A extends StringAttribute | NumberAttribute | BinaryAttribute> = A extends StringAttribute
   ? StringSetAttribute
@@ -72,7 +73,12 @@ export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribu
  * @param fn
  */
 function spreadSetAndApplyToFn<T, R>(fn: (values: T[]) => R) {
-  return (values: Set<T>) => fn([...values])
+  return (values: Set<T>) => {
+    if (!isSet(values)) {
+      throw new Error(`provided argument (${JSON.stringify(values)}) is not a Set or an Array`)
+    }
+    return fn([...values])
+  }
 }
 
 /**
