@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
 import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
-import { Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { hasType, Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
@@ -84,10 +84,9 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 }
 
 export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): Attribute | null {
-  const explicitType: AttributeValueType | null =
-    propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
-      ? propertyMetadata.typeInfo.type
-      : null
+  const explicitType: AttributeValueType | null = hasType(propertyMetadata)
+    ? propertyMetadata.typeInfo.type
+    : null
   const type: AttributeValueType = explicitType || typeOf(propertyValue)
 
   const mapper = propertyMetadata && propertyMetadata.mapper ? propertyMetadata.mapper() : forType(type)
@@ -215,10 +214,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
 }
 
 export function fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: PropertyMetadata<any, any>): T {
-  const explicitType: AttributeValueType | null =
-    propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.isCustom
-      ? propertyMetadata.typeInfo.type
-      : null
+  const explicitType: AttributeValueType | null = hasType(propertyMetadata) ? propertyMetadata.typeInfo.type : null
   const type: AttributeValueType = explicitType || typeOfFromDb(attributeValue)
 
   if (explicitType) {

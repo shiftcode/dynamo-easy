@@ -10,10 +10,7 @@ import { initOrUpdateProperty } from '../property/init-or-update-property.functi
 export function TypedArray<T>(modelConstructor?: ModelConstructor<T>): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-      const typeInfo: TypeInfo = {
-        type: Array,
-        isCustom: true,
-      }
+      const typeInfo: TypeInfo = {type: Array}
 
       if (modelConstructor) {
         typeInfo.genericType = modelConstructor

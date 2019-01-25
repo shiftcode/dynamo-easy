@@ -11,8 +11,7 @@ export function TypedSet(modelConstructor?: ModelConstructor<any>): PropertyDeco
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
       const typeInfo: TypeInfo = {
-        type: Set,
-        isCustom: true,
+        type: Set
       }
 
       if (modelConstructor) {

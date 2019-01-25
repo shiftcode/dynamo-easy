@@ -33,6 +33,7 @@ export interface NumberAttribute {
 
 /**
  * An attribute of type Binary. For example:  "B": "dGhpcyB0ZXh0IGlzIGJhc2U2NC1lbmNvZGVk"
+ * TODO LOW:BINARY check for all possible types
  */
 export interface BinaryAttribute {
   B: Buffer | Uint8Array | {} | string

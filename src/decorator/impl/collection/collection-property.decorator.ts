@@ -26,10 +26,7 @@ export function CollectionProperty<R, T extends StringAttribute | NumberAttribut
       const meta: Partial<PropertyMetadata<any>> & { typeInfo: TypeInfo } = {
         name: propertyKey,
         nameDb: opts && opts.name || propertyKey,
-        typeInfo: {
-          type,
-          isCustom: true,
-        },
+        typeInfo: {type},
         isSortedCollection: !!opts.sorted,
       }
 

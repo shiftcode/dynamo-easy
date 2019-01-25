@@ -6,8 +6,6 @@ import { ModelConstructor } from '../../model/model-constructor'
 
 export interface TypeInfo {
   type: ModelConstructor<any>
-  // true if we use a non native type for dynamo document client
-  isCustom?: boolean
   genericType?: ModelConstructor<any>
 }
 
@@ -55,6 +53,12 @@ export function hasGenericType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { genericType: ModelConstructor<any> } } {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType)
+}
+
+export function hasType(
+  propertyMetadata?: PropertyMetadata<any, any>,
+): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { type: ModelConstructor<any> } } {
+  return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.type)
 }
 
 export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: PropertyMetadata<T> | null): PropertyMetadata<T> | undefined {

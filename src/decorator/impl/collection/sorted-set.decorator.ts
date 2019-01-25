@@ -12,8 +12,7 @@ export function SortedSet(modelConstructor?: ModelConstructor<any>): PropertyDec
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
       const typeInfo: TypeInfo = {
-        type: Set,
-        isCustom: true,
+        type: Set
       }
 
       if (modelConstructor) {

@@ -111,7 +111,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key!.uuid).toBeFalsy()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeFalsy()
         expect(prop!.typeInfo!.type).toBe(String)
       })
 
@@ -125,7 +124,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key!.uuid).toBeFalsy()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
       })
 
       it('active', () => {
@@ -143,6 +141,7 @@ describe('Decorators should add correct metadata', () => {
       it('set', () => {
         const prop = getMetaDataProperty(modelOptions, 'set')
         expect(prop).toBeDefined()
+
         expect(prop!.name).toBe('set')
         expect(prop!.nameDb).toBe('set')
         expect(prop!.key).toBeUndefined()
@@ -328,11 +327,11 @@ describe('Decorators should add correct metadata', () => {
     it('should add enum type to property', () => {
       const enumPropertyMetadata = metadata.forProperty('type')!
       expect(enumPropertyMetadata.typeInfo).toBeDefined()
-      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number, isCustom: false })
+      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number })
 
       const strEnumPropertyMetadata = metadata.forProperty('strType')!
       expect(strEnumPropertyMetadata.typeInfo).toBeDefined()
-      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String, isCustom: false })
+      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String })
     })
   })
 

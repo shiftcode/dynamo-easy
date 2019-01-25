@@ -111,7 +111,7 @@ describe('Mapper', () => {
 
       it('enum (propertyMetadata -> no enum decorator)', () => {
         const attrValue: Attribute = <MapAttribute>toDbOne(Type.FirstType, <any>{
-          typeInfo: { type: Object, isCustom: true },
+          typeInfo: { type: Object },
         })!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('M')
@@ -128,7 +128,6 @@ describe('Mapper', () => {
           isSortedCollection: true,
           typeInfo: {
             type: Array,
-            isCustom: true,
           },
         }
         const attrValue = <ListAttribute<StringAttribute>>toDbOne(['foo', 'bar'], <any>propertyMetadata)!
@@ -194,7 +193,6 @@ describe('Mapper', () => {
         const meta: PropertyMetadata<any, any> = <any>{
           typeInfo: {
             type: Set,
-            isCustom: true,
           },
         }
         const attrValue = toDbOne(new Set(['foo', 'bar', 25]), meta)
@@ -213,7 +211,6 @@ describe('Mapper', () => {
       it('Set of objects with decorator -> L(ist)', () => {
         const meta: PropertyMetadata<any> = <any>{
           typeInfo: {
-            isCustom: true,
             type: Set,
           },
         }
@@ -329,7 +326,7 @@ describe('Mapper', () => {
 
       it('SS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, isCustom: true },
+          typeInfo: { type: Array },
         }
         const attrValue = { SS: ['foo', 'bar'] }
         const arr = fromDbOne<string[]>(attrValue, <any>propertyMetadata)
@@ -349,7 +346,7 @@ describe('Mapper', () => {
 
       it('NS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, isCustom: true },
+          typeInfo: { type: Array },
         }
         const attrValue = { NS: ['45', '2'] }
         const arr = fromDbOne<number[]>(attrValue, <any>propertyMetadata)
@@ -371,7 +368,7 @@ describe('Mapper', () => {
 
       it('L -> set', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Set, isCustom: true },
+          typeInfo: { type: Set },
         }
         const attrValue = { L: [{ S: 'foo' }, { N: '45' }, { BOOL: true }] }
         const set = fromDbOne<Set<any>>(attrValue, <any>propertyMetadata)
