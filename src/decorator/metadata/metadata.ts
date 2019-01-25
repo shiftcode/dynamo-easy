@@ -35,13 +35,13 @@ export class Metadata<T> {
     if (!this.modelOptions.properties) {
       return
     }
-    if (typeof propertyKey === 'string' && NESTED_ATTR_PATH_REGEX.test(propertyKey)) {
+    if (typeof propertyKey === 'string' && NESTED_ATTR_PATH_REGEX.test(<string>propertyKey)) {
       let re: RegExpExecArray | null
       let currentMeta: ModelMetadata<T> = this.modelOptions
       let lastPropMeta: PropertyMetadata<any> | undefined
       let lastPathPart = ''
       // tslint:disable-next-line:no-conditional-assignment
-      while ((re = NESTED_ATTR_PATH_CAPTURED_REGEX.exec(propertyKey)) !== null) {
+      while ((re = NESTED_ATTR_PATH_CAPTURED_REGEX.exec(<string>propertyKey)) !== null) {
         lastPathPart = re[1]
         lastPropMeta = Metadata.findMetaDataForProperty(currentMeta, <any>lastPathPart)
         if (lastPropMeta && lastPropMeta.typeInfo) {
