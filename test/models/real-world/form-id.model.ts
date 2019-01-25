@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
 
-import { ListAttribute, MapperForType, StringAttribute } from '../../../src/dynamo-easy'
+import { MapperForType, StringAttribute } from '../../../src/dynamo-easy'
 import { FormType } from './form-type.enum'
 
 export class FormId {
@@ -87,34 +87,4 @@ export class FormId {
 export const formIdMapper: MapperForType<FormId, StringAttribute> = {
   fromDb: (attributeValue: StringAttribute) => FormId.parse(attributeValue.S),
   toDb: (propertyValue: FormId) => ({ S: FormId.unparse(propertyValue) }),
-}
-
-type AttributeStringOrListValue = StringAttribute | ListAttribute
-
-function formIdsFromDb(attributeValue: AttributeStringOrListValue): FormId[] | FormId {
-  if ('L' in attributeValue) {
-    return attributeValue.L.map(formIdDb => FormId.parse((<StringAttribute>formIdDb).S))
-  } else if ('S' in attributeValue) {
-    return FormId.parse(attributeValue.S)
-  } else {
-    throw new Error('there is no mapping defined to read attributeValue ' + JSON.stringify(attributeValue))
-  }
-}
-
-function formIdsToDb(propertyValue: FormId[] | FormId): AttributeStringOrListValue | null {
-  if (Array.isArray(propertyValue)) {
-    return { L: propertyValue.map(a => ({ S: FormId.unparse(a) })) }
-  } else {
-    return { S: FormId.unparse(propertyValue) }
-  }
-}
-
-export const FormIdsMapper: MapperForType<FormId[] | FormId, AttributeStringOrListValue> = {
-  fromDb: formIdsFromDb,
-  toDb: formIdsToDb,
-}
-
-export const formIdsMapper: MapperForType<FormId[], ListAttribute> = {
-  fromDb: attributeValue => attributeValue.L.map(formIdDb => FormId.parse((<StringAttribute>formIdDb).S)),
-  toDb: propertyValue => ({ L: propertyValue.map(a => ({ S: FormId.unparse(a) })) }),
 }

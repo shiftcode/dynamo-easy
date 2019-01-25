@@ -26,7 +26,7 @@ import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './i
 import { metadataForProperty } from './metadata'
 
 describe('Decorators should add correct metadata', () => {
-  describe('CustomMapper() should allow to define a different Mapper', () => {
+  describe('Property() should allow to define a different Mapper', () => {
     it('should define the mapper in metadata', () => {
       const metaData = metadataForModel(ModelWithCustomMapperModel)
 
@@ -100,7 +100,7 @@ describe('Decorators should add correct metadata', () => {
       expect(modelOptions.transientProperties!.length).toBe(1)
     })
 
-    describe('with correct property metdata', () => {
+    describe('with correct property metadata', () => {
       it('ids', () => {
         const prop = getMetaDataProperty(modelOptions, 'id')
         expect(prop).toBeDefined()
@@ -127,75 +127,76 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('active', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'active')
+        const prop = getMetaDataProperty(modelOptions, 'active')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('active')
-        expect(prop.nameDb).toBe('isActive')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(Boolean)
+        expect(prop!.name).toBe('active')
+        expect(prop!.nameDb).toBe('isActive')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Boolean)
       })
 
       it('set', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'set')
+        const prop = getMetaDataProperty(modelOptions, 'set')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('set')
-        expect(prop.nameDb).toBe('set')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(Set)
+
+        expect(prop!.name).toBe('set')
+        expect(prop!.nameDb).toBe('set')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Set)
       })
 
       it('sortedSet', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'sortedSet')
+        const prop = getMetaDataProperty(modelOptions, 'sortedSet')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('sortedSet')
-        expect(prop.nameDb).toBe('sortedSet')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.isSortedCollection).toBeTruthy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(Set)
+        expect(prop!.name).toBe('sortedSet')
+        expect(prop!.nameDb).toBe('sortedSet')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.isSortedCollection).toBeTruthy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Set)
       })
 
       it('sortedComplexSet', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'sortedComplexSet')
+        const prop = getMetaDataProperty(modelOptions, 'sortedComplexSet')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('sortedComplexSet')
-        expect(prop.nameDb).toBe('sortedComplexSet')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.isSortedCollection).toBeTruthy()
+        expect(prop!.name).toBe('sortedComplexSet')
+        expect(prop!.nameDb).toBe('sortedComplexSet')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.isSortedCollection).toBeTruthy()
 
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(Set)
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Set)
 
-        expect(prop.typeInfo.genericType).toBeDefined()
-        expect(prop.typeInfo.genericType).toBe(NestedObject)
+        expect(prop!.typeInfo!.genericType).toBeDefined()
+        expect(prop!.typeInfo!.genericType).toBe(NestedObject)
       })
 
       it('mapWithNoType', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'mapWithNoType')
+        const prop = getMetaDataProperty(modelOptions, 'mapWithNoType')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('mapWithNoType')
-        expect(prop.nameDb).toBe('mapWithNoType')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(Map)
+        expect(prop!.name).toBe('mapWithNoType')
+        expect(prop!.nameDb).toBe('mapWithNoType')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Map)
       })
 
       it('transientField', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'transientField')
+        const prop = getMetaDataProperty(modelOptions, 'transientField')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('transientField')
-        expect(prop.nameDb).toBe('transientField')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeTruthy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(String)
+        expect(prop!.name).toBe('transientField')
+        expect(prop!.nameDb).toBe('transientField')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeTruthy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(String)
       })
 
       it('simpleProperty', () => {
@@ -204,14 +205,14 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('nestedObject', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'nestedObj')
+        const prop = getMetaDataProperty(modelOptions, 'nestedObj')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('nestedObj')
-        expect(prop.nameDb).toBe('nestedObj')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.type).toBe(NestedObject)
+        expect(prop!.name).toBe('nestedObj')
+        expect(prop!.nameDb).toBe('my_nested_object')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(NestedObject)
       })
     })
   })

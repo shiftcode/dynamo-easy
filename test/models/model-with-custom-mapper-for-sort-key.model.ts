@@ -1,5 +1,5 @@
 // tslint:disable:max-classes-per-file
-import { CustomMapper, MapperForType, Model, NumberAttribute, PartitionKey, SortKey } from '../../src/dynamo-easy'
+import { MapperForType, Model, NumberAttribute, PartitionKey, Property, SortKey } from '../../src/dynamo-easy'
 
 export class CustomId {
   private static MULTIPLIER_E = 5
@@ -42,8 +42,8 @@ export class ModelWithCustomMapperForSortKeyModel {
   @PartitionKey()
   name: string
 
-  @CustomMapper(CustomIdMapper)
   @SortKey()
+  @Property({ mapper: CustomIdMapper })
   customId: CustomId
 
   constructor(name: string, id: CustomId) {

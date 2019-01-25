@@ -1,3 +1,7 @@
+import {
+  NESTED_ATTR_PATH_CAPTURED_REGEX,
+  NESTED_ATTR_PATH_REGEX,
+} from '../../dynamo/expression/functions/attribute-names.function'
 import { ModelConstructor } from '../../model/model-constructor'
 import { Omit } from '../../model/omit.type'
 import { SecondaryIndex } from '../impl/index/secondary-index'
@@ -17,20 +21,41 @@ export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSo
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata<T>
 
+  private static findMetaDataForProperty<M>(modelOpts: ModelMetadata<M>, propertyName: keyof M): PropertyMetadata<M> | undefined {
+    return modelOpts.properties && modelOpts.properties.find(
+      property => property.name === propertyName || property.nameDb === propertyName,
+    ) || undefined
+  }
+
   constructor(modelConstructor: ModelConstructor<T>) {
     this.modelOptions = Reflect.getMetadata(KEY_MODEL, modelConstructor)
   }
 
   forProperty(propertyKey: keyof T | string): PropertyMetadata<T> | undefined {
-    let options: PropertyMetadata<T> | undefined
-
-    if (this.modelOptions.properties) {
-      options = this.modelOptions.properties.find(
-        property => property.name === propertyKey || property.nameDb === propertyKey,
-      )
+    if (!this.modelOptions.properties) {
+      return
     }
-
-    return options
+    if (typeof propertyKey === 'string' && NESTED_ATTR_PATH_REGEX.test(<string>propertyKey)) {
+      const regex = new RegExp(NESTED_ATTR_PATH_CAPTURED_REGEX)
+      let re: RegExpExecArray | null
+      let currentMeta: ModelMetadata<T> = this.modelOptions
+      let lastPropMeta: PropertyMetadata<any> | undefined
+      let lastPathPart = ''
+      // tslint:disable-next-line:no-conditional-assignment
+      while ((re = regex.exec(<string>propertyKey)) !== null) {
+        lastPathPart = re[1]
+        lastPropMeta = Metadata.findMetaDataForProperty(currentMeta, <any>lastPathPart)
+        if (lastPropMeta && lastPropMeta.typeInfo) {
+          currentMeta = new Metadata(lastPropMeta.typeInfo.genericType || lastPropMeta.typeInfo.type).modelOptions
+        } else { break }
+      }
+      if (lastPropMeta && (lastPathPart === lastPropMeta.name || lastPathPart === lastPropMeta.nameDb)) {
+        return lastPropMeta
+      }
+    } else {
+      return Metadata.findMetaDataForProperty(this.modelOptions, <keyof T>propertyKey)
+    }
+    return
   }
 
   /**

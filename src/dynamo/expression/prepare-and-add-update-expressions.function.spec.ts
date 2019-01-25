@@ -1,13 +1,14 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Address, UpdateModel } from '../../../test/models/index'
+import { BrutalistModel } from '../../../test/models/brutalist.model'
+import { Address, ComplexModel, UpdateModel } from '../../../test/models/index'
 import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world/index'
 import { Metadata, metadataForClass } from '../../decorator/metadata/index'
 import { createKeyAttributes } from '../../mapper'
-import { and, not, update2 } from './logical-operator/index'
+import { getTableName } from '../get-table-name.function'
 import { attribute } from './logical-operator/attribute.function'
+import { and, not, update2 } from './logical-operator/index'
 import { update } from './logical-operator/update.function'
 import { addExpression } from './param-util'
-import { getTableName } from '../get-table-name.function'
 import { prepareAndAddUpdateExpressions } from './prepare-and-add-update-expressions.function'
 
 describe('PrepareExpressions function', () => {
@@ -377,6 +378,101 @@ describe('PrepareExpressions function', () => {
           ':topics_2': { S: 'otherTopic' },
         })
         expect(params.ConditionExpression).toBe('(NOT contains (#topics, :topics_2))')
+      })
+    })
+
+    describe('expressions for nested properties', () => {
+      let metadata: Metadata<ComplexModel>
+      let params: DynamoDB.UpdateItemInput | DynamoDB.Update
+
+      beforeEach(() => {
+        metadata = metadataForClass(ComplexModel)
+        params = {
+          TableName: getTableName(metadata),
+          Key: createKeyAttributes(metadata, 'myId', new Date()),
+        }
+      })
+
+      it('list', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('sortedComplexSet[1]').set({ id: 'ok' })])
+
+        expect(params.UpdateExpression).toBe('SET #sortedComplexSet[1] = :sortedComplexSet_at_1')
+        expect(params.ExpressionAttributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet' })
+        expect(params.ExpressionAttributeValues).toEqual({ ':sortedComplexSet_at_1': { M: { id: { S: 'ok' } } } })
+      })
+      it('list nested prop', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('sortedComplexSet[0].id').set('ok')])
+
+        expect(params.UpdateExpression).toBe('SET #sortedComplexSet[0].#id = :sortedComplexSet_at_0__id')
+        expect(params.ExpressionAttributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet', '#id': 'id' })
+        expect(params.ExpressionAttributeValues).toEqual({ ':sortedComplexSet_at_0__id': { S: 'ok' } })
+      })
+
+      it('map', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('nestedObj.id').set('ok')])
+        expect(params.UpdateExpression).toBe('SET #nestedObj.#id = :nestedObj__id')
+        expect(params.ExpressionAttributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#id': 'id' })
+        expect(params.ExpressionAttributeValues).toEqual({ ':nestedObj__id': { S: 'ok' } })
+      })
+
+      it('remove attribute in nested object', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('nestedObj.date').remove()])
+        expect(params.UpdateExpression).toBe('REMOVE #nestedObj.#date')
+        expect(params.ExpressionAttributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#date': 'my_date' })
+      })
+    })
+  })
+
+  describe('with brutalist model', () => {
+    let metadata: Metadata<BrutalistModel>
+    let params: DynamoDB.UpdateItemInput | DynamoDB.Update
+    let aFormId: FormId
+    let aDate: Date
+
+    beforeEach(() => {
+      metadata = metadataForClass(BrutalistModel)
+      aFormId = new FormId(FormType.REQUEST, 99, 2000)
+      aDate = new Date()
+      params = {
+        TableName: getTableName(metadata),
+        Key: createKeyAttributes(metadata, aFormId),
+      }
+    })
+
+    it('set date in a nested list in nested list', () => {
+      prepareAndAddUpdateExpressions(metadata, params, [
+        update('level1Prop[1].level2Prop[2].level3Prop[3].level4Date').set(aDate),
+      ])
+
+      expect(params.UpdateExpression).toBe(
+        'SET #level1Prop[1].#level2Prop[2].#level3Prop[3].#level4Date = :level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Date',
+      )
+      expect(params.ExpressionAttributeNames).toEqual({
+        '#level1Prop': 'level1_list',
+        '#level2Prop': 'level2_list',
+        '#level3Prop': 'level3_list',
+        '#level4Date': 'level4_date',
+      })
+      expect(params.ExpressionAttributeValues).toEqual({
+        ':level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Date': { S: aDate.toISOString() },
+      })
+    })
+
+    it('add to a set in nested list in a nested list', () => {
+      prepareAndAddUpdateExpressions(metadata, params, [
+        update('level1Prop[1].level2Prop[2].level3Prop[3].level4Set').add([aFormId]),
+      ])
+      expect(params.UpdateExpression).toBe(
+        'ADD #level1Prop[1].#level2Prop[2].#level3Prop[3].#level4Set :level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Set',
+      )
+      expect(params.ExpressionAttributeNames).toEqual({
+        '#level1Prop': 'level1_list',
+        '#level2Prop': 'level2_list',
+        '#level3Prop': 'level3_list',
+        '#level4Set': 'level4_set',
+      })
+      expect(params.ExpressionAttributeValues).toEqual({
+        ':level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Set': { SS: [FormId.unparse(aFormId)] },
       })
     })
   })

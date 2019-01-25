@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-non-null-assertion
 
-import { CustomMapper, MapperForType, Model, PartitionKey, StringAttribute } from '../../src/dynamo-easy'
+import { MapperForType, Model, PartitionKey, Property, StringAttribute } from '../../src/dynamo-easy'
 
 export class Id {
   counter: number
@@ -33,7 +33,7 @@ export const IdMapper: MapperForType<Id, StringAttribute> = {
 
 @Model()
 export class ModelWithCustomMapperModel {
-  @CustomMapper(IdMapper)
+  @Property({ mapper: IdMapper })
   @PartitionKey()
   id: Id
 }
