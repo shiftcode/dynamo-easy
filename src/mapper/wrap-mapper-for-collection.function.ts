@@ -75,7 +75,7 @@ export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribu
 function spreadSetAndApplyToFn<T, R>(fn: (values: T[]) => R) {
   return (values: Set<T>) => {
     if (!isSet(values)) {
-      throw new Error(`provided argument (${JSON.stringify(values)}) is not a Set or an Array`)
+      throw new Error(`provided argument (${JSON.stringify(values)}) is neither a Set nor an Array`)
     }
     return fn([...values])
   }

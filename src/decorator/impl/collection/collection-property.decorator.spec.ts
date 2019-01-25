@@ -58,7 +58,7 @@ describe('@CollectionProperty', () => {
     expect(meta!.typeInfo!.genericType).toBe(FormId)
   })
 
-  it('thows when not on an array or set', () => {
+  it('throws when not on an array or set', () => {
     expect(() => {
       @Model()
       class Test {
@@ -70,7 +70,7 @@ describe('@CollectionProperty', () => {
     }).toThrow()
   })
 
-  it('thows when not both itemMapper and itemType are set', () => {
+  it('throws when not both itemMapper and itemType are set', () => {
     expect(() => {
       @Model()
       class Test {
