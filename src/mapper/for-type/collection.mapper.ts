@@ -31,21 +31,21 @@ function collectionFromDb(
   // if [L]ist
   if ('L' in attributeValue) {
     if (hasGenericType(propertyMetadata)) {
-      arr = (<ListAttribute>attributeValue).L.map(item => fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType))
+      arr = attributeValue.L.map(item => fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType))
     } else {
       // tslint:disable-next-line:no-unnecessary-callback-wrapper
-      arr = (<ListAttribute>attributeValue).L.map(v => fromDbOne(v))
+      arr = attributeValue.L.map(v => fromDbOne(v))
     }
     return explicitType && explicitType === Set ? new Set(arr) : arr
   }
 
   // if [(N|S|B)S]et
   if ('SS' in attributeValue) {
-    arr = (<StringSetAttribute>attributeValue).SS
+    arr = attributeValue.SS
   } else if ('NS' in attributeValue) {
-    arr = (<NumberSetAttribute>attributeValue).NS.map(parseFloat)
+    arr = attributeValue.NS.map(parseFloat)
   } else if ('BS' in attributeValue) {
-    arr = (<BinarySetAttribute>attributeValue).BS
+    arr = attributeValue.BS
   } else {
     throw new Error('No Collection Data (SS | NS | BS | L) was found in attribute data')
   }

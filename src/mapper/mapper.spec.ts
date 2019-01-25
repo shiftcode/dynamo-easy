@@ -800,7 +800,6 @@ describe('Mapper', () => {
         }
 
         const toDbValue = toDb(model, ModelWithEmptyValues)
-        console.log(toDbValue)
 
         // expect(Object.keys(toDbValue).length).toBe(4)
 
