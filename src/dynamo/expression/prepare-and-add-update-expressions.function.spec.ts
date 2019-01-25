@@ -1,13 +1,13 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Address, UpdateModel } from '../../../test/models/index'
+import { Address, ComplexModel, UpdateModel } from '../../../test/models/index'
 import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world/index'
 import { Metadata, metadataForClass } from '../../decorator/metadata/index'
 import { createKeyAttributes } from '../../mapper'
-import { and, not, update2 } from './logical-operator/index'
+import { getTableName } from '../get-table-name.function'
 import { attribute } from './logical-operator/attribute.function'
+import { and, not, update2 } from './logical-operator/index'
 import { update } from './logical-operator/update.function'
 import { addExpression } from './param-util'
-import { getTableName } from '../get-table-name.function'
 import { prepareAndAddUpdateExpressions } from './prepare-and-add-update-expressions.function'
 
 describe('PrepareExpressions function', () => {
@@ -377,6 +377,42 @@ describe('PrepareExpressions function', () => {
           ':topics_2': { S: 'otherTopic' },
         })
         expect(params.ConditionExpression).toBe('(NOT contains (#topics, :topics_2))')
+      })
+    })
+
+    describe('expressions for nested properties', () => {
+      let metadata: Metadata<ComplexModel>
+      let params: DynamoDB.UpdateItemInput | DynamoDB.Update
+
+      beforeEach(() => {
+        metadata = metadataForClass(ComplexModel)
+        params = {
+          TableName: getTableName(metadata),
+          Key: createKeyAttributes(metadata, 'myId', new Date()),
+        }
+      })
+
+      it('list', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('sortedComplexSet[1]').set({ id: 'ok' })])
+
+        expect(params.UpdateExpression).toBe('SET #sortedComplexSet[1] = :sortedComplexSet_at_1')
+        expect(params.ExpressionAttributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet' })
+        expect(params.ExpressionAttributeValues).toEqual({ ':sortedComplexSet_at_1': { M: { id: { S: 'ok' } } } })
+      })
+      it('list nested prop', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('sortedComplexSet[0].id').set('ok')])
+
+        expect(params.UpdateExpression).toBe('SET #sortedComplexSet[0].#id = :sortedComplexSet_at_0__id')
+        expect(params.ExpressionAttributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet', '#id': 'id' })
+        expect(params.ExpressionAttributeValues).toEqual({ ':sortedComplexSet_at_0__id': { S: 'ok' } })
+      })
+
+      it('map', () => {
+        const updtFn = update('nestedObj.id').set('ok')
+        prepareAndAddUpdateExpressions(metadata, params, [updtFn])
+        expect(params.UpdateExpression).toBe('SET #nestedObj.#id = :nestedObj__id')
+        expect(params.ExpressionAttributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#id': 'id' })
+        expect(params.ExpressionAttributeValues).toEqual({ ':nestedObj__id': { S: 'ok' } })
       })
     })
   })

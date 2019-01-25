@@ -119,7 +119,7 @@ export function buildFilterExpression(
    * person.list[0].age -> #person: person, #attr: attr, #age: age
    * person.age
    */
-  const resolvedAttributeNames = resolveAttributeNames(attributePath, propertyMetadata)
+  const resolvedAttributeNames = resolveAttributeNames(attributePath, metadata)
   const valuePlaceholder = uniqueAttributeValueName(attributePath, existingValueNames)
 
   /*
@@ -247,10 +247,7 @@ function buildDefaultConditionExpression(
   if (hasValue) {
     let attribute: Attribute | null
     if (operator === 'contains' || operator === 'not_contains') {
-      attribute = toDbOne(values[0], propertyMetadata
-        ? alterCollectionPropertyMetadataForSingleItem(propertyMetadata)
-        : undefined,
-      )
+      attribute = toDbOne(values[0], alterCollectionPropertyMetadataForSingleItem(propertyMetadata))
       validateAttributeType(`${operator} condition`, attribute, 'N', 'S', 'B')
     } else {
       attribute = toDbOne(values[0], propertyMetadata)

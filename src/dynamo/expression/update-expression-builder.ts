@@ -1,4 +1,4 @@
-import { Metadata, PropertyMetadata } from '../../decorator/metadata'
+import { alterCollectionPropertyMetadataForSingleItem, Metadata, PropertyMetadata } from '../../decorator/metadata'
 import { Attribute, Attributes, AttributeType, isSet, toDbOne } from '../../mapper'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
@@ -42,7 +42,7 @@ export function buildUpdateExpression(
    * person.list[0].age -> #person: person, #attr: attr, #age: age
    * person.age
    */
-  const resolvedAttributeNames = resolveAttributeNames(attributePath, propertyMetadata)
+  const resolvedAttributeNames = resolveAttributeNames(attributePath, metadata)
   const valuePlaceholder = uniqueAttributeValueName(attributePath, existingValueNames)
 
   /*
@@ -79,11 +79,18 @@ function buildDefaultExpression(
     // so it's necessary to make sure appendToList receives Arrays, add & removeFromSet receive Sets
     if (['removeFromSet', 'add'].includes(operator.action) && Array.isArray(values[0])) {
       values[0] = new Set(values[0])
-    } else if( ['appendToList'].includes(operator.action) && isSet(values[0])) {
+    } else if (['appendToList'].includes(operator.action) && isSet(values[0])) {
       values[0] = [...values[0]]
     }
 
-    attribute = toDbOne(values[0], propertyMetadata)
+    // special case: [same as in buildDefaultConditionExpression]
+    // we have the metadata for an Array/Set of an Object,
+    // but only get a single item when using `attribute('myCollectionProp[0]').set({})`
+    if (operator.action === 'set' && /\[\d+\]$/.test(attributePath)) {
+      attribute = toDbOne(values[0], alterCollectionPropertyMetadataForSingleItem(propertyMetadata))
+    } else {
+      attribute = toDbOne(values[0], propertyMetadata)
+    }
     if (attribute) {
       attributeValues[valuePlaceholder] = attribute
     }

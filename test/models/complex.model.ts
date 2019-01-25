@@ -38,6 +38,6 @@ export class ComplexModel {
   @Transient()
   transientField: string
 
-  @Property()
+  @Property({ name: 'my_nested_object' })
   nestedObj: NestedObject
 }

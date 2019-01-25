@@ -215,7 +215,7 @@ describe('Decorators should add correct metadata', () => {
         const prop: any = getMetaDataProperty(modelOptions, 'nestedObj')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('nestedObj')
-        expect(prop.nameDb).toBe('nestedObj')
+        expect(prop.nameDb).toBe('my_nested_object')
         expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
