@@ -100,7 +100,7 @@ describe('Decorators should add correct metadata', () => {
       expect(modelOptions.transientProperties!.length).toBe(1)
     })
 
-    describe('with correct property metdata', () => {
+    describe('with correct property metadata', () => {
       it('ids', () => {
         const prop = getMetaDataProperty(modelOptions, 'id')
         expect(prop).toBeDefined()
@@ -129,7 +129,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('active', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'active')
+        const prop = getMetaDataProperty(modelOptions, 'active')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('active')
         expect(prop.nameDb).toBe('isActive')
@@ -141,7 +141,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('set', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'set')
+        const prop = getMetaDataProperty(modelOptions, 'set')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('set')
         expect(prop.nameDb).toBe('set')
@@ -153,7 +153,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('sortedSet', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'sortedSet')
+        const prop = getMetaDataProperty(modelOptions, 'sortedSet')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('sortedSet')
         expect(prop.nameDb).toBe('sortedSet')
@@ -166,7 +166,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('sortedComplexSet', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'sortedComplexSet')
+        const prop = getMetaDataProperty(modelOptions, 'sortedComplexSet')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('sortedComplexSet')
         expect(prop.nameDb).toBe('sortedComplexSet')
@@ -183,7 +183,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('mapWithNoType', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'mapWithNoType')
+        const prop = getMetaDataProperty(modelOptions, 'mapWithNoType')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('mapWithNoType')
         expect(prop.nameDb).toBe('mapWithNoType')
@@ -195,7 +195,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('transientField', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'transientField')
+        const prop = getMetaDataProperty(modelOptions, 'transientField')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('transientField')
         expect(prop.nameDb).toBe('transientField')
@@ -212,7 +212,7 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('nestedObject', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'nestedObj')
+        const prop = getMetaDataProperty(modelOptions, 'nestedObj')
         expect(prop).toBeDefined()
         expect(prop.name).toBe('nestedObj')
         expect(prop.nameDb).toBe('my_nested_object')
