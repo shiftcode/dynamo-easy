@@ -29,7 +29,7 @@ export class FormId {
 
   type: FormType
   // if there are multiple forms for one formType the formId must have an additional postfix to be unique
-  postfix: string | undefined | null
+  postfix: string | null
   counter: number
   year: number
 
@@ -76,7 +76,7 @@ export class FormId {
     )
   }
 
-  constructor(type: FormType, counter: number, year: number, postfix?: string | null) {
+  constructor(type: FormType, counter: number, year: number, postfix: string | null = null) {
     this.type = type
     this.postfix = postfix
     this.year = year
@@ -84,7 +84,7 @@ export class FormId {
   }
 }
 
-export const FormIdMapper: MapperForType<FormId, StringAttribute> = {
+export const formIdMapper: MapperForType<FormId, StringAttribute> = {
   fromDb: (attributeValue: StringAttribute) => FormId.parse(attributeValue.S),
   toDb: (propertyValue: FormId) => ({ S: FormId.unparse(propertyValue) }),
 }
@@ -112,4 +112,9 @@ function formIdsToDb(propertyValue: FormId[] | FormId): AttributeStringOrListVal
 export const FormIdsMapper: MapperForType<FormId[] | FormId, AttributeStringOrListValue> = {
   fromDb: formIdsFromDb,
   toDb: formIdsToDb,
+}
+
+export const formIdsMapper: MapperForType<FormId[], ListAttribute> = {
+  fromDb: attributeValue => attributeValue.L.map(formIdDb => FormId.parse((<StringAttribute>formIdDb).S)),
+  toDb: propertyValue => ({ L: propertyValue.map(a => ({ S: FormId.unparse(a) })) }),
 }

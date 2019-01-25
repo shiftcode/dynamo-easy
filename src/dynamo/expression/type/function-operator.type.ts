@@ -4,5 +4,6 @@ export type FunctionOperator =
   | 'attribute_type'
   | 'begins_with'
   | 'contains'
+  | 'not_contains'
   | 'IN'
   | 'BETWEEN'

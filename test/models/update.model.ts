@@ -1,4 +1,5 @@
-import { DateProperty, Model, PartitionKey, Property, SortedSet } from '../../src/dynamo-easy'
+import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
+import { DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 
 // tslint:disable-next-line:max-classes-per-file
 @Model()
@@ -36,12 +37,12 @@ export class UpdateModel {
   // maps to L(ist)
   addresses: Address[]
 
-  @SortedSet()
+  @CollectionProperty({ sorted: true })
   numberValues: number[]
 
   // maps to M(ap)
   info: Info
 
   // maps to S(tring)S(et)
-  topics: string[]
+  topics: Set<string>
 }

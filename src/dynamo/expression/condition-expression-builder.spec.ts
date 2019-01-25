@@ -1,6 +1,9 @@
+// tslint:disable:max-classes-per-file
 import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
+import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
 import { Model, PartitionKey, Property } from '../../decorator/impl'
+import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'
 import { metadataForClass } from '../../decorator/metadata'
 import { typeOf } from '../../mapper'
 import {
@@ -206,18 +209,39 @@ describe('expressions', () => {
       expect(condition.attributeValues[':textProp']).toEqual({ S: 'te' })
     })
 
-    it('contains', () => {
-      // property('myCollection').contains(2)
-      const condition = buildFilterExpression('myCollection', 'contains', [2], undefined, undefined)
-      expect(condition.statement).toBe('contains (#myCollection, :myCollection)')
+    describe('contains', () => {
+      it('string subsequence', () => {
+        const condition = buildFilterExpression('id', 'contains', ['substr'], undefined, metadataForClass(Form))
+        expect(condition.statement).toBe('contains (#id, :id)')
+        expect(condition.attributeNames).toEqual({ '#id': 'id' })
+        expect(condition.attributeValues).toEqual({ ':id': { S: 'substr' } })
+      })
 
-      expect(condition.attributeNames).toBeDefined()
-      expect(Object.keys(condition.attributeNames)[0]).toBe('#myCollection')
-      expect(condition.attributeNames['#myCollection']).toBe('myCollection')
+      it('value in set', () => {
+        const condition = buildFilterExpression('types', 'contains', [2], undefined, metadataForClass(Form))
+        expect(condition.statement).toBe('contains (#types, :types)')
+        expect(condition.attributeNames).toEqual({ '#types': 'types' })
+        expect(condition.attributeValues).toEqual({ ':types': { N: '2' } })
+      })
 
-      expect(condition.attributeValues).toBeDefined()
-      expect(Object.keys(condition.attributeValues)[0]).toBe(':myCollection')
-      expect(condition.attributeValues[':myCollection']).toEqual({ N: '2' })
+      it('value in set with custom mapper', () => {
+        @Model()
+        class MyModelWithCustomMappedSet {
+          @CollectionProperty({ itemMapper: formIdMapper })
+          formIds: Set<FormId>
+        }
+
+        const condition = buildFilterExpression(
+          'formIds',
+          'contains',
+          [new FormId(FormType.REQUEST, 1, 2019)],
+          undefined,
+          metadataForClass(MyModelWithCustomMappedSet),
+        )
+        expect(condition.statement).toBe('contains (#formIds, :formIds)')
+        expect(condition.attributeNames).toEqual({ '#formIds': 'formIds' })
+        expect(condition.attributeValues).toEqual({ ':formIds': { S: 'AF00012019' } })
+      })
     })
 
     it('in', () => {

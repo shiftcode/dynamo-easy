@@ -19,7 +19,8 @@ import {
   SimpleModel,
 } from '../../test/models'
 import { Form } from '../../test/models/real-world'
-import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortedSet, SortKey, Transient } from './impl'
+import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortKey, Transient } from './impl'
+import { CollectionProperty } from './impl/collection/collection-property.decorator'
 import { Model } from './impl/model/model.decorator'
 import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
 import { metadataForProperty } from './metadata'
@@ -110,7 +111,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key!.uuid).toBeFalsy()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeFalsy()
         expect(prop!.typeInfo!.type).toBe(String)
       })
 
@@ -124,7 +124,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key!.uuid).toBeFalsy()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
       })
 
       it('active', () => {
@@ -135,7 +134,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeFalsy()
         expect(prop.typeInfo.type).toBe(Boolean)
       })
 
@@ -147,7 +145,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(Set)
       })
 
@@ -160,7 +157,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.transient).toBeFalsy()
         expect(prop.isSortedCollection).toBeTruthy()
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(Set)
       })
 
@@ -174,7 +170,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.isSortedCollection).toBeTruthy()
 
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(Set)
 
         expect(prop.typeInfo.genericType).toBeDefined()
@@ -189,7 +184,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(Map)
       })
 
@@ -201,7 +195,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeTruthy()
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeFalsy()
         expect(prop.typeInfo.type).toBe(String)
       })
 
@@ -218,7 +211,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop.key).toBeUndefined()
         expect(prop.transient).toBeFalsy()
         expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
         expect(prop.typeInfo.type).toBe(NestedObject)
       })
     })
@@ -327,11 +319,11 @@ describe('Decorators should add correct metadata', () => {
     it('should add enum type to property', () => {
       const enumPropertyMetadata = metadata.forProperty('type')!
       expect(enumPropertyMetadata.typeInfo).toBeDefined()
-      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number, isCustom: false })
+      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number })
 
       const strEnumPropertyMetadata = metadata.forProperty('strType')!
       expect(strEnumPropertyMetadata.typeInfo).toBeDefined()
-      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String, isCustom: false })
+      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String })
     })
   })
 
@@ -370,7 +362,7 @@ describe('Decorators should add correct metadata', () => {
 
       @Model()
       class B extends A {
-        @SortedSet()
+        @CollectionProperty({ sorted: true })
         myOwnProp: string[]
       }
 

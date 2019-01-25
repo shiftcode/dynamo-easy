@@ -1,22 +1,23 @@
 // tslint:disable:max-classes-per-file
 
+import { CollectionProperty } from '../../../src/decorator/impl/collection/collection-property.decorator'
 import {
-  CustomMapper,
   DateProperty,
   GSIPartitionKey,
   GSISortKey,
   Model,
   PartitionKey,
+  Property,
   Transient,
 } from '../../../src/dynamo-easy'
-import { FormId, FormIdsMapper } from './form-id.model'
+import { FormId, formIdMapper } from './form-id.model'
 import { FormType } from './form-type.enum'
-import { OrderId, OrderIdMapper } from './order-id.model'
+import { OrderId, orderIdMapper } from './order-id.model'
 
 @Model()
 export class BaseOrder {
   @PartitionKey()
-  @CustomMapper(OrderIdMapper)
+  @Property({ mapper: orderIdMapper })
   id: OrderId
 
   @GSIPartitionKey('order_product_id_creation_date')
@@ -26,7 +27,7 @@ export class BaseOrder {
   @DateProperty()
   creationDate: Date
 
-  @CustomMapper(FormIdsMapper)
+  @CollectionProperty({ sorted: true, itemMapper: formIdMapper }) // mapped to list, since sorted
   formIds: FormId[]
 
   // internal use for UI only, should not be persisted

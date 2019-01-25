@@ -1,6 +1,9 @@
 import { curry, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
+import {
+  alterCollectionPropertyMetadataForSingleItem,
+  PropertyMetadata,
+} from '../../decorator/metadata/property-metadata.model'
 import { toDbOne, typeOf } from '../../mapper'
 import { Attribute, Attributes } from '../../mapper/type/attribute.type'
 import { resolveAttributeNames } from './functions/attribute-names.function'
@@ -242,18 +245,26 @@ function buildDefaultConditionExpression(
 
   const attributeValues: Attributes<any> = {}
   if (hasValue) {
-    const attribute: Attribute | null = toDbOne(values[0], propertyMetadata)
-    switch (operator) {
-      case 'begins_with':
-        validateAttributeType(`${operator} condition`, attribute, 'S', 'B')
-        break
-      case 'contains':
-      case '<':
-      case '<=':
-      case '>':
-      case '>=':
-        validateAttributeType(`${operator} condition`, attribute, 'N', 'S', 'B')
-        break
+    let attribute: Attribute | null
+    if (operator === 'contains' || operator === 'not_contains') {
+      attribute = toDbOne(values[0], propertyMetadata
+        ? alterCollectionPropertyMetadataForSingleItem(propertyMetadata)
+        : undefined,
+      )
+      validateAttributeType(`${operator} condition`, attribute, 'N', 'S', 'B')
+    } else {
+      attribute = toDbOne(values[0], propertyMetadata)
+      switch (operator) {
+        case 'begins_with':
+          validateAttributeType(`${operator} condition`, attribute, 'S', 'B')
+          break
+        case '<':
+        case '<=':
+        case '>':
+        case '>=':
+          validateAttributeType(`${operator} condition`, attribute, 'N', 'S', 'B')
+          break
+      }
     }
 
     if (attribute) {

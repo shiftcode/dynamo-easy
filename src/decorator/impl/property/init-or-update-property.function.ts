@@ -1,4 +1,3 @@
-import { AttributeValueType } from '../../../mapper/type/attribute-value-type.type'
 import { Attribute } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
@@ -35,12 +34,7 @@ function createNewProperty(
   propertyKey: string,
 ): PropertyMetadata<any> {
   const propertyType: ModelConstructor<any> = getMetadataType(target, propertyKey)
-  const isCustom = isCustomType(propertyType)
-
-  const typeInfo: TypeInfo = {
-    type: propertyType,
-    isCustom,
-  }
+  const typeInfo: TypeInfo = { type: propertyType}
 
   propertyOptions = {
     name: propertyKey,
@@ -50,12 +44,4 @@ function createNewProperty(
   }
 
   return <PropertyMetadata<any>>propertyOptions
-}
-
-/**
- * TODO LOW:BINARY make sure to implement the context dependant details of Binary (Buffer vs. Uint8Array)
- * @returns {boolean} true if the type cannot be mapped by dynamo document client
- */
-function isCustomType(type: AttributeValueType): boolean {
-  return <any>type !== String && <any>type !== Number && <any>type !== Boolean && <any>type !== Uint8Array
 }

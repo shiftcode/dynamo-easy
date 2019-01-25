@@ -34,20 +34,6 @@ const BUFFER_TYPES = [
  */
 export function detectCollectionTypeFromValue(collection: any[] | Set<any>): AttributeCollectionType {
   if (Array.isArray(collection)) {
-    if (collection.length) {
-      if (collection.every(isString)) {
-        return 'SS'
-      }
-
-      if (collection.every(isNumber)) {
-        return 'NS'
-      }
-
-      if (collection.every(isBinary)) {
-        return 'BS'
-      }
-    }
-
     return 'L'
   } else if (isSet(collection)) {
     if (collection.size) {
@@ -61,21 +47,21 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
           case 'B':
             return 'BS'
           default:
-            return 'L'
+            throw new Error(`"Set<CustomType>" without decorator is not supported. Add the @CollectionProperty() decorator (optionally with {itemType:CustomType}) for a Set<->[L]ist mapping)`)
         }
       } else {
         // sets can not contain items with different types (heterogeneous)
-        return 'L'
+        throw new Error(`"Set with values of different types without decorator is not supported. Use an array instead.`)
       }
     } else {
       /*
-       * an empty Set will not be persisted so we just return a random Set type, it is only important that it is one of
+       * an empty Set will not be persisted so we just return an arbitrary Set type, it is only important that it is one of
        * S(et)
        */
       return 'SS'
     }
   } else {
-    throw new Error('given collection was no array or Set -> type could not be detected')
+    throw new Error('given collection was neither array nor Set -> type could not be detected')
   }
 }
 

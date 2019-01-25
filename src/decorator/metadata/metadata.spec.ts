@@ -33,7 +33,6 @@ describe('metadata', () => {
     expect(forId!.key).toBeDefined()
     expect(forId!.name).toBe('id')
     expect(forId!.typeInfo).toBeDefined()
-    expect(forId!.typeInfo!.isCustom).toBeFalsy()
   })
 
   it('getKeysWithUUID', () => {

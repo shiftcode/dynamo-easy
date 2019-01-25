@@ -1,10 +1,11 @@
+import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
 // tslint:disable:max-classes-per-file
-import { Model, Property, SortedSet, TypedArray } from '../../src/dynamo-easy'
+import { Model, Property } from '../../src/dynamo-easy'
 import { NestedComplexModel } from './nested-complex.model'
 
 @Model()
 export class ProductNested {
-  @SortedSet()
+  @CollectionProperty({ sorted: true })
   collection: Set<string>
 
   counter = 0
@@ -22,7 +23,7 @@ export class Product {
   @Property()
   nestedValue: NestedComplexModel
 
-  @TypedArray(ProductNested)
+  @CollectionProperty({ itemType: ProductNested })
   list: ProductNested[]
 
   constructor() {
