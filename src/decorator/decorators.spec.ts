@@ -26,7 +26,7 @@ import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './i
 import { metadataForProperty } from './metadata'
 
 describe('Decorators should add correct metadata', () => {
-  describe('CustomMapper() should allow to define a different Mapper', () => {
+  describe('Property() should allow to define a different Mapper', () => {
     it('should define the mapper in metadata', () => {
       const metaData = metadataForModel(ModelWithCustomMapperModel)
 

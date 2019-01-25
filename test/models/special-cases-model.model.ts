@@ -1,4 +1,4 @@
-import { CustomMapper, Model, PartitionKey } from '../../src/decorator/impl'
+import { Model, PartitionKey, Property } from '../../src/decorator/impl'
 import { charArrayMapper } from './char-array.mapper'
 import { Duration, durationMapper } from './duration.model'
 
@@ -7,9 +7,9 @@ export class SpecialCasesModel {
   @PartitionKey()
   id: string
 
-  @CustomMapper(charArrayMapper)
+  @Property({ mapper: charArrayMapper })
   myChars: string
 
-  @CustomMapper(durationMapper)
+  @Property({ mapper: durationMapper })
   duration: Duration
 }

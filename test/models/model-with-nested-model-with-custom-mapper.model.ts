@@ -1,10 +1,10 @@
 // tslint:disable:max-classes-per-file
-import { CustomMapper, Model, Property } from '../../src/dynamo-easy'
+import { Model, Property } from '../../src/dynamo-easy'
 import { Id, IdMapper } from './model-with-custom-mapper.model'
 
 @Model()
 export class NestedModelWithCustomMapper {
-  @CustomMapper(IdMapper)
+  @Property({ mapper: IdMapper })
   id: Id
 
   constructor() {
