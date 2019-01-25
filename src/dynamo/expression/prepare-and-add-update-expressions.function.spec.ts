@@ -408,11 +408,16 @@ describe('PrepareExpressions function', () => {
       })
 
       it('map', () => {
-        const updtFn = update('nestedObj.id').set('ok')
-        prepareAndAddUpdateExpressions(metadata, params, [updtFn])
+        prepareAndAddUpdateExpressions(metadata, params, [update('nestedObj.id').set('ok')])
         expect(params.UpdateExpression).toBe('SET #nestedObj.#id = :nestedObj__id')
         expect(params.ExpressionAttributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#id': 'id' })
         expect(params.ExpressionAttributeValues).toEqual({ ':nestedObj__id': { S: 'ok' } })
+      })
+
+      it('remove attribute in nested object', () => {
+        prepareAndAddUpdateExpressions(metadata, params, [update('nestedObj.date').remove()])
+        expect(params.UpdateExpression).toBe('REMOVE #nestedObj.#date')
+        expect(params.ExpressionAttributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#date': 'my_date' })
       })
     })
   })
