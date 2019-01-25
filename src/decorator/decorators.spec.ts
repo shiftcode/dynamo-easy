@@ -134,7 +134,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key).toBeUndefined()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeFalsy()
         expect(prop!.typeInfo!.type).toBe(Boolean)
       })
 
@@ -147,7 +146,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key).toBeUndefined()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
         expect(prop!.typeInfo!.type).toBe(Set)
       })
 
@@ -160,7 +158,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.transient).toBeFalsy()
         expect(prop!.isSortedCollection).toBeTruthy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
         expect(prop!.typeInfo!.type).toBe(Set)
       })
 
@@ -174,7 +171,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.isSortedCollection).toBeTruthy()
 
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
         expect(prop!.typeInfo!.type).toBe(Set)
 
         expect(prop!.typeInfo!.genericType).toBeDefined()
@@ -189,7 +185,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key).toBeUndefined()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
         expect(prop!.typeInfo!.type).toBe(Map)
       })
 
@@ -201,7 +196,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key).toBeUndefined()
         expect(prop!.transient).toBeTruthy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeFalsy()
         expect(prop!.typeInfo!.type).toBe(String)
       })
 
@@ -218,7 +212,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key).toBeUndefined()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
         expect(prop!.typeInfo!.type).toBe(NestedObject)
       })
     })
