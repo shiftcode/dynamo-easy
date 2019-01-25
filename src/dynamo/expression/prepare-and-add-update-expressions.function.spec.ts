@@ -1,4 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { BrutalistModel } from '../../../test/models/brutalist.model'
 import { Address, ComplexModel, UpdateModel } from '../../../test/models/index'
 import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world/index'
 import { Metadata, metadataForClass } from '../../decorator/metadata/index'
@@ -418,6 +419,60 @@ describe('PrepareExpressions function', () => {
         prepareAndAddUpdateExpressions(metadata, params, [update('nestedObj.date').remove()])
         expect(params.UpdateExpression).toBe('REMOVE #nestedObj.#date')
         expect(params.ExpressionAttributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#date': 'my_date' })
+      })
+    })
+  })
+
+  describe('with brutalist model', () => {
+    let metadata: Metadata<BrutalistModel>
+    let params: DynamoDB.UpdateItemInput | DynamoDB.Update
+    let aFormId: FormId
+    let aDate: Date
+
+    beforeEach(() => {
+      metadata = metadataForClass(BrutalistModel)
+      aFormId = new FormId(FormType.REQUEST, 99, 2000)
+      aDate = new Date()
+      params = {
+        TableName: getTableName(metadata),
+        Key: createKeyAttributes(metadata, aFormId),
+      }
+    })
+
+    it('set date in a nested list in nested list', () => {
+      prepareAndAddUpdateExpressions(metadata, params, [
+        update('level1Prop[1].level2Prop[2].level3Prop[3].level4Date').set(aDate),
+      ])
+
+      expect(params.UpdateExpression).toBe(
+        'SET #level1Prop[1].#level2Prop[2].#level3Prop[3].#level4Date = :level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Date',
+      )
+      expect(params.ExpressionAttributeNames).toEqual({
+        '#level1Prop': 'level1_list',
+        '#level2Prop': 'level2_list',
+        '#level3Prop': 'level3_list',
+        '#level4Date': 'level4_date',
+      })
+      expect(params.ExpressionAttributeValues).toEqual({
+        ':level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Date': { S: aDate.toISOString() },
+      })
+    })
+
+    it('add to a set in nested list in a nested list', () => {
+      prepareAndAddUpdateExpressions(metadata, params, [
+        update('level1Prop[1].level2Prop[2].level3Prop[3].level4Set').add([aFormId]),
+      ])
+      expect(params.UpdateExpression).toBe(
+        'ADD #level1Prop[1].#level2Prop[2].#level3Prop[3].#level4Set :level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Set',
+      )
+      expect(params.ExpressionAttributeNames).toEqual({
+        '#level1Prop': 'level1_list',
+        '#level2Prop': 'level2_list',
+        '#level3Prop': 'level3_list',
+        '#level4Set': 'level4_set',
+      })
+      expect(params.ExpressionAttributeValues).toEqual({
+        ':level1Prop_at_1__level2Prop_at_2__level3Prop_at_3__level4Set': { SS: [FormId.unparse(aFormId)] },
       })
     })
   })
