@@ -2,8 +2,7 @@
 import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
 import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
-import { Model, PartitionKey, Property } from '../../decorator/impl'
-import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'
+import { CollectionProperty, Model, PartitionKey, Property } from '../../decorator/impl'
 import { metadataForClass } from '../../decorator/metadata'
 import { typeOf } from '../../mapper'
 import {

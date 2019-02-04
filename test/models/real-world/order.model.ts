@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file
 
-import { CollectionProperty } from '../../../src/decorator/impl/collection/collection-property.decorator'
 import {
+  CollectionProperty,
   DateProperty,
   GSIPartitionKey,
   GSISortKey,

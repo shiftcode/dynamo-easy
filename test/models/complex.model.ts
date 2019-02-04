@@ -1,5 +1,12 @@
-import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
-import { DateProperty, Model, PartitionKey, Property, SortKey, Transient } from '../../src/dynamo-easy'
+import {
+  CollectionProperty,
+  DateProperty,
+  Model,
+  PartitionKey,
+  Property,
+  SortKey,
+  Transient,
+} from '../../src/dynamo-easy'
 import { NestedObject } from './nested-object.model'
 
 @Model({ tableName: 'complex_model' })

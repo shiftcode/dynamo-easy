@@ -1,7 +1,7 @@
 import { BinaryAttribute, MapperForType, NumberAttribute, StringAttribute } from '../../../mapper'
 import { ModelConstructor } from '../../../model'
 
-export interface CollectionPropertyDataBase<R, T extends StringAttribute | NumberAttribute | BinaryAttribute> {
+export interface CollectionPropertyData<R, T extends StringAttribute | NumberAttribute | BinaryAttribute> {
   /**
    * the name of property how it is named in dynamoDB
    */

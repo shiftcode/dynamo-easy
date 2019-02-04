@@ -1,5 +1,4 @@
-import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
-import { DateProperty, Model } from '../../src/dynamo-easy'
+import { CollectionProperty, DateProperty, Model } from '../../src/dynamo-easy'
 
 @Model()
 export class Employee {

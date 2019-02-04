@@ -1,5 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { QueryRequest, ReadManyRequest, ScanRequest } from '../dynamo/request'
+import { QueryRequest } from '../dynamo/request/query/query.request'
+import { ReadManyRequest } from '../dynamo/request/read-many.request'
+import { ScanRequest } from '../dynamo/request/scan/scan.request'
 
 /**
  * When we cant load all the items of a table with one request, we will fetch as long as there is more data

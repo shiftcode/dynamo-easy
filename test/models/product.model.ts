@@ -1,6 +1,5 @@
-import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
 // tslint:disable:max-classes-per-file
-import { Model, Property } from '../../src/dynamo-easy'
+import { CollectionProperty, Model, Property } from '../../src/dynamo-easy'
 import { NestedComplexModel } from './nested-complex.model'
 
 @Model()

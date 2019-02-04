@@ -9,11 +9,10 @@ import { ModelConstructor } from '../../../model'
 import { PropertyMetadata, TypeInfo } from '../../metadata'
 import { getMetadataType } from '../../util'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
-import { CollectionPropertyDataBase } from './collection-property-data.model'
+import { CollectionPropertyData } from './collection-property-data.model'
 
-type DecoratorFn = (target: object, propertyKey: string | symbol) => void
 
-export function CollectionProperty<R, T extends StringAttribute | NumberAttribute | BinaryAttribute>(opts: CollectionPropertyDataBase<R, T> = {}): DecoratorFn {
+export function CollectionProperty<R, T extends StringAttribute | NumberAttribute | BinaryAttribute>(opts: CollectionPropertyData<R, T> = {}): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
 

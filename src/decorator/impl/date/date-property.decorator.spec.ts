@@ -4,7 +4,7 @@ import { getMetaDataProperty } from '../../../../test/helper'
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../../../config'
 import { dateToNumberMapper } from '../../../mapper/custom'
-import { DateProperty } from './date.decorator'
+import { DateProperty } from './date-property.decorator'
 
 @Model()
 class ModelWithDate {
