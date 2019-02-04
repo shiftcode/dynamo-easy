@@ -1,7 +1,7 @@
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { Organization, SimpleModel } from '../../test/models'
-import { updateDynamoEasyConfig } from '../config'
-import { metadataForClass } from '../decorator/metadata'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
+import { metadataForClass } from '../decorator/metadata/metadata-helper'
 import { getTableName } from './get-table-name.function'
 
 describe('getTableName', () => {

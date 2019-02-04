@@ -1,4 +1,4 @@
-import { ExtractListType } from '../../../helper'
+import { ExtractListType } from '../../../helper/extract-list-type.type'
 import { AttributeType } from '../../../mapper/type/attribute-type.type'
 import { ConditionalParamsHost } from '../../operation-params.type'
 import { ConditionExpressionDefinitionFunction } from './condition-expression-definition-function'

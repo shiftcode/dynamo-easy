@@ -4,7 +4,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 // tslint:disable:no-non-null-assertion
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { updateDynamoEasyConfig } from '../../../config'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { getTableName } from '../../get-table-name.function'
 import { BatchGetSingleTableRequest } from './batch-get-single-table.request'
 

@@ -1,6 +1,7 @@
 import { UpdateModel } from '../../../test/models'
-import { Metadata, metadataForClass } from '../../decorator/metadata'
-import { createKeyAttributes } from '../../mapper'
+import { Metadata } from '../../decorator/metadata/metadata'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { createKeyAttributes } from '../../mapper/mapper'
 import { getTableName } from '../get-table-name.function'
 import { TransactConditionCheck } from './transact-condition-check'
 

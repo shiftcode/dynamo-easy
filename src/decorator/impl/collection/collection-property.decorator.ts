@@ -1,12 +1,13 @@
-import { BinaryAttribute, MapperForType, NumberAttribute, StringAttribute } from '../../../mapper'
+import { MapperForType } from '../../../mapper/for-type/base.mapper'
+import { BinaryAttribute, NumberAttribute, StringAttribute } from '../../../mapper/type/attribute.type'
 import {
   wrapMapperForDynamoListJsArray,
   wrapMapperForDynamoListJsSet,
   wrapMapperForDynamoSetJsArray,
   wrapMapperForDynamoSetJsSet,
 } from '../../../mapper/wrap-mapper-for-collection.function'
-import { ModelConstructor } from '../../../model'
-import { PropertyMetadata, TypeInfo } from '../../metadata'
+import { ModelConstructor } from '../../../model/model-constructor'
+import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
 import { getMetadataType } from '../../util'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { CollectionPropertyData } from './collection-property-data.model'

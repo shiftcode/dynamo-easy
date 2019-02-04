@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { ModelConstructor } from '../../model'
+import { ModelConstructor } from '../../model/model-constructor'
 import { TransactGetFullResponse } from './transact-get-full.response'
 
 export interface TransactGetRequestBase {

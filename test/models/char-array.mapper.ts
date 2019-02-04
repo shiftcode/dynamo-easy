@@ -1,4 +1,4 @@
-import { MapperForType, StringSetAttribute } from '../../src/mapper'
+import { MapperForType, StringSetAttribute } from '../../src/dynamo-easy'
 
 /**
  * stores a string as char array

@@ -2,7 +2,7 @@
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-unused-variable
-import { getMetaDataProperty } from '../../test/helper'
+import { getMetaDataProperty } from '../../test/helper/get-meta-data-property.function'
 import {
   ComplexModel,
   CustomTableNameModel,
@@ -19,11 +19,18 @@ import {
   SimpleModel,
 } from '../../test/models'
 import { Form } from '../../test/models/real-world'
-import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortKey, Transient } from './impl'
 import { CollectionProperty } from './impl/collection/collection-property.decorator'
+import { GSIPartitionKey } from './impl/index/gsi-partition-key.decorator'
+import { GSISortKey } from './impl/index/gsi-sort-key.decorator'
+import { LSISortKey } from './impl/index/lsi-sort-key.decorator'
+import { PartitionKey } from './impl/key/partition-key.decorator'
+import { SortKey } from './impl/key/sort-key.decorator'
 import { Model } from './impl/model/model.decorator'
-import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
-import { metadataForProperty } from './metadata'
+import { Property } from './impl/property/property.decorator'
+import { Transient } from './impl/transient/transient.decorator'
+import { Metadata } from './metadata/metadata'
+import { metadataForClass, metadataForModel, metadataForProperty } from './metadata/metadata-helper'
+import { ModelMetadata } from './metadata/model-metadata.model'
 
 describe('Decorators should add correct metadata', () => {
   describe('Property() should allow to define a different Mapper', () => {

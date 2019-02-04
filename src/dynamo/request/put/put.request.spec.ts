@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { updateDynamoEasyConfig } from '../../../config'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {

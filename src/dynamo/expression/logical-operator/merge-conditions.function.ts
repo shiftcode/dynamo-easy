@@ -1,5 +1,5 @@
 import { Metadata } from '../../../decorator/metadata/metadata'
-import { Attribute } from '../../../mapper'
+import { Attribute } from '../../../mapper/type/attribute.type'
 import { uniqueAttributeValueName } from '../functions/unique-attribute-value-name.function'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
 import { Expression } from '../type/expression.type'

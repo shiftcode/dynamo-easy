@@ -1,8 +1,10 @@
-import { Model, PartitionKey } from '../../decorator/impl'
-import { Metadata, metadataForClass } from '../../decorator/metadata'
+import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
+import { Model } from '../../decorator/impl/model/model.decorator'
+import { Metadata } from '../../decorator/metadata/metadata'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { ConditionalParams } from '../operation-params.type'
-import { and, or, update2 } from './logical-operator'
 import { attribute } from './logical-operator/attribute.function'
+import { and, or, update2 } from './logical-operator/public.api'
 import { addExpression, mergeUpdateExpressions } from './param-util'
 
 describe('ParamUtils', () => {

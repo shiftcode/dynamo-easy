@@ -1,4 +1,4 @@
-import { Attributes } from '../../../mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { ConditionalParams } from '../../operation-params.type'
 import { Expression } from '../type/expression.type'
 import { uniqueAttributeValueName } from './unique-attribute-value-name.function'

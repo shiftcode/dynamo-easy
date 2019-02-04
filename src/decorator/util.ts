@@ -1,5 +1,5 @@
 // these reflection keys are built in using the reflect-metadata library
-import { ModelConstructor } from '../model'
+import { ModelConstructor } from '../model/model-constructor'
 
 export const KEY_TYPE = 'design:type'
 export const KEY_PARAMETER = 'design:paramtypes'

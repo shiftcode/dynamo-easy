@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { toDb } from '../../mapper'
-import { ModelConstructor } from '../../model'
+import { toDb } from '../../mapper/mapper'
+import { ModelConstructor } from '../../model/model-constructor'
 import { createIfNotExistsCondition } from '../expression/create-if-not-exists-condition.function'
 import { TransactBaseOperation } from './transact-base-operation'
 

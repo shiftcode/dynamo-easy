@@ -1,8 +1,8 @@
 // tslint:disable:no-unused-expression
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { updateDynamoEasyConfig } from '../../../config'
-import { Attributes } from '../../../mapper'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { Attributes } from '../../../mapper/type/attribute.type'
 import { getTableName } from '../../get-table-name.function'
 import { GetRequest } from './get.request'
 

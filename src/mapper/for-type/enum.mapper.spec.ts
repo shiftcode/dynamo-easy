@@ -1,4 +1,4 @@
-import { PropertyMetadata } from '../../decorator/metadata'
+import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { NumberAttribute } from '../type/attribute.type'
 import { EnumMapper } from './enum.mapper'
 

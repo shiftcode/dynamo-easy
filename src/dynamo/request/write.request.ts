@@ -1,11 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { ModelConstructor } from '../../model'
+import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
-import { RequestConditionFunction } from '../expression'
-import { and } from '../expression/logical-operator'
+import { and } from '../expression/logical-operator/public.api'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { ConditionExpressionDefinitionFunction } from '../expression/type'
+import { RequestConditionFunction } from '../expression/type/condition-expression-definition-chain'
+import { ConditionExpressionDefinitionFunction } from '../expression/type/condition-expression-definition-function'
 import { StandardRequest } from './standard.request'
 
 /**

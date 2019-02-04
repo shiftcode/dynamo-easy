@@ -1,9 +1,9 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { createLogger, Logger } from '../../../logger/logger'
-import { ModelConstructor } from '../../../model'
+import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { addSortKeyCondition } from '../../expression/request-expression-builder'
-import { SortKeyConditionFunction } from '../../expression/type'
+import { SortKeyConditionFunction } from '../../expression/type/sort-key-condition-function'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryResponse } from './query.response'
 

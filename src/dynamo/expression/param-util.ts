@@ -2,7 +2,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { isEmpty, isString } from 'lodash'
 import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
-import { Expression } from './type'
+import { Expression } from './type/expression.type'
 import { UpdateActionKeyword } from './type/update-action-keyword.type'
 
 export function addUpdateExpression(updateExpression: Expression, params: DynamoDB.UpdateItemInput): void {
