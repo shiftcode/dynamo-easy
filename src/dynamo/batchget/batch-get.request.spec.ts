@@ -35,6 +35,11 @@ describe('batch get', () => {
         },
       ])
     })
+
+    it('returnConsumedCapacity', () => {
+      request.returnConsumedCapacity('TOTAL')
+      expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
+    })
   })
 
   describe('forModel', () => {
