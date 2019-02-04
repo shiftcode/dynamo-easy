@@ -35,6 +35,12 @@ describe('delete request', () => {
     it('should throw for no sort key value', () => {
       expect(() => new DeleteRequest(<any>null, ComplexModel, 'myId')).toThrowError()
     })
+
+    it('returnValues', () => {
+      const request = new DeleteRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
+      const req = request.returnValues('ALL_OLD')
+      expect(req.params.ReturnValues).toEqual('ALL_OLD')
+    })
   })
 
   describe('logger', () => {
