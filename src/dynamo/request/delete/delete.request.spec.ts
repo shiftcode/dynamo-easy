@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { updateDynamoEasyConfig } from '../../../config'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {

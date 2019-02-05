@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { promiseDelay } from '../../helper'
+import { promiseDelay } from '../../helper/promise-delay.function'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 
 /**

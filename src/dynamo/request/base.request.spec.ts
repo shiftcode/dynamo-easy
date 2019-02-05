@@ -1,6 +1,6 @@
 // tslint:disable:max-classes-per-file
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
-import { ModelConstructor } from '../../model'
+import { ModelConstructor } from '../../model/model-constructor'
 import { BaseRequest } from './base.request'
 
 describe('base request', () => {

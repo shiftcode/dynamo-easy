@@ -1,8 +1,9 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel, Organization } from '../../../test/models'
-import { Metadata, metadataForClass } from '../../decorator/metadata'
+import { Metadata } from '../../decorator/metadata/metadata'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
-import { QueryRequest } from '../request'
+import { QueryRequest } from '../request/query/query.request'
 import {
   addCondition,
   addPartitionKeyCondition,

@@ -1,9 +1,11 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Metadata } from '../../decorator/metadata/index'
-import { Attributes } from '../../mapper/index'
+import { Metadata } from '../../decorator/metadata/metadata'
+import { Attributes } from '../../mapper/type/attribute.type'
 import { addUpdateExpression } from './param-util'
-import { Expression, UpdateExpression, UpdateExpressionDefinitionFunction } from './type/index'
+import { Expression } from './type/expression.type'
 import { UpdateActionKeyword } from './type/update-action-keyword.type'
+import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
+import { UpdateExpression } from './type/update-expression.type'
 
 export function prepareAndAddUpdateExpressions(
   metadata: Metadata<any>,

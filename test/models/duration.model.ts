@@ -1,4 +1,4 @@
-import { MapperForType, NumberAttribute } from '../../src/mapper'
+import { MapperForType, NumberAttribute } from '../../src/dynamo-easy'
 
 export class Duration {
   value: number

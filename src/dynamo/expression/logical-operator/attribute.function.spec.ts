@@ -1,5 +1,5 @@
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { Expression } from '../type'
+import { Expression } from '../type/expression.type'
 import { and } from './and.function'
 import { attribute, attribute2 } from './attribute.function'
 import { not } from './not.function'

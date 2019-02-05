@@ -1,5 +1,5 @@
 import { Organization } from '../../../test/models'
-import { ModelConstructor } from '../../model'
+import { ModelConstructor } from '../../model/model-constructor'
 import { getTableName } from '../get-table-name.function'
 import { StandardRequest } from './standard.request'
 

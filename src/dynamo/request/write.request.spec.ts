@@ -1,7 +1,7 @@
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
-import { ModelConstructor } from '../../model'
-import { or } from '../expression/logical-operator'
+import { ModelConstructor } from '../../model/model-constructor'
 import { attribute } from '../expression/logical-operator/attribute.function'
+import { or } from '../expression/logical-operator/public.api'
 import { WriteRequest } from './write.request'
 
 describe('write request', () => {

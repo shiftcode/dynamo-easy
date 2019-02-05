@@ -2,9 +2,12 @@
 import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
 import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
-import { CollectionProperty, Model, PartitionKey, Property } from '../../decorator/impl'
-import { metadataForClass } from '../../decorator/metadata'
-import { typeOf } from '../../mapper'
+import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'
+import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
+import { Model } from '../../decorator/impl/model/model.decorator'
+import { Property } from '../../decorator/impl/property/property.decorator'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { typeOf } from '../../mapper/util'
 import {
   buildFilterExpression,
   deepFilter,
@@ -14,7 +17,7 @@ import {
   ERR_VALUES_IN,
 } from './condition-expression-builder'
 import { operatorParameterArity } from './functions/operator-parameter-arity.function'
-import { ConditionOperator } from './type'
+import { ConditionOperator } from './type/condition-operator.type'
 import { dynamicTemplate } from './util'
 
 @Model()

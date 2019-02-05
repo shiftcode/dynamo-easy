@@ -1,6 +1,6 @@
 import { Employee } from '../../test/models'
-import { updateDynamoEasyConfig } from '../config'
-import { DynamoStore } from '../dynamo'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
+import { DynamoStore } from '../dynamo/dynamo-store'
 import { LogInfo } from './log-info.type'
 import { LogReceiver } from './log-receiver.type'
 

@@ -1,5 +1,6 @@
-import { BinaryAttribute, MapperForType, NumberAttribute, StringAttribute } from '../../../mapper'
-import { ModelConstructor } from '../../../model'
+import { MapperForType } from '../../../mapper/for-type/base.mapper'
+import { BinaryAttribute, NumberAttribute, StringAttribute } from '../../../mapper/type/attribute.type'
+import { ModelConstructor } from '../../../model/model-constructor'
 
 export interface CollectionPropertyData<R, T extends StringAttribute | NumberAttribute | BinaryAttribute> {
   /**

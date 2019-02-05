@@ -1,4 +1,4 @@
-import { DateProperty, Model } from '../../src/decorator/impl'
+import { DateProperty, Model } from '../../src/dynamo-easy'
 
 @Model()
 export class NestedModelWithDate {

@@ -1,5 +1,12 @@
-import { alterCollectionPropertyMetadataForSingleItem, Metadata, PropertyMetadata } from '../../decorator/metadata'
-import { Attribute, Attributes, AttributeType, isSet, toDbOne } from '../../mapper'
+import { Metadata } from '../../decorator/metadata/metadata'
+import {
+  alterCollectionPropertyMetadataForSingleItem,
+  PropertyMetadata,
+} from '../../decorator/metadata/property-metadata.model'
+import { toDbOne } from '../../mapper/mapper'
+import { AttributeType } from '../../mapper/type/attribute-type.type'
+import { Attribute, Attributes } from '../../mapper/type/attribute.type'
+import { isSet } from '../../mapper/util'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { uniqueAttributeValueName } from './functions/unique-attribute-value-name.function'

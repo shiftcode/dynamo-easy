@@ -1,21 +1,19 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { promiseTap } from '../helper'
+import { promiseTap } from '../helper/promise-tap.function'
 import { createLogger, Logger } from '../logger/logger'
-import { ModelConstructor } from '../model'
+import { ModelConstructor } from '../model/model-constructor'
 import { DynamoApiOperations } from './dynamo-api-operations.type'
 import { DynamoDbWrapper } from './dynamo-db-wrapper'
 import { getTableName } from './get-table-name.function'
-import {
-  BatchGetSingleTableRequest,
-  DeleteRequest,
-  GetRequest,
-  PutRequest,
-  QueryRequest,
-  ScanRequest,
-  TransactGetSingleTableRequest,
-  UpdateRequest,
-} from './request'
+import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
+import { DeleteRequest } from './request/delete/delete.request'
+import { GetRequest } from './request/get/get.request'
+import { PutRequest } from './request/put/put.request'
+import { QueryRequest } from './request/query/query.request'
+import { ScanRequest } from './request/scan/scan.request'
+import { TransactGetSingleTableRequest } from './request/transactgetsingletable/transact-get-single-table.request'
+import { UpdateRequest } from './request/update/update.request'
 
 export class DynamoStore<T> {
   get dynamoDB(): DynamoDB {

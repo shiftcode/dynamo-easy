@@ -11,9 +11,11 @@ import {
   SimpleWithPartitionKeyModel,
 } from '../../../../test/models'
 import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
-import { GSISortKey, Model, PartitionKey } from '../../../decorator/impl'
+import { GSISortKey } from '../../../decorator/impl/index/gsi-sort-key.decorator'
+import { PartitionKey } from '../../../decorator/impl/key/partition-key.decorator'
+import { Model } from '../../../decorator/impl/model/model.decorator'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
-import { attribute } from '../../expression'
+import { attribute } from '../../expression/logical-operator/attribute.function'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
 

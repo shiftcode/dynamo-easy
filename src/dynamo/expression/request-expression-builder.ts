@@ -1,11 +1,10 @@
 import { curry } from 'lodash'
-import { Metadata } from '../../decorator/metadata'
+import { Metadata } from '../../decorator/metadata/metadata'
 import { ConditionalParamsHost, UpdateParamsHost } from '../operation-params.type'
 import { StandardRequest } from '../request/standard.request'
 import { buildFilterExpression } from './condition-expression-builder'
 import { addExpression } from './param-util'
 import { prepareAndAddUpdateExpressions } from './prepare-and-add-update-expressions.function'
-import { RequestUpdateFunction } from './type'
 import {
   ConditionExpressionDefinitionChain,
   ConditionExpressionDefinitionChainTyped,
@@ -21,6 +20,7 @@ import { SortKeyConditionFunction } from './type/sort-key-condition-function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UPDATE_ACTION_DEFS } from './type/update-action-defs.const'
 import {
+  RequestUpdateFunction,
   UpdateExpressionDefinitionChain,
   UpdateExpressionDefinitionChainTyped,
 } from './type/update-expression-definition-chain'

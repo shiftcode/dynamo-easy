@@ -1,6 +1,7 @@
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
-import { Metadata, metadataForClass } from '../decorator/metadata'
-import { ModelConstructor } from '../model'
+import { Metadata } from '../decorator/metadata/metadata'
+import { metadataForClass } from '../decorator/metadata/metadata-helper'
+import { ModelConstructor } from '../model/model-constructor'
 
 /*
  * only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long

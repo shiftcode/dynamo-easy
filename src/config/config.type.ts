@@ -1,7 +1,7 @@
-import { TableNameResolver } from '../dynamo'
 import { SessionValidityEnsurer } from '../dynamo/session-validity-ensurer.type'
-import { LogReceiver } from '../logger'
-import { MapperForType } from '../mapper'
+import { TableNameResolver } from '../dynamo/table-name-resolver.type'
+import { LogReceiver } from '../logger/log-receiver.type'
+import { MapperForType } from '../mapper/for-type/base.mapper'
 
 /**
  * the global config object
