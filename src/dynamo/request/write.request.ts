@@ -48,7 +48,7 @@ export abstract class WriteRequest<T,
   /**
    * @returns { void } if no ReturnValues are requested, { T } if the requested ReturnValues are ALL_OLD|ALL_NEW or {Partial<T>} if the requested ReturnValues are UPDATED_OLD|UPDATED_NEW
    */
-  exec(): Promise<T | undefined> {
+  exec(): Promise<T | void> {
     return this.execFullResponse()
       .then(response => {
         if ('Attributes' in response && typeof response.Attributes === 'object' && response.Attributes !== null) {

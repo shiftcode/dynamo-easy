@@ -40,6 +40,17 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
     return this
   }
 
+  /*
+   * kind a hacky - this is just for typing reasons so Promise<void> is the default return type when not defining a
+   * returnValues other than NONE
+   *
+   * const valueVoid = new DeleteRequest(...).exec()
+   * const valueMyModel = new DeleteRequest(...).returnValues('ALL_OLD').exec()
+   */
+  exec(): Promise<void> {
+    return <Promise<void>>super.exec()
+  }
+
   execFullResponse(): Promise<DynamoDB.UpdateItemOutput> {
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper.updateItem(this.params)
