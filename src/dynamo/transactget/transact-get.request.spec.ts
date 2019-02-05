@@ -2,7 +2,7 @@
 // tslint:disable:no-unnecessary-class
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
-import { Attributes } from '../../mapper'
+import { Attributes } from '../../mapper/type/attribute.type'
 import { getTableName } from '../get-table-name.function'
 import { TransactGetRequest } from './transact-get.request'
 import { TransactGetRequest2 } from './transact-get.request.type'

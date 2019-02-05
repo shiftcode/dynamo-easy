@@ -1,7 +1,8 @@
+import { dateToStringMapper } from '../../mapper/custom/date-to-string.mapper'
 // tslint:disable:no-non-null-assertion
-import { dateToStringMapper } from '../../mapper/custom'
-import { Model, Property } from '../impl'
 import { CollectionProperty } from '../impl/collection/collection-property.decorator'
+import { Model } from '../impl/model/model.decorator'
+import { Property } from '../impl/property/property.decorator'
 import { metadataForProperty } from './metadata-helper'
 import { alterCollectionPropertyMetadataForSingleItem } from './property-metadata.model'
 

@@ -1,6 +1,7 @@
 import { NestedObject } from '../../../test/models'
 import { ModelWithCollections } from '../../../test/models/model-with-collections.model'
-import { Metadata, metadataForClass } from '../../decorator/metadata'
+import { Metadata } from '../../decorator/metadata/metadata'
+import { metadataForClass } from '../../decorator/metadata/metadata-helper'
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { ListAttribute, NumberSetAttribute, StringSetAttribute } from '../type/attribute.type'
 import { CollectionMapper } from './collection.mapper'

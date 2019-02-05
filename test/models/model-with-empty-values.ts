@@ -1,4 +1,4 @@
-import { Model, PartitionKey } from '../../src/decorator/impl'
+import { Model, PartitionKey } from '../../src/dynamo-easy'
 
 @Model()
 export class ModelWithEmptyValues {

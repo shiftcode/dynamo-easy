@@ -1,7 +1,7 @@
 import {
   NESTED_ATTR_PATH_CAPTURED_REGEX,
   NESTED_ATTR_PATH_REGEX,
-} from '../../dynamo/expression/functions/attribute-names.function'
+} from '../../dynamo/expression/functions/attribute-names.const'
 import { ModelConstructor } from '../../model/model-constructor'
 import { Omit } from '../../model/omit.type'
 import { SecondaryIndex } from '../impl/index/secondary-index'

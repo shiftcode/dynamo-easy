@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { createKeyAttributes } from '../../mapper'
-import { ModelConstructor } from '../../model'
+import { createKeyAttributes } from '../../mapper/mapper'
+import { ModelConstructor } from '../../model/model-constructor'
 import { TransactBaseOperation } from './transact-base-operation'
 
 export class TransactConditionCheck<T> extends TransactBaseOperation<

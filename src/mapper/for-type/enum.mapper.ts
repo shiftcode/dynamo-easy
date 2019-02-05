@@ -1,4 +1,4 @@
-import { hasGenericType, PropertyMetadata } from '../../decorator/metadata'
+import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 

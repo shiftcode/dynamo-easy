@@ -1,5 +1,5 @@
-import { hasGenericType, PropertyMetadata } from '../../decorator'
-import { notNull } from '../../helper'
+import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
+import { notNull } from '../../helper/not-null.function'
 import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'
 import { AttributeCollectionType, AttributeType } from '../type/attribute-type.type'
 import {

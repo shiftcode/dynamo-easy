@@ -1,8 +1,8 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { promiseTap } from '../../../helper'
+import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
-import { createKeyAttributes } from '../../../mapper'
-import { ModelConstructor } from '../../../model'
+import { createKeyAttributes } from '../../../mapper/mapper'
+import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { WriteRequest } from '../write.request'
 

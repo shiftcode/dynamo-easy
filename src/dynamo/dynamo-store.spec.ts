@@ -3,20 +3,18 @@
 // tslint:disable:no-unused-expression
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
-import { updateDynamoEasyConfig } from '../config'
-import { Model } from '../decorator/impl'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
+import { Model } from '../decorator/impl/model/model.decorator'
 import { DynamoStore } from './dynamo-store'
-import {
-  BatchGetSingleTableRequest,
-  DeleteRequest,
-  GetRequest,
-  PutRequest,
-  QueryRequest,
-  ScanRequest,
-  TransactGetSingleTableRequest,
-  UpdateRequest,
-} from './request'
+import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
 import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
+import { DeleteRequest } from './request/delete/delete.request'
+import { GetRequest } from './request/get/get.request'
+import { PutRequest } from './request/put/put.request'
+import { QueryRequest } from './request/query/query.request'
+import { ScanRequest } from './request/scan/scan.request'
+import { TransactGetSingleTableRequest } from './request/transactgetsingletable/transact-get-single-table.request'
+import { UpdateRequest } from './request/update/update.request'
 
 @Model()
 class DynamoStoreModel {}

@@ -1,10 +1,12 @@
 // tslint:disable:no-non-null-assertion
-import { metadataForModel, Model, ModelMetadata } from '../..'
-import { getMetaDataProperty } from '../../../../test/helper'
+import { getMetaDataProperty } from '../../../../test/helper/get-meta-data-property.function'
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
-import { updateDynamoEasyConfig } from '../../../config'
-import { dateToNumberMapper } from '../../../mapper/custom'
-import { DateProperty } from './date.decorator'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { dateToNumberMapper } from '../../../mapper/custom/date-to-number.mapper'
+import { metadataForModel } from '../../metadata/metadata-helper'
+import { ModelMetadata } from '../../metadata/model-metadata.model'
+import { Model } from '../model/model.decorator'
+import { DateProperty } from './date-property.decorator'
 
 @Model()
 class ModelWithDate {

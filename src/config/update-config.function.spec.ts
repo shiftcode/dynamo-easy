@@ -1,7 +1,7 @@
 // tslint:disable:no-empty
 
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
-import { dateToNumberMapper } from '../mapper/custom'
+import { dateToNumberMapper } from '../mapper/custom/date-to-number.mapper'
 import { dynamoEasyConfig } from './dynamo-easy-config'
 import { updateDynamoEasyConfig } from './update-config.function'
 

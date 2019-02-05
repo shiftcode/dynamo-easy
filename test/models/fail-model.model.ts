@@ -1,8 +1,5 @@
-import { Model } from '../../src/decorator/impl'
-
 // tslint:disable:max-classes-per-file
-import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
-import { MapAttribute, MapperForType, StringAttribute } from '../../src/mapper'
+import { CollectionProperty, MapAttribute, MapperForType, Model, StringAttribute } from '../../src/dynamo-easy'
 
 const strangeMapper: MapperForType<FailModelNestedFail, MapAttribute> = {
   toDb: propertyValue => ({ M: { id: { S: `${propertyValue}` } } }),

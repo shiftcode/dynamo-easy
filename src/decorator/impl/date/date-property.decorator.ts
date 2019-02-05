@@ -1,5 +1,5 @@
 import { dynamoEasyConfig } from '../../../config/dynamo-easy-config'
-import { PropertyMetadata } from '../../metadata'
+import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { DatePropertyData } from './date-property-data.model'
 

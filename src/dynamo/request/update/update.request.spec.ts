@@ -7,9 +7,8 @@ import {
 } from '../../../../test/models'
 import { Duration } from '../../../../test/models/duration.model'
 import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
-import { updateDynamoEasyConfig } from '../../../config'
-import { update2 } from '../../expression'
-import { update } from '../../expression/logical-operator/update.function'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { update, update2 } from '../../expression/logical-operator/update.function'
 import { UpdateRequest } from './update.request'
 
 describe('update request', () => {

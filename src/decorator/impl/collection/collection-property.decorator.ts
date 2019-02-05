@@ -1,19 +1,19 @@
-import { BinaryAttribute, MapperForType, NumberAttribute, StringAttribute } from '../../../mapper'
+import { MapperForType } from '../../../mapper/for-type/base.mapper'
+import { BinaryAttribute, NumberAttribute, StringAttribute } from '../../../mapper/type/attribute.type'
 import {
   wrapMapperForDynamoListJsArray,
   wrapMapperForDynamoListJsSet,
   wrapMapperForDynamoSetJsArray,
   wrapMapperForDynamoSetJsSet,
 } from '../../../mapper/wrap-mapper-for-collection.function'
-import { ModelConstructor } from '../../../model'
-import { PropertyMetadata, TypeInfo } from '../../metadata'
+import { ModelConstructor } from '../../../model/model-constructor'
+import { PropertyMetadata, TypeInfo } from '../../metadata/property-metadata.model'
 import { getMetadataType } from '../../util'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
-import { CollectionPropertyDataBase } from './collection-property-data.model'
+import { CollectionPropertyData } from './collection-property-data.model'
 
-type DecoratorFn = (target: object, propertyKey: string | symbol) => void
 
-export function CollectionProperty<R, T extends StringAttribute | NumberAttribute | BinaryAttribute>(opts: CollectionPropertyDataBase<R, T> = {}): DecoratorFn {
+export function CollectionProperty<R, T extends StringAttribute | NumberAttribute | BinaryAttribute>(opts: CollectionPropertyData<R, T> = {}): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
 

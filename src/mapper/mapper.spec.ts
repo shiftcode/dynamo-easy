@@ -38,10 +38,9 @@ import {
   NestedModelWithCustomMapper,
 } from '../../test/models/model-with-nested-model-with-custom-mapper.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
-import { PropertyMetadata } from '../decorator'
-import { metadataForClass } from '../decorator/metadata'
-import { createKeyAttributes, createToKeyFn, toKey } from './index'
-import { fromDb, fromDbOne, toDb, toDbOne } from './mapper'
+import { metadataForClass } from '../decorator/metadata/metadata-helper'
+import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { createKeyAttributes, createToKeyFn, fromDb, fromDbOne, toDb, toDbOne, toKey } from './mapper'
 import {
   Attribute,
   Attributes,

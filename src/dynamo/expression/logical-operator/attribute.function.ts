@@ -1,4 +1,4 @@
-import { ModelConstructor } from '../../../model'
+import { ModelConstructor } from '../../../model/model-constructor'
 import { propertyDefinitionFunction } from '../request-expression-builder'
 import {
   ConditionExpressionDefinitionChain,

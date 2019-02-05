@@ -1,8 +1,8 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-non-null-assertion
-import { Model } from '..'
 import { FormId, formIdMapper } from '../../../../test/models/real-world'
-import { metadataForClass, metadataForProperty } from '../../metadata'
+import { metadataForClass, metadataForProperty } from '../../metadata/metadata-helper'
+import { Model } from '../model/model.decorator'
 import { CollectionProperty } from './collection-property.decorator'
 
 describe('@CollectionProperty', () => {

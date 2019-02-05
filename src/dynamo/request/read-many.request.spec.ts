@@ -5,12 +5,12 @@ import {
   SimpleWithPartitionKeyModel,
 } from '../../../test/models'
 import { INDEX_ACTIVE_CREATED_AT, INDEX_COUNT } from '../../../test/models/model-with-indexes.model'
-import { updateDynamoEasyConfig } from '../../config'
+import { updateDynamoEasyConfig } from '../../config/update-config.function'
 import { createLogger, Logger } from '../../logger/logger'
-import { Attributes } from '../../mapper'
+import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { or } from '../expression/logical-operator'
 import { attribute } from '../expression/logical-operator/attribute.function'
+import { or } from '../expression/logical-operator/public.api'
 import { getTableName } from '../get-table-name.function'
 import { ReadManyRequest } from './read-many.request'
 

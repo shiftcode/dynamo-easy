@@ -4,8 +4,9 @@ import {
   alterCollectionPropertyMetadataForSingleItem,
   PropertyMetadata,
 } from '../../decorator/metadata/property-metadata.model'
-import { toDbOne, typeOf } from '../../mapper'
+import { toDbOne } from '../../mapper/mapper'
 import { Attribute, Attributes } from '../../mapper/type/attribute.type'
+import { typeOf } from '../../mapper/util'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { isFunctionOperator } from './functions/is-function-operator.function'
 import { isNoParamFunctionOperator } from './functions/is-no-param-function-operator.function'

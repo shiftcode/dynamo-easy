@@ -3,7 +3,7 @@
 
 import { Config, Credentials } from 'aws-sdk/global'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
-import { updateDynamoEasyConfig } from '../config'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
 import { DynamoDbWrapper } from './dynamo-db-wrapper'
 
 describe('dynamo rx', () => {

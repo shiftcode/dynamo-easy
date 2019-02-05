@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { metadataForClass } from '../../../decorator/metadata'
-import { createKeyAttributes } from '../../../mapper'
+import { metadataForClass } from '../../../decorator/metadata/metadata-helper'
+import { createKeyAttributes } from '../../../mapper/mapper'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
 import { TransactGetSingleTableRequest } from './transact-get-single-table.request'
@@ -32,7 +32,7 @@ describe('TransactGetSingleTableRequest', () => {
       ],
       ConsumedCapacity: [],
     }
-    let transactGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
+    const transactGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
 
     beforeEach(() => {
       const dynamoDBWrapperMock: DynamoDbWrapper = <any>{ transactGetItems: transactGetItemsSpy }

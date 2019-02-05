@@ -1,5 +1,4 @@
-import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
-import { DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
+import { CollectionProperty, DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 
 // tslint:disable-next-line:max-classes-per-file
 @Model()

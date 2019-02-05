@@ -1,5 +1,5 @@
 import { UpdateModel } from '../../../test/models'
-import { toDb } from '../../mapper'
+import { toDb } from '../../mapper/mapper'
 import { getTableName } from '../get-table-name.function'
 import { TransactPut } from './transact-put'
 
