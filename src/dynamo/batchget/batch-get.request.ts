@@ -24,6 +24,11 @@ export class BatchGetRequest {
     }
   }
 
+  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): BatchGetRequest {
+    this.params.ReturnConsumedCapacity = level
+    return this
+  }
+
   /**
    * @param {ModelConstructor<T>} modelClazz
    * @param {Partial<T>[]} keys a partial of T that contains Partition key and SortKey (if necessary). Throws if missing.

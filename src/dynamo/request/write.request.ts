@@ -1,4 +1,8 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { promiseTap } from '../../helper/promise-tap.function'
+import { Logger } from '../../logger/logger'
+import { fromDb } from '../../mapper/mapper'
+import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/public.api'
@@ -14,6 +18,10 @@ import { StandardRequest } from './standard.request'
 export abstract class WriteRequest<T,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
   R extends WriteRequest<T, I, R>> extends StandardRequest<T, I, R> {
+
+  protected abstract readonly logger: Logger
+
+
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
     super(dynamoDBWrapper, modelClazz)
   }
@@ -28,7 +36,6 @@ export abstract class WriteRequest<T,
   }
 
   /**
-   * @param conditionDefFns
    * @example writeRequest.onlyIf( attribute('age').eq(23) )
    * @example writeRequest.onlyIf( or( attribute('age').lt(18), attribute('age').gt(65) ) )
    */
@@ -38,17 +45,23 @@ export abstract class WriteRequest<T,
     return <any>this
   }
 
-  /*
-   * The ReturnValues parameter is used by several DynamoDB operations; however,
-   * DeleteItem/PutItem/UpdateItem does not recognize any values other than NONE or ALL_OLD.
+  /**
+   * @returns { void } if no ReturnValues are requested, { T } if the requested ReturnValues are ALL_OLD|ALL_NEW or {Partial<T>} if the requested ReturnValues are UPDATED_OLD|UPDATED_NEW
    */
-  returnValues(returnValues: 'NONE' | 'ALL_OLD'): R {
-    this.params.ReturnValues = returnValues
-    return <R>(<any>this)
-  }
-
-  exec(): Promise<void> {
+  exec(): Promise<T | undefined> {
     return this.execFullResponse()
-      .then(response => {return})
+      .then(response => {
+        if ('Attributes' in response && typeof response.Attributes === 'object' && response.Attributes !== null) {
+          return fromDb(<Attributes<T>>response.Attributes, this.modelClazz)
+        }
+        return
+      })
+      .then(promiseTap(item => {
+        if (item) {
+          this.logger.debug('mapped item', item)
+        } else {
+          this.logger.debug('no return values to map')
+        }
+      }))
   }
 }

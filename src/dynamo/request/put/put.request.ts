@@ -3,12 +3,16 @@ import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
 import { toDb } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
+import { Omit } from '../../../model/omit.type'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { createIfNotExistsCondition } from '../../expression/create-if-not-exists-condition.function'
 import { WriteRequest } from '../write.request'
 
+type PutRequestReturnT<T> = Omit<PutRequest<T>, 'exec'> & { exec(): Promise<DynamoDB.AttributeMap> }
+
+
 export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, PutRequest<T>> {
-  private readonly logger: Logger
+  protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, item: T) {
     super(dynamoDBWrapper, modelClazz)
@@ -24,6 +28,13 @@ export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, PutReq
     if (predicate) {
       this.onlyIf(...createIfNotExistsCondition(this.metadata))
     }
+    return this
+  }
+
+  returnValues(returnValues: 'ALL_OLD'): PutRequestReturnT<T>
+  returnValues(returnValues: 'NONE'): PutRequest<T>
+  returnValues(returnValues: 'ALL_OLD' | 'NONE'): PutRequest<T> | PutRequestReturnT<T> {
+    this.params.ReturnValues = returnValues
     return this
   }
 

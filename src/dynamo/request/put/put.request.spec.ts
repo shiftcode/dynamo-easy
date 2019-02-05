@@ -26,6 +26,11 @@ describe('put request', () => {
       expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
       expect(params.ExpressionAttributeValues).toBeUndefined()
     })
+
+    it('returnValues', () => {
+      const req = request.returnValues('ALL_OLD')
+      expect(req.params.ReturnValues).toEqual('ALL_OLD')
+    })
   })
 
   describe('logger', () => {

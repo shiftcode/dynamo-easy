@@ -3,16 +3,27 @@ import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
+import { Omit } from '../../../model/omit.type'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { WriteRequest } from '../write.request'
 
+type DeleteRequestReturnT<T> = Omit<DeleteRequest<T>, 'exec'> & { exec(): Promise<T> }
+
 export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, DeleteRequest<T>> {
-  private readonly logger: Logger
+  protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
     super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
+  }
+
+
+  returnValues(returnValues: 'ALL_OLD'): DeleteRequestReturnT<T>
+  returnValues(returnValues: 'NONE'): DeleteRequest<T>
+  returnValues(returnValues: 'ALL_OLD' | 'NONE'): DeleteRequest<T> | DeleteRequestReturnT<T> {
+    this.params.ReturnValues = returnValues
+    return this
   }
 
   execFullResponse(): Promise<DynamoDB.DeleteItemOutput> {
@@ -21,3 +32,4 @@ export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, 
       .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }
+

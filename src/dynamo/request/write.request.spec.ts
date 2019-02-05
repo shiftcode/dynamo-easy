@@ -1,4 +1,6 @@
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
+import { createLogger, Logger } from '../../logger/logger'
+import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { or } from '../expression/logical-operator/public.api'
@@ -6,10 +8,12 @@ import { WriteRequest } from './write.request'
 
 describe('write request', () => {
   class TestWriteRequest<T> extends WriteRequest<T, any, TestWriteRequest<T>> {
+    protected readonly logger: Logger
     readonly params: any = {}
 
     constructor(modelClazz: ModelConstructor<T>) {
       super(<any>null, modelClazz)
+      this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
     }
 
     execFullResponse() {
@@ -19,7 +23,7 @@ describe('write request', () => {
 
   let req: TestWriteRequest<SimpleWithPartitionKeyModel>
 
-  describe('exec', () => {
+  describe('exec [ReturnValues = NONE]', () => {
     let execFullResponseSpy: jasmine.Spy
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
@@ -37,6 +41,18 @@ describe('write request', () => {
     })
   })
 
+  describe('exec [ReturnValues = ALL_OLD]', () => {
+    beforeEach(() => {
+      req = new TestWriteRequest(SimpleWithPartitionKeyModel)
+      const returnValues: Attributes<SimpleWithPartitionKeyModel> = { id: { S: 'myId' }, age: { N: '20' } }
+      spyOn(req, 'execFullResponse').and.returnValue(Promise.resolve({ Attributes: returnValues }))
+    })
+    it('should map result if Attributes return values(s)', async () => {
+      const result = await req.exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
+    })
+  })
+
   describe('params', () => {
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
@@ -45,11 +61,6 @@ describe('write request', () => {
     it('should set returnItemCollectionMetrics', () => {
       req.returnItemCollectionMetrics('SIZE')
       expect(req.params.ReturnItemCollectionMetrics).toBe('SIZE')
-    })
-
-    it('should set returnValues', () => {
-      req.returnValues('ALL_OLD')
-      expect(req.params.ReturnValues).toBe('ALL_OLD')
     })
 
     it('[onlyIfAttribute] should set condition', () => {

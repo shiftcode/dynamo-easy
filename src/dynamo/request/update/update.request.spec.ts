@@ -44,6 +44,12 @@ describe('update request', () => {
       expect(() => new UpdateRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'myId')).toThrow()
     })
 
+    it('returnValues', () => {
+      const request = new UpdateRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
+      const req = request.returnValues('UPDATED_OLD')
+      expect(req.params.ReturnValues).toEqual('UPDATED_OLD')
+    })
+
     it('should add operations', () => {
       const now = new Date()
       const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
