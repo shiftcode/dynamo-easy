@@ -1,6 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SecondaryIndex } from '../../decorator/impl'
-import { fetchAll, promiseTap } from '../../helper'
+import { fetchAll } from '../../helper/fetch-all.function'
+import { promiseTap } from '../../helper/promise-tap.function'
 import { Logger } from '../../logger/logger'
 import { Attributes, fromDb } from '../../mapper'
 import { ModelConstructor } from '../../model'

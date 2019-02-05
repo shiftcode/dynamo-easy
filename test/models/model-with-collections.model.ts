@@ -1,5 +1,4 @@
-import { Model } from '../../src/decorator/impl'
-import { CollectionProperty } from '../../src/decorator/impl/collection/collection-property.decorator'
+import { CollectionProperty, Model } from '../../src/dynamo-easy'
 import { NestedModelWithDate } from './nested-model-with-date.model'
 import { NestedObject } from './nested-object.model'
 import { FormId, formIdMapper } from './real-world'
