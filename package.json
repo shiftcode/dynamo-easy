@@ -59,7 +59,7 @@
     "lint-staged": "8.1.0",
     "lodash": "4.17.11",
     "lodash.camelcase": "4.3.0",
-    "prettier": "1.15.2",
+    "prettier": "1.16.4",
     "rimraf": "2.6.2",
     "rxjs": "6.3.3",
     "semantic-release": "15.12.0",
