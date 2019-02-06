@@ -17,7 +17,8 @@ describe('TransactPut', () => {
       counter: 10,
       addresses: [],
       numberValues: [42],
-      info: { details: 'Foo Bar' },
+      info: { details: 'Foo Bar', createdAt: now },
+      informations: [{ details: 'My Details', createdAt: now }],
       topics: new Set(['Table-Tennis']),
     }
     op = new TransactPut(UpdateModel, item)
