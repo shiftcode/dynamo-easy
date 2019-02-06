@@ -29,6 +29,7 @@
     "prebuild": "rimraf dist",
     "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
     "build:docs": "typedoc --out dist/docs --target es6 --theme minimal",
+    "check-snippets": "npx tsc --outDir ./dist-snippets --project ./tsconfig.snippets.json && rimraf dist-snippets",
     "commity": "commit",
     "deploy-docs": "ts-node tools/gh-pages-publish",
     "lint": "tslint --project tsconfig.json -t codeFrame --fix",
