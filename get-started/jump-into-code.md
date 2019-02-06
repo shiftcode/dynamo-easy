@@ -1,7 +1,3 @@
----
-description: First simple sample not at all showing the full power of the library
----
-
 # Jump into code
 
 Start with defining your first model

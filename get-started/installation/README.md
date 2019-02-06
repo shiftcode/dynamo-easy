@@ -1,3 +1,7 @@
+---
+description: some description
+---
+
 # Installation
 
 ```text
