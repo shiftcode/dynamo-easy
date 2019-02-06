@@ -60,7 +60,7 @@
     "lodash": "4.17.11",
     "lodash.camelcase": "4.3.0",
     "prettier": "1.15.2",
-    "rimraf": "2.6.2",
+    "rimraf": "2.6.3",
     "rxjs": "6.3.3",
     "semantic-release": "15.12.0",
     "sort-package-json": "1.16.0",
