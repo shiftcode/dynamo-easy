@@ -26,7 +26,7 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
     this.params.ReturnItemCollectionMetrics = value
   }
 
-  delete(items: T[]): BatchWriteSingleTableRequest<T> {
+  delete(items: Array<Partial<T>>): BatchWriteSingleTableRequest<T> {
     if (this.params.RequestItems[this.tableName].length + items.length > BATCH_WRITE_MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`batch write takes at max ${BATCH_WRITE_MAX_REQUEST_ITEM_COUNT} items`)
     }
@@ -66,6 +66,6 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
     return batchWriteItemsWriteAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
-  private createDeleteRequest = (item: T): DynamoDB.WriteRequest => ({ DeleteRequest: { Key: this.toKey(item) } })
+  private createDeleteRequest = (item: Partial<T>): DynamoDB.WriteRequest => ({ DeleteRequest: { Key: this.toKey(item) } })
   private createPutRequest = (item: T): DynamoDB.WriteRequest => ({ PutRequest: { Item: toDb(item, this.modelClazz) } })
 }
