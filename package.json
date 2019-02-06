@@ -55,7 +55,7 @@
     "cross-env": "5.0.5",
     "greenkeeper-lockfile": "1.15.1",
     "husky": "1.2.0",
-    "jest": "23.6.0",
+    "jest": "24.1.0",
     "lint-staged": "8.1.0",
     "lodash": "4.17.11",
     "lodash.camelcase": "4.3.0",
