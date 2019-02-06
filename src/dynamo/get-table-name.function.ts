@@ -1,6 +1,6 @@
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 import { Metadata } from '../decorator/metadata/metadata'
-import { metadataForClass } from '../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../decorator/metadata/metadata-helper'
 import { ModelConstructor } from '../model/model-constructor'
 
 /*
@@ -13,7 +13,7 @@ export function getTableName(metaDataOrModelClazz: Metadata<any> | ModelConstruc
   const modelOptions =
     metaDataOrModelClazz instanceof Metadata
       ? metaDataOrModelClazz.modelOptions
-      : metadataForClass(metaDataOrModelClazz).modelOptions
+      : metadataForModel(metaDataOrModelClazz).modelOptions
 
   const tableName = dynamoEasyConfig.tableNameResolver(modelOptions.tableName)
 

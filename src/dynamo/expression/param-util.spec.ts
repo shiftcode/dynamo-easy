@@ -1,7 +1,7 @@
 import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
 import { Model } from '../../decorator/impl/model/model.decorator'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { ConditionalParams } from '../operation-params.type'
 import { attribute } from './logical-operator/attribute.function'
 import { and, or, update2 } from './logical-operator/public.api'
@@ -20,7 +20,7 @@ describe('ParamUtils', () => {
   let metadata: Metadata<FooBar>
   beforeEach(() => {
     params = {}
-    metadata = metadataForClass(FooBar)
+    metadata = metadataForModel(FooBar)
   })
 
   it('shoud build correct conditions', () => {

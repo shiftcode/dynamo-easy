@@ -1,5 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { createToKeyFn, fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
@@ -24,7 +24,7 @@ export class TransactGetRequest {
 
   forModel<T>(modelClazz: ModelConstructor<T>, key: Partial<T>): TransactGetRequest1<T> {
     // check if modelClazz is really an @Model() decorated class
-    const metadata = metadataForClass(modelClazz)
+    const metadata = metadataForModel(modelClazz)
     if (!metadata.modelOptions) {
       throw new Error('given ModelConstructor has no @Model decorator')
     }

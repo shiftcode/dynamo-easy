@@ -1,6 +1,6 @@
 import { Model } from '../impl/model/model.decorator'
 import { Property } from '../impl/property/property.decorator'
-import { metadataForProperty } from './metadata-helper'
+import { metadataForModel } from './metadata-helper'
 
 @Model()
 class ModelWithMetadata {
@@ -10,9 +10,9 @@ class ModelWithMetadata {
 
 describe('metadata helper', () => {
   it('should return metadata using either name or namedb as property name', () => {
-    const modelOptionsWithName = metadataForProperty(ModelWithMetadata, 'prop')
+    const modelOptionsWithName = metadataForModel(ModelWithMetadata).forProperty('prop')
     expect(modelOptionsWithName).toBeDefined()
-    const modelOptionsWithNameDb = metadataForProperty(ModelWithMetadata, 'myProp')
+    const modelOptionsWithNameDb = metadataForModel(ModelWithMetadata).forProperty('myProp')
     expect(modelOptionsWithNameDb).toBeDefined()
   })
 })

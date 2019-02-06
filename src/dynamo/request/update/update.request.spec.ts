@@ -1,6 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
   ComplexModel,
+  Info,
   SimpleWithCompositePartitionKeyModel,
   SimpleWithPartitionKeyModel,
   UpdateModel,
@@ -8,6 +9,7 @@ import {
 import { Duration } from '../../../../test/models/duration.model'
 import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { dateToStringMapper } from '../../../mapper/custom/date-to-string.mapper'
 import { update, update2 } from '../../expression/logical-operator/update.function'
 import { UpdateRequest } from './update.request'
 
@@ -122,6 +124,37 @@ describe('update request', () => {
       expect(request.params.UpdateExpression).toBe('SET #counter = if_not_exists(#counter, :counter)')
       expect(request.params.ExpressionAttributeNames).toEqual({ '#counter': 'counter' })
       expect(request.params.ExpressionAttributeValues).toEqual({ ':counter': { N: '25' } })
+    })
+
+    it('should map with metadata of itemType (Info)', () => {
+      const now = new Date()
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
+        update('informations[0]').set(<Info>{ details: 'my details', createdAt: now }),
+      )
+
+      expect(request).toBeDefined()
+      expect(request.params.UpdateExpression).toBe('SET #informations[0] = :informations_at_0')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#informations': 'informations' })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':informations_at_0': { M: { details: { S: 'my details' }, createdAt: dateToStringMapper.toDb(now) } },
+      })
+    })
+
+    it('should map with property metadata of itemType (Info)', () => {
+      const now = new Date()
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
+        update('informations[0].createdAt').set(now),
+      )
+
+      expect(request).toBeDefined()
+      expect(request.params.UpdateExpression).toBe('SET #informations[0].#createdAt = :informations_at_0__createdAt')
+      expect(request.params.ExpressionAttributeNames).toEqual({
+        '#informations': 'informations',
+        '#createdAt': 'createdAt',
+      })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':informations_at_0__createdAt': dateToStringMapper.toDb(now),
+      })
     })
 
     it('should allow to add multiple update operations and conditions chained', () => {

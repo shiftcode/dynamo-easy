@@ -19,7 +19,7 @@ describe('Date decorators should allow to use a different date mapper', () => {
   afterEach(resetDynamoEasyConfig)
 
   it('should define the dateToNumberMapper in metadata', () => {
-    const metaData: ModelMetadata<ModelWithDate> = metadataForModel(ModelWithDate)
+    const metaData: ModelMetadata<ModelWithDate> = metadataForModel(ModelWithDate).modelOptions
 
     expect(metaData).toBeDefined()
     expect(metaData.clazz).toBe(ModelWithDate)

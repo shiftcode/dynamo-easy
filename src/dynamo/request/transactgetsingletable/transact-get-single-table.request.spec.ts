@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { metadataForClass } from '../../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../../decorator/metadata/metadata-helper'
 import { createKeyAttributes } from '../../../mapper/mapper'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
@@ -9,7 +9,7 @@ import { TransactGetSingleTableRequest } from './transact-get-single-table.reque
 describe('TransactGetSingleTableRequest', () => {
   let req: TransactGetSingleTableRequest<any>
 
-  const simpleWithPartitionKeyMeta = metadataForClass(SimpleWithPartitionKeyModel)
+  const simpleWithPartitionKeyMeta = metadataForModel(SimpleWithPartitionKeyModel)
 
   describe('params', () => {
     it('should add Get item with tableName and key to params.TransactItems', () => {

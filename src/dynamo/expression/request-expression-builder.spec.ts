@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel, Organization } from '../../../test/models'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { QueryRequest } from '../request/query/query.request'
 import {
@@ -52,7 +52,7 @@ describe('updateDefinitionFunction', () => {
   let metadata: Metadata<ComplexModel>
   let aDate: Date
   beforeEach(() => {
-    metadata = metadataForClass(ComplexModel)
+    metadata = metadataForModel(ComplexModel)
     aDate = new Date()
   })
 

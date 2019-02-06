@@ -6,7 +6,7 @@ import { CollectionProperty } from '../../decorator/impl/collection/collection-p
 import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
 import { Model } from '../../decorator/impl/model/model.decorator'
 import { Property } from '../../decorator/impl/property/property.decorator'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { typeOf } from '../../mapper/util'
 import {
   buildFilterExpression,
@@ -51,7 +51,7 @@ describe('expressions', () => {
   })
 
   it('use property metadata', () => {
-    const condition = buildFilterExpression('prop', '>', [10], undefined, metadataForClass(MyModel))
+    const condition = buildFilterExpression('prop', '>', [10], undefined, metadataForModel(MyModel))
     expect(condition.statement).toBe('#prop > :prop')
 
     expect(condition.attributeNames['#prop']).toBe('propDb')
@@ -69,7 +69,7 @@ describe('expressions', () => {
   describe('operators', () => {
     it('simple', () => {
       // property('age').gt(10)
-      const condition = buildFilterExpression('age', '>', [10], undefined, metadataForClass(MyModel))
+      const condition = buildFilterExpression('age', '>', [10], undefined, metadataForModel(MyModel))
       expect(condition.statement).toBe('#age > :age')
     })
 
@@ -213,14 +213,14 @@ describe('expressions', () => {
 
     describe('contains', () => {
       it('string subsequence', () => {
-        const condition = buildFilterExpression('id', 'contains', ['substr'], undefined, metadataForClass(Form))
+        const condition = buildFilterExpression('id', 'contains', ['substr'], undefined, metadataForModel(Form))
         expect(condition.statement).toBe('contains (#id, :id)')
         expect(condition.attributeNames).toEqual({ '#id': 'id' })
         expect(condition.attributeValues).toEqual({ ':id': { S: 'substr' } })
       })
 
       it('value in set', () => {
-        const condition = buildFilterExpression('types', 'contains', [2], undefined, metadataForClass(Form))
+        const condition = buildFilterExpression('types', 'contains', [2], undefined, metadataForModel(Form))
         expect(condition.statement).toBe('contains (#types, :types)')
         expect(condition.attributeNames).toEqual({ '#types': 'types' })
         expect(condition.attributeValues).toEqual({ ':types': { N: '2' } })
@@ -238,7 +238,7 @@ describe('expressions', () => {
           'contains',
           [new FormId(FormType.REQUEST, 1, 2019)],
           undefined,
-          metadataForClass(MyModelWithCustomMappedSet),
+          metadataForModel(MyModelWithCustomMappedSet),
         )
         expect(condition.statement).toBe('contains (#formIds, :formIds)')
         expect(condition.attributeNames).toEqual({ '#formIds': 'formIds' })
@@ -284,7 +284,7 @@ describe('expressions', () => {
         'BETWEEN',
         [date1, date2],
         undefined,
-        metadataForClass(ComplexModel),
+        metadataForModel(ComplexModel),
       )
 
       expect(condition.statement).toBe('#creationDate BETWEEN :creationDate AND :creationDate_2')

@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
@@ -39,7 +39,7 @@ export abstract class BaseRequest<
     }
     this.modelClazz = modelClazz
 
-    this.metadata = metadataForClass(this.modelClazz)
+    this.metadata = metadataForModel(this.modelClazz)
 
     if (!this.metadata.modelOptions) {
       throw new Error('given ModelConstructor has no @Model decorator')
