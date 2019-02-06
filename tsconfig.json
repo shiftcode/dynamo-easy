@@ -71,6 +71,7 @@
   ],
   "exclude": [
     "test/**/*",
+    "snippets/**/*",
     "**/*.spec.ts"
   ]
 }
