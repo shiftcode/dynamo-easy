@@ -51,7 +51,7 @@
     "@types/uuid": "3.4.2",
     "aws-sdk": "2.286.1",
     "colors": "1.1.2",
-    "coveralls": "3.0.0",
+    "coveralls": "3.0.2",
     "cross-env": "5.0.5",
     "greenkeeper-lockfile": "1.15.1",
     "husky": "1.2.0",
