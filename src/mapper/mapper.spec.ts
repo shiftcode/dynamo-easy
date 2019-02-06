@@ -38,7 +38,7 @@ import {
   NestedModelWithCustomMapper,
 } from '../../test/models/model-with-nested-model-with-custom-mapper.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
-import { metadataForClass } from '../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../decorator/metadata/metadata-helper'
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { createKeyAttributes, createToKeyFn, fromDb, fromDbOne, toDb, toDbOne, toKey } from './mapper'
 import {
@@ -972,7 +972,7 @@ describe('Mapper', () => {
 
   describe('createKeyAttributes', () => {
     it('PartitionKey only', () => {
-      const attrs = createKeyAttributes(metadataForClass(SimpleWithPartitionKeyModel), 'myId')
+      const attrs = createKeyAttributes(metadataForModel(SimpleWithPartitionKeyModel), 'myId')
       expect(attrs).toEqual({
         id: { S: 'myId' },
       })
@@ -980,7 +980,7 @@ describe('Mapper', () => {
 
     it('PartitionKey + SortKey', () => {
       const now = new Date()
-      const attrs = createKeyAttributes(metadataForClass(SimpleWithCompositePartitionKeyModel), 'myId', now)
+      const attrs = createKeyAttributes(metadataForModel(SimpleWithCompositePartitionKeyModel), 'myId', now)
       expect(attrs).toEqual({
         id: { S: 'myId' },
         creationDate: { S: now.toISOString() },
@@ -988,7 +988,7 @@ describe('Mapper', () => {
     })
 
     it('should throw when required sortKey is missing', () => {
-      expect(() => createKeyAttributes(metadataForClass(SimpleWithCompositePartitionKeyModel), 'myId')).toThrow()
+      expect(() => createKeyAttributes(metadataForModel(SimpleWithCompositePartitionKeyModel), 'myId')).toThrow()
     })
   })
 

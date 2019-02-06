@@ -65,11 +65,18 @@ export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: P
   if (!propertyMeta) {
     return
   }
+
   if (propertyMeta.mapper && propertyMeta.mapperForSingleItem) {
     return { ...propertyMeta, mapper: propertyMeta.mapperForSingleItem }
   }
+
   if (propertyMeta.typeInfo && (propertyMeta.typeInfo.type === Set || propertyMeta.typeInfo.type === Array)) {
-    return
+    if(hasGenericType(propertyMeta)){
+      return <PropertyMetadata<T>>{ ...propertyMeta, typeInfo: {type: propertyMeta.typeInfo.genericType } }
+    }else{
+      return
+    }
   }
+
   return { ...propertyMeta }
 }

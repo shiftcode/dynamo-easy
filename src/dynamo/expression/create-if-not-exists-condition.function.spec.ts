@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models/index'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { toDb } from '../../mapper/mapper'
 import { getTableName } from '../get-table-name.function'
 import { createIfNotExistsCondition } from './create-if-not-exists-condition.function'
@@ -18,12 +18,12 @@ describe('create ifNotExistsCondition', () => {
   let paramsComposite: DynamoDB.PutItemInput
 
   beforeEach(() => {
-    metaSimple = metadataForClass(SimpleWithPartitionKeyModel)
+    metaSimple = metadataForModel(SimpleWithPartitionKeyModel)
     paramsSimple = {
       TableName: getTableName(metaSimple),
       Item: toDb(jsItemSimple, SimpleWithPartitionKeyModel),
     }
-    metaComposite = metadataForClass(SimpleWithCompositePartitionKeyModel)
+    metaComposite = metadataForModel(SimpleWithCompositePartitionKeyModel)
     paramsComposite = {
       TableName: getTableName(metaComposite),
       Item: toDb(jsItemComposite, SimpleWithCompositePartitionKeyModel),

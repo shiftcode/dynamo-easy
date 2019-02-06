@@ -6,7 +6,7 @@ import {
 import { toDbOne } from '../../mapper/mapper'
 import { AttributeType } from '../../mapper/type/attribute-type.type'
 import { Attribute, Attributes } from '../../mapper/type/attribute.type'
-import { isSet } from '../../mapper/util'
+import { getPropertyPath, isSet } from '../../mapper/util'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
 import { uniqueAttributeValueName } from './functions/unique-attribute-value-name.function'
@@ -94,7 +94,7 @@ function buildDefaultExpression(
     // we have the metadata for an Array/Set of an Object,
     // but only get a single item when using `attribute('myCollectionProp[0]').set({})`
     if (operator.action === 'set' && /\[\d+\]$/.test(attributePath)) {
-      attribute = toDbOne(values[0], alterCollectionPropertyMetadataForSingleItem(propertyMetadata))
+      attribute = toDbOne(values[0], getPropertyPath(propertyMetadata, attributePath), alterCollectionPropertyMetadataForSingleItem(propertyMetadata))
     } else {
       attribute = toDbOne(values[0], propertyMetadata)
     }

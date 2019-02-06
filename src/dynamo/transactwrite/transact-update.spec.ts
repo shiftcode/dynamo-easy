@@ -1,6 +1,6 @@
 import { UpdateModel } from '../../../test/models'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { createKeyAttributes } from '../../mapper/mapper'
 import { update2 } from '../expression/logical-operator/update.function'
 import { getTableName } from '../get-table-name.function'
@@ -13,7 +13,7 @@ describe('TransactUpdate', () => {
   beforeEach(() => {
     op = new TransactUpdate(UpdateModel, 'myId')
     now = new Date()
-    metadata = metadataForClass(UpdateModel)
+    metadata = metadataForModel(UpdateModel)
   })
 
   afterEach(() => {

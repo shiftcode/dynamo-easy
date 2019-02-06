@@ -19,6 +19,10 @@ export function CollectionProperty<R, T extends StringAttribute | NumberAttribut
 
       const type: ModelConstructor<any> = getMetadataType(target, propertyKey)
 
+      if(type === undefined){
+        throw new Error('make sure you have enabled the typescript compiler options which enable us to work with decorators (see doc)')
+      }
+
       if (type !== Set && type !== Array) {
         throw new Error(`[${target.constructor.name}::${propertyKey}] The CollectionProperty decorator is meant for properties of type Set or Array`)
       }

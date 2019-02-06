@@ -3,7 +3,7 @@ import { BrutalistModel } from '../../../test/models/brutalist.model'
 import { Address, ComplexModel, UpdateModel } from '../../../test/models/index'
 import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world/index'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { createKeyAttributes } from '../../mapper/mapper'
 import { getTableName } from '../get-table-name.function'
 import { attribute } from './logical-operator/attribute.function'
@@ -19,7 +19,7 @@ describe('PrepareExpressions function', () => {
       let params: DynamoDB.UpdateItemInput | DynamoDB.Update
 
       beforeEach(() => {
-        metadata = metadataForClass(UpdateModel)
+        metadata = metadataForModel(UpdateModel)
         params = {
           TableName: getTableName(metadata),
           Key: createKeyAttributes(metadata, 'myId'),
@@ -294,7 +294,7 @@ describe('PrepareExpressions function', () => {
       let params: DynamoDB.UpdateItemInput | DynamoDB.Update
 
       beforeEach(() => {
-        metadata = metadataForClass(UpdateModel)
+        metadata = metadataForModel(UpdateModel)
         params = {
           TableName: getTableName(metadata),
           Key: createKeyAttributes(metadata, 'myId'),
@@ -387,7 +387,7 @@ describe('PrepareExpressions function', () => {
       let params: DynamoDB.UpdateItemInput | DynamoDB.Update
 
       beforeEach(() => {
-        metadata = metadataForClass(ComplexModel)
+        metadata = metadataForModel(ComplexModel)
         params = {
           TableName: getTableName(metadata),
           Key: createKeyAttributes(metadata, 'myId', new Date()),
@@ -431,7 +431,7 @@ describe('PrepareExpressions function', () => {
     let aDate: Date
 
     beforeEach(() => {
-      metadata = metadataForClass(BrutalistModel)
+      metadata = metadataForModel(BrutalistModel)
       aFormId = new FormId(FormType.REQUEST, 99, 2000)
       aDate = new Date()
       params = {
@@ -483,7 +483,7 @@ describe('PrepareExpressions function', () => {
     let params: DynamoDB.UpdateItemInput | DynamoDB.Update
 
     beforeEach(() => {
-      metadata = metadataForClass(Order)
+      metadata = metadataForModel(Order)
       params = {
         TableName: getTableName(metadata),
         Key: createKeyAttributes(metadata, new OrderId(5, 2018)),

@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-non-null-assertion
 import { FormId, formIdMapper } from '../../../../test/models/real-world'
-import { metadataForClass, metadataForProperty } from '../../metadata/metadata-helper'
+import { metadataForModel } from '../../metadata/metadata-helper'
 import { Model } from '../model/model.decorator'
 import { CollectionProperty } from './collection-property.decorator'
 
@@ -13,7 +13,7 @@ describe('@CollectionProperty', () => {
       myCollection: Set<FormId>
     }
 
-    const meta = metadataForProperty(Test, 'myCollection')
+    const meta = metadataForModel(Test).forProperty('myCollection')
     expect(meta).toBeDefined()
     expect(meta!.name).toBe('myCollection')
     expect(meta!.nameDb).toBe('my_collection')
@@ -26,7 +26,7 @@ describe('@CollectionProperty', () => {
       myCollection: Set<FormId>
     }
 
-    const meta = metadataForProperty(Test, 'myCollection')
+    const meta = metadataForModel(Test).forProperty('myCollection')
     expect(meta).toBeDefined()
     expect(meta!.isSortedCollection).toBeTruthy()
   })
@@ -38,7 +38,7 @@ describe('@CollectionProperty', () => {
       myCollection: Set<FormId>
     }
 
-    const meta = metadataForProperty(Test, 'myCollection')
+    const meta = metadataForModel(Test).forProperty('myCollection')
     expect(meta).toBeDefined()
     expect(meta!.mapper).toBeDefined()
     expect(typeof meta!.mapperForSingleItem === 'function').toBeTruthy()
@@ -52,7 +52,7 @@ describe('@CollectionProperty', () => {
       myCollection: FormId[]
     }
 
-    const meta = metadataForProperty(Test, 'myCollection')
+    const meta = metadataForModel(Test).forProperty('myCollection')
     expect(meta).toBeDefined()
     expect(meta!.typeInfo).toBeDefined()
     expect(meta!.typeInfo!.genericType).toBe(FormId)
@@ -66,7 +66,7 @@ describe('@CollectionProperty', () => {
         myCollection: FormId
       }
 
-      metadataForClass(Test)
+      metadataForModel(Test)
     }).toThrow()
   })
 
@@ -81,7 +81,7 @@ describe('@CollectionProperty', () => {
         myCollection: Set<FormId>
       }
 
-      metadataForClass(Test)
+      metadataForModel(Test)
     }).toThrow()
   })
 })

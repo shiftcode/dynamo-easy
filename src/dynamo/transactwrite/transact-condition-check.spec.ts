@@ -1,6 +1,6 @@
 import { UpdateModel } from '../../../test/models'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForClass } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { createKeyAttributes } from '../../mapper/mapper'
 import { getTableName } from '../get-table-name.function'
 import { TransactConditionCheck } from './transact-condition-check'
@@ -10,7 +10,7 @@ describe('TransactConditionCheck', () => {
   let metadata: Metadata<UpdateModel>
   beforeEach(() => {
     op = new TransactConditionCheck(UpdateModel, 'myId')
-    metadata = metadataForClass(UpdateModel)
+    metadata = metadataForModel(UpdateModel)
   })
 
   it('correct transactItem', () => {

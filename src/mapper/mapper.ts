@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
-import { metadataForClass, metadataForProperty } from '../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../decorator/metadata/metadata-helper'
 import { hasType, Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
 import { MapperForType } from './for-type/base.mapper'
@@ -15,7 +15,7 @@ import { Attribute, Attributes } from './type/attribute.type'
 import { Binary } from './type/binary.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
-import { typeOf, typeOfFromDb } from './util'
+import { getPropertyPath, typeOf, typeOfFromDb } from './util'
 
 const mapperForType: Map<AttributeValueType, MapperForType<any, any>> = new Map()
 
@@ -23,7 +23,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
   const mapped = <Attributes<T>>{}
 
   if (modelConstructor) {
-    const metadata: Metadata<T> = metadataForClass(modelConstructor)
+    const metadata: Metadata<T> = metadataForModel(modelConstructor)
 
     /*
      * initialize possible properties with auto generated uuid
@@ -55,19 +55,19 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
       let propertyMetadata: PropertyMetadata<T, any> | null | undefined
       if (modelConstructor) {
-        propertyMetadata = metadataForProperty(modelConstructor, propertyKey)
+        propertyMetadata = metadataForModel(modelConstructor).forProperty(propertyKey)
       }
 
       if (propertyMetadata) {
         if (propertyMetadata.transient) {
-          // 3a_1) skip transient propert
+          // 3a_1) skip transient property
         } else {
           // 3a_2) property metadata is defined and property is not marked not transient
-          attributeValue = toDbOne(propertyValue, propertyMetadata)
+          attributeValue = toDbOne(propertyValue, getPropertyPath<T>(modelConstructor, propertyKey), propertyMetadata)
         }
       } else {
         // 3b) no metadata found
-        attributeValue = toDbOne(propertyValue)
+        attributeValue = toDbOne(propertyValue, getPropertyPath<T>(modelConstructor, propertyKey))
       }
 
       if (attributeValue === undefined) {
@@ -83,11 +83,30 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
   return mapped
 }
 
-export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): Attribute | null {
+/**
+ * @param propertyValue The value which should be mapped
+ * @param propertyMetadata Some optional metadata
+ */
+export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): Attribute | null
+
+/**
+ *
+ * You can provide the property path to have a more verbose output
+ *
+ * @param propertyValue The value which should be mapped
+ * @param propertyPath The property path is only used for logging purposes
+ * @param propertyMetadata Some optional metadata
+ */
+export function toDbOne(propertyValue: any, propertyPath: string, propertyMetadata?: PropertyMetadata<any>): Attribute | null
+
+export function toDbOne(propertyValue: any, propertyPathOrMetadata?: string | PropertyMetadata<any>, propertyMetadata?: PropertyMetadata<any>): Attribute | null {
+  const propertyPath = propertyPathOrMetadata && typeof propertyPathOrMetadata === 'string' ? propertyPathOrMetadata : null
+  propertyMetadata = propertyPathOrMetadata && typeof propertyPathOrMetadata !== 'string' ? propertyPathOrMetadata : propertyMetadata
+
   const explicitType: AttributeValueType | null = hasType(propertyMetadata)
     ? propertyMetadata.typeInfo.type
     : null
-  const type: AttributeValueType = explicitType || typeOf(propertyValue)
+  const type: AttributeValueType = explicitType || typeOf(propertyValue, propertyPath)
 
   const mapper = propertyMetadata && propertyMetadata.mapper ? propertyMetadata.mapper() : forType(type)
 
@@ -121,7 +140,7 @@ function testForKey<T>(p: PropertyMetadata<T>): p is PropertyMetadata<T> & { key
  * @param modelConstructor
  */
 export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: Partial<T>) => Attributes<T> {
-  const metadata = metadataForClass(modelConstructor)
+  const metadata = metadataForModel(modelConstructor)
   const properties = metadata.modelOptions.properties
   if (!properties) {
     throw new Error('metadata properties is not defined')
@@ -184,7 +203,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
     let modelValue: T | undefined
     let propertyMetadata: PropertyMetadata<any, any> | null | undefined
     if (modelConstructor) {
-      propertyMetadata = metadataForProperty(modelConstructor, attributeName)
+      propertyMetadata = metadataForModel(modelConstructor).forProperty(attributeName)
     }
 
     if (propertyMetadata) {

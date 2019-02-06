@@ -12,6 +12,9 @@ export class Address {
 @Model()
 export class Info {
   details: string
+
+  @DateProperty()
+  createdAt: Date
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -38,6 +41,9 @@ export class UpdateModel {
 
   @CollectionProperty({ sorted: true })
   numberValues: number[]
+
+  @CollectionProperty({ itemType: Info })
+  informations: Info[]
 
   // maps to M(ap)
   info: Info

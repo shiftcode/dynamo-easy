@@ -1,7 +1,7 @@
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { Organization, SimpleModel } from '../../test/models'
 import { updateDynamoEasyConfig } from '../config/update-config.function'
-import { metadataForClass } from '../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../decorator/metadata/metadata-helper'
 import { getTableName } from './get-table-name.function'
 
 describe('getTableName', () => {
@@ -12,7 +12,7 @@ describe('getTableName', () => {
   })
 
   it('correct table name - default by metaData', () => {
-    expect(getTableName(metadataForClass(SimpleModel))).toBe('simple-models')
+    expect(getTableName(metadataForModel(SimpleModel))).toBe('simple-models')
   })
 
   it('correct table name - by decorator', () => {
@@ -22,13 +22,13 @@ describe('getTableName', () => {
   it('correct table name - by tableNameResolver', () => {
     updateDynamoEasyConfig({ tableNameResolver: tableName => `${tableName}-with-special-thing` })
     expect(getTableName(SimpleModel)).toBe('simple-models-with-special-thing')
-    expect(getTableName(metadataForClass(Organization))).toBe('Organization-with-special-thing')
+    expect(getTableName(metadataForModel(Organization))).toBe('Organization-with-special-thing')
   })
 
   it('throw error because table name is invalid', () => {
     // tslint:disable-next-line:no-unused-expression
     updateDynamoEasyConfig({ tableNameResolver: tableName => `${tableName}$` })
-    expect(() => getTableName(metadataForClass(SimpleModel))).toThrowError()
+    expect(() => getTableName(metadataForModel(SimpleModel))).toThrowError()
     expect(() => getTableName(Organization)).toThrowError()
   })
 })

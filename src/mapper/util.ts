@@ -1,10 +1,28 @@
 import { isNumber, isString } from 'lodash'
+import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { ModelConstructor } from '../model/model-constructor'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
 import { Attribute } from './type/attribute.type'
 import { Binary } from './type/binary.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
+
+export function getPropertyPath<T>(modelConstructorOrPropertyMetadata: ModelConstructor<T> | PropertyMetadata<T> | undefined, propertyKey: keyof T): string {
+  if (modelConstructorOrPropertyMetadata && modelConstructorOrPropertyMetadata.name) {
+    return `[${modelConstructorOrPropertyMetadata.name}::${propertyKey}]`
+  } else {
+    return `[unknown::${propertyKey}]`
+  }
+}
+
+export function messageWithPath(propertyPath: string | null | undefined, message: string): string{
+  if(!!propertyPath){
+    return `${propertyPath} ${message}`
+  }else{
+  return `${message}`
+  }
+}
 
 const BUFFER_TYPES = [
   'Buffer',
@@ -119,7 +137,7 @@ export function detectType(value: any): AttributeType {
 /**
  * Will resolve the type based on given property value
  */
-export function typeOf(propertyValue: any): AttributeValueType {
+export function typeOf(propertyValue: any, propertyPath?: string | null): AttributeValueType {
   if (propertyValue === null) {
     return NullType
   } else if (Array.isArray(propertyValue)) {
@@ -145,7 +163,7 @@ export function typeOf(propertyValue: any): AttributeValueType {
     }
   }
 
-  throw new Error(`typeof data ${propertyValue} could not be detected`)
+  throw new Error(messageWithPath(propertyPath, `typeof data ${propertyValue} could not be detected`))
 }
 
 /*
