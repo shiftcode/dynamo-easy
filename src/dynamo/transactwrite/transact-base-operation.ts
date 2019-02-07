@@ -5,16 +5,17 @@ import { ModelConstructor } from '../../model/model-constructor'
 import { and } from '../expression/logical-operator/and.function'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { RequestConditionFunction } from '../expression/type/condition-expression-definition-chain'
+import {
+  RequestConditionFunction,
+  RequestConditionFunctionTyped,
+} from '../expression/type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from '../expression/type/condition-expression-definition-function'
 import { getTableName } from '../get-table-name.function'
 import { ConditionalParamsHost } from '../operation-params.type'
 
-export abstract class TransactBaseOperation<
-  T,
+export abstract class TransactBaseOperation<T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
-  R extends TransactBaseOperation<T, I, any>
-> implements ConditionalParamsHost {
+  R extends TransactBaseOperation<T, I, any>> implements ConditionalParamsHost {
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>
@@ -37,8 +38,10 @@ export abstract class TransactBaseOperation<
     }
   }
 
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
-    return addCondition('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
+  onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
+  onlyIfAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
+    return addCondition<R, T, any>('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
   }
 
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
