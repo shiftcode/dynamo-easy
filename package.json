@@ -71,7 +71,7 @@
     "tslint": "5.11.0",
     "tslint-config-prettier": "1.16.0",
     "typedoc": "0.13.0",
-    "typescript": "3.1.6"
+    "typescript": "3.3.3"
   },
   "peerDependencies": {
     "aws-sdk": "^2.286.1",
