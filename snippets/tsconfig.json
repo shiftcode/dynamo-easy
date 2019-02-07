@@ -20,15 +20,11 @@
     ],
     "paths": {
       "@shiftcoders/*": [
-        "src/*"
+        "../src/*"
       ]
     }
   },
   "include": [
-    "snippets/**/*.ts"
-  ],
-  "exclude": [
-    "test/**/*",
-    "src/**/*"
+    "./**/*.ts"
   ]
 }
