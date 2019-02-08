@@ -10,6 +10,7 @@ import { Duration } from '../../../../test/models/duration.model'
 import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { dateToStringMapper } from '../../../mapper/custom/date-to-string.mapper'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { update, update2 } from '../../expression/logical-operator/update.function'
 import { UpdateRequest } from './update.request'
 
@@ -218,6 +219,35 @@ describe('update request', () => {
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+  })
+
+  describe('typings', () => {
+    // tests basically only exists to be not valid when typings would be wrong
+    let req: UpdateRequest<SimpleWithPartitionKeyModel>
+    let dynamoDbWrapperMock: DynamoDbWrapper
+
+    beforeEach(() => {
+      dynamoDbWrapperMock = <any>{
+        updateItem: () =>
+          Promise.resolve({
+            Attributes: {
+              id: { S: 'myId' },
+              age: { N: '20' },
+            },
+          }),
+      }
+      req = new UpdateRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+    })
+
+    it('exec, ALL_OLD', async () => {
+      const result: SimpleWithPartitionKeyModel = await req.returnValues('ALL_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
+    })
+
+    it('exec, UPDATED_OLD', async () => {
+      const result: Partial<SimpleWithPartitionKeyModel> = await req.returnValues('UPDATED_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
     })
   })
 })

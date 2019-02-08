@@ -1,5 +1,4 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
@@ -10,11 +9,22 @@ import { addUpdate } from '../../expression/request-expression-builder'
 import { RequestUpdateFunction } from '../../expression/type/update-expression-definition-chain'
 import { UpdateExpressionDefinitionFunction } from '../../expression/type/update-expression-definition-function'
 import { WriteRequest } from '../write.request'
+import { UpdateResponse } from './update.response'
 
-type UpdateRequestReturnT<T> = Omit<UpdateRequest<T>, 'exec'> & { exec(): Promise<T> }
-type UpdateRequestReturnPartialT<T> = Omit<UpdateRequest<T>, 'exec'> & { exec(): Promise<Partial<T>> }
+type UpdateRequestReturnT<T> = Omit<Omit<UpdateRequest<T>, 'exec'>, 'execFullResponse'> & {
+  exec(): Promise<T>
+  execFullResponse(): Promise<UpdateResponse<T>>
+}
+type UpdateRequestReturnPartialT<T> = Omit<Omit<UpdateRequest<T>, 'exec'>, 'execFullResponse'> & {
+  exec(): Promise<Partial<T>>
+  execFullResponse(): Promise<UpdateResponse<T>>
+}
 
-export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, UpdateRequest<T>> {
+/**
+ * Request class for the UpdateItem operation.
+ */
+export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, DynamoDB.UpdateItemOutput, UpdateRequest<T>> {
+
   protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
@@ -23,10 +33,18 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
+  /**
+   * create and add a single update operation
+   * @example req.updateAttribute('path.to.attr').set('newVal')
+   */
   updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<UpdateRequest<T>, T, K> {
     return addUpdate(attributePath, this, this.metadata)
   }
 
+  /**
+   * add multiple update operations comma separated
+   * @example req.operations(update('path.to.attr).set('newVal'), ... )
+   */
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
     prepareAndAddUpdateExpressions(this.metadata, this.params, updateDefFns)
     return this
@@ -40,20 +58,7 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
     return this
   }
 
-  /*
-   * kind a hacky - this is just for typing reasons so Promise<void> is the default return type when not defining a
-   * returnValues other than NONE
-   *
-   * const valueVoid = new DeleteRequest(...).exec()
-   * const valueMyModel = new DeleteRequest(...).returnValues('ALL_OLD').exec()
-   */
-  exec(): Promise<void> {
-    return <Promise<void>>super.exec()
-  }
-
-  execFullResponse(): Promise<DynamoDB.UpdateItemOutput> {
-    this.logger.debug('request', this.params)
+  protected doRequest(params: DynamoDB.UpdateItemInput): Promise<DynamoDB.UpdateItemOutput> {
     return this.dynamoDBWrapper.updateItem(this.params)
-      .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }
