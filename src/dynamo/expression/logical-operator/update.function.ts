@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ModelConstructor } from '../../../model/model-constructor'
 import { updateDefinitionFunction } from '../request-expression-builder'
 import {

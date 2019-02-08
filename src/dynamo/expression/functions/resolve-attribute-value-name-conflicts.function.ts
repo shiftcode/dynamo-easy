@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ConditionalParams } from '../../operation-params.type'
 import { Expression } from '../type/expression.type'
@@ -8,6 +11,7 @@ import { uniqueAttributeValueName } from './unique-attribute-value-name.function
  * @param expression
  * @param params
  * @return safe-to-use Expression
+ * @hidden
  */
 export function resolveAttributeValueNameConflicts(expression: Expression, params: ConditionalParams): Expression {
   let attributeValues: Attributes<any> = {}

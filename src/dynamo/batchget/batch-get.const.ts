@@ -1,4 +1,7 @@
 /**
+ * @module multi-model-requests/batch-get
+ */
+/**
  * max count of request items allowed by aws
  */
 export const BATCH_GET_MAX_REQUEST_ITEM_COUNT = 100

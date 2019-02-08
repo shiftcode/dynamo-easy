@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 export type Attribute =
   | StringAttribute
   | NumberAttribute

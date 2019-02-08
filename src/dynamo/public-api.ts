@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 export * from './batchget/public-api'
 export * from './batchwrite/public-api'
 export * from './dynamo-db-wrapper'

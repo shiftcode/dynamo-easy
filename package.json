@@ -28,7 +28,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
-    "build:docs": "typedoc --out dist/docs --target es6 --theme minimal",
+    "build:docs": "rimraf ./dist/docs && typedoc --out dist/docs --readme ./doc-intro.md --target es6 --hideGenerator --theme minimal --excludePrivate --stripInternal",
     "check-snippets": "npx tsc --outDir ./dist-snippets --project ./snippets/tsconfig.json && rimraf dist-snippets",
     "commity": "commit",
     "deploy-docs": "ts-node tools/gh-pages-publish",
@@ -73,6 +73,7 @@
     "tslint-config-prettier": "^1.17.0",
     "tsutils": "^3.6.0",
     "typedoc": "^0.13.0",
+    "typedoc-plugin-external-module-name": "^2.0.0",
     "typescript": ">=2.9.1",
     "uuid": "^3.3.2"
   },

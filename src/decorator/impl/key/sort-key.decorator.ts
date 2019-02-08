@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 
 export function SortKey(): PropertyDecorator {

@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { isNumber, isString } from 'lodash'
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'

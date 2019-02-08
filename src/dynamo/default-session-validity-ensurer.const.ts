@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 import { SessionValidityEnsurer } from './session-validity-ensurer.type'
 
 /**

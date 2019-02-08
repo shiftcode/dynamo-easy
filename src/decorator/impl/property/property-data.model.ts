@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import { MapperForType } from '../../../mapper/for-type/base.mapper'
 
 /**

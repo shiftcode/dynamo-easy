@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { notNull } from '../helper/not-null.function'
 import { MapperForType } from './for-type/base.mapper'
 import {

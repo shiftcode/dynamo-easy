@@ -1,3 +1,6 @@
+/**
+ * @module metadata
+ */
 import { SecondaryIndex } from '../impl/index/secondary-index'
 import { PropertyMetadata } from './property-metadata.model'
 

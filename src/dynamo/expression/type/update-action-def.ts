@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { UpdateActionKeyword } from './update-action-keyword.type'
 import { UpdateAction } from './update-action.type'
 

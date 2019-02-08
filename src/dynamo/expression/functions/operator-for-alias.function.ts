@@ -1,7 +1,13 @@
+/**
+ * @module expression
+ */
 import { OperatorAlias } from '../type/condition-operator-alias.type'
 import { OPERATOR_TO_ALIAS_MAP } from '../type/condition-operator-to-alias-map.const'
 import { ConditionOperator } from '../type/condition-operator.type'
 
+/**
+ * @hidden
+ */
 export function operatorForAlias(alias: OperatorAlias): ConditionOperator | undefined {
   let operator: ConditionOperator | undefined
   Object.keys(OPERATOR_TO_ALIAS_MAP).forEach(key => {

@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ConditionalParamsHost } from '../../operation-params.type'
 
 /*

@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SecondaryIndex } from '../../decorator/impl/index/secondary-index'
 import { fetchAll } from '../../helper/fetch-all.function'

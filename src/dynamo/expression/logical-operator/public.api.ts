@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 export * from './and.function'
 export * from './attribute.function'
 export * from './not.function'

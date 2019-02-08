@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ComparatorOperator } from './comparator-operator.type'
 import { FunctionOperator } from './function-operator.type'
 

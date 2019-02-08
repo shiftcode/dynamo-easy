@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import {
   BinaryAttribute,

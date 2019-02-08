@@ -1,3 +1,9 @@
+/**
+ * @module expression
+ */
+/**
+ * @hidden
+ */
 export type FunctionOperator =
   | 'attribute_exists'
   | 'attribute_not_exists'

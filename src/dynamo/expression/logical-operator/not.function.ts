@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
 import { Expression } from '../type/expression.type'

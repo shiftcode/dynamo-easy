@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/batch-write
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../helper/random-exponential-backoff-timer.generator'
 import { createToKeyFn, toDb } from '../../mapper/mapper'

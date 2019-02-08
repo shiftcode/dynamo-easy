@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { Expression } from './expression.type'
 

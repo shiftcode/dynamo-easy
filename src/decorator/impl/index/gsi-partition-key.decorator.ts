@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import { IndexType } from './index-type.enum'
 import { initOrUpdateIndex } from './util'
 

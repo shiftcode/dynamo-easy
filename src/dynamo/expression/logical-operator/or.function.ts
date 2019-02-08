@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
 import { mergeConditions } from './merge-conditions.function'
 

@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import { MapperForType } from '../../../mapper/for-type/base.mapper'
 import { BinaryAttribute, NumberAttribute, StringAttribute } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'

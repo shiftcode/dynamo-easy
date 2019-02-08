@@ -1,3 +1,9 @@
+/**
+ * @module expression
+ */
+/**
+ * @hidden
+ */
 export type OperatorAlias =
   | 'equals'
   | 'eq'

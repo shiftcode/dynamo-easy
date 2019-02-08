@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../../helper/random-exponential-backoff-timer.generator'
 import { createLogger, Logger } from '../../../logger/logger'

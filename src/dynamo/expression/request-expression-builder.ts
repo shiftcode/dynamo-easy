@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { curry } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { ConditionalParamsHost, UpdateParamsHost } from '../operation-params.type'
@@ -111,6 +114,9 @@ export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   return createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
 }
 
+/**
+ * @hidden
+ */
 export function doAddCondition<T, R extends ConditionalParamsHost>(
   expressionType: ExpressionType,
   attributePath: string,

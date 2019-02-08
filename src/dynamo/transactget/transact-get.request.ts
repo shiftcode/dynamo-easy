@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/transact-get
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { createToKeyFn, fromDb } from '../../mapper/mapper'

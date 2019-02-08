@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'

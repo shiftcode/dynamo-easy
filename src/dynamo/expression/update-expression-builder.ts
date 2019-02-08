@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { Metadata } from '../../decorator/metadata/metadata'
 import {
   alterCollectionPropertyMetadataForSingleItem,
@@ -24,6 +27,7 @@ import { UpdateExpression } from './type/update-expression.type'
  * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
  * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
  * @returns {Expression}
+ * @hidden
  */
 export function buildUpdateExpression(
   attributePath: string,
@@ -67,6 +71,9 @@ export function buildUpdateExpression(
   )
 }
 
+/**
+ * @hidden
+ */
 function buildDefaultExpression(
   attributePath: string,
   namePlaceholder: string,
@@ -154,6 +161,9 @@ function buildDefaultExpression(
   }
 }
 
+/**
+ * @hidden
+ */
 function isNoAttributeValueAction(action: UpdateAction) {
   return (
     action === 'remove' ||
@@ -162,6 +172,9 @@ function isNoAttributeValueAction(action: UpdateAction) {
   )
 }
 
+/**
+ * @hidden
+ */
 export function validateAttributeType(name: string, attribute: Attribute | null, ...allowedTypes: AttributeType[]) {
   if (attribute === null || attribute === undefined) {
     throw new Error(`${name} requires an attributeValue of ${allowedTypes.join(', ')} but non was given`)

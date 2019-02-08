@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/batch-get
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { metadataForModel } from '../../decorator/metadata/metadata-helper'
 import { randomExponentialBackoffTimer } from '../../helper/random-exponential-backoff-timer.generator'

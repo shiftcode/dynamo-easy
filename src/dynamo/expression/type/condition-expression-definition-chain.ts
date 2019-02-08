@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ExtractListType } from '../../../helper/extract-list-type.type'
 import { AttributeType } from '../../../mapper/type/attribute-type.type'
 import { ConditionalParamsHost } from '../../operation-params.type'

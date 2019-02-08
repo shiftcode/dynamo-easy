@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/batch-write
+ */
 
 /**
  * max count of request items allowed by aws

@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 import { Config } from './config.type'
 import { dynamoEasyConfig } from './dynamo-easy-config'
 

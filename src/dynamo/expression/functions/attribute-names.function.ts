@@ -1,8 +1,14 @@
+/**
+ * @module expression
+ */
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { NESTED_ATTR_PATH_CAPTURED_REGEX, NESTED_ATTR_PATH_REGEX } from './attribute-names.const'
 
 
 // problem: we only get the metadata from the last property -> but we need it for all properties in the chain (prop1.prop2.prop3)
+/**
+ * @hidden
+ */
 export function resolveAttributeNames(
   attributePath: string,
   metadata?: Metadata<any> | undefined,

@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/transact-write
+ */
 export * from './transact-condition-check'
 export * from './transact-delete'
 export * from './transact-put'

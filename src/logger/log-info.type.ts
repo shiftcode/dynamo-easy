@@ -1,3 +1,6 @@
+/**
+ * @module logger
+ */
 import { LogLevel } from './log-level.type'
 
 /**

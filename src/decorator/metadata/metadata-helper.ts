@@ -1,3 +1,6 @@
+/**
+ * @module metadata
+ */
 import { ModelConstructor } from '../../model/model-constructor'
 import { Metadata } from './metadata'
 

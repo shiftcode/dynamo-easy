@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
 import { metadataForModel } from '../decorator/metadata/metadata-helper'

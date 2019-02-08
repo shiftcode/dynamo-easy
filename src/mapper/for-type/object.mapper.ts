@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { hasType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { fromDb, toDb } from '../mapper'
 import { Attributes, MapAttribute } from '../type/attribute.type'

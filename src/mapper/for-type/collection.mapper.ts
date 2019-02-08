@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { notNull } from '../../helper/not-null.function'
 import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'

@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { NON_PARAM_FUNCTION_OPERATORS } from '../non-param-function-operators.const'
 import { FunctionOperator } from '../type/function-operator.type'
 

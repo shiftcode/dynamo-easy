@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { Attributes } from '../../mapper/type/attribute.type'

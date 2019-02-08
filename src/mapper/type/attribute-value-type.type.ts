@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { Binary } from './binary.type'
 import { NullType } from './null.type'
 import { UndefinedType } from './undefined.type'

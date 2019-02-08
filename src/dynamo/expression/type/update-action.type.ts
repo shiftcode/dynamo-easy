@@ -1,4 +1,7 @@
 /**
+ * @module expression
+ */
+/**
  *
  * update expressions support these 4 base operations:
  * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html

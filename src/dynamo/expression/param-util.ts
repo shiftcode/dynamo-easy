@@ -1,14 +1,22 @@
+/**
+ * @module expression
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { isEmpty, isString } from 'lodash'
 import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type/expression.type'
 import { UpdateActionKeyword } from './type/update-action-keyword.type'
-
+/**
+ * @hidden
+ */
 export function addUpdateExpression(updateExpression: Expression, params: DynamoDB.UpdateItemInput): void {
   addExpression('UpdateExpression', updateExpression, params)
 }
 
+/**
+ * @hidden
+ */
 export function addExpression(
   expressionType: 'ConditionExpression' | 'KeyConditionExpression' | 'FilterExpression' | 'UpdateExpression',
   condition: Expression,
@@ -61,8 +69,7 @@ type UpdateExpressionsByKeyword = Record<UpdateActionKeyword, string>
  * console.log(merged) -> 'SET a, b, c, d REMOVE e, f, g, h ADD i, j, k, l DELETE m, n, o, p'
  * ```
  *
- * @param expression1
- * @param expression2
+ * @hidden
  */
 export function mergeUpdateExpressions(expression1: string, expression2: string): string {
   const a = splitUpdateExpressionToActionKeyword(expression1)
@@ -74,6 +81,7 @@ export function mergeUpdateExpressions(expression1: string, expression2: string)
 
 /**
  * Will return an object containing all the update statements mapped to an update action keyword
+ * @hidden
  */
 function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {
   // add a whitespace at the beginning of the expression to be able to work with a more stricter regex
@@ -95,6 +103,9 @@ function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateE
   )
 }
 
+/**
+ * @hidden
+ */
 function isUpdateActionKeyword(val: string): val is UpdateActionKeyword {
   return /^(SET|REMOVE|ADD|DELETE)$/.test(val)
 }

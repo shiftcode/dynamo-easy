@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { metadataForModel } from '../../decorator/metadata/metadata-helper'

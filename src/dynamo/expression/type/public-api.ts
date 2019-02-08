@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 export * from './comparator-operator.type'
 export * from './condition-expression-definition-chain'
 export * from './condition-expression-definition-function'

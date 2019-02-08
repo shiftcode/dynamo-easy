@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { createToKeyFn, fromDb } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'

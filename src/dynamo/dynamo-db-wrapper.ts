@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Config } from 'aws-sdk/global'
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
@@ -5,6 +8,7 @@ import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 /**
  * Simply calls the sessionValidityEnsurer before each standard dynamoDB operations and returns a promise for each
  * request
+ * @hidden
  */
 export class DynamoDbWrapper {
   readonly dynamoDB: DynamoDB

@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ModelConstructor } from '../../../model/model-constructor'
 import { propertyDefinitionFunction } from '../request-expression-builder'
 import {

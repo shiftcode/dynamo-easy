@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 // collection
 export * from './collection/collection-property.decorator'
 

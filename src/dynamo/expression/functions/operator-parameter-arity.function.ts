@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ConditionOperator } from '../type/condition-operator.type'
 import { isFunctionOperator } from './is-function-operator.function'
 import { isNoParamFunctionOperator } from './is-no-param-function-operator.function'
