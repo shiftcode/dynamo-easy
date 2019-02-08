@@ -2,6 +2,9 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { TransactOperation } from './transact-operation.type'
 
+/**
+ * Request class for the TransactWriteItems operation. Write up to 10 items to one or many tables in a transaction.
+ */
 export class TransactWriteRequest {
   readonly params: DynamoDB.TransactWriteItemsInput
   private readonly dynamoDBWrapper: DynamoDbWrapper
@@ -18,6 +21,9 @@ export class TransactWriteRequest {
     return this
   }
 
+  /**
+   * return item collection metrics.
+   */
   returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): TransactWriteRequest {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
     return this
@@ -35,10 +41,16 @@ export class TransactWriteRequest {
     return this
   }
 
+  /**
+   * execute the request and return the full reponse.
+   */
   execFullResponse(): Promise<DynamoDB.TransactWriteItemsOutput> {
     return this.dynamoDBWrapper.transactWriteItems(this.params)
   }
 
+  /**
+   * execute the request.
+   */
   exec(): Promise<void> {
     return this.dynamoDBWrapper.transactWriteItems(this.params)
       .then(response => { return })

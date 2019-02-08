@@ -3,6 +3,9 @@ import { createKeyAttributes } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { TransactBaseOperation } from './transact-base-operation'
 
+/**
+ * TransactOperation class for transactional condition checks.
+ */
 export class TransactConditionCheck<T> extends TransactBaseOperation<
   T,
   DynamoDB.ConditionCheck,

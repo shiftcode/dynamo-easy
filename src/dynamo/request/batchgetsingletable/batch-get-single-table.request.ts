@@ -11,6 +11,9 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
+/**
+ * Request class for BatchGetItem operation which supports a single model class only.
+ */
 export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
   DynamoDB.BatchGetItemInput,
   BatchGetSingleTableRequest<T>> {
@@ -37,7 +40,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
   }
 
   /**
-   * fetch all entries and return an the raw response (no mapping of items)
+   * fetch all entries and return the raw response (without parsing the attributes to js objects)
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
@@ -63,7 +66,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
   }
 
   /**
-   * fetch all entries and return the mapped entries as an array
+   * fetch all entries and return the parsed items
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */

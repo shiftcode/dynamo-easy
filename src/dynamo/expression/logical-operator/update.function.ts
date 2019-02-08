@@ -10,15 +10,15 @@ import {
  *
  * ```typescript
  * @Model()
- * class Person{
+ * class Person {
  *
  *   @PartitionKeyUUID()
  *   id: string
  *   age: number
  * }
  *
- * store.update('idValue')
- *  .operations(update2(SimpleWithPartitionKeyModel, 'age').set(5))
+ * personStore.update('idValue')
+ *  .operations(update2(Person, 'age').set(5))
  *  .exec()
  * ```
  *

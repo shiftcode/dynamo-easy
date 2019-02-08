@@ -2,6 +2,9 @@ import { Metadata } from '../../../decorator/metadata/metadata'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
 import { Expression } from '../type/expression.type'
 
+/**
+ * function to negate a condition
+ */
 export function not(
   conditionDefinitionFn: ConditionExpressionDefinitionFunction,
 ): ConditionExpressionDefinitionFunction {

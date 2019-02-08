@@ -4,6 +4,9 @@ import { ModelConstructor } from '../../model/model-constructor'
 import { createIfNotExistsCondition } from '../expression/create-if-not-exists-condition.function'
 import { TransactBaseOperation } from './transact-base-operation'
 
+/**
+ * TransactOperation class for transactional put items.
+ */
 export class TransactPut<T> extends TransactBaseOperation<T, DynamoDB.Put, TransactPut<T>> {
   constructor(modelClazz: ModelConstructor<T>, item: T) {
     super(modelClazz)

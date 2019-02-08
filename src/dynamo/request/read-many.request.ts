@@ -22,7 +22,7 @@ import { ScanResponse } from './scan/scan.response'
 import { StandardRequest } from './standard.request'
 
 /**
- * Base class for query and scan request classes.
+ * abstract class for query and scan request classes.
  */
 export abstract class ReadManyRequest<T,
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
@@ -38,7 +38,6 @@ export abstract class ReadManyRequest<T,
 
   /**
    * method that executes the actual call on dynamoDBWrapper with the given params.
-   * @param params
    */
   protected abstract doRequest(params: I): Promise<O>
 
@@ -51,9 +50,9 @@ export abstract class ReadManyRequest<T,
    *
    * @param key A map representing the start id which is included in next call, if null is delivered
    * startKey will be removed from params
-   * @returns {Request}
    */
   exclusiveStartKey(key: DynamoDB.Key | null): R {
+    // TODO ENHANCEMENT exclusiveStartKey(item: Partial<T>)
     if (key) {
       this.params.ExclusiveStartKey = key
     } else {
@@ -63,6 +62,9 @@ export abstract class ReadManyRequest<T,
     return <any>this
   }
 
+  /**
+   * query items on the given index.
+   */
   index(indexName: string): R {
     const index = this.metadata.getIndex(indexName)
 
@@ -75,6 +77,9 @@ export abstract class ReadManyRequest<T,
     return <any>this
   }
 
+  /**
+   * set Limit to params - The maximum number of items to evaluate (not necessarily the number of matching items)
+   */
   limit(limit: number): R {
     if (limit === ReadManyRequest.INFINITE_LIMIT) {
       delete this.params.Limit
@@ -89,31 +94,39 @@ export abstract class ReadManyRequest<T,
     return <any>this
   }
 
-
   /**
    * add a condition for propertyPath
-   * @param attributePath
+   * @example req.whereAttribute('path.to.prop').eq('value')
    */
   whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
   whereAttribute(attributePath: string): RequestConditionFunction<R, T>
-  whereAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K>
-
-  {
+  whereAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
     return addCondition<R, T, any>('FilterExpression', attributePath, <any>this, this.metadata)
   }
 
+  /**
+   * add one or multiple conditions.
+   * @example req.where( attribute('age').eq(23) )
+   * @example req.where( or( attribute('age').lt(18), attribute('age').gt(65) ) )
+   */
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('FilterExpression', condition, this.params)
     return <any>this
   }
 
+  /**
+   * execute the request and return the raw response (without parsing the attributes to js objects)
+   */
   execNoMap() {
     this.logger.debug('request (noMap)', this.params)
     return this.doRequest(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
   }
 
+  /**
+   * Execute with Limit: 1 to read the first item only
+   */
   execSingle(): Promise<T | null> {
     // do not alter the params on the instance but add the additional 'Limit' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
@@ -131,8 +144,11 @@ export abstract class ReadManyRequest<T,
 
   }
 
+  /**
+   * Execute with Select: 'Count' to count the items.
+   */
   execCount(): Promise<number> {
-    // do not alter the params on the instance but add the additional 'Limit' param to a copy.
+    // do not alter the params on the instance but add the additional 'Select' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
       ...(<any>this.params),
@@ -144,9 +160,11 @@ export abstract class ReadManyRequest<T,
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(response => response.Count || 0)
       .then(promiseTap(count => this.logger.debug('count', count)))
-
   }
 
+  /**
+   * execute request and return the parsed items
+   */
   exec(): Promise<T[]> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
@@ -156,6 +174,9 @@ export abstract class ReadManyRequest<T,
       .then(promiseTap(items => this.logger.debug('mapped items', items)))
   }
 
+  /**
+   * execute request and return the full response with the parsed items
+   */
   execFullResponse(): Promise<Z> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)

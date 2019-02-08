@@ -9,6 +9,9 @@ import { resolveAttributeNames } from '../../expression/functions/attribute-name
 import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
 
+/**
+ * Request class for the GetItem operation.
+ */
 export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, GetRequest<T>> {
   private readonly logger: Logger
 
@@ -18,7 +21,11 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
-  consistentRead(consistentRead: boolean): GetRequest<T> {
+
+  /**
+   * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
+   */
+  consistentRead(consistentRead: boolean = true): GetRequest<T> {
     this.params.ConsistentRead = consistentRead
     return this
   }
@@ -52,6 +59,9 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
 
   }
 
+  /**
+   * execute request and return the parsed item
+   */
   exec(): Promise<T | null> {
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper.getItem(this.params)

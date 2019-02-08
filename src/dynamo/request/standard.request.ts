@@ -5,7 +5,7 @@ import { getTableName } from '../get-table-name.function'
 import { BaseRequest } from './base.request'
 
 /**
- * base class for all requests types that operate on exactly one dynamo table.
+ * abstract class for all requests types that operate on exactly one dynamo table.
  * basically just sets the TableName info on input params.
  */
 export abstract class StandardRequest<
@@ -23,8 +23,4 @@ export abstract class StandardRequest<
     super(dynamoDBWrapper, modelClazz)
     this.params.TableName = getTableName(this.metadata)
   }
-
-  abstract execFullResponse(): Promise<any>
-
-  abstract exec(): Promise<T[] | T | null | void>
 }

@@ -1,5 +1,8 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 
+/**
+ * Response from {@link BatchGetSingleTableRequest}::exec
+ */
 export interface BatchGetSingleTableResponse<T> {
   /**
    * A map of table name to a list of items. Each object in Responses consists of a table name, along with a map of attribute data consisting of the data type and attribute value.

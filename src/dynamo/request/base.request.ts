@@ -6,14 +6,12 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 
 /**
- * Base Request for all Request classes usable with DynamoStore.
+ * abstract class for all request classes usable with DynamoStore.
  * which means they have only one table they work with
  * (even if the actual operation would allow to use multiple tables. e.g. BatchWriteSingleTable)
  */
-export abstract class BaseRequest<
-  T,
-  I extends
-    | DynamoDB.DeleteItemInput
+export abstract class BaseRequest<T,
+  I extends | DynamoDB.DeleteItemInput
     | DynamoDB.GetItemInput
     | DynamoDB.PutItemInput
     | DynamoDB.UpdateItemInput
@@ -23,13 +21,30 @@ export abstract class BaseRequest<
     | DynamoDB.BatchWriteItemInput
     | DynamoDB.TransactGetItemsInput
     | DynamoDB.TransactWriteItemsInput,
-  R extends BaseRequest<T, I, any>
-> {
+  R extends BaseRequest<T, I, any>> {
+
   readonly dynamoDBWrapper: DynamoDbWrapper
+
+  /**
+   * corresponding Model Class
+   */
   readonly modelClazz: ModelConstructor<T>
+
+  /**
+   * metadata created from modelClazz
+   */
   readonly metadata: Metadata<T>
+
+  /**
+   * tableName created with configured tableNameResolver function
+   */
   readonly tableName: string
+
+  /**
+   * request input object
+   */
   readonly params: I
+
 
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
     this.dynamoDBWrapper = dynamoDBWrapper
@@ -50,8 +65,22 @@ export abstract class BaseRequest<
     this.params = <I>{}
   }
 
+  /**
+   * return ConsumedCapacity of the corresponding table(s) in the response
+   * @param level not all requests support all values
+   */
   returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): R {
     this.params.ReturnConsumedCapacity = level
     return <R>(<any>this)
   }
+
+  /**
+   * execute request and return the full response of dynamoDB. read items will be parsed to JS objects.
+   */
+  abstract execFullResponse(): Promise<any>
+
+  /**
+   * execute request and return the parsed item(s) or void if none were requested.
+   */
+  abstract exec(): Promise<T | T[] | void | null>
 }

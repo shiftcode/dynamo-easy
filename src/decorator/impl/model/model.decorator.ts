@@ -7,6 +7,9 @@ import { KEY_PROPERTY } from '../property/key-property.const'
 import { KEY_MODEL } from './key-model.const'
 import { ModelData } from './model-data.model'
 
+/**
+ * decorator to define a model for dynamo easy
+ */
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {

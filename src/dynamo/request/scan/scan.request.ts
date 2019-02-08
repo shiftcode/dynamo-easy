@@ -5,6 +5,9 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { ReadManyRequest } from '../read-many.request'
 import { ScanResponse } from './scan.response'
 
+/**
+ * Request class for the Scan operation.
+ */
 export class ScanRequest<T> extends ReadManyRequest<T,
   DynamoDB.ScanInput,
   DynamoDB.ScanOutput,

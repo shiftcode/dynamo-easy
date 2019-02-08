@@ -13,6 +13,9 @@ import { ConditionExpressionDefinitionFunction } from '../expression/type/condit
 import { getTableName } from '../get-table-name.function'
 import { ConditionalParamsHost } from '../operation-params.type'
 
+/**
+ * Abstract base class for all transact items.
+ */
 export abstract class TransactBaseOperation<T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
   R extends TransactBaseOperation<T, I, any>> implements ConditionalParamsHost {
@@ -38,18 +41,29 @@ export abstract class TransactBaseOperation<T,
     }
   }
 
+  /**
+   * create a condition on given attributePath
+   * @example req.onlyIfAttribute('age').lt(10)
+   */
   onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
   onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
   onlyIfAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
     return addCondition<R, T, any>('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
   }
 
+  /**
+   * add a condition necessary for the transaction to succeed
+   * @example req.onlyIf(or(attribute('age').lt(10), attribute('age').gt(20)))
+   */
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
     return <R>(<any>this)
   }
 
+  /**
+   * get the item attributes if the condition fails
+   */
   returnValuesOnConditionCheckFailure(value: DynamoDB.ReturnValuesOnConditionCheckFailure): R {
     this.params.ReturnValuesOnConditionCheckFailure = value
     return <R>(<any>this)

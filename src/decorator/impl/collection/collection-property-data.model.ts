@@ -2,6 +2,9 @@ import { MapperForType } from '../../../mapper/for-type/base.mapper'
 import { BinaryAttribute, NumberAttribute, StringAttribute } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 
+/**
+ * Option interface for @CollectionProperty decorator
+ */
 export interface CollectionPropertyData<R, T extends StringAttribute | NumberAttribute | BinaryAttribute> {
   /**
    * the name of property how it is named in dynamoDB

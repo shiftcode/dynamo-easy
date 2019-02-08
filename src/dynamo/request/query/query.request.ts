@@ -7,6 +7,9 @@ import { SortKeyConditionFunction } from '../../expression/type/sort-key-conditi
 import { ReadManyRequest } from '../read-many.request'
 import { QueryResponse } from './query.response'
 
+/**
+ * Request class for the Query operation.
+ */
 export class QueryRequest<T> extends ReadManyRequest<
   T,
   DynamoDB.QueryInput,
@@ -21,6 +24,9 @@ export class QueryRequest<T> extends ReadManyRequest<
     this.logger = createLogger('dynamo.request.QueryRequest', modelClazz)
   }
 
+  /**
+   *
+   */
   wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
     let partitionKey: keyof T
     if (this.secondaryIndex) {
@@ -37,7 +43,6 @@ export class QueryRequest<T> extends ReadManyRequest<
 
   /**
    * used to define some condition for the sort key, use the secondary index to query based on a custom index
-   * @returns {SortKeyConditionFunction<QueryRequest<T>>}
    */
   whereSortKey(): SortKeyConditionFunction<QueryRequest<T>> {
     let sortKey: keyof T | null
