@@ -1,6 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {
@@ -65,6 +66,30 @@ describe('put request', () => {
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+  })
+
+  describe('typings', () => {
+    // tests basically only exists to be not valid when typings would be wrong
+    let req: PutRequest<SimpleWithPartitionKeyModel>
+    let dynamoDbWrapperMock: DynamoDbWrapper
+
+    beforeEach(() => {
+      dynamoDbWrapperMock = <any>{
+        putItem: () =>
+          Promise.resolve({
+            Attributes: {
+              id: { S: 'myId' },
+              age: { N: '20' },
+            },
+          }),
+      }
+      req = new PutRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, { id: 'myKey', age: 20 })
+    })
+
+    it('exec, ALL_OLD', async () => {
+      const result: SimpleWithPartitionKeyModel = await req.returnValues('ALL_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
     })
   })
 })

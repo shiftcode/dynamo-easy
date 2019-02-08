@@ -1,6 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
@@ -70,6 +71,30 @@ describe('delete request', () => {
       const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+  })
+
+  describe('typings', () => {
+    // tests basically only exists to be not valid when typings would be wrong
+    let req: DeleteRequest<SimpleWithPartitionKeyModel>
+    let dynamoDbWrapperMock: DynamoDbWrapper
+
+    beforeEach(() => {
+      dynamoDbWrapperMock = <any>{
+        deleteItem: () =>
+          Promise.resolve({
+            Attributes: {
+              id: { S: 'myId' },
+              age: { N: '20' },
+            },
+          }),
+      }
+      req = new DeleteRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+    })
+
+    it('exec, ALL_OLD', async () => {
+      const result: SimpleWithPartitionKeyModel = await req.returnValues('ALL_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
     })
   })
 })

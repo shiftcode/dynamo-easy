@@ -1,15 +1,21 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { Omit } from '../../../model/omit.type'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { WriteRequest } from '../write.request'
+import { DeleteResponse } from './delete.response'
 
-type DeleteRequestReturnT<T> = Omit<DeleteRequest<T>, 'exec'> & { exec(): Promise<T> }
+type DeleteRequestReturnT<T> = Omit<Omit<DeleteRequest<T>, 'exec'>,'execFullResponse'> & {
+  exec(): Promise<T>
+  execFullResponse(): Promise<DeleteResponse<T>>
+}
 
-export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, DeleteRequest<T>> {
+/**
+ * Request class for the DeleteItem operation.
+ */
+export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, DynamoDB.DeleteItemOutput, DeleteRequest<T>> {
   protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
@@ -26,20 +32,7 @@ export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, 
     return this
   }
 
-  /*
-   * kind a hacky - this is just for typing reasons so Promise<void> is the default return type when not defining a
-   * returnValues other than NONE
-   *
-   * const valueVoid = new DeleteRequest(...).exec()
-   * const valueMyModel = new DeleteRequest(...).returnValues('ALL_OLD').exec()
-   */
-  exec(): Promise<void> {
-    return <Promise<void>>super.exec()
-  }
-
-  execFullResponse(): Promise<DynamoDB.DeleteItemOutput> {
-    this.logger.debug('request', this.params)
-    return this.dynamoDBWrapper.deleteItem(this.params)
-      .then(promiseTap(response => this.logger.debug('response', response)))
+  protected doRequest(params: DynamoDB.DeleteItemInput): Promise<DynamoDB.DeleteItemOutput> {
+    return this.dynamoDBWrapper.deleteItem(params)
   }
 }

@@ -7,7 +7,7 @@ import { or } from '../expression/logical-operator/public.api'
 import { WriteRequest } from './write.request'
 
 describe('write request', () => {
-  class TestWriteRequest<T> extends WriteRequest<T, any, TestWriteRequest<T>> {
+  class TestWriteRequest<T> extends WriteRequest<T, any, any, TestWriteRequest<T>> {
     protected readonly logger: Logger
     readonly params: any = {}
 
@@ -16,40 +16,49 @@ describe('write request', () => {
       this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
     }
 
-    execFullResponse() {
+    protected doRequest(params: any): Promise<any> {
       return Promise.resolve(null)
     }
   }
 
   let req: TestWriteRequest<SimpleWithPartitionKeyModel>
 
-  describe('exec [ReturnValues = NONE]', () => {
-    let execFullResponseSpy: jasmine.Spy
+  describe('ReturnValues = NONE', () => {
+    let doRequestSpy: jasmine.Spy
+    const response = { myValue: true }
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
-      execFullResponseSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ myValue: true }))
-      Object.assign(req, { execFullResponse: execFullResponseSpy })
+      doRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
+      Object.assign(req, { doRequest: doRequestSpy })
     })
 
-    it('should call execFullResponse', async () => {
+    it('exec should call execFullResponse', async () => {
       await req.exec()
-      expect(execFullResponseSpy).toHaveBeenCalled()
+      expect(doRequestSpy).toHaveBeenCalled()
     })
 
-    it('should return void', async () => {
+    it('exec should return void', async () => {
       expect(await req.exec()).toBeUndefined()
+    })
+
+    it('execNoMap should return our specified response', async () => {
+      expect(await req.execNoMap()).toEqual(response)
     })
   })
 
-  describe('exec [ReturnValues = ALL_OLD]', () => {
+  describe('ReturnValues = ALL_OLD', () => {
+    const returnValues: Attributes<SimpleWithPartitionKeyModel> = { id: { S: 'myId' }, age: { N: '20' } }
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
-      const returnValues: Attributes<SimpleWithPartitionKeyModel> = { id: { S: 'myId' }, age: { N: '20' } }
-      spyOn(req, 'execFullResponse').and.returnValue(Promise.resolve({ Attributes: returnValues }))
+      Object.assign(req, { doRequest: () => Promise.resolve({ Attributes: returnValues }) })
     })
-    it('should map result if Attributes return values(s)', async () => {
+    it('exec should map result if Attributes return values(s)', async () => {
       const result = await req.exec()
       expect(result).toEqual({ id: 'myId', age: 20 })
+    })
+    it('execNoMap should not map result', async () => {
+      const result = await req.execNoMap()
+      expect(result).toEqual({ Attributes: returnValues })
     })
   })
 
