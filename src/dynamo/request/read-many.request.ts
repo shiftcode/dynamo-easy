@@ -10,7 +10,10 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/and.function'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { RequestConditionFunction } from '../expression/type/condition-expression-definition-chain'
+import {
+  RequestConditionFunction,
+  RequestConditionFunctionTyped,
+} from '../expression/type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from '../expression/type/condition-expression-definition-function'
 import { QueryRequest } from './query/query.request'
 import { QueryResponse } from './query/query.response'
@@ -86,8 +89,17 @@ export abstract class ReadManyRequest<T,
     return <any>this
   }
 
-  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
-    return addCondition('FilterExpression', attributePath, <any>this, this.metadata)
+
+  /**
+   * add a condition for propertyPath
+   * @param attributePath
+   */
+  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
+  whereAttribute(attributePath: string): RequestConditionFunction<R, T>
+  whereAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K>
+
+  {
+    return addCondition<R, T, any>('FilterExpression', attributePath, <any>this, this.metadata)
   }
 
   where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {

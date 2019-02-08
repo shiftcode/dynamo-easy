@@ -8,7 +8,10 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/public.api'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
-import { RequestConditionFunction } from '../expression/type/condition-expression-definition-chain'
+import {
+  RequestConditionFunction,
+  RequestConditionFunctionTyped,
+} from '../expression/type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from '../expression/type/condition-expression-definition-function'
 import { StandardRequest } from './standard.request'
 
@@ -31,8 +34,14 @@ export abstract class WriteRequest<T,
     return <R>(<any>this)
   }
 
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunction<R, T, K> {
-    return addCondition<R, T, K>('ConditionExpression', attributePath, <any>this, this.metadata)
+  /**
+   * add a condition for propertyPath
+   * @param attributePath
+   */
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
+  onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
+  onlyIfAttribute<K extends keyof T>(attributePath: K | string): RequestConditionFunctionTyped<R, T, K> {
+    return addCondition<R, T, any>('ConditionExpression', attributePath, <any>this, this.metadata)
   }
 
   /**

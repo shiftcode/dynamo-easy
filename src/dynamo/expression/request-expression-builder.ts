@@ -8,7 +8,7 @@ import { prepareAndAddUpdateExpressions } from './prepare-and-add-update-express
 import {
   ConditionExpressionDefinitionChain,
   ConditionExpressionDefinitionChainTyped,
-  RequestConditionFunction,
+  RequestConditionFunctionTyped,
 } from './type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from './type/condition-expression-definition-function'
 import { OperatorAlias } from './type/condition-operator-alias.type'
@@ -66,16 +66,13 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
 /**
  * return the condition-functions which then can apply a conditionDefinition to the given request.params
  * and afterwards will return the request object (which allows chaining)
- * @param attributePath
- * @param request
- * @param metadata
  */
 export function addCondition<R extends ConditionalParamsHost, T, K extends keyof T>(
   expressionType: ExpressionType,
   attributePath: K,
   request: R,
   metadata?: Metadata<T>,
-): RequestConditionFunction<R, T, K> {
+): RequestConditionFunctionTyped<R, T, K> {
   // f the function to create the condition functions
   const f = (operator: ConditionOperator) => {
     // return the function the user will call in the end
@@ -83,7 +80,7 @@ export function addCondition<R extends ConditionalParamsHost, T, K extends keyof
       return doAddCondition(expressionType, <string>attributePath, request, metadata, operator, ...values)
     }
   }
-  return createConditionFunctions<RequestConditionFunction<R, T, K>>(f)
+  return createConditionFunctions<RequestConditionFunctionTyped<R, T, K>>(f)
 }
 
 export function addSortKeyCondition<R extends ConditionalParamsHost>(
