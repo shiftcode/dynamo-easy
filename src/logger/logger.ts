@@ -43,8 +43,8 @@ function getLogFn(className: string, modelConstructor: string, level: LogLevel):
  */
 export function createLogger(className: string, modelConstructor: ModelConstructor<any>): Logger {
   return {
-    warn: getLogFn(className, modelConstructor.name, 'warning'),
-    info: getLogFn(className, modelConstructor.name, 'info'),
-    debug: getLogFn(className, modelConstructor.name, 'debug'),
+    warn: getLogFn(className, modelConstructor.name, LogLevel.WARNING),
+    info: getLogFn(className, modelConstructor.name, LogLevel.INFO),
+    debug: getLogFn(className, modelConstructor.name, LogLevel.DEBUG),
   }
 }
