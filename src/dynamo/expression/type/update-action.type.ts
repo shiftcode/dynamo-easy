@@ -13,6 +13,7 @@
  * [ DELETE action [, action] ...]
  *
  * we provide our own aliases for easier usage
+ * @hidden
  */
 export type UpdateAction =
   | 'incrementBy'

@@ -56,6 +56,9 @@ export function addExpression(
   }
 }
 
+/**
+ * @hidden
+ */
 type UpdateExpressionsByKeyword = Record<UpdateActionKeyword, string>
 
 /**

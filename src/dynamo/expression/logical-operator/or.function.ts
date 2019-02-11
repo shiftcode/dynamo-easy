@@ -6,7 +6,10 @@ import { mergeConditions } from './merge-conditions.function'
 
 /**
  * function to combine multiple conditions with or
- * @param conditionDefinitionFns
+ * @example
+ * ```typescript
+ * or(attribute('propA').eq('foo'), attribute('propB').eq('bar'))
+ * ```
  */
 export function or(
   ...conditionDefinitionFns: ConditionExpressionDefinitionFunction[]

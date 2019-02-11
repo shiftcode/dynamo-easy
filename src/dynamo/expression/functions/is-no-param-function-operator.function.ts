@@ -6,6 +6,7 @@ import { FunctionOperator } from '../type/function-operator.type'
 
 /**
  * @returns {boolean} Returns true for all function operators with no param false otherwise
+ * @hidden
  */
 export function isNoParamFunctionOperator(operator: FunctionOperator): boolean {
   return NON_PARAM_FUNCTION_OPERATORS.includes(operator)

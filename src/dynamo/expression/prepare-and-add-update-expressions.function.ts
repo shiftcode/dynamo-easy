@@ -10,6 +10,9 @@ import { UpdateActionKeyword } from './type/update-action-keyword.type'
 import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
 import { UpdateExpression } from './type/update-expression.type'
 
+/**
+ * @hidden
+ */
 export function prepareAndAddUpdateExpressions(
   metadata: Metadata<any>,
   params: DynamoDB.UpdateItemInput | DynamoDB.Update,

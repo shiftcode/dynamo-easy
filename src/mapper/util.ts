@@ -11,6 +11,9 @@ import { Binary } from './type/binary.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 
+/**
+ * @hidden
+ */
 export function getPropertyPath<T>(modelConstructorOrPropertyMetadata: ModelConstructor<T> | PropertyMetadata<T> | undefined, propertyKey: keyof T): string {
   if (modelConstructorOrPropertyMetadata && modelConstructorOrPropertyMetadata.name) {
     return `[${modelConstructorOrPropertyMetadata.name}::${propertyKey}]`
@@ -19,6 +22,9 @@ export function getPropertyPath<T>(modelConstructorOrPropertyMetadata: ModelCons
   }
 }
 
+/**
+ * @hidden
+ */
 export function messageWithPath(propertyPath: string | null | undefined, message: string): string{
   if(!!propertyPath){
     return `${propertyPath} ${message}`
@@ -27,6 +33,9 @@ export function messageWithPath(propertyPath: string | null | undefined, message
   }
 }
 
+/**
+ * @hidden
+ */
 const BUFFER_TYPES = [
   'Buffer',
   'File',
@@ -52,6 +61,7 @@ const BUFFER_TYPES = [
  *
  * @param {any[] | Set<any>} collection
  * @returns {AttributeCollectionType}
+ * @hidden
  */
 export function detectCollectionTypeFromValue(collection: any[] | Set<any>): AttributeCollectionType {
   if (Array.isArray(collection)) {
@@ -86,6 +96,9 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
   }
 }
 
+/**
+ * @hidden
+ */
 export function isHomogeneous(collection: Set<any> | any[]): { homogeneous: boolean, type?: AttributeType | null } {
   const collectionAsArray = isSet(collection) ? Array.from(collection) : collection
   const firstValueType: AttributeType | null = collectionAsArray.length ? detectType(collectionAsArray[0]) : null
@@ -106,10 +119,16 @@ export function isHomogeneous(collection: Set<any> | any[]): { homogeneous: bool
   }
 }
 
+/**
+ * @hidden
+ */
 export function isCollection(value: any): boolean {
   return value && (Array.isArray(value) || isSet(value))
 }
 
+/**
+ * @hidden
+ */
 export function isSet(value: any): value is Set<any> {
   return (
     (value !== null && value !== undefined && value.hasOwnProperty('name') && value.name === 'Set') ||
@@ -117,6 +136,9 @@ export function isSet(value: any): value is Set<any> {
   )
 }
 
+/**
+ * @hidden
+ */
 export function detectType(value: any): AttributeType {
   if (isCollection(value)) {
     return detectCollectionTypeFromValue(value)
@@ -139,6 +161,7 @@ export function detectType(value: any): AttributeType {
 
 /**
  * Will resolve the type based on given property value
+ * @hidden
  */
 export function typeOf(propertyValue: any, propertyPath?: string | null): AttributeValueType {
   if (propertyValue === null) {
@@ -169,9 +192,10 @@ export function typeOf(propertyValue: any, propertyPath?: string | null): Attrib
   throw new Error(messageWithPath(propertyPath, `typeof data ${propertyValue} could not be detected`))
 }
 
-/*
+/**
  * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
  * should we work with string match
+ * @hidden
  */
 export function typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
   if (attributeValue) {
@@ -201,6 +225,9 @@ export function typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
   throw new Error(`could not resolve the dynamo db type for attribute value ${attributeValue}`)
 }
 
+/**
+ * @hidden
+ */
 export function isBinary(data: any): boolean {
   if (isNode()) {
     // TODO LOW:BINARY should add || data instanceof Stream
@@ -212,12 +239,16 @@ export function isBinary(data: any): boolean {
   }
 }
 
+/**
+ * @hidden
+ */
 export function isBufferType(type: any): boolean {
   return BUFFER_TYPES.includes(type)
 }
 
-/*
+/**
  * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/js
+ * @hidden
  */
 export function isType(obj: any, type: any): boolean {
   // handle cross-"frame" objects
@@ -228,21 +259,29 @@ export function isType(obj: any, type: any): boolean {
   return Object.prototype.toString.call(obj) === `[object ${type}]`
 }
 
-// tslint:disable-next-line:function-constructor
+/**
+ * @hidden
+ */
+ // tslint:disable-next-line:function-constructor
 const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
 
+/**
+ * @hidden
+ */
 export function isBrowser() {
   return isGlobalScopeWindow
 }
 
+/**
+ * @hidden
+ */
 export function isNode() {
   return !isGlobalScopeWindow
 }
 
 /**
  * Returns the name of the given Type. null and undefined are special cases were we return 'Null' vs. 'Undefined'
- * @param type
- * @returns {string}
+ * @hidden
  */
 export function typeName(type: any): 'Null' | 'Undefined' | string {
   if (type !== null && type !== undefined) {

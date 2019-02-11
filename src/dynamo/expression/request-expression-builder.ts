@@ -37,6 +37,7 @@ import { buildUpdateExpression } from './update-expression-builder'
  * @param attributePath
  * @param request
  * @param metadata
+ * @hidden
  */
 export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
   attributePath: K,
@@ -69,6 +70,7 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
 /**
  * return the condition-functions which then can apply a conditionDefinition to the given request.params
  * and afterwards will return the request object (which allows chaining)
+ * @hidden
  */
 export function addCondition<R extends ConditionalParamsHost, T, K extends keyof T>(
   expressionType: ExpressionType,
@@ -86,17 +88,26 @@ export function addCondition<R extends ConditionalParamsHost, T, K extends keyof
   return createConditionFunctions<RequestConditionFunctionTyped<R, T, K>>(f)
 }
 
+/**
+ * @hidden
+ */
 export function addSortKeyCondition<R extends ConditionalParamsHost>(
   keyName: keyof any,
   request: R,
 ): SortKeyConditionFunction<R>
 
+/**
+ * @hidden
+ */
 export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
   metadata: Metadata<T>,
 ): SortKeyConditionFunction<R>
 
+/**
+ * @hidden
+ */
 export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   keyName: keyof T,
   request: R,
@@ -137,6 +148,9 @@ export function doAddCondition<T, R extends ConditionalParamsHost>(
   return request
 }
 
+/**
+ * @hidden
+ */
 export function addPartitionKeyCondition<R extends StandardRequest<any, any, any>>(
   keyName: keyof any,
   keyValue: any,
@@ -161,6 +175,9 @@ export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, an
   }
 }
 
+/**
+ * @hidden
+ */
 export function updateDefinitionFunction(attributePath: string): UpdateExpressionDefinitionChain
 export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain
 export function updateDefinitionFunction<T, K extends keyof T>(
@@ -188,6 +205,9 @@ export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpre
   return createUpdateFunctions<UpdateExpressionDefinitionChain>(f)
 }
 
+/**
+ * @hidden
+ */
 export function propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
 export function propertyDefinitionFunction<T, K extends keyof T>(
   attributePath: K,
@@ -213,6 +233,7 @@ export function propertyDefinitionFunction<T>(attributePath: keyof T): Condition
  * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
  * for the condition. when executed the implementation defines what to do with the condition, just return it for example or add the condition to the request
  * parameters as another example
+ * @hidden
  */
 function createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T {
   return UPDATE_ACTION_DEFS.reduce(
@@ -232,6 +253,7 @@ function createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T 
  * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
  * for the condition. when executed the implementation defines what to do with the condition, just return it for example or add the condition to the request
  * parameters as another example
+ * @hidden
  */
 function createConditionFunctions<T>(impl: (operator: ConditionOperator) => any, ...operators: ConditionOperator[]): T {
   const includedAlias: ConditionOperator[] =

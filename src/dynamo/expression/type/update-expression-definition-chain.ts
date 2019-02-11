@@ -85,11 +85,16 @@ export interface UpdateFunctions<T, R> {
   removeFromSet: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 }
 
+
 export type UpdateExpressionDefinitionChainTyped<T, K extends keyof T> = UpdateFunctions<
   T[K],
   UpdateExpressionDefinitionFunction
 >
 
+
 export type UpdateExpressionDefinitionChain = UpdateFunctions<any, UpdateExpressionDefinitionFunction>
 
+/**
+ * @hidden
+ */
 export type RequestUpdateFunction<R extends ConditionalParamsHost, T, K extends keyof T> = UpdateFunctions<T[K], R>
