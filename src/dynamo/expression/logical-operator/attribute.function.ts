@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ModelConstructor } from '../../../model/model-constructor'
 import { propertyDefinitionFunction } from '../request-expression-builder'
 import {
@@ -7,8 +10,9 @@ import {
 
 /**
  * Use this method when accessing a top level attribute of a model with strict typing of the value in chained function
- *
+ * @example
  * ```typescript
+ *
  * @Model()
  * class Person{
  *
@@ -36,6 +40,10 @@ export function attribute2<T, K extends keyof T>(
 
 /**
  * Use this method when accessing a top level attribute of a model to have type checking of the attributePath
+ * @example
+ * ```typescript
+ * attribute('myProp').eq('foo')
+ * ```
  */
 export function attribute<T>(attributePath: keyof T): ConditionExpressionDefinitionChain
 

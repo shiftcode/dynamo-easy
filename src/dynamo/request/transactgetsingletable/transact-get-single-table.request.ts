@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { createToKeyFn, fromDb } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
@@ -6,6 +9,9 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 import { TransactGetResponse } from './transact-get-single-table.response'
 
+/**
+ * Request class for TransactGetItems operation which supports a single model class only.
+ */
 export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
   DynamoDB.TransactGetItemsInput,
   TransactGetSingleTableRequest<T>> {
@@ -20,11 +26,21 @@ export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
     }))
   }
 
+  /**
+   * fetch all entries and return the raw response (without parsing the attributes to js objects)
+   */
+  execNoMap(): Promise<DynamoDB.TransactGetItemsOutput> {
+    return this.dynamoDBWrapper.transactGetItems(this.params)
+  }
+
   execFullResponse(): Promise<TransactGetResponse<T>> {
     return this.dynamoDBWrapper.transactGetItems(this.params)
       .then(this.mapResponse)
   }
 
+  /**
+   * execute request and return the parsed items
+   */
   exec(): Promise<T[]> {
     return this.dynamoDBWrapper.transactGetItems(this.params)
       .then(this.mapResponse)

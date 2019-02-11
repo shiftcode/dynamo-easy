@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'

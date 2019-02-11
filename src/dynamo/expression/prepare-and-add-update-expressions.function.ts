@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { Attributes } from '../../mapper/type/attribute.type'
@@ -7,6 +10,9 @@ import { UpdateActionKeyword } from './type/update-action-keyword.type'
 import { UpdateExpressionDefinitionFunction } from './type/update-expression-definition-function'
 import { UpdateExpression } from './type/update-expression.type'
 
+/**
+ * @hidden
+ */
 export function prepareAndAddUpdateExpressions(
   metadata: Metadata<any>,
   params: DynamoDB.UpdateItemInput | DynamoDB.Update,

@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 import { SessionValidityEnsurer } from '../dynamo/session-validity-ensurer.type'
 import { TableNameResolver } from '../dynamo/table-name-resolver.type'
 import { LogReceiver } from '../logger/log-receiver.type'

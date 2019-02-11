@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 //
 // Export public api of the library
 //

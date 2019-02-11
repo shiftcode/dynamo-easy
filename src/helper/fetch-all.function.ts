@@ -1,3 +1,6 @@
+/**
+ * @module helper
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { QueryRequest } from '../dynamo/request/query/query.request'
 import { ReadManyRequest } from '../dynamo/request/read-many.request'

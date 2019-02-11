@@ -1,3 +1,6 @@
+/**
+ * @module metadata
+ */
 export * from './metadata'
 export * from './metadata-helper'
 export * from './model-metadata.model'

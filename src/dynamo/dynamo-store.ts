@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseTap } from '../helper/promise-tap.function'
 import { createLogger, Logger } from '../logger/logger'
@@ -15,6 +18,9 @@ import { ScanRequest } from './request/scan/scan.request'
 import { TransactGetSingleTableRequest } from './request/transactgetsingletable/transact-get-single-table.request'
 import { UpdateRequest } from './request/update/update.request'
 
+/**
+ * DynamoStore
+ */
 export class DynamoStore<T> {
   get dynamoDB(): DynamoDB {
     return this.dynamoDBWrapper.dynamoDB

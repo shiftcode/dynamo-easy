@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/batch-get
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseDelay } from '../../helper/promise-delay.function'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
@@ -9,6 +12,7 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
  * @param params containing the keys per table to create the batchGet operation
  * @param backoffTimer used to determine how many time slots the follow-up request should be delayed
  * @param throttleTimeSlot used to calculate the effective wait time
+ * @hidden
  */
 export function batchGetItemsFetchAll(
   dynamoDBWrapper: DynamoDbWrapper,
@@ -36,10 +40,16 @@ export function batchGetItemsFetchAll(
     )
 }
 
+/**
+ * @hidden
+ */
 export type BatchGetItemOutputWithUnprocessedKeys = DynamoDB.BatchGetItemOutput & {
   UnprocessedKeys: DynamoDB.BatchGetRequestMap
 }
 
+/**
+ * @hidden
+ */
 export function hasUnprocessedKeys(
   response: DynamoDB.BatchGetItemOutput,
 ): response is BatchGetItemOutputWithUnprocessedKeys {
@@ -51,7 +61,7 @@ export function hasUnprocessedKeys(
 
 /**
  * combines a first with a second response. ConsumedCapacity is always from the latter.
- * @param response1
+ * @hidden
  */
 export function combineBatchGetResponses(response1: DynamoDB.BatchGetItemOutput) {
   return (response2: DynamoDB.BatchGetItemOutput): DynamoDB.BatchGetItemOutput => {

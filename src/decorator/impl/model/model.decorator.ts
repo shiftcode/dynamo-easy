@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { kebabCase } from 'lodash'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
@@ -7,6 +10,9 @@ import { KEY_PROPERTY } from '../property/key-property.const'
 import { KEY_MODEL } from './key-model.const'
 import { ModelData } from './model-data.model'
 
+/**
+ * decorator to define a model for dynamo easy
+ */
 export function Model(opts: ModelData = {}): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
@@ -52,16 +58,25 @@ export function Model(opts: ModelData = {}): ClassDecorator {
   }
 }
 
+/**
+ * @hidden
+ */
 function testForGSI<T>(
   property: PropertyMetadata<T>,
 ): property is PropertyMetadata<T> & { keyForGSI: Record<string, DynamoDB.KeyType> } {
   return !!(property.keyForGSI && Object.keys(property.keyForGSI).length)
 }
 
+/**
+ * @hidden
+ */
 function testForLSI<T>(property: PropertyMetadata<T>): property is PropertyMetadata<T> & { sortKeyForLSI: string[] } {
   return !!(property.sortKeyForLSI && property.sortKeyForLSI.length)
 }
 
+/**
+ * @hidden
+ */
 function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Map<string, SecondaryIndex<any>> | null {
   if (properties && properties.length) {
     return properties.filter(testForGSI).reduce((map, property): Map<string, SecondaryIndex<any>> => {
@@ -117,6 +132,9 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
   }
 }
 
+/**
+ * @hidden
+ */
 function getLocalSecondaryIndexes(
   basePartitionKey: string | null,
   properties: Array<PropertyMetadata<any>>,

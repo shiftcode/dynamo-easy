@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { KEY_PROPERTY } from '../property/key-property.const'

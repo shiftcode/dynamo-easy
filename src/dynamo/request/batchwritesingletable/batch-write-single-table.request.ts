@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../../helper/random-exponential-backoff-timer.generator'
 import { createLogger, Logger } from '../../../logger/logger'
@@ -8,6 +11,9 @@ import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } fro
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 
+/**
+ * Request class for BatchWriteItem operation which supports a single model class only.
+ */
 export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
   DynamoDB.BatchWriteItemInput,
   BatchWriteSingleTableRequest<T>> {
@@ -22,6 +28,9 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
     }
   }
 
+  /**
+   * return item collection metrics.
+   */
   returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics) {
     this.params.ReturnItemCollectionMetrics = value
   }
@@ -43,7 +52,7 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
   }
 
   /**
-   * write all given items
+   * execute the request
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
@@ -55,6 +64,11 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
     return this.write(backoffTimer, throttleTimeSlot).then(() => {return})
   }
 
+  /**
+   * execute the request and return the full response
+   * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,

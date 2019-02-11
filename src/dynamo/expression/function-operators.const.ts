@@ -1,5 +1,11 @@
+/**
+ * @module expression
+ */
 import { FunctionOperator } from './type/function-operator.type'
 
+/**
+ * @hidden
+ */
 export const FUNCTION_OPERATORS: FunctionOperator[] = [
   'attribute_exists',
   'attribute_not_exists',

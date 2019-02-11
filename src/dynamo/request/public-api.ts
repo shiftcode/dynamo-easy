@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 export * from './delete/delete.request'
 export * from './delete/delete.response'
 export * from './get/get.request'

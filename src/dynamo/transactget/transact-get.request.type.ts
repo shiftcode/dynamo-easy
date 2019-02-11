@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/transact-get
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ModelConstructor } from '../../model/model-constructor'
 import { TransactGetFullResponse } from './transact-get-full.response'

@@ -1,7 +1,14 @@
+/**
+ * @module multi-model-requests/batch-get
+ */
+
 // tslint:disable-next-line:interface-over-type-literal
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { BatchGetResponse } from './batch-get.response'
 
+/**
+ * Response from {@link BatchGetRequest}::execFullResponse
+ */
 export interface BatchGetFullResponse {
   /**
    * A map of table name to a list of items. Each object in Responses consists of a table name, along with a map of attribute data consisting of the data type and attribute value.

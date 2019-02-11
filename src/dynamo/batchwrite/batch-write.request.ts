@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/batch-write
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { randomExponentialBackoffTimer } from '../../helper/random-exponential-backoff-timer.generator'
 import { createToKeyFn, toDb } from '../../mapper/mapper'
@@ -7,6 +10,9 @@ import { getTableName } from '../get-table-name.function'
 import { batchWriteItemsWriteAll } from './batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from './batch-write.const'
 
+/**
+ * Request class for the BatchWriteItem operation. Put or delete multiple items in one or more table.
+ */
 export class BatchWriteRequest {
   readonly params: DynamoDB.BatchWriteItemInput
   private readonly dynamoDBWrapper: DynamoDbWrapper
@@ -19,28 +25,44 @@ export class BatchWriteRequest {
     }
   }
 
+  /**
+   * return ConsumedCapacity of the corresponding tables in the response
+   */
   returnConsumedCapacity(value: DynamoDB.ReturnConsumedCapacity): BatchWriteRequest {
     this.params.ReturnConsumedCapacity = value
     return this
   }
 
+  /**
+   * return item collection metrics.
+   */
   returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics): BatchWriteRequest {
     this.params.ReturnItemCollectionMetrics = value
     return this
   }
 
-  delete<T>(modelClazz: ModelConstructor<T>, items: Array<Partial<T>>): BatchWriteRequest {
-    this.requestItems(modelClazz, items.map(this.createDeleteRequest(modelClazz)))
+  /**
+   * add keys for deletion
+   * @param modelClazz the corresponding ModelConstructor
+   * @param keys an array of partials of T that contains PartitionKey and SortKey (if necessary). Throws if missing.
+   */
+  delete<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>): BatchWriteRequest {
+    this.requestItems(modelClazz, keys.map(this.createDeleteRequest(modelClazz)))
     return this
   }
 
+  /**
+   * add items to put
+   * @param modelClazz the corresponding ModelConstructor
+   * @param items the items to put
+   */
   put<T>(modelClazz: ModelConstructor<T>, items: T[]): BatchWriteRequest {
     this.requestItems(modelClazz, items.map(this.createPutRequest(modelClazz)))
     return this
   }
 
   /**
-   *
+   * execute request
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
    * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
    */
@@ -52,6 +74,11 @@ export class BatchWriteRequest {
       .then(() => { return })
   }
 
+  /**
+   * execute request and return (last) response
+   * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
+   * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
+   */
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,

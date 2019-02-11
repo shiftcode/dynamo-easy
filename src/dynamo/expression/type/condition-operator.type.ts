@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ComparatorOperator } from './comparator-operator.type'
 import { FunctionOperator } from './function-operator.type'
 
@@ -30,5 +33,6 @@ import { FunctionOperator } from './function-operator.type'
  *    | begins_with (path, substr)
  *    | contains (path, operand)
  *    | size (path)
+ * @hidden
  */
 export type ConditionOperator = FunctionOperator | ComparatorOperator

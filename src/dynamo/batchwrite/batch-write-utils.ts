@@ -1,3 +1,6 @@
+/**
+ * @module multi-model-requests/batch-write
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseDelay } from '../../helper/promise-delay.function'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
@@ -9,6 +12,7 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
  * @param params containing the items per table to create the batchWrite operation
  * @param backoffTimer used to determine how many time slots the follow-up request should be delayed
  * @param throttleTimeSlot used to calculate the effective wait time
+ * @hidden
  */
 export function batchWriteItemsWriteAll(
   dynamoDBWrapper: DynamoDbWrapper,
@@ -35,10 +39,16 @@ export function batchWriteItemsWriteAll(
     })
 }
 
+/**
+ * @hidden
+ */
 export type BatchWriteItemOutputWithUnprocessedItems = DynamoDB.BatchWriteItemOutput & {
   UnprocessedItems: DynamoDB.BatchWriteItemRequestMap
 }
 
+/**
+ * @hidden
+ */
 export function hasUnprocessedItems(
   response: DynamoDB.BatchWriteItemOutput,
 ): response is BatchWriteItemOutputWithUnprocessedItems {

@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { promiseTap } from '../../helper/promise-tap.function'
 import { Logger } from '../../logger/logger'
@@ -21,7 +24,7 @@ type WriteResponse<O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput 
   Omit<O, 'Attributes'>
 
 /**
- * base class for all basic write request classes (DeleteItem, PutItem, UpdateItem
+ * abstract class for all basic write request classes (DeleteItem, PutItem, UpdateItem
  */
 export abstract class WriteRequest<T,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,

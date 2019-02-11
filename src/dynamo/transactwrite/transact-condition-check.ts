@@ -1,8 +1,14 @@
+/**
+ * @module multi-model-requests/transact-write
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { createKeyAttributes } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { TransactBaseOperation } from './transact-base-operation'
 
+/**
+ * TransactOperation class for transactional condition checks.
+ */
 export class TransactConditionCheck<T> extends TransactBaseOperation<
   T,
   DynamoDB.ConditionCheck,

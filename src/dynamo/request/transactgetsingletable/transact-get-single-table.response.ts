@@ -1,3 +1,6 @@
+/**
+ * @module store-requests
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Omit } from '../../../model/omit.type'
 

@@ -1,4 +1,6 @@
-// def good
+/**
+ * @module metadata
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { MapperForType } from '../../mapper/for-type/base.mapper'
 import { Attribute } from '../../mapper/type/attribute.type'
@@ -49,18 +51,27 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   transient?: boolean
 }
 
+/**
+ * @hidden
+ */
 export function hasGenericType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { genericType: ModelConstructor<any> } } {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType)
 }
 
+/**
+ * @hidden
+ */
 export function hasType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { type: ModelConstructor<any> } } {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.type)
 }
 
+/**
+ * @hidden
+ */
 export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: PropertyMetadata<T> | null): PropertyMetadata<T> | undefined {
   if (!propertyMeta) {
     return

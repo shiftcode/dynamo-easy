@@ -1,3 +1,9 @@
+/**
+ * @module dynamo-easy
+ */
+/**
+ * @hidden
+ */
 export type DynamoApiOperations =
   | 'batchGetItem'
   | 'batchWriteItem'

@@ -1,3 +1,10 @@
+/**
+ * @module expression
+ */
+
+/**
+ * @hidden
+ */
 export function dynamicTemplate(templateString: string, templateVariables: Record<string, any>) {
   const keys = Object.keys(templateVariables)
   const values = Object.values(templateVariables)

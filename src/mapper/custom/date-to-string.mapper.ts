@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { MapperForType } from '../for-type/base.mapper'
 import { StringAttribute } from '../type/attribute.type'
 

@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { curry, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import {
@@ -17,6 +20,9 @@ import { Expression } from './type/expression.type'
 import { validateAttributeType } from './update-expression-builder'
 import { dynamicTemplate } from './util'
 
+/**
+ * @hidden
+ */
 type BuildFilterFn = (
   attributePath: string,
   namePlaceholder: string,
@@ -37,6 +43,7 @@ type BuildFilterFn = (
  * @param obj
  * @param {(value: any) => boolean} filterFn
  * @returns {any}
+ * @hidden
  */
 export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
   if (Array.isArray(obj)) {
@@ -92,6 +99,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
  * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
  * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
  * @returns {Expression}
+ * @hidden
  */
 export function buildFilterExpression(
   attributePath: string,
@@ -158,6 +166,7 @@ export function buildFilterExpression(
  * @param {string[]} existingValueNames
  * @param {PropertyMetadata<any>} propertyMetadata
  * @returns {Expression}
+ * @hidden
  */
 function buildInConditionExpression(
   attributePath: string,
@@ -190,6 +199,9 @@ function buildInConditionExpression(
   }
 }
 
+/**
+ * @hidden
+ */
 function buildBetweenConditionExpression(
   attributePath: string,
   namePlaceholder: string,
@@ -221,6 +233,9 @@ function buildBetweenConditionExpression(
   }
 }
 
+/**
+ * @hidden
+ */
 function buildDefaultConditionExpression(
   operator: ConditionOperator,
   attributePath: string,
@@ -285,6 +300,7 @@ function buildDefaultConditionExpression(
  * @param values The values which will be applied to the operator function implementation, not every operator requires values
  * @throws {Error} error Throws an error if the amount of values won't match the operator function parameter arity or
  * the given values is not an array
+ * @hidden
  */
 function validateForOperator(operator: ConditionOperator, values?: any[]) {
   validateArity(operator, values)
@@ -307,13 +323,22 @@ function validateForOperator(operator: ConditionOperator, values?: any[]) {
 /*
  * error messages for arity issues
  */
+/**
+ * @hidden
+ */
 export const ERR_ARITY_IN =
   'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)'
+
+/**
+ * @hidden
+ */
 export const ERR_ARITY_DEFAULT =
   'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator'
 
 // tslint:enable:no-invalid-template-strings
-
+/**
+ * @hidden
+ */
 function validateArity(operator: ConditionOperator, values?: any[]) {
   if (values === null || values === undefined) {
     if (isFunctionOperator(operator) && !isNoParamFunctionOperator(operator)) {
@@ -340,8 +365,14 @@ function validateArity(operator: ConditionOperator, values?: any[]) {
  * error message for wrong operator values
  */
 // tslint:disable:no-invalid-template-strings
+/**
+ * @hidden
+ */
 export const ERR_VALUES_BETWEEN_TYPE =
   'both values for operator BETWEEN must have the same type, got ${value1} and ${value2}'
+/**
+ * @hidden
+ */
 export const ERR_VALUES_IN = 'the provided value for IN operator must be an array'
 
 // tslint:enable:no-invalid-template-strings
@@ -349,6 +380,7 @@ export const ERR_VALUES_IN = 'the provided value for IN operator must be an arra
 /**
  * Every operator has some constraints about the values it supports, this method makes sure everything is fine for given
  * operator and values
+ * @hidden
  */
 function validateValues(operator: ConditionOperator, values: any[]) {
   // some additional operator dependent validation

@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
 import { metadataForModel } from '../decorator/metadata/metadata-helper'
@@ -17,8 +20,14 @@ import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 import { getPropertyPath, typeOf, typeOfFromDb } from './util'
 
+/**
+ * @hidden
+ */
 const mapperForType: Map<AttributeValueType, MapperForType<any, any>> = new Map()
 
+/**
+ * mapps an item according to given model constructor [its meta data] to attributes
+ */
 export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attributes<T> {
   const mapped = <Attributes<T>>{}
 
@@ -84,13 +93,14 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 }
 
 /**
+ * maps a js value to its dynamoDB attribute
  * @param propertyValue The value which should be mapped
  * @param propertyMetadata Some optional metadata
  */
 export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<any>): Attribute | null
 
 /**
- *
+ * maps a js value to its dynamoDB attribute.
  * You can provide the property path to have a more verbose output
  *
  * @param propertyValue The value which should be mapped
@@ -98,7 +108,6 @@ export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<
  * @param propertyMetadata Some optional metadata
  */
 export function toDbOne(propertyValue: any, propertyPath: string, propertyMetadata?: PropertyMetadata<any>): Attribute | null
-
 export function toDbOne(propertyValue: any, propertyPathOrMetadata?: string | PropertyMetadata<any>, propertyMetadata?: PropertyMetadata<any>): Attribute | null {
   const propertyPath = propertyPathOrMetadata && typeof propertyPathOrMetadata === 'string' ? propertyPathOrMetadata : null
   propertyMetadata = propertyPathOrMetadata && typeof propertyPathOrMetadata !== 'string' ? propertyPathOrMetadata : propertyMetadata
@@ -131,12 +140,15 @@ type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyV
   return attrValue
 }
 
+/**
+ * @hidden
+ */
 function testForKey<T>(p: PropertyMetadata<T>): p is PropertyMetadata<T> & { key: Key } {
   return !!p.key
 }
 
 /**
- * returns the function for the given ModelConstructor to create the AttributeMap with HASH (and RANGE) Key of a given item. used to delete items
+ * returns the function for the given ModelConstructor to create the AttributeMap with HASH (and RANGE) Key of a given item.
  * @param modelConstructor
  */
 export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: Partial<T>) => Attributes<T> {
@@ -162,10 +174,17 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
     )
 }
 
+/**
+ * creates toKeyFn and applies item to it.
+ * @see {@link createToKeyFn}
+ */
 export function toKey<T>(item: T, modelConstructor: ModelConstructor<T>): Attributes<T> {
   return createToKeyFn(modelConstructor)(item)
 }
 
+/**
+ * @hidden
+ */
 export function createKeyAttributes<T>(
   metadata: Metadata<T>,
   partitionKey: any,
@@ -188,6 +207,9 @@ export function createKeyAttributes<T>(
   return keyAttributeMap
 }
 
+/**
+ * parses attributes to a js item according to the given model constructor [its meta data]
+ */
 export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelConstructor<T>): T {
   const model: T = <T>{}
 
@@ -232,6 +254,9 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
   return model
 }
 
+/**
+ * parses an attribute to a js value according to the given property metadata
+ */
 export function fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: PropertyMetadata<any, any>): T {
   const explicitType: AttributeValueType | null = hasType(propertyMetadata) ? propertyMetadata.typeInfo.type : null
   const type: AttributeValueType = explicitType || typeOfFromDb(attributeValue)
@@ -243,6 +268,9 @@ export function fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: Prope
   }
 }
 
+/**
+ * @hidden
+ */
 export function forType(type: AttributeValueType): MapperForType<any, Attribute> {
   let mapper = mapperForType.get(type)
   if (!mapper) {
@@ -287,6 +315,9 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
   return mapper
 }
 
+/**
+ * @hidden
+ */
 export function getPropertyValue(item: any, propertyKey: PropertyKey): any {
   const propertyDescriptor = Object.getOwnPropertyDescriptor(item, propertyKey)
 

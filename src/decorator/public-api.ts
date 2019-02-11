@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 //
 // impl
 //

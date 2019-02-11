@@ -1,14 +1,23 @@
+/**
+ * @module decorators
+ */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { KEY_PROPERTY } from '../property/key-property.const'
 import { IndexType } from './index-type.enum'
 
+/**
+ * @hidden
+ */
 export interface IndexData {
   name: string
   keyType: DynamoDB.KeyType
 }
 
+/**
+ * @hidden
+ */
 export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, target: any, propertyKey: string): void {
   const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
   const existingProperty = properties.find(property => property.name === propertyKey)
@@ -34,6 +43,9 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
   initOrUpdateProperty(propertyMetadata, target, propertyKey)
 }
 
+/**
+ * @hidden
+ */
 function initOrUpdateGSI(
   indexes: Record<string, DynamoDB.KeyType>,
   indexData: IndexData,
@@ -50,6 +62,9 @@ function initOrUpdateGSI(
   return { keyForGSI: indexes }
 }
 
+/**
+ * @hidden
+ */
 function initOrUpdateLSI(indexes: string[], indexData: IndexData): Partial<PropertyMetadata<any>> {
   indexes.push(indexData.name)
   return { sortKeyForLSI: indexes }

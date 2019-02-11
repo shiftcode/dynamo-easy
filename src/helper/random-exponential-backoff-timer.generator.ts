@@ -1,3 +1,9 @@
+/**
+ * @module helper
+ */
+/**
+ * returns a random value from an increasing range by each iteration.
+ */
 export function* randomExponentialBackoffTimer() {
   let i = 0
   while (true) {

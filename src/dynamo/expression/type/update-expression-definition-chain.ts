@@ -1,3 +1,6 @@
+/**
+ * @module expression
+ */
 import { ExtractListType } from '../../../helper/extract-list-type.type'
 import { ConditionalParamsHost } from '../../operation-params.type'
 import { UpdateExpressionDefinitionFunction } from './update-expression-definition-function'
@@ -82,11 +85,16 @@ export interface UpdateFunctions<T, R> {
   removeFromSet: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 }
 
+
 export type UpdateExpressionDefinitionChainTyped<T, K extends keyof T> = UpdateFunctions<
   T[K],
   UpdateExpressionDefinitionFunction
 >
 
+
 export type UpdateExpressionDefinitionChain = UpdateFunctions<any, UpdateExpressionDefinitionFunction>
 
+/**
+ * @hidden
+ */
 export type RequestUpdateFunction<R extends ConditionalParamsHost, T, K extends keyof T> = UpdateFunctions<T[K], R>

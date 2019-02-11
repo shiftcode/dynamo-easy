@@ -1,3 +1,6 @@
+/**
+ * @module metadata
+ */
 import {
   NESTED_ATTR_PATH_CAPTURED_REGEX,
   NESTED_ATTR_PATH_REGEX,
@@ -9,10 +12,14 @@ import { KEY_MODEL } from '../impl/model/key-model.const'
 import { ModelMetadata } from './model-metadata.model'
 import { PropertyMetadata } from './property-metadata.model'
 
+/**
+ * @hidden
+ */
 export type MetadataWithSortKey<T> = Omit<Metadata<T>, 'getSortKey'> & { getSortKey: (indexName?: string) => keyof T }
 
 /**
  * Checks if given metadata returns a sort key when calling metadata.getSortKey
+ * @hidden
  */
 export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSortKey<T> {
   return metadata.getSortKey() !== null
@@ -140,6 +147,9 @@ export class Metadata<T> {
   }
 }
 
+/**
+ * @hidden
+ */
 function filterBy<T, R>(
   modelOptions: ModelMetadata<T>,
   predicate: (property: PropertyMetadata<any>) => boolean,
@@ -155,6 +165,9 @@ function filterBy<T, R>(
   return defaultValue
 }
 
+/**
+ * @hidden
+ */
 function filterByFirst<T>(
   modelOptions: ModelMetadata<T>,
   predicate: (property: PropertyMetadata<T>) => boolean,

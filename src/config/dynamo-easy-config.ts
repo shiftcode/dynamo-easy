@@ -1,3 +1,6 @@
+/**
+ * @module dynamo-easy
+ */
 import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../dynamo/default-session-validity-ensurer.const'
 import { DEFAULT_TABLE_NAME_RESOLVER } from '../dynamo/default-table-name-resolver.const'
 import { DEFAULT_LOG_RECEIVER } from '../logger/default-log-receiver.const'

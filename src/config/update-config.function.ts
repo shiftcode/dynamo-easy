@@ -1,10 +1,11 @@
+/**
+ * @module dynamo-easy
+ */
 import { Config } from './config.type'
 import { dynamoEasyConfig } from './dynamo-easy-config'
 
 /**
- * update the global dynamoEasy configuration.
- * @see {@link Config}
- * @param config
+ * update the global dynamoEasy {@link Config}
  */
 export function updateDynamoEasyConfig(config: Partial<Config>): void {
   if ('logReceiver' in config && typeof config.logReceiver !== 'function') {
