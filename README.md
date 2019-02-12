@@ -41,9 +41,9 @@ personStore
 - 🚀 Check the running sample on [Stackblitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
 
 ## Credits
-- [https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) - Starter project which helps creating a TypeScript library project
-- [https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the fluent api
-- [http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Inspiration on how to implement the model decorators
+- [https://github.com/alexjoverm/typescript-library-starter](typescript-library-starter) - Starter project which helps creating a TypeScript library project
+- [https://github.com/ryanfitz/vogels](vogels) - To get an idea on how to build the fluent api
+- [http://densebrain.github.io/typestore/](typestore) - Inspiration on how to implement the model decorators
 
 ## Contributors
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
