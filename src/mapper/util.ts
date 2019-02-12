@@ -230,7 +230,7 @@ export function typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
  */
 export function isBinary(data: any): boolean {
   if (isNode()) {
-    // TODO LOW:BINARY should add || data instanceof Stream
+    // TODO LOW:ENHANCEMENT should add || data instanceof Stream
     return Buffer.isBuffer(data)
   } else {
     return BUFFER_TYPES.some(

@@ -51,7 +51,7 @@ function initOrUpdateGSI(
   indexData: IndexData,
 ): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
-    // TODO LOW:INVESTIGATE when we throw an error we have a problem where multiple different classes extend one base class, this will be executed multiple times
+    // TODO INVESTIGATE when we throw an error we have a problem where multiple different classes extend one base class, this will be executed multiple times
     // throw new Error(
     //   'the property with name is already registered as key for index - one property can only define one key per index'
     // )
