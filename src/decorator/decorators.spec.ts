@@ -29,7 +29,7 @@ import { Model } from './impl/model/model.decorator'
 import { Property } from './impl/property/property.decorator'
 import { Transient } from './impl/transient/transient.decorator'
 import { Metadata } from './metadata/metadata'
-import { metadataForModel } from './metadata/metadata-helper'
+import { metadataForModel } from './metadata/metadata-for-model.function'
 import { ModelMetadata } from './metadata/model-metadata.model'
 
 describe('Decorators should add correct metadata', () => {

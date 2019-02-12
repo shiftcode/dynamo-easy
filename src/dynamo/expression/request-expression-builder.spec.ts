@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel, Organization } from '../../../test/models'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { QueryRequest } from '../request/query/query.request'
 import {

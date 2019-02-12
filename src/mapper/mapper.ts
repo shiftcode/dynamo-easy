@@ -3,7 +3,7 @@
  */
 import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
-import { metadataForModel } from '../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
 import { hasType, Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
 import { MapperForType } from './for-type/base.mapper'

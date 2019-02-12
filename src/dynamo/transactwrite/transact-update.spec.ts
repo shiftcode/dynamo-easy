@@ -1,6 +1,6 @@
 import { UpdateModel } from '../../../test/models'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { createKeyAttributes } from '../../mapper/mapper'
 import { update2 } from '../expression/logical-operator/update.function'
 import { getTableName } from '../get-table-name.function'

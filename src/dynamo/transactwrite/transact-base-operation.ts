@@ -3,7 +3,7 @@
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { ModelConstructor } from '../../model/model-constructor'
 import { and } from '../expression/logical-operator/and.function'
 import { addExpression } from '../expression/param-util'

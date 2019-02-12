@@ -1,7 +1,7 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models/index'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { toDb } from '../../mapper/mapper'
 import { getTableName } from '../get-table-name.function'
 import { createIfNotExistsCondition } from './create-if-not-exists-condition.function'

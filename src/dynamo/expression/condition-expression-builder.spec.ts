@@ -6,7 +6,7 @@ import { CollectionProperty } from '../../decorator/impl/collection/collection-p
 import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
 import { Model } from '../../decorator/impl/model/model.decorator'
 import { Property } from '../../decorator/impl/property/property.decorator'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { typeOf } from '../../mapper/util'
 import {
   buildFilterExpression,

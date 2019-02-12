@@ -1,6 +1,6 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
-import { metadataForModel } from '../../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../../decorator/metadata/metadata-for-model.function'
 import { createKeyAttributes } from '../../../mapper/mapper'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'

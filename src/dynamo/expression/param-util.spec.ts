@@ -1,7 +1,7 @@
 import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
 import { Model } from '../../decorator/impl/model/model.decorator'
 import { Metadata } from '../../decorator/metadata/metadata'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { ConditionalParams } from '../operation-params.type'
 import { attribute } from './logical-operator/attribute.function'
 import { and, or, update2 } from './logical-operator/public.api'

@@ -3,7 +3,7 @@
  */
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 import { Metadata } from '../decorator/metadata/metadata'
-import { metadataForModel } from '../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
 import { ModelConstructor } from '../model/model-constructor'
 
 /**

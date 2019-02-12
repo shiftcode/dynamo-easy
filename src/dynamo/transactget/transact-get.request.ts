@@ -2,7 +2,7 @@
  * @module multi-model-requests/transact-get
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { createToKeyFn, fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'

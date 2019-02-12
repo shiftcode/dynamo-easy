@@ -4,7 +4,7 @@ import { CollectionProperty } from '../impl/collection/collection-property.decor
 import { DateProperty } from '../impl/date/date-property.decorator'
 import { Model } from '../impl/model/model.decorator'
 import { Property } from '../impl/property/property.decorator'
-import { metadataForModel } from './metadata-helper'
+import { metadataForModel } from './metadata-for-model.function'
 import { alterCollectionPropertyMetadataForSingleItem } from './property-metadata.model'
 
 @Model()

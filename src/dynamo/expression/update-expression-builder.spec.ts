@@ -1,6 +1,6 @@
 import { SimpleWithPartitionKeyModel, UpdateModel } from '../../../test/models'
 import { SpecialCasesModel } from '../../../test/models/special-cases-model.model'
-import { metadataForModel } from '../../decorator/metadata/metadata-helper'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
 import { UpdateActionDef } from './type/update-action-def'
 import { buildUpdateExpression } from './update-expression-builder'
 

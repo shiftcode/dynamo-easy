@@ -3,7 +3,7 @@ import { getMetaDataProperty } from '../../../../test/helper/get-meta-data-prope
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { dateToNumberMapper } from '../../../mapper/custom/date-to-number.mapper'
-import { metadataForModel } from '../../metadata/metadata-helper'
+import { metadataForModel } from '../../metadata/metadata-for-model.function'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { Model } from '../model/model.decorator'
 import { DateProperty } from './date-property.decorator'
