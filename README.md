@@ -8,22 +8,42 @@
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg)](#contributors)
 
-Abstracts away the complexity of the low level aws dynamosdk. Provides an easy to use fluent api to for requests and supports typescript decorators,
-to define some metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
 
-Checkout the full technical api documentation [here](https://shiftcode.github.io/dynamo-easy/).
+A dynamoDB client which provides an easy to use fluent api to execute requests. It supports typescript decorators, to define the necessary metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
 
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
-## Ressources
+## Show me some code
+```typescript
+import { Model, PartitionKey, DynamoStore } from '@shiftcoders/dynamo-easy'
 
+@Model()
+export class Person {
+  @PartitionKey()
+  id: string
+  name: string
+  yearOfBirth: number
+}
+
+const personStore = new DynamoStore(Person)
+
+personStore
+  .scan()
+  .whereAttribute('yearOfBirth').equals(1958)
+  .exec()
+  .then(res => console.log('ALL items with yearOfBirth == 1958', res))
+
+```
+
+## Ressources
 - 🤓 Learn more visiting the [docs](https://shiftcode.gitbook.io/dynamo-easy)
-- Check the running sample on TODO [Stackblitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
+- 📖 Checkout the technical API documentation [api docs](https://shiftcode.github.io/dynamo-easy/)
+- 🚀 Check the running sample on [Stackblitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
 
 ## Credits
-- [https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) For the awesome project which helps to scaffold, develop and build a typescript library project
-- [https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the chainable api
-- [http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Thats where the base idea on how to implement the model decorators came came from
+- [https://github.com/alexjoverm/typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) - Starter project which helps creating a TypeScript library project
+- [https://github.com/ryanfitz/vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the fluent api
+- [http://densebrain.github.io/typestore/](http://densebrain.github.io/typestore/) - Inspiration on how to implement the model decorators
 
 ## Contributors
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
