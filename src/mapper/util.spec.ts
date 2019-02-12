@@ -1,7 +1,15 @@
 import { Employee } from '../../test/models'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
-import { detectCollectionType, isCollection, isSet, typeName, typeOf, typeOfFromDb } from './util'
+import {
+  detectCollectionTypeFromValue,
+  isCollection,
+  isHomogeneous,
+  isSet,
+  typeName,
+  typeOf,
+  typeOfFromDb,
+} from './util'
 
 describe('Util', () => {
   describe('is set', () => {
@@ -48,30 +56,35 @@ describe('Util', () => {
     })
   })
 
-  describe('detect collection type', () => {
+  describe('detect collection type without property metadata', () => {
+    it('set (empty)', () => {
+      const collection: Set<string> = new Set()
+      expect(detectCollectionTypeFromValue(collection)).toBe('SS')
+    })
+
     it('set with string values', () => {
       const collection: Set<string> = new Set(['foo', 'bar'])
-      expect(detectCollectionType(collection)).toBe('SS')
+      expect(detectCollectionTypeFromValue(collection)).toBe('SS')
     })
 
     it('set with number values', () => {
       const collection: Set<number> = new Set([25, 65])
-      expect(detectCollectionType(collection)).toBe('NS')
-    })
-
-    it('set with object values', () => {
-      const collection: Set<any> = new Set([{ foo: 'foo' }, { bar: 'bar' }])
-      expect(detectCollectionType(collection)).toBe('L')
-    })
-
-    it('set with values of different type', () => {
-      const collection: Set<any> = new Set(['foo', 5])
-      expect(detectCollectionType(collection)).toBe('L')
+      expect(detectCollectionTypeFromValue(collection)).toBe('NS')
     })
 
     it('set with no values', () => {
       const collection: Set<any> = new Set()
-      expect(detectCollectionType(collection)).toBe('L')
+      expect(detectCollectionTypeFromValue(collection)).toBe('SS')
+    })
+
+    it('set with object values should throw', () => {
+      const collection: Set<any> = new Set([{ foo: 'foo' }, { bar: 'bar' }])
+      expect(() => detectCollectionTypeFromValue(collection)).toThrow()
+    })
+
+    it('set with values of different type should throw', () => {
+      const collection: Set<any> = new Set(['foo', 5])
+      expect(() => detectCollectionTypeFromValue(collection)).toThrow()
     })
   })
 
@@ -211,6 +224,60 @@ describe('Util', () => {
       expect(() => {
         typeOfFromDb(undefined)
       }).toThrowError()
+    })
+  })
+
+  describe('isHomogeneous', () => {
+    describe('array', () => {
+      it('array (homo -> number)', () => {
+        const { homogeneous, type } = isHomogeneous([1, 2, 3])
+        expect(homogeneous).toBeTruthy()
+        expect(type).toBe('N')
+      })
+
+      it('array (homo -> string)', () => {
+        const { homogeneous, type } = isHomogeneous(['one', 'two', 'three'])
+        expect(homogeneous).toBeTruthy()
+        expect(type).toBe('S')
+      })
+
+      it('array (homo -> boolean)', () => {
+        const { homogeneous, type } = isHomogeneous([true, false, false])
+        expect(homogeneous).toBeTruthy()
+        expect(type).toBe('BOOL')
+      })
+
+      it('array (homo -> boolean)', () => {
+        const { homogeneous, type } = isHomogeneous(['one', 2, false])
+        expect(homogeneous).toBeFalsy()
+        expect(type).toBeUndefined()
+      })
+    })
+
+    describe('set', () => {
+      it('set (homo -> number)', () => {
+        const { homogeneous, type } = isHomogeneous(new Set([1, 2, 3]))
+        expect(homogeneous).toBeTruthy()
+        expect(type).toBe('N')
+      })
+
+      it('set (homo -> string)', () => {
+        const { homogeneous, type } = isHomogeneous(new Set(['one', 'two', 'three']))
+        expect(homogeneous).toBeTruthy()
+        expect(type).toBe('S')
+      })
+
+      it('set (homo -> boolean)', () => {
+        const { homogeneous, type } = isHomogeneous(new Set([true, false, false]))
+        expect(homogeneous).toBeTruthy()
+        expect(type).toBe('BOOL')
+      })
+
+      it('set (hetero)', () => {
+        const { homogeneous, type } = isHomogeneous(new Set(['one', 2, false]))
+        expect(homogeneous).toBeFalsy()
+        expect(type).toBeUndefined()
+      })
     })
   })
 })

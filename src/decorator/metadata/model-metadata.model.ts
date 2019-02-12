@@ -1,9 +1,11 @@
+/**
+ * @module metadata
+ */
 import { SecondaryIndex } from '../impl/index/secondary-index'
 import { PropertyMetadata } from './property-metadata.model'
 
 /**
- * Options provided to model
- * decorator annotation
+ * Options provided to model decorator annotation
  */
 export interface ModelMetadata<T> {
   clazzName: string

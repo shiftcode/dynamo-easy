@@ -1,31 +1,62 @@
 // tslint:disable:no-non-null-assertion
+// tslint:disable:max-classes-per-file
 
-import { QueryInput, QueryOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable, of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import {
   ComplexModel,
   CustomId,
   INDEX_ACTIVE_CREATED_AT,
   ModelWithABunchOfIndexes,
   ModelWithCustomMapperForSortKeyModel,
+  ModelWithGSI,
+  SimpleWithPartitionKeyModel,
 } from '../../../../test/models'
-import { DynamoRx } from '../../dynamo-rx'
-import { attribute } from '../../expression'
+import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
+import { GSISortKey } from '../../../decorator/impl/index/gsi-sort-key.decorator'
+import { PartitionKey } from '../../../decorator/impl/key/partition-key.decorator'
+import { Model } from '../../../decorator/impl/model/model.decorator'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { attribute } from '../../expression/logical-operator/attribute.function'
+import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
 
-export const DYNAMO_RX_MOCK: DynamoRx = <DynamoRx>{
-  query(params: QueryInput): Observable<QueryOutput> {
-    return of({})
-  },
-}
-
 describe('query request', () => {
+  let querySpy: jasmine.Spy
+
+  describe('constructor', () => {
+    class MyQueryRequest extends QueryRequest<ComplexModel> {
+      constructor(dynamoDBWrapper: DynamoDbWrapper) {
+        super(dynamoDBWrapper, ComplexModel)
+      }
+
+      get theLogger() {
+        return this.logger
+      }
+    }
+
+    let request: MyQueryRequest
+
+    beforeEach(() => {
+      querySpy = jasmine.createSpy().and.returnValue(Promise.resolve({ Count: 1 }))
+      request = new MyQueryRequest(<any>{ query: querySpy })
+    })
+
+    it('extends ReadManyRequest', () => {
+      expect(request instanceof ReadManyRequest).toBeTruthy()
+    })
+    it('creates logger', () => {
+      expect(request.theLogger).toBeDefined()
+    })
+    it('doRequest uses dynamoDBWrapper.query', async () => {
+      await request.exec()
+      expect(querySpy).toHaveBeenCalled()
+    })
+  })
+
   describe('defines correct params', () => {
     let request: QueryRequest<ComplexModel>
 
     beforeEach(() => {
-      request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+      request = new QueryRequest(<any>null, ComplexModel)
     })
 
     it('defaults should be defined', () => {
@@ -40,9 +71,42 @@ describe('query request', () => {
     })
   })
 
+  describe('wherePartitionKey', () => {
+    let request: QueryRequest<any>
+
+    @Model()
+    class ModelWithoutGsiPartitionKey {
+      @PartitionKey()
+      id: string
+      @GSISortKey('MY_GSI')
+      count: number
+    }
+
+    beforeEach(() => {
+      request = new QueryRequest(<any>null, ModelWithoutGsiPartitionKey)
+    })
+
+    it('throws when index has no partition key defined', () => {
+      expect(() => request.index('MY_GSI').wherePartitionKey('myId')).toThrow()
+    })
+  })
+
+  describe('whereSortKey', () => {
+    let request: QueryRequest<any>
+    beforeEach(() => {
+      request = new QueryRequest(<any>null, ModelWithGSI)
+    })
+    it('throws when no sortKey was defined', () => {
+      expect(() => request.whereSortKey()).toThrow()
+    })
+    it('throws when index has no sortKey', () => {
+      expect(() => request.index(INDEX_ACTIVE).whereSortKey()).toThrow()
+    })
+  })
+
   describe('indexes', () => {
     it('simple', () => {
-      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes, getTableName(ModelWithABunchOfIndexes))
+      const request = new QueryRequest(<any>null, ModelWithABunchOfIndexes)
 
       const now = new Date()
 
@@ -67,7 +131,7 @@ describe('query request', () => {
 
   describe('filter expression', () => {
     it('simple', () => {
-      const request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+      const request = new QueryRequest(<any>null, ComplexModel)
 
       request.whereAttribute('active').eq(true)
       expect(request.params.FilterExpression).toBe('#active = :active')
@@ -82,7 +146,7 @@ describe('query request', () => {
     })
 
     it('complex', () => {
-      const request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
+      const request = new QueryRequest(<any>null, ComplexModel)
 
       request.where(attribute<ComplexModel>('active').eq(true), attribute('creationDate').lt(new Date()))
 
@@ -92,11 +156,7 @@ describe('query request', () => {
   })
 
   describe('uses custom mapper for sortKey', () => {
-    const request = new QueryRequest(
-      <any>null,
-      ModelWithCustomMapperForSortKeyModel,
-      getTableName(ModelWithCustomMapperForSortKeyModel),
-    )
+    const request = new QueryRequest(<any>null, ModelWithCustomMapperForSortKeyModel)
 
     request.whereSortKey().between(new CustomId(new Date('2018-01-01'), 0), new CustomId(new Date('2018-12-31'), 99999))
 
@@ -109,14 +169,16 @@ describe('query request', () => {
     })
   })
 
-  // describe('calls endpoint with correct params', () => {
-  //   const dynamoRx: DynamoRx = DYNAMO_RX_MOCK as DynamoRx
-  //   let querySpy: jasmine.Spy
-  //   let request: QueryRequest<ComplexModel>
-  //
-  //   beforeEach(() => {
-  //     request = new QueryRequest(<any>null, ComplexModel, getTableName(ComplexModel))
-  //     querySpy = spyOn(dynamoRx, 'query').and.callThrough()
-  //   })
-  // })
+  describe('scan direction', () => {
+    let req: QueryRequest<SimpleWithPartitionKeyModel>
+    beforeEach(() => (req = new QueryRequest(<any>null, SimpleWithPartitionKeyModel)))
+    it('ascending', () => {
+      req.ascending()
+      expect(req.params.ScanIndexForward).toBeTruthy()
+    })
+    it('descending', () => {
+      req.descending()
+      expect(req.params.ScanIndexForward).toBeFalsy()
+    })
+  })
 })

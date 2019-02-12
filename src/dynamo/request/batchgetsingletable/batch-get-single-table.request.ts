@@ -1,126 +1,103 @@
-import { BatchGetItemInput } from 'aws-sdk/clients/dynamodb'
-import { isObject } from 'lodash'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
-import { hasSortKey, Metadata, metadataForClass } from '../../../decorator/metadata'
+/**
+ * @module store-requests
+ */
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { promiseTap } from '../../../helper/promise-tap.function'
+import { randomExponentialBackoffTimer } from '../../../helper/random-exponential-backoff-timer.generator'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, fromDb, toDbOne } from '../../../mapper'
-import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
+import { createToKeyFn, fromDb } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
+import { ModelConstructor } from '../../../model/model-constructor'
+import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
+import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget/batch-get.const'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
-// TODO add support for indexes
-export class BatchGetSingleTableRequest<T> {
+/**
+ * Request class for BatchGetItem operation which supports a single model class only.
+ */
+export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
+  DynamoDB.BatchGetItemInput,
+  BatchGetSingleTableRequest<T>> {
   private readonly logger: Logger
-  readonly dynamoRx: DynamoRx
-  readonly params: BatchGetItemInput
-  readonly modelClazz: ModelConstructor<T>
-  readonly tableName: string
 
-  readonly metadata: Metadata<T>
-
-  // todo: make use of toKey<T>(item: T, modelConstructor: ModelConstructor<T>)
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, keys: any[]) {
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+    super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
-    this.dynamoRx = dynamoRx
 
-    if (modelClazz === null || modelClazz === undefined) {
-      throw new Error("please provide the model clazz for the request, won't work otherwise")
+    if (keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) {
+      throw new Error(`you can request at max ${BATCH_GET_MAX_REQUEST_ITEM_COUNT} items per request`)
     }
 
-    this.modelClazz = modelClazz
-    this.params = <BatchGetItemInput>{
-      RequestItems: {},
+    this.params.RequestItems = {
+      [this.tableName]: {
+        Keys: keys.map(createToKeyFn(modelClazz)),
+      },
     }
-
-    this.tableName = tableName
-    this.metadata = metadataForClass(this.modelClazz)
-
-    this.addKeyParams(keys)
   }
 
-  execFullResponse(): Observable<BatchGetSingleTableResponse<T>> {
+  consistentRead(value: boolean = true): BatchGetSingleTableRequest<T> {
+    this.params.RequestItems[this.tableName].ConsistentRead = value
+    return this
+  }
+
+  /**
+   * fetch all entries and return the raw response (without parsing the attributes to js objects)
+   * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
+  execNoMap(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
+  ): Promise<DynamoDB.BatchGetItemOutput> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+  }
+
+  /**
+   * fetch all entries and return an object containing the mapped items and the other response data
+   * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
+  execFullResponse(
+    backoffTimer = randomExponentialBackoffTimer,
+    throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
+  ): Promise<BatchGetSingleTableResponse<T>> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
+      .then(promiseTap(response => this.logger.debug('mapped items', response.Items)))
+  }
+
+  /**
+   * fetch all entries and return the parsed items
+   * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
+   * @param throttleTimeSlot the duration of a time slot in ms
+   */
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Promise<T[]> {
+    return this.fetch(backoffTimer, throttleTimeSlot)
+      .then(this.mapResponse)
+      .then(r => r.Items)
+      .then(promiseTap(items => this.logger.debug('mapped items', items)))
+  }
+
+  private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
+    let items: T[] = []
+    if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
+      const mapped: T[] = response.Responses[this.tableName].map(attributeMap =>
+        fromDb(<Attributes<T>>attributeMap, this.modelClazz),
+      )
+      items = mapped
+    }
+    return {
+      Items: items,
+      UnprocessedKeys: response.UnprocessedKeys,
+      ConsumedCapacity: response.ConsumedCapacity,
+    }
+  }
+
+  private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.batchGetItems(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => {
-        let items: T[]
-        if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          const mapped: T[] = response.Responses[this.tableName].map(attributeMap =>
-            fromDb(<Attributes<T>>attributeMap, this.modelClazz),
-          )
-          items = mapped
-        } else {
-          items = []
-        }
-
-        return {
-          Items: items,
-          UnprocessedKeys: response.UnprocessedKeys,
-          ConsumedCapacity: response.ConsumedCapacity,
-        }
-      }),
-      tap(response => this.logger.debug('mapped items', response.Items)),
-    )
-  }
-
-  exec(): Observable<T[]> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.batchGetItems(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => {
-        if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-          return response.Responses[this.tableName].map(attributeMap =>
-            fromDb(<Attributes<T>>attributeMap, this.modelClazz),
-          )
-        } else {
-          return []
-        }
-      }),
-      tap(items => this.logger.debug('mapped items', items)),
-    )
-  }
-
-  private addKeyParams(keys: any[]) {
-    const attributeMaps: Array<Attributes<T>> = []
-
-    keys.forEach(key => {
-      const idOb: Attributes<T> = <any>{}
-      if (isObject(key)) {
-        // TODO add some more checks
-        // got a composite primary key
-
-        // partition key
-        const mappedPartitionKey = toDbOne(key.partitionKey)
-        if (mappedPartitionKey === null) {
-          throw Error('please provide an actual value for partition key')
-        }
-        idOb[this.metadata.getPartitionKey()] = mappedPartitionKey
-
-        // sort key
-        if (key.sortKey && hasSortKey(this.metadata)) {
-          const mappedSortKey = toDbOne(key.sortKey)
-          if (mappedSortKey === null) {
-            throw Error('please provide an actual value for sort key')
-          }
-
-          idOb[this.metadata.getSortKey()] = mappedSortKey
-        }
-      } else {
-        // got a simple primary key
-        const value = toDbOne(key)
-        if (value === null) {
-          throw Error('please provide an actual value for partition key')
-        }
-
-        idOb[this.metadata.getPartitionKey()] = value
-      }
-
-      attributeMaps.push(idOb)
-    })
-
-    this.params.RequestItems[this.tableName] = {
-      Keys: <any>attributeMaps,
-    }
+    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
+      .then(promiseTap(response => this.logger.debug('response', response)))
   }
 }

@@ -1,65 +1,35 @@
-import { ReturnConsumedCapacity } from 'aws-sdk/clients/dynamodb'
-import { values as objValues } from 'lodash'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
-import { hasSortKey } from '../../../decorator/metadata'
+/**
+ * @module store-requests
+ */
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, fromDb, toDbOne } from '../../../mapper'
-import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
+import { createKeyAttributes, fromDb } from '../../../mapper/mapper'
+import { Attributes } from '../../../mapper/type/attribute.type'
+import { ModelConstructor } from '../../../model/model-constructor'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
-import { BaseRequest } from '../base.request'
+import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
 
-export class GetRequest<T> extends BaseRequest<T, any> {
+/**
+ * Request class for the GetItem operation.
+ */
+export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, GetRequest<T>> {
   private readonly logger: Logger
 
-  constructor(
-    dynamoRx: DynamoRx,
-    modelClazz: ModelConstructor<T>,
-    tableName: string,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
-    super(dynamoRx, modelClazz, tableName)
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
-
-    if (hasSortKey(this.metadata) && (sortKey === null || sortKey === undefined)) {
-      throw new Error(`please provide the sort key for attribute ${this.metadata.getSortKey()}`)
-    }
-
-    const keyAttributeMap: Attributes<T> = <any>{}
-
-    // partition key
-    const partitionKeyValue = toDbOne(partitionKey, this.metadata.forProperty(this.metadata.getPartitionKey()))
-
-    if (partitionKeyValue === null) {
-      throw new Error('please provide an acutal value for partition key, got null')
-    }
-
-    keyAttributeMap[this.metadata.getPartitionKey()] = partitionKeyValue
-
-    // sort key
-    if (hasSortKey(this.metadata)) {
-      const sortKeyValue = toDbOne(sortKey, this.metadata.forProperty(this.metadata.getSortKey()))
-
-      if (sortKeyValue === null) {
-        throw new Error('please provide an actual value for sort key, got null')
-      }
-
-      keyAttributeMap[this.metadata.getSortKey()] = sortKeyValue
-    }
-
-    this.params.Key = keyAttributeMap
+    this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
-  consistentRead(consistendRead: boolean): GetRequest<T> {
-    this.params.ConsistentRead = consistendRead
-    return this
-  }
 
-  returnConsumedCapacity(level: ReturnConsumedCapacity): GetRequest<T> {
-    this.params.ReturnConsumedCapacity = level
+  /**
+   * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
+   */
+  consistentRead(consistentRead: boolean = true): GetRequest<T> {
+    this.params.ConsistentRead = consistentRead
     return this
   }
 
@@ -67,17 +37,17 @@ export class GetRequest<T> extends BaseRequest<T, any> {
     // tslint:disable-next-line:no-unnecessary-callback-wrapper
     const resolved = attributesToGet.map(a => resolveAttributeNames(a))
     this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
-    objValues(resolved).forEach(r => {
+    Object.values(resolved).forEach(r => {
       this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
     })
     return this
   }
 
-  execFullResponse(): Observable<GetResponse<T>> {
+  execFullResponse(): Promise<GetResponse<T>> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.getItem(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(getItemResponse => {
+    return this.dynamoDBWrapper.getItem(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(getItemResponse => {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
 
         if (getItemResponse.Item) {
@@ -87,23 +57,25 @@ export class GetRequest<T> extends BaseRequest<T, any> {
         }
 
         return response
-      }),
-      tap(response => this.logger.debug('mapped item', response.Item)),
-    )
+      })
+      .then(promiseTap(response => this.logger.debug('mapped item', response.Item)))
+
   }
 
-  exec(): Observable<T | null> {
+  /**
+   * execute request and return the parsed item
+   */
+  exec(): Promise<T | null> {
     this.logger.debug('request', this.params)
-    return this.dynamoRx.getItem(this.params).pipe(
-      tap(response => this.logger.debug('response', response)),
-      map(response => {
+    return this.dynamoDBWrapper.getItem(this.params)
+      .then(promiseTap(response => this.logger.debug('response', response)))
+      .then(response => {
         if (response.Item) {
           return fromDb(<Attributes<T>>response.Item, this.modelClazz)
         } else {
           return null
         }
-      }),
-      tap(item => this.logger.debug('mapped item', item)),
-    )
+      })
+      .then(promiseTap(item => this.logger.debug('mapped item', item)))
   }
 }

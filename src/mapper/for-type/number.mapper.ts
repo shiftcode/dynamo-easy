@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { isNumber } from 'lodash'
 import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
@@ -18,6 +21,11 @@ function numberToDb(modelValue: number): NumberAttribute | null {
   if (!isNumber(modelValue)) {
     throw new Error('this mapper only support values of type number')
   }
+
+  if(isNaN(modelValue)){
+    return null
+  }
+
   return { N: modelValue.toString() }
 }
 

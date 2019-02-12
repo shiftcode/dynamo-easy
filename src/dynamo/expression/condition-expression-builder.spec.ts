@@ -1,8 +1,24 @@
+// tslint:disable:max-classes-per-file
 import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
-import { Model, PartitionKey, Property } from '../../decorator/impl'
-import { metadataForClass } from '../../decorator/metadata'
-import { buildFilterExpression, deepFilter } from './condition-expression-builder'
+import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
+import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'
+import { PartitionKey } from '../../decorator/impl/key/partition-key.decorator'
+import { Model } from '../../decorator/impl/model/model.decorator'
+import { Property } from '../../decorator/impl/property/property.decorator'
+import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
+import { typeOf } from '../../mapper/util'
+import {
+  buildFilterExpression,
+  deepFilter,
+  ERR_ARITY_DEFAULT,
+  ERR_ARITY_IN,
+  ERR_VALUES_BETWEEN_TYPE,
+  ERR_VALUES_IN,
+} from './condition-expression-builder'
+import { operatorParameterArity } from './functions/operator-parameter-arity.function'
+import { ConditionOperator } from './type/condition-operator.type'
+import { dynamicTemplate } from './util'
 
 @Model()
 class MyModel {
@@ -35,7 +51,7 @@ describe('expressions', () => {
   })
 
   it('use property metadata', () => {
-    const condition = buildFilterExpression('prop', '>', [10], undefined, metadataForClass(MyModel))
+    const condition = buildFilterExpression('prop', '>', [10], undefined, metadataForModel(MyModel))
     expect(condition.statement).toBe('#prop > :prop')
 
     expect(condition.attributeNames['#prop']).toBe('propDb')
@@ -53,7 +69,7 @@ describe('expressions', () => {
   describe('operators', () => {
     it('simple', () => {
       // property('age').gt(10)
-      const condition = buildFilterExpression('age', '>', [10], undefined, metadataForClass(MyModel))
+      const condition = buildFilterExpression('age', '>', [10], undefined, metadataForModel(MyModel))
       expect(condition.statement).toBe('#age > :age')
     })
 
@@ -195,18 +211,39 @@ describe('expressions', () => {
       expect(condition.attributeValues[':textProp']).toEqual({ S: 'te' })
     })
 
-    it('contains', () => {
-      // property('myCollection').contains(2)
-      const condition = buildFilterExpression('myCollection', 'contains', [2], undefined, undefined)
-      expect(condition.statement).toBe('contains (#myCollection, :myCollection)')
+    describe('contains', () => {
+      it('string subsequence', () => {
+        const condition = buildFilterExpression('id', 'contains', ['substr'], undefined, metadataForModel(Form))
+        expect(condition.statement).toBe('contains (#id, :id)')
+        expect(condition.attributeNames).toEqual({ '#id': 'id' })
+        expect(condition.attributeValues).toEqual({ ':id': { S: 'substr' } })
+      })
 
-      expect(condition.attributeNames).toBeDefined()
-      expect(Object.keys(condition.attributeNames)[0]).toBe('#myCollection')
-      expect(condition.attributeNames['#myCollection']).toBe('myCollection')
+      it('value in set', () => {
+        const condition = buildFilterExpression('types', 'contains', [2], undefined, metadataForModel(Form))
+        expect(condition.statement).toBe('contains (#types, :types)')
+        expect(condition.attributeNames).toEqual({ '#types': 'types' })
+        expect(condition.attributeValues).toEqual({ ':types': { N: '2' } })
+      })
 
-      expect(condition.attributeValues).toBeDefined()
-      expect(Object.keys(condition.attributeValues)[0]).toBe(':myCollection')
-      expect(condition.attributeValues[':myCollection']).toEqual({ N: '2' })
+      it('value in set with custom mapper', () => {
+        @Model()
+        class MyModelWithCustomMappedSet {
+          @CollectionProperty({ itemMapper: formIdMapper })
+          formIds: Set<FormId>
+        }
+
+        const condition = buildFilterExpression(
+          'formIds',
+          'contains',
+          [new FormId(FormType.REQUEST, 1, 2019)],
+          undefined,
+          metadataForModel(MyModelWithCustomMappedSet),
+        )
+        expect(condition.statement).toBe('contains (#formIds, :formIds)')
+        expect(condition.attributeNames).toEqual({ '#formIds': 'formIds' })
+        expect(condition.attributeValues).toEqual({ ':formIds': { S: 'AF00012019' } })
+      })
     })
 
     it('in', () => {
@@ -247,7 +284,7 @@ describe('expressions', () => {
         'BETWEEN',
         [date1, date2],
         undefined,
-        metadataForClass(ComplexModel),
+        metadataForModel(ComplexModel),
       )
 
       expect(condition.statement).toBe('#creationDate BETWEEN :creationDate AND :creationDate_2')
@@ -263,24 +300,6 @@ describe('expressions', () => {
       expect(condition.attributeValues[':creationDate']).toEqual({ S: date1.toISOString() })
       expect(has(condition.attributeValues, ':creationDate_2')).toBeTruthy()
       expect(condition.attributeValues[':creationDate_2']).toEqual({ S: date2.toISOString() })
-    })
-
-    it('should throw error for wrong value arity', () => {
-      expect(() => buildFilterExpression('age', 'attribute_type', [], undefined, undefined)).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
-      )
-    })
-
-    it('should throw error for wrong value arity', () => {
-      expect(() => buildFilterExpression('age', 'attribute_type', [undefined], undefined, undefined)).toThrowError(
-        'expected 1 value(s) for operator attribute_type, this is not the right amount of method parameters for this operator',
-      )
-    })
-
-    it('should throw error for wrong value type', () => {
-      expect(() => buildFilterExpression('age', 'IN', ['myValue', 'mySecondValue'], undefined, undefined)).toThrowError(
-        'expected 1 value(s) for operator IN, this is not the right amount of method parameters for this operator (IN operator requires one value of array type)',
-      )
     })
   })
 
@@ -310,6 +329,40 @@ describe('expressions', () => {
       expect(condition.statement).toBe('#person.#birthdays[5].#year = :person__birthdays_at_5__year')
       expect(condition.attributeNames).toEqual({ '#person': 'person', '#birthdays': 'birthdays', '#year': 'year' })
       expect(condition.attributeValues).toEqual({ ':person__birthdays_at_5__year': { N: '2016' } })
+    })
+  })
+
+  describe('validation', () => {
+    describe('arity', () => {
+      it('should throw default error for wrong arity', () => {
+        const operator: ConditionOperator = 'attribute_type'
+        expect(() => buildFilterExpression('age', operator, [], undefined, undefined)).toThrow(
+          dynamicTemplate(ERR_ARITY_DEFAULT, { parameterArity: operatorParameterArity(operator), operator }),
+        )
+      })
+
+      it('should throw error for wrong IN arity', () => {
+        const operator: ConditionOperator = 'IN'
+        expect(() =>
+          buildFilterExpression('age', operator, ['myValue', 'mySecondValue'], undefined, undefined),
+        ).toThrowError(dynamicTemplate(ERR_ARITY_IN, { parameterArity: operatorParameterArity(operator), operator }))
+      })
+    })
+
+    describe('operator values', () => {
+      it('should throw error for wrong IN values', () => {
+        const operator: ConditionOperator = 'IN'
+        expect(() => buildFilterExpression('age', operator, ['myValue'], undefined, undefined)).toThrowError(
+          ERR_VALUES_IN,
+        )
+      })
+
+      it('should throw error for wrong value type', () => {
+        const operator: ConditionOperator = 'BETWEEN'
+        expect(() => buildFilterExpression('age', operator, ['myValue', 2], undefined, undefined)).toThrowError(
+          dynamicTemplate(ERR_VALUES_BETWEEN_TYPE, { value1: typeOf('myValue'), value2: typeOf(2) }),
+        )
+      })
     })
   })
 })

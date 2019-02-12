@@ -1,7 +1,17 @@
+/**
+ * @module expression
+ */
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { ConditionExpressionDefinitionFunction } from '../type/condition-expression-definition-function'
 import { Expression } from '../type/expression.type'
 
+/**
+ * function to negate a condition
+ * @example
+ * ```typescript
+ * not(attribute('propA').eq('foo'))
+ * ```
+ */
 export function not(
   conditionDefinitionFn: ConditionExpressionDefinitionFunction,
 ): ConditionExpressionDefinitionFunction {

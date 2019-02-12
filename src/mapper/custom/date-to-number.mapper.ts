@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { MapperForType } from '../for-type/base.mapper'
 import { NumberAttribute } from '../type/attribute.type'
 
@@ -18,7 +21,7 @@ function dateToDb(modelValue: Date): NumberAttribute {
   }
 }
 
-export const DateToNumberMapper: MapperForType<Date, NumberAttribute> = {
+export const dateToNumberMapper: MapperForType<Date, NumberAttribute> = {
   fromDb: dateFromDb,
   toDb: dateToDb,
 }

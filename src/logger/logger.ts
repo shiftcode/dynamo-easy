@@ -1,20 +1,35 @@
+/**
+ * @module logger
+ * @preferred
+ *
+ * Logger used in dynamo-easy
+ */
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
-import { ModelConstructor } from '../model'
+import { ModelConstructor } from '../model/model-constructor'
 import { LogLevel } from './log-level.type'
 
+/**
+ * @hidden
+ */
 export type LogFn = (message: string, data?: any) => void
 
+/**
+ * @hidden
+ */
 export interface Logger {
   warn: LogFn
   info: LogFn
   debug: LogFn
 }
 
-function getLogFn(className: string, modelClass: string, level: LogLevel): LogFn {
+/**
+ * @hidden
+ */
+function getLogFn(className: string, modelConstructor: string, level: LogLevel): LogFn {
   return (message: string, data?: any) => {
     dynamoEasyConfig.logReceiver({
       className,
-      modelClass,
+      modelConstructor,
       level,
       message,
       data,
@@ -23,10 +38,13 @@ function getLogFn(className: string, modelClass: string, level: LogLevel): LogFn
   }
 }
 
-export function createLogger(className: string, modelClass: ModelConstructor<any>): Logger {
+/**
+ * @hidden
+ */
+export function createLogger(className: string, modelConstructor: ModelConstructor<any>): Logger {
   return {
-    warn: getLogFn(className, modelClass.name, 'warning'),
-    info: getLogFn(className, modelClass.name, 'info'),
-    debug: getLogFn(className, modelClass.name, 'debug'),
+    warn: getLogFn(className, modelConstructor.name, LogLevel.WARNING),
+    info: getLogFn(className, modelConstructor.name, LogLevel.INFO),
+    debug: getLogFn(className, modelConstructor.name, LogLevel.DEBUG),
   }
 }

@@ -1,19 +1,18 @@
+/**
+ * @module metadata
+ */
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { MapperForType } from '../../mapper/for-type/base.mapper'
-
-// def good
-import { KeyType } from 'aws-sdk/clients/dynamodb'
 import { Attribute } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 
 export interface TypeInfo {
   type: ModelConstructor<any>
-  // true if we use a non native type for dynamo document client
-  isCustom?: boolean
   genericType?: ModelConstructor<any>
 }
 
 export interface Key {
-  type: KeyType
+  type: DynamoDB.KeyType
   uuid?: boolean
 }
 
@@ -24,7 +23,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   // name of the property on js side
   name: keyof T
 
-  // name of the dynamodb attribute, same as key by default
+  // name of the dynamoDB attribute, same as key by default
   nameDb: string
 
   /*
@@ -34,14 +33,16 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   typeInfo?: TypeInfo
 
   /*
-   * defines which dynamodb type should be used for storing collection data, only L(ist) preserves order (compared to Set types)
+   * defines which dynamoDB type should be used for storing collection data, only L(ist) preserves order (compared to Set types)
    */
   isSortedCollection?: boolean
 
   mapper?: () => MapperForType<any, R>
 
+  mapperForSingleItem?: () => MapperForType<any, any>
+
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
-  keyForGSI?: { [key: string]: KeyType }
+  keyForGSI?: Record<string, DynamoDB.KeyType>
 
   // holds all the the index names for which this property describes the sort key attribute
   sortKeyForLSI?: string[]
@@ -50,13 +51,43 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   transient?: boolean
 }
 
-// todo: fixme
-// export function hasSortKey(propertyMetadata: PropertyMetadata<any, any>): propertyMetadata is PropertyMetadata<any, any> & {} {
-//   return propertyMetadata.getSortKey() !== null
-// }
-
+/**
+ * @hidden
+ */
 export function hasGenericType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { genericType: ModelConstructor<any> } } {
   return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.genericType)
+}
+
+/**
+ * @hidden
+ */
+export function hasType(
+  propertyMetadata?: PropertyMetadata<any, any>,
+): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { type: ModelConstructor<any> } } {
+  return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.type)
+}
+
+/**
+ * @hidden
+ */
+export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: PropertyMetadata<T> | null): PropertyMetadata<T> | undefined {
+  if (!propertyMeta) {
+    return
+  }
+
+  if (propertyMeta.mapper && propertyMeta.mapperForSingleItem) {
+    return { ...propertyMeta, mapper: propertyMeta.mapperForSingleItem }
+  }
+
+  if (propertyMeta.typeInfo && (propertyMeta.typeInfo.type === Set || propertyMeta.typeInfo.type === Array)) {
+    if(hasGenericType(propertyMeta)){
+      return <PropertyMetadata<T>>{ ...propertyMeta, typeInfo: {type: propertyMeta.typeInfo.genericType } }
+    }else{
+      return
+    }
+  }
+
+  return { ...propertyMeta }
 }

@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-string-literal
-import { AttributeMap, MapAttributeValue } from 'aws-sdk/clients/dynamodb'
+import * as DynamoDb from 'aws-sdk/clients/dynamodb'
 import {
   organization1CreatedAt,
   organization1Employee1CreatedAt,
@@ -18,22 +18,29 @@ import {
   ModelWithCustomMapperModel,
   ModelWithDateAsHashKey,
   ModelWithDateAsIndexHashKey,
+  ModelWithNonDecoratedEnum,
   ModelWithoutCustomMapper,
   ModelWithoutCustomMapperOnIndex,
   Organization,
   OrganizationEvent,
   Product,
   ProductNested,
+  SimpleModel,
+  SimpleWithCompositePartitionKeyModel,
+  SimpleWithPartitionKeyModel,
+  StringType,
   Type,
 } from '../../test/models'
 import { IdMapper } from '../../test/models/model-with-custom-mapper.model'
+import { ModelWithEmptyValues } from '../../test/models/model-with-empty-values'
 import {
   ModelWithNestedModelWithCustomMapper,
   NestedModelWithCustomMapper,
 } from '../../test/models/model-with-nested-model-with-custom-mapper.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
-import { PropertyMetadata } from '../decorator'
-import { fromDb, fromDbOne, toDb, toDbOne } from './mapper'
+import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
+import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { createKeyAttributes, createToKeyFn, fromDb, fromDbOne, toDb, toDbOne, toKey } from './mapper'
 import {
   Attribute,
   Attributes,
@@ -45,7 +52,6 @@ import {
   StringAttribute,
   StringSetAttribute,
 } from './type/attribute.type'
-import { EnumType } from './type/enum.type'
 
 describe('Mapper', () => {
   describe('should map single values', () => {
@@ -59,7 +65,7 @@ describe('Mapper', () => {
 
       it('string (empty)', () => {
         const attrValue = <StringAttribute>toDbOne('')!
-        expect(attrValue).toBe(null)
+        expect(attrValue).toBeNull()
       })
 
       it('number', () => {
@@ -67,6 +73,11 @@ describe('Mapper', () => {
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('N')
         expect(attrValue.N).toBe('3')
+      })
+
+      it('number (NaN)', () => {
+        const attrValue = <NumberAttribute>toDbOne(NaN)!
+        expect(attrValue).toBeNull()
       })
 
       it('boolean', () => {
@@ -83,55 +94,53 @@ describe('Mapper', () => {
         expect(attrValue.NULL).toBe(true)
       })
 
-      it('enum (no enum decorator)', () => {
+      it('enum (number)', () => {
         const attrValue = <NumberAttribute>toDbOne(Type.FirstType)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('N')
         expect(attrValue.N).toBe('0')
       })
 
+      it('enum (string)', () => {
+        const attrValue = <StringAttribute>toDbOne(StringType.FirstType)!
+        expect(attrValue).toBeDefined()
+        expect(keyOf(attrValue)).toBe('S')
+        expect(attrValue.S).toBe('first')
+      })
+
       it('enum (propertyMetadata -> no enum decorator)', () => {
         const attrValue: Attribute = <MapAttribute>toDbOne(Type.FirstType, <any>{
-          typeInfo: { type: Object, isCustom: true },
+          typeInfo: { type: Object },
         })!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('M')
         expect(attrValue.M).toEqual({})
       })
 
-      it('enum (with decorator)', () => {
-        const attrValue = <NumberAttribute>toDbOne(Type.FirstType, <any>{
-          typeInfo: { type: EnumType, isCustom: true },
-        })!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('N')
-        expect(attrValue.N).toBe('0')
+      it('array -> L(ist) (no explicit type)', () => {
+        const attrValue = <ListAttribute<StringAttribute>>toDbOne(['foo', 'bar'])!
+        expect(attrValue).toEqual({ L: [{ S: 'foo' }, { S: 'bar' }] })
       })
 
-      it('array -> SS (homogen, no duplicates)', () => {
-        const attrValue = <StringSetAttribute>toDbOne(['foo', 'bar'])!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('SS')
-        expect(attrValue.SS[0]).toBe('foo')
-        expect(attrValue.SS[1]).toBe('bar')
-      })
-
-      it('array -> L (homogen, no duplicates, explicit type)', () => {
+      it('array -> L(ist) (homogeneous, no duplicates, explicit type)', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, isCustom: true },
+          isSortedCollection: true,
+          typeInfo: {
+            type: Array,
+          },
         }
-        const attrValue = <ListAttribute>toDbOne(['foo', 'bar'], <any>propertyMetadata)!
+        const attrValue = <ListAttribute<StringAttribute>>toDbOne(['foo', 'bar'], <any>propertyMetadata)!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
 
         expect(keyOf(attrValue.L[0])).toBe('S')
-        expect((<StringAttribute>attrValue.L[0]).S).toBe('foo')
+        expect(attrValue.L[0].S).toBe('foo')
 
         expect(keyOf(attrValue.L[1])).toBe('S')
-        expect((<StringAttribute>attrValue.L[1]).S).toBe('bar')
+        expect(attrValue.L[1].S).toBe('bar')
       })
 
-      it('array -> L (heterogen, no duplicates)', () => {
+      it('array -> L(ist) (heterogeneous, no duplicates)', () => {
         const attrValue = <ListAttribute>toDbOne(['foo', 56, true])!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
@@ -154,7 +163,7 @@ describe('Mapper', () => {
         expect(bool.BOOL).toBe(true)
       })
 
-      it('array -> L (homogen, complex type)', () => {
+      it('array -> L(ist) (homogeneous, complex type)', () => {
         const attrValue = <ListAttribute>(
           toDbOne([{ name: 'max', age: 25, sortedSet: null }, { name: 'anna', age: 65, sortedSet: null }])!
         )
@@ -175,32 +184,40 @@ describe('Mapper', () => {
         expect((<NumberAttribute>employee1.M.age).N).toBe('25')
       })
 
-      it('set', () => {
-        const attrValue = <ListAttribute>toDbOne(new Set(['foo', 'bar', 25]))!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('L')
-        expect(attrValue.L[0]).toEqual({ S: 'foo' })
-        expect(attrValue.L[1]).toEqual({ S: 'bar' })
-        expect(attrValue.L[2]).toEqual({ N: '25' })
+      it('heterogenous Set without decorator should throw', () => {
+        expect(() => toDbOne(new Set(['foo', 'bar', 25]))).toThrow()
       })
 
-      it('set (empty)', () => {
+      it('heterogenous Set with decorator to L(ist)', () => {
+        const meta: PropertyMetadata<any, any> = <any>{
+          typeInfo: {
+            type: Set,
+          },
+        }
+        const attrValue = toDbOne(new Set(['foo', 'bar', 25]), meta)
+        expect(attrValue).toEqual({ L: [{ S: 'foo' }, { S: 'bar' }, { N: '25' }] })
+      })
+
+      it('Set (empty) -> null', () => {
         const attrValue = <NullAttribute>toDbOne(new Set())!
-        expect(attrValue).toBe(null)
+        expect(attrValue).toBeNull()
       })
 
-      it('set of objects', () => {
-        const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 56 }, { name: 'anna', age: 26 }]))!
+      it('Set of objects without decorator should throw', () => {
+        expect(() => toDbOne(new Set([{ name: 'foo', age: 7 }, { name: 'bar', age: 42 }]))).toThrow()
+      })
 
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('L')
-        expect(attrValue.L.length).toBe(2)
-        expect((<MapAttribute>attrValue.L[0]).M).toBeDefined()
+      it('Set of objects with decorator -> L(ist)', () => {
+        const meta: PropertyMetadata<any> = <any>{
+          typeInfo: {
+            type: Set,
+          },
+        }
+        const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 7 }, { name: 'bar', age: 42 }]), meta)
 
-        const objFromDb = <MapAttribute<{ name: StringAttribute }>>attrValue.L[0]
-        expect(objFromDb.M.name).toBeDefined()
-        expect(keyOf(objFromDb.M.name)).toBe('S')
-        expect((<StringAttribute>objFromDb.M.name).S).toBe('foo')
+        expect(attrValue).toEqual({
+          L: [{ M: { name: { S: 'foo' }, age: { N: '7' } } }, { M: { name: { S: 'bar' }, age: { N: '42' } } }],
+        })
       })
 
       it('simple object', () => {
@@ -227,6 +244,7 @@ describe('Mapper', () => {
           age: NumberAttribute
           children: ListAttribute
         }
+
         const attrValue = <MapAttribute<ObjType>>toDbOne({
           name: 'Max',
           age: 35,
@@ -302,21 +320,17 @@ describe('Mapper', () => {
         const set: Set<string> = fromDbOne(attrValue)
         // noinspection SuspiciousInstanceOfGuard
         expect(set instanceof Set).toBeTruthy()
-        expect(set.size).toBe(2)
-        expect(Array.from(set)[0]).toBe('foo')
-        expect(Array.from(set)[1]).toBe('bar')
+        expect([...set]).toEqual(['foo', 'bar'])
       })
 
       it('SS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, isCustom: true },
+          typeInfo: { type: Array },
         }
         const attrValue = { SS: ['foo', 'bar'] }
         const arr = fromDbOne<string[]>(attrValue, <any>propertyMetadata)
         expect(Array.isArray(arr)).toBeTruthy()
-        expect(arr.length).toBe(2)
-        expect(arr[0]).toBe('foo')
-        expect(arr[1]).toBe('bar')
+        expect(arr).toEqual(['foo', 'bar'])
       })
 
       it('NS -> set', () => {
@@ -331,7 +345,7 @@ describe('Mapper', () => {
 
       it('NS -> array', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Array, isCustom: true },
+          typeInfo: { type: Array },
         }
         const attrValue = { NS: ['45', '2'] }
         const arr = fromDbOne<number[]>(attrValue, <any>propertyMetadata)
@@ -353,7 +367,7 @@ describe('Mapper', () => {
 
       it('L -> set', () => {
         const propertyMetadata = <Partial<PropertyMetadata<any>>>{
-          typeInfo: { type: Set, isCustom: true },
+          typeInfo: { type: Set },
         }
         const attrValue = { L: [{ S: 'foo' }, { N: '45' }, { BOOL: true }] }
         const set = fromDbOne<Set<any>>(attrValue, <any>propertyMetadata)
@@ -415,13 +429,13 @@ describe('Mapper', () => {
           organization.domains = ['shiftcode.ch', 'shiftcode.io', 'shiftcode.it']
           organization.randomDetails = ['sample', 26, true]
 
-          const employees: Employee[] = []
           createdAtDateEmployee1 = new Date('2017-03-05')
           createdAtDateEmployee2 = new Date()
 
-          employees.push(new Employee('max', 50, createdAtDateEmployee1, []))
-          employees.push(new Employee('anna', 27, createdAtDateEmployee2, []))
-          organization.employees = employees
+          organization.employees = [
+            new Employee('max', 50, createdAtDateEmployee1, []),
+            new Employee('anna', 27, createdAtDateEmployee2, []),
+          ]
 
           organization.cities = new Set(['zürich', 'bern'])
 
@@ -432,7 +446,7 @@ describe('Mapper', () => {
             new Birthday(birthday2Date, 'car', 'gin'),
           ])
 
-          organization.awards = new Set(['good, better, shiftcode', 'jus kiddin'])
+          organization.awards = new Set(['good, better, shiftcode', 'just kiddin'])
 
           const events = new Set()
           events.add(new OrganizationEvent('shift the web', 1520))
@@ -444,7 +458,7 @@ describe('Mapper', () => {
 
         describe('creates correct attribute map', () => {
           it('all properties are mapped', () => {
-            expect(Object.keys(organizationAttrMap).length).toBe(14)
+            expect(Object.keys(organizationAttrMap).length).toBe(13)
           })
 
           it('id', () => {
@@ -474,15 +488,9 @@ describe('Mapper', () => {
           })
 
           it('domains', () => {
-            expect(organizationAttrMap.domains).toBeDefined()
-
-            const domains = (<StringSetAttribute>organizationAttrMap.domains).SS
-            expect(domains).toBeDefined()
-            expect(domains.length).toBe(3)
-
-            expect(domains[0]).toBe('shiftcode.ch')
-            expect(domains[1]).toBe('shiftcode.io')
-            expect(domains[2]).toBe('shiftcode.it')
+            expect(organizationAttrMap.domains).toEqual({
+              L: ['shiftcode.ch', 'shiftcode.io', 'shiftcode.it'].map(v => ({ S: v })),
+            })
           })
 
           it('random details', () => {
@@ -523,7 +531,7 @@ describe('Mapper', () => {
             expect((<StringAttribute>employee1.createdAt).S).toBe(createdAtDateEmployee1.toISOString())
 
             // test employee2
-            const employee2: MapAttributeValue = (<MapAttribute>employeesL[1]).M
+            const employee2: DynamoDb.MapAttributeValue = (<MapAttribute>employeesL[1]).M
             expect(employee2['name']).toBeDefined()
             expect(employee2['name'].S).toBeDefined()
             expect(employee2['name'].S).toBe('anna')
@@ -611,7 +619,7 @@ describe('Mapper', () => {
             expect((<StringAttribute>awards[0]).S).toBe('good, better, shiftcode')
 
             expect(keyOf(awards[1])).toBe('S')
-            expect((<StringAttribute>awards[1]).S).toBe('jus kiddin')
+            expect((<StringAttribute>awards[1]).S).toBe('just kiddin')
           })
 
           it('events', () => {
@@ -637,9 +645,10 @@ describe('Mapper', () => {
             expect(organizationAttrMap.transient).toBeUndefined()
           })
 
-          // an empty set is not a valid attribute value to be persisted either NULL:true or
+          // an empty set is not a valid attribute value to be persisted
           it('emptySet', () => {
-            expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
+            expect(organizationAttrMap.emptySet).toBeUndefined()
+            // expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
           })
         })
       })
@@ -674,13 +683,16 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDbVal: AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          const toDbVal: DynamoDb.AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
           expect(toDbVal.startDate.S).toBeDefined()
           expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })
         it('should accept date as HASH or RANGE key on GSI', () => {
           const now = new Date()
-          const toDbVal: AttributeMap = toDb(new ModelWithDateAsIndexHashKey(0, now), ModelWithDateAsIndexHashKey)
+          const toDbVal: DynamoDb.AttributeMap = toDb(
+            new ModelWithDateAsIndexHashKey(0, now),
+            ModelWithDateAsIndexHashKey,
+          )
           expect(toDbVal.creationDate.S).toBeDefined()
           expect(toDbVal.creationDate.S).toEqual(now.toISOString())
         })
@@ -738,6 +750,69 @@ describe('Mapper', () => {
           const nestedModel = <MapAttribute<NestedModelWithCustomMapper>>toDbVal.nestedModel
           expect(nestedModel.M.id).toEqual(IdMapper.toDb(object.nestedModel.id))
         })
+      })
+
+      describe('model with enums', () => {
+        const object = new ModelWithNonDecoratedEnum()
+        object.id = 'myId'
+        object.type = Type.FirstType
+        object.strType = StringType.FirstType
+
+        const toDbVal: Attributes<ModelWithNonDecoratedEnum> = toDb(object, ModelWithNonDecoratedEnum)
+
+        it('should map all properties', () => {
+          expect(toDbVal).toBeDefined()
+
+          expect(toDbVal.id).toBeDefined()
+          expect((<StringAttribute>toDbVal.id).S).toBe('myId')
+
+          expect(toDbVal.type).toBeDefined()
+          expect((<NumberAttribute>toDbVal.type).N).toBe('0')
+
+          expect(toDbVal.strType).toBeDefined()
+          expect((<StringAttribute>toDbVal.strType).S).toBe('first')
+        })
+      })
+
+      describe('model with empty values', () => {
+        const model: ModelWithEmptyValues = {
+          // OK
+          id: 'myId',
+
+          // x -> empty strings are not valid
+          name: '',
+
+          // x -> empty set is not valid
+          roles: new Set(),
+
+          // OK ->empty L(ist) is valid
+          lastNames: [],
+
+          // OK -> depending on mapper
+          createdAt: new Date(),
+
+          // OK -> empty M(ap) is valid
+          details: {},
+        }
+
+        const toDbValue = toDb(model, ModelWithEmptyValues)
+
+        // expect(Object.keys(toDbValue).length).toBe(4)
+
+        expect(toDbValue.id).toBeDefined()
+        expect(keyOf(toDbValue.id)).toBe('S')
+
+        expect(toDbValue.name).toBeUndefined()
+
+        expect(toDbValue.roles).toBeUndefined()
+
+        expect(toDbValue.lastNames).toBeDefined()
+        expect(keyOf(toDbValue.lastNames)).toBe('L')
+
+        expect(toDbValue.createdAt).toBeDefined()
+
+        expect(toDbValue.details).toBeDefined()
+        expect(keyOf(toDbValue.details)).toBe('M')
       })
     })
 
@@ -868,6 +943,83 @@ describe('Mapper', () => {
           expect(event.name).toBe('yearly get together')
           expect(event.participants).toBe(125)
         })
+      })
+
+      describe('model with enums', () => {
+        const attributes: Attributes<ModelWithNonDecoratedEnum> = {
+          id: { S: 'myId' },
+          type: { N: Type.FirstType.toString() },
+          strType: { S: StringType.FirstType },
+        }
+
+        const fromDbVal: ModelWithNonDecoratedEnum = fromDb(attributes, ModelWithNonDecoratedEnum)
+
+        it('should map all properties', () => {
+          expect(fromDbVal).toBeDefined()
+
+          expect(fromDbVal.id).toBeDefined()
+          expect(fromDbVal.id).toBe('myId')
+
+          expect(fromDbVal.type).toBeDefined()
+          expect(fromDbVal.type).toBe(Type.FirstType)
+
+          expect(fromDbVal.strType).toBeDefined()
+          expect(fromDbVal.strType).toBe(StringType.FirstType)
+        })
+      })
+    })
+  })
+
+  describe('createKeyAttributes', () => {
+    it('PartitionKey only', () => {
+      const attrs = createKeyAttributes(metadataForModel(SimpleWithPartitionKeyModel), 'myId')
+      expect(attrs).toEqual({
+        id: { S: 'myId' },
+      })
+    })
+
+    it('PartitionKey + SortKey', () => {
+      const now = new Date()
+      const attrs = createKeyAttributes(metadataForModel(SimpleWithCompositePartitionKeyModel), 'myId', now)
+      expect(attrs).toEqual({
+        id: { S: 'myId' },
+        creationDate: { S: now.toISOString() },
+      })
+    })
+
+    it('should throw when required sortKey is missing', () => {
+      expect(() => createKeyAttributes(metadataForModel(SimpleWithCompositePartitionKeyModel), 'myId')).toThrow()
+    })
+  })
+
+  describe('createToKeyFn, toKey', () => {
+    it('should throw when model has no defined properties', () => {
+      expect(() => createToKeyFn(SimpleModel)).toThrow()
+    })
+    it('should throw when given partial has undefined key properties', () => {
+      expect(() => toKey({}, SimpleWithPartitionKeyModel)).toThrow()
+      expect(() => toKey({ id: 'myId' }, SimpleWithCompositePartitionKeyModel)).toThrow()
+      expect(() => toKey({ creationDate: new Date() }, SimpleWithCompositePartitionKeyModel)).toThrow()
+    })
+    it('should create key attributes of simple key', () => {
+      const key = toKey({ id: 'myId' }, SimpleWithPartitionKeyModel)
+      expect(key).toEqual({
+        id: { S: 'myId' },
+      })
+    })
+    it('should create key attributes of composite key', () => {
+      const partial: Partial<SimpleWithCompositePartitionKeyModel> = { id: 'myId', creationDate: new Date() }
+      const key = toKey(partial, SimpleWithCompositePartitionKeyModel)
+      expect(key).toEqual({
+        id: { S: partial.id! },
+        creationDate: { S: partial.creationDate!.toISOString() },
+      })
+    })
+    it('should create key with custom mapper', () => {
+      const partial: ModelWithCustomMapperModel = { id: new Id(7, 2018) }
+      const key = toKey(partial, ModelWithCustomMapperModel)
+      expect(key).toEqual({
+        id: { S: Id.unparse(partial.id) },
       })
     })
   })

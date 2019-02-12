@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { BooleanAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 

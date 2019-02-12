@@ -1,3 +1,9 @@
+/**
+ * @module expression
+ */
+/**
+ * @hidden
+ */
 export type OperatorAlias =
   | 'equals'
   | 'eq'
@@ -11,6 +17,7 @@ export type OperatorAlias =
   | 'type'
   | 'beginsWith'
   | 'contains'
+  | 'not_contains'
   | 'in'
   | 'between'
   | 'attributeExists'

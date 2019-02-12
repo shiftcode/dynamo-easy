@@ -1,72 +1,95 @@
-import { PutItemInput } from 'aws-sdk/clients/dynamodb'
-import { getTableName } from '../../../../test/helper'
-import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import { SimpleWithPartitionKeyModel } from '../../../../test/models'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {
-  it('default params', () => {
-    const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-    const request = new PutRequest(
-      <any>null,
-      SimpleWithPartitionKeyModel,
-      getTableName(SimpleWithPartitionKeyModel),
-      item,
-    )
-    const params: PutItemInput = request.params
+  describe('params', () => {
+    const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, {
+      id: 'myId',
+      age: 45,
+    })
 
-    expect(params.TableName).toBe('simple-with-partition-key-models')
-    expect(params.Item).toEqual({ id: { S: 'myId' }, age: { N: '45' } })
-    expect(Object.keys(params).length).toBe(2)
-  })
+    it('constructor', () => {
+      const params: DynamoDB.PutItemInput = request.params
 
-  describe('if exists condition', () => {
-    it('simple partition key', () => {
-      const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-      const request = new PutRequest(
-        <any>null,
-        SimpleWithPartitionKeyModel,
-        getTableName(SimpleWithPartitionKeyModel),
-        item,
-      )
+      expect(params.TableName).toBe('simple-with-partition-key-models')
+      expect(params.Item).toEqual({ id: { S: 'myId' }, age: { N: '45' } })
+      expect(Object.keys(params).length).toBe(2)
+    })
+
+    it('ifNotExists', () => {
       request.ifNotExists()
 
-      const params: PutItemInput = request.params
+      const params: DynamoDB.PutItemInput = request.params
       expect(params.ConditionExpression).toBe('(attribute_not_exists (#id))')
       expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
       expect(params.ExpressionAttributeValues).toBeUndefined()
     })
 
-    it('composite partition key', () => {
-      const now = new Date()
-      const item: SimpleWithCompositePartitionKeyModel = { id: 'myId', creationDate: now, age: 45 }
-      const request = new PutRequest(
-        <any>null,
-        SimpleWithCompositePartitionKeyModel,
-        getTableName(SimpleWithCompositePartitionKeyModel),
-        item,
-      )
-      request.ifNotExists()
+    it('returnValues', () => {
+      const req = request.returnValues('ALL_OLD')
+      expect(req.params.ReturnValues).toEqual('ALL_OLD')
+    })
+  })
 
-      const params: PutItemInput = request.params
-      expect(params.ConditionExpression).toBe('(attribute_not_exists (#id) AND attribute_not_exists (#creationDate))')
-      expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id', '#creationDate': 'creationDate' })
-      expect(params.ExpressionAttributeValues).toBeUndefined()
+  describe('logger', () => {
+    const sampleResponse: DynamoDB.PutItemOutput = { Attributes: undefined }
+    let logReceiver: jasmine.Spy
+    let putItemSpy: jasmine.Spy
+    let req: PutRequest<SimpleWithPartitionKeyModel>
+
+    const jsItem: SimpleWithPartitionKeyModel = {
+      id: 'id',
+      age: 0,
+    }
+
+    beforeEach(() => {
+      logReceiver = jasmine.createSpy()
+      putItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver })
+      req = new PutRequest(<any>{ putItem: putItemSpy }, SimpleWithPartitionKeyModel, jsItem)
     })
 
-    it('predicate', () => {
-      const item: SimpleWithPartitionKeyModel = { id: 'myId', age: 45 }
-      const request = new PutRequest(
-        <any>null,
-        SimpleWithPartitionKeyModel,
-        getTableName(SimpleWithPartitionKeyModel),
-        item,
-      )
-      request.ifNotExists(25 + 20 === 40)
+    it('exec should log params and response', async () => {
+      await req.exec()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
 
-      const params: PutItemInput = request.params
-      expect(params.ConditionExpression).toBeUndefined()
-      expect(params.ExpressionAttributeNames).toBeUndefined()
-      expect(params.ExpressionAttributeValues).toBeUndefined()
+    it('execFullResponse should log params and response', async () => {
+      await req.execFullResponse()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+  })
+
+  describe('typings', () => {
+    // tests basically only exists to be not valid when typings would be wrong
+    let req: PutRequest<SimpleWithPartitionKeyModel>
+    let dynamoDbWrapperMock: DynamoDbWrapper
+
+    beforeEach(() => {
+      dynamoDbWrapperMock = <any>{
+        putItem: () =>
+          Promise.resolve({
+            Attributes: {
+              id: { S: 'myId' },
+              age: { N: '20' },
+            },
+          }),
+      }
+      req = new PutRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, { id: 'myKey', age: 20 })
+    })
+
+    it('exec, ALL_OLD', async () => {
+      const result: SimpleWithPartitionKeyModel = await req.returnValues('ALL_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
     })
   })
 })

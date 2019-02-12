@@ -1,461 +1,253 @@
-import { getTableName } from '../../../../test/helper'
-import { Address, UpdateModel } from '../../../../test/models'
-import { FormId, FormType, Order, OrderId } from '../../../../test/models/real-world'
-import { attribute, not, update, update2 } from '../../expression'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import {
+  ComplexModel,
+  Info,
+  SimpleWithCompositePartitionKeyModel,
+  SimpleWithPartitionKeyModel,
+  UpdateModel,
+} from '../../../../test/models'
+import { Duration } from '../../../../test/models/duration.model'
+import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
+import { updateDynamoEasyConfig } from '../../../config/update-config.function'
+import { dateToStringMapper } from '../../../mapper/custom/date-to-string.mapper'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { update, update2 } from '../../expression/logical-operator/update.function'
 import { UpdateRequest } from './update.request'
 
 describe('update request', () => {
-  describe('update expression', () => {
-    describe('single operation', () => {
-      it('incrementBy', () => {
-        const now = new Date()
+  describe('params', () => {
+    it('simple key', () => {
+      const request = new UpdateRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
 
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-        request.operations(update<UpdateModel>('counter').incrementBy(5))
-
-        expect(request.params.UpdateExpression).toBe('SET #counter = #counter + :counter')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#counter': 'counter' })
-        expect(request.params.ExpressionAttributeValues).toEqual({ ':counter': { N: '5' } })
-      })
-
-      it('decrementBy', () => {
-        const now = new Date()
-
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-        request.operations(update<UpdateModel>('counter').decrementBy(5))
-
-        expect(request.params.UpdateExpression).toBe('SET #counter = #counter - :counter')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#counter': 'counter' })
-        expect(request.params.ExpressionAttributeValues).toEqual({ ':counter': { N: '5' } })
-      })
-
-      it('set', () => {
-        const now = new Date()
-
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('lastUpdated').set(now))
-
-        expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':lastUpdated': {
-            S: now.toISOString(),
-          },
-        })
-      })
-
-      it('set (nested map)', () => {
-        const now = new Date()
-
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update('info.details').set('the new detail'))
-
-        expect(request.params.UpdateExpression).toBe('SET #info.#details = :info__details')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#info': 'info', '#details': 'details' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':info__details': {
-            S: 'the new detail',
-          },
-        })
-      })
-
-      it('set (list)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update('addresses[1]').set({ street: 'Bond Street', place: 'London', zip: 25650 }))
-
-        expect(request.params.UpdateExpression).toBe('SET #addresses[1] = :addresses_at_1')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':addresses_at_1': {
-            M: {
-              street: {
-                S: 'Bond Street',
-              },
-              place: {
-                S: 'London',
-              },
-              zip: {
-                N: '25650',
-              },
-            },
-          },
-        })
-      })
-
-      it('append to list simple (default position)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('numberValues').appendToList([5]))
-
-        expect(request.params.UpdateExpression).toBe('SET #numberValues = list_append(#numberValues, :numberValues)')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#numberValues': 'numberValues' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':numberValues': {
-            L: [{ N: '5' }],
-          },
-        })
-      })
-
-      it('append to list (default position)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
-        request.operations(update<UpdateModel>('addresses').appendToList([newAddress]))
-
-        expect(request.params.UpdateExpression).toBe('SET #addresses = list_append(#addresses, :addresses)')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':addresses': {
-            L: [
-              {
-                M: {
-                  street: {
-                    S: 'The street',
-                  },
-                  place: {
-                    S: 'London',
-                  },
-                  zip: {
-                    N: '15241',
-                  },
-                },
-              },
-            ],
-          },
-        })
-      })
-
-      it('append to list (position = END)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
-        request.operations(update<UpdateModel>('addresses').appendToList([newAddress], 'END'))
-
-        expect(request.params.UpdateExpression).toBe('SET #addresses = list_append(#addresses, :addresses)')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':addresses': {
-            L: [
-              {
-                M: {
-                  street: {
-                    S: 'The street',
-                  },
-                  place: {
-                    S: 'London',
-                  },
-                  zip: {
-                    N: '15241',
-                  },
-                },
-              },
-            ],
-          },
-        })
-      })
-
-      it('append to list (position = START)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        const newAddress: Address = { street: 'The street', place: 'London', zip: 15241 }
-        request.operations(update<UpdateModel>('addresses').appendToList([newAddress], 'START'))
-
-        expect(request.params.UpdateExpression).toBe('SET #addresses = list_append(:addresses, #addresses)')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':addresses': {
-            L: [
-              {
-                M: {
-                  street: {
-                    S: 'The street',
-                  },
-                  place: {
-                    S: 'London',
-                  },
-                  zip: {
-                    N: '15241',
-                  },
-                },
-              },
-            ],
-          },
-        })
-      })
-
-      it('remove', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('counter').remove(), update<UpdateModel>('name').remove())
-
-        expect(request.params.UpdateExpression).toBe('REMOVE #counter, #name')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#counter': 'counter', '#name': 'name' })
-        expect(request.params.ExpressionAttributeValues).toBeUndefined()
-      })
-
-      it('remove from list at (single)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('addresses').removeFromListAt(2))
-
-        expect(request.params.UpdateExpression).toBe('REMOVE #addresses[2]')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
-        expect(request.params.ExpressionAttributeValues).toBeUndefined()
-      })
-
-      it('remove from list at (many)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('addresses').removeFromListAt(2, 5, 6))
-
-        expect(request.params.UpdateExpression).toBe('REMOVE #addresses[2], #addresses[5], #addresses[6]')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#addresses': 'addresses' })
-        expect(request.params.ExpressionAttributeValues).toBeUndefined()
-      })
-
-      it('add (multiple arr)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').add(['newTopic', 'newTopic2']))
-
-        expect(request.params.UpdateExpression).toBe('ADD #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
-
-      it('add (multiple set)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').add(new Set(['newTopic', 'newTopic2'])))
-
-        expect(request.params.UpdateExpression).toBe('ADD #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
-
-      it('add (multiple vararg)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').add('newTopic', 'newTopic2'))
-
-        expect(request.params.UpdateExpression).toBe('ADD #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
-
-      it('add (single)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').add('newTopic'))
-
-        expect(request.params.UpdateExpression).toBe('ADD #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic'],
-          },
-        })
-      })
-
-      it('remove from set (single)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').removeFromSet('newTopic'))
-
-        expect(request.params.UpdateExpression).toBe('DELETE #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic'],
-          },
-        })
-      })
-
-      it('remove from set (multiple vararg)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').removeFromSet('newTopic', 'newTopic2'))
-
-        expect(request.params.UpdateExpression).toBe('DELETE #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
-
-      it('remove from set (multiple arr)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').removeFromSet(['newTopic', 'newTopic2']))
-
-        expect(request.params.UpdateExpression).toBe('DELETE #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
-
-      it('remove from set (multiple set)', () => {
-        const now = new Date()
-        const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-
-        request.operations(update<UpdateModel>('topics').removeFromSet(new Set(['newTopic', 'newTopic2'])))
-
-        expect(request.params.UpdateExpression).toBe('DELETE #topics :topics')
-        expect(request.params.ExpressionAttributeNames).toEqual({ '#topics': 'topics' })
-        expect(request.params.ExpressionAttributeValues).toEqual({
-          ':topics': {
-            SS: ['newTopic', 'newTopic2'],
-          },
-        })
-      })
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(1)
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
     })
-  })
 
-  describe('multiple operations', () => {
-    it('one type (SET)', () => {
+    it('composite key', () => {
       const now = new Date()
+      const request = new UpdateRequest(<any>null, ComplexModel, 'myId', now)
 
-      const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-      request.operations(update<UpdateModel>('active').set(true), update<UpdateModel>('name').set('newName'))
+      expect(request.params).toBeDefined()
+      const key = request.params.Key
+      expect(key).toBeDefined()
+      expect(Object.keys(key).length).toBe(2)
 
-      expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name')
-      expect(request.params.ExpressionAttributeNames).toEqual({ '#active': 'isActive', '#name': 'name' })
+      expect(key.id).toBeDefined()
+      expect(key.id).toEqual({ S: 'myId' })
+
+      expect(key.creationDate).toBeDefined()
+      expect(key.creationDate).toEqual({ S: now.toISOString() })
+    })
+
+    it('should throw when no sortKey was given but necessary', () => {
+      expect(() => new UpdateRequest(<any>null, SimpleWithCompositePartitionKeyModel, 'myId')).toThrow()
+    })
+
+    it('returnValues', () => {
+      const request = new UpdateRequest(<any>null, SimpleWithPartitionKeyModel, 'myId')
+      const req = request.returnValues('UPDATED_OLD')
+      expect(req.params.ReturnValues).toEqual('UPDATED_OLD')
+    })
+
+    it('should add operations', () => {
+      const now = new Date()
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
+      request.operations(update<UpdateModel>('lastUpdated').set(now))
+
+      expect(request.params.UpdateExpression).toBe('SET #lastUpdated = :lastUpdated')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
       expect(request.params.ExpressionAttributeValues).toEqual({
-        ':active': { BOOL: true },
-        ':name': { S: 'newName' },
+        ':lastUpdated': { S: now.toISOString() },
       })
     })
 
-    it('mixed types (SET, ADD)', () => {
-      const now = new Date()
-
-      const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-      request.operations(
-        update<UpdateModel>('active').set(true),
-        update<UpdateModel>('name').set('newName'),
-        update<UpdateModel>('topics').add('myTopic'),
+    it('should allow to add multiple operations', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
+        update2(UpdateModel, 'addresses').appendToList([{ place: 'PLACE', street: 'STREET', zip: 9999 }]),
+        update2(UpdateModel, 'name').set('simon'),
+        update2(UpdateModel, 'counter').add(20),
       )
 
-      expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name ADD #topics :topics')
+      expect(request.params.UpdateExpression).toEqual(
+        'SET #addresses = list_append(#addresses, :addresses), #name = :name ADD #counter :counter',
+      )
       expect(request.params.ExpressionAttributeNames).toEqual({
-        '#active': 'isActive',
+        '#addresses': 'addresses',
+        '#counter': 'counter',
         '#name': 'name',
-        '#topics': 'topics',
       })
       expect(request.params.ExpressionAttributeValues).toEqual({
-        ':active': { BOOL: true },
-        ':name': { S: 'newName' },
-        ':topics': { SS: ['myTopic'] },
+        ':addresses': {
+          L: [
+            {
+              M: {
+                place: { S: 'PLACE' },
+                street: { S: 'STREET' },
+                zip: { N: '9999' },
+              },
+            },
+          ],
+        },
+        ':counter': { N: '20' },
+        ':name': { S: 'simon' },
       })
     })
 
-    it('with where clause', () => {
-      const now = new Date()
-
-      const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-      request
-        .operations(update<UpdateModel>('active').set(true), update<UpdateModel>('name').set('newName'))
-        .onlyIf(not(attribute('topics').contains('otherTopic')))
-
-      expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name')
-      expect(request.params.ExpressionAttributeNames).toEqual({
-        '#active': 'isActive',
-        '#name': 'name',
-        '#topics': 'topics',
-      })
-      expect(request.params.ExpressionAttributeValues).toEqual({
-        ':active': { BOOL: true },
-        ':name': { S: 'newName' },
-        ':topics': { S: 'otherTopic' },
-      })
-      expect(request.params.ConditionExpression).toBe('(NOT contains (#topics, :topics))')
+    it('should allow ops with custom mappers (1)', () => {
+      const request = new UpdateRequest(<any>null, SpecialCasesModel, 'myId')
+      request.operations(update2(SpecialCasesModel, 'myChars').removeFromSet('abc'))
+      expect(request.params).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':myChars': { SS: ['a', 'b', 'c'] } })
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#myChars': 'myChars' })
+      expect(request.params.UpdateExpression).toEqual('DELETE #myChars :myChars')
     })
 
-    it('with name conflicting where clause', () => {
-      const now = new Date()
-
-      const request = new UpdateRequest(<any>null, UpdateModel, getTableName(UpdateModel), 'myId', now)
-      request
-        .operations(
-          update<UpdateModel>('active').set(true),
-          update<UpdateModel>('name').set('newName'),
-          update<UpdateModel>('topics').add('myTopic'),
-        )
-        .onlyIf(not(attribute('topics').contains('otherTopic')))
-      // .onlyIfAttribute('topics').notContains('otherTopic')
-
-      expect(request.params.UpdateExpression).toBe('SET #active = :active, #name = :name ADD #topics :topics')
-      expect(request.params.ExpressionAttributeNames).toEqual({
-        '#active': 'isActive',
-        '#name': 'name',
-        '#topics': 'topics',
-      })
-      expect(request.params.ExpressionAttributeValues).toEqual({
-        ':active': { BOOL: true },
-        ':name': { S: 'newName' },
-        ':topics': { SS: ['myTopic'] },
-        ':topics_2': { S: 'otherTopic' },
-      })
-      expect(request.params.ConditionExpression).toBe('(NOT contains (#topics, :topics_2))')
+    it('should allow ops with custom mappers (2)', () => {
+      const request = new UpdateRequest(<any>null, SpecialCasesModel, 'myId')
+      request.operations(update2(SpecialCasesModel, 'duration').add(new Duration(30)))
+      expect(request.params).toBeDefined()
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':duration': { N: '30' } })
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#duration': 'duration' })
+      expect(request.params.UpdateExpression).toEqual('ADD #duration :duration')
     })
   })
 
-  describe('real world scenario', () => {
-    it('should create correct update statement', () => {
-      const request = new UpdateRequest(<any>null, Order, getTableName(Order), new OrderId(5, 2018))
+  describe('updateAttribute', () => {
+    it('should add params and return the request', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').updateAttribute('counter').set(25, true)
 
-      const u1 = update2(Order, 'types').add([FormType.INVOICE])
-      const u2 = update2(Order, 'formIds').appendToList([new FormId(FormType.DELIVERY, 5, 2018)])
+      expect(request).toBeDefined()
+      expect(request instanceof UpdateRequest).toBeTruthy()
+      expect(request.params.UpdateExpression).toBe('SET #counter = if_not_exists(#counter, :counter)')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#counter': 'counter' })
+      expect(request.params.ExpressionAttributeValues).toEqual({ ':counter': { N: '25' } })
+    })
 
-      const c1 = attribute<Order>('types').attributeExists()
-      const c2 = attribute<Order>('formIds').attributeExists()
-      request.operations(u1, u2).onlyIf(c1, c2)
+    it('should map with metadata of itemType (Info)', () => {
+      const now = new Date()
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
+        update('informations[0]').set(<Info>{ details: 'my details', createdAt: now }),
+      )
 
-      expect(request.params.UpdateExpression).toBe('ADD #types :types SET #formIds = list_append(#formIds, :formIds)')
+      expect(request).toBeDefined()
+      expect(request.params.UpdateExpression).toBe('SET #informations[0] = :informations_at_0')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#informations': 'informations' })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':informations_at_0': { M: { details: { S: 'my details' }, createdAt: dateToStringMapper.toDb(now) } },
+      })
+    })
+
+    it('should map with property metadata of itemType (Info)', () => {
+      const now = new Date()
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
+        update('informations[0].createdAt').set(now),
+      )
+
+      expect(request).toBeDefined()
+      expect(request.params.UpdateExpression).toBe('SET #informations[0].#createdAt = :informations_at_0__createdAt')
       expect(request.params.ExpressionAttributeNames).toEqual({
-        '#types': 'types',
-        '#formIds': 'formIds',
+        '#informations': 'informations',
+        '#createdAt': 'createdAt',
       })
       expect(request.params.ExpressionAttributeValues).toEqual({
-        ':types': { NS: ['5'] },
-        ':formIds': { L: [{ S: 'LS00052018' }] },
+        ':informations_at_0__createdAt': dateToStringMapper.toDb(now),
       })
-      expect(request.params.ConditionExpression).toEqual('(attribute_exists (#types) AND attribute_exists (#formIds))')
+    })
+
+    it('should allow to add multiple update operations and conditions chained', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
+        .updateAttribute('name')
+        .set('simon')
+        .updateAttribute('addresses')
+        .appendToList([{ place: 'PLACE', street: 'STREET', zip: 9999 }])
+        .updateAttribute('topics')
+        .add(['myNewTopic'])
+        .updateAttribute('counter')
+        .remove()
+        .onlyIfAttribute('topics')
+        .contains('myOldTopic')
+
+      expect(request).toBeDefined()
+      expect(request instanceof UpdateRequest).toBeTruthy()
+      expect(request.params.UpdateExpression).toBe(
+        'SET #name = :name, #addresses = list_append(#addresses, :addresses) ADD #topics :topics REMOVE #counter',
+      )
+      expect(request.params.ExpressionAttributeNames).toEqual({
+        '#name': 'name',
+        '#addresses': 'addresses',
+        '#topics': 'topics',
+        '#counter': 'counter',
+      })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':name': { S: 'simon' },
+        ':addresses': { L: [{ M: { place: { S: 'PLACE' }, street: { S: 'STREET' }, zip: { N: '9999' } } }] },
+        ':topics': { SS: ['myNewTopic'] },
+        ':topics_2': { S: 'myOldTopic' },
+      })
+    })
+  })
+
+  describe('logger', () => {
+    const sampleResponse: DynamoDB.UpdateItemOutput = { Attributes: undefined }
+    let logReceiver: jasmine.Spy
+    let updateItemSpy: jasmine.Spy
+    let req: UpdateRequest<SimpleWithPartitionKeyModel>
+
+    beforeEach(() => {
+      logReceiver = jasmine.createSpy()
+      updateItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver })
+      req = new UpdateRequest(<any>{ updateItem: updateItemSpy }, SimpleWithPartitionKeyModel, 'id')
+      req.operations(update2(SimpleWithPartitionKeyModel, 'age').set(10))
+    })
+
+    it('exec should log params and response', async () => {
+      await req.exec()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+
+    it('execFullResponse should log params and response', async () => {
+      await req.execFullResponse()
+      expect(logReceiver).toHaveBeenCalled()
+      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      expect(logInfoData.includes(req.params)).toBeTruthy()
+      expect(logInfoData.includes(sampleResponse)).toBeTruthy()
+    })
+  })
+
+  describe('typings', () => {
+    // tests basically only exists to be not valid when typings would be wrong
+    let req: UpdateRequest<SimpleWithPartitionKeyModel>
+    let dynamoDbWrapperMock: DynamoDbWrapper
+
+    beforeEach(() => {
+      dynamoDbWrapperMock = <any>{
+        updateItem: () =>
+          Promise.resolve({
+            Attributes: {
+              id: { S: 'myId' },
+              age: { N: '20' },
+            },
+          }),
+      }
+      req = new UpdateRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+    })
+
+    it('exec, ALL_OLD', async () => {
+      const result: SimpleWithPartitionKeyModel = await req.returnValues('ALL_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
+    })
+
+    it('exec, UPDATED_OLD', async () => {
+      const result: Partial<SimpleWithPartitionKeyModel> = await req.returnValues('UPDATED_OLD').exec()
+      expect(result).toEqual({ id: 'myId', age: 20 })
     })
   })
 })

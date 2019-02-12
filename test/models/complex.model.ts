@@ -1,12 +1,11 @@
 import {
+  CollectionProperty,
   DateProperty,
   Model,
   PartitionKey,
   Property,
-  SortedSet,
   SortKey,
   Transient,
-  TypedSet,
 } from '../../src/dynamo-easy'
 import { NestedObject } from './nested-object.model'
 
@@ -25,20 +24,17 @@ export class ComplexModel {
   @Property({ name: 'isActive' })
   active: boolean
 
-  @TypedSet()
+  @CollectionProperty()
   set: Set<string>
-
-  // @Type(Map)
-  // myMap: Map<String, String>;
 
   /*
    * actually this value is always mapped to an array, so the typing is not correct,
    * we still leave it to check if it works
    */
-  @SortedSet()
+  @CollectionProperty({ sorted: true })
   sortedSet: Set<string>
 
-  @SortedSet(NestedObject)
+  @CollectionProperty({ sorted: true, itemType: NestedObject })
   sortedComplexSet: Set<NestedObject>
 
   @Property()
@@ -49,6 +45,6 @@ export class ComplexModel {
   @Transient()
   transientField: string
 
-  @Property()
+  @Property({ name: 'my_nested_object' })
   nestedObj: NestedObject
 }

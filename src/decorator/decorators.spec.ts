@@ -1,7 +1,8 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-non-null-assertion
-import { getMetaDataProperty } from '../../test/helper'
+// tslint:disable:no-unused-variable
+import { getMetaDataProperty } from '../../test/helper/get-meta-data-property.function'
 import {
   ComplexModel,
   CustomTableNameModel,
@@ -13,22 +14,28 @@ import {
   ModelWithABunchOfIndexes,
   ModelWithCustomMapperModel,
   ModelWithEnum,
-  ModelWithEnumDeclared,
   ModelWithGSI,
   NestedObject,
   SimpleModel,
 } from '../../test/models'
 import { Form } from '../../test/models/real-world'
-import { EnumType } from '../mapper'
-import { GSIPartitionKey, GSISortKey, LSISortKey, PartitionKey, Property, SortedSet, SortKey, Transient } from './impl'
+import { CollectionProperty } from './impl/collection/collection-property.decorator'
+import { GSIPartitionKey } from './impl/index/gsi-partition-key.decorator'
+import { GSISortKey } from './impl/index/gsi-sort-key.decorator'
+import { LSISortKey } from './impl/index/lsi-sort-key.decorator'
+import { PartitionKey } from './impl/key/partition-key.decorator'
+import { SortKey } from './impl/key/sort-key.decorator'
 import { Model } from './impl/model/model.decorator'
-import { Metadata, metadataForClass, metadataForModel, ModelMetadata } from './index'
-import { metadataForProperty } from './metadata'
+import { Property } from './impl/property/property.decorator'
+import { Transient } from './impl/transient/transient.decorator'
+import { Metadata } from './metadata/metadata'
+import { metadataForModel } from './metadata/metadata-for-model.function'
+import { ModelMetadata } from './metadata/model-metadata.model'
 
 describe('Decorators should add correct metadata', () => {
-  describe('CustomMapper() should allow to define a different Mapper', () => {
+  describe('Property() should allow to define a different Mapper', () => {
     it('should define the mapper in metadata', () => {
-      const metaData = metadataForModel(ModelWithCustomMapperModel)
+      const metaData = metadataForModel(ModelWithCustomMapperModel).modelOptions
 
       expect(metaData).toBeDefined()
       expect(metaData.clazz).toBe(ModelWithCustomMapperModel)
@@ -47,7 +54,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<SimpleModel>
 
     beforeEach(() => {
-      modelOptions = metadataForModel(SimpleModel)
+      modelOptions = metadataForModel(SimpleModel).modelOptions
     })
 
     it('with default table name', () => {
@@ -66,7 +73,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<CustomTableNameModel>
 
     beforeEach(() => {
-      modelOptions = metadataForModel(CustomTableNameModel)
+      modelOptions = metadataForModel(CustomTableNameModel).modelOptions
     })
 
     it('with custom table name', () => {
@@ -81,7 +88,7 @@ describe('Decorators should add correct metadata', () => {
     let modelOptions: ModelMetadata<ComplexModel>
 
     beforeEach(() => {
-      modelOptions = metadataForClass(ComplexModel).modelOptions
+      modelOptions = metadataForModel(ComplexModel).modelOptions
     })
 
     it('with default model metadata', () => {
@@ -100,7 +107,7 @@ describe('Decorators should add correct metadata', () => {
       expect(modelOptions.transientProperties!.length).toBe(1)
     })
 
-    describe('with correct property metdata', () => {
+    describe('with correct property metadata', () => {
       it('ids', () => {
         const prop = getMetaDataProperty(modelOptions, 'id')
         expect(prop).toBeDefined()
@@ -111,7 +118,6 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key!.uuid).toBeFalsy()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeFalsy()
         expect(prop!.typeInfo!.type).toBe(String)
       })
 
@@ -125,85 +131,79 @@ describe('Decorators should add correct metadata', () => {
         expect(prop!.key!.uuid).toBeFalsy()
         expect(prop!.transient).toBeFalsy()
         expect(prop!.typeInfo).toBeDefined()
-        expect(prop!.typeInfo!.isCustom).toBeTruthy()
       })
 
       it('active', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'active')
+        const prop = getMetaDataProperty(modelOptions, 'active')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('active')
-        expect(prop.nameDb).toBe('isActive')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeFalsy()
-        expect(prop.typeInfo.type).toBe(Boolean)
+        expect(prop!.name).toBe('active')
+        expect(prop!.nameDb).toBe('isActive')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Boolean)
       })
 
       it('set', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'set')
+        const prop = getMetaDataProperty(modelOptions, 'set')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('set')
-        expect(prop.nameDb).toBe('set')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(Set)
+
+        expect(prop!.name).toBe('set')
+        expect(prop!.nameDb).toBe('set')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Set)
       })
 
       it('sortedSet', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'sortedSet')
+        const prop = getMetaDataProperty(modelOptions, 'sortedSet')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('sortedSet')
-        expect(prop.nameDb).toBe('sortedSet')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.isSortedCollection).toBeTruthy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(Set)
+        expect(prop!.name).toBe('sortedSet')
+        expect(prop!.nameDb).toBe('sortedSet')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.isSortedCollection).toBeTruthy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Set)
       })
 
       it('sortedComplexSet', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'sortedComplexSet')
+        const prop = getMetaDataProperty(modelOptions, 'sortedComplexSet')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('sortedComplexSet')
-        expect(prop.nameDb).toBe('sortedComplexSet')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.isSortedCollection).toBeTruthy()
+        expect(prop!.name).toBe('sortedComplexSet')
+        expect(prop!.nameDb).toBe('sortedComplexSet')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.isSortedCollection).toBeTruthy()
 
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(Set)
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Set)
 
-        expect(prop.typeInfo.genericType).toBeDefined()
-        expect(prop.typeInfo.genericType).toBe(NestedObject)
+        expect(prop!.typeInfo!.genericType).toBeDefined()
+        expect(prop!.typeInfo!.genericType).toBe(NestedObject)
       })
 
       it('mapWithNoType', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'mapWithNoType')
+        const prop = getMetaDataProperty(modelOptions, 'mapWithNoType')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('mapWithNoType')
-        expect(prop.nameDb).toBe('mapWithNoType')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(Map)
+        expect(prop!.name).toBe('mapWithNoType')
+        expect(prop!.nameDb).toBe('mapWithNoType')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(Map)
       })
 
       it('transientField', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'transientField')
+        const prop = getMetaDataProperty(modelOptions, 'transientField')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('transientField')
-        expect(prop.nameDb).toBe('transientField')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeTruthy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeFalsy()
-        expect(prop.typeInfo.type).toBe(String)
+        expect(prop!.name).toBe('transientField')
+        expect(prop!.nameDb).toBe('transientField')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeTruthy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(String)
       })
 
       it('simpleProperty', () => {
@@ -212,15 +212,14 @@ describe('Decorators should add correct metadata', () => {
       })
 
       it('nestedObject', () => {
-        const prop: any = getMetaDataProperty(modelOptions, 'nestedObj')
+        const prop = getMetaDataProperty(modelOptions, 'nestedObj')
         expect(prop).toBeDefined()
-        expect(prop.name).toBe('nestedObj')
-        expect(prop.nameDb).toBe('nestedObj')
-        expect(prop.key).toBeUndefined()
-        expect(prop.transient).toBeFalsy()
-        expect(prop.typeInfo).toBeDefined()
-        expect(prop.typeInfo.isCustom).toBeTruthy()
-        expect(prop.typeInfo.type).toBe(NestedObject)
+        expect(prop!.name).toBe('nestedObj')
+        expect(prop!.nameDb).toBe('my_nested_object')
+        expect(prop!.key).toBeUndefined()
+        expect(prop!.transient).toBeFalsy()
+        expect(prop!.typeInfo).toBeDefined()
+        expect(prop!.typeInfo!.type).toBe(NestedObject)
       })
     })
   })
@@ -230,7 +229,7 @@ describe('Decorators should add correct metadata', () => {
       let metadata: Metadata<ModelWithGSI>
 
       beforeEach(() => {
-        metadata = metadataForClass(ModelWithGSI)
+        metadata = metadataForModel(ModelWithGSI)
       })
 
       it('should add indexes on model', () => {
@@ -255,7 +254,7 @@ describe('Decorators should add correct metadata', () => {
       let metadata: Metadata<DifferentModel>
 
       beforeEach(() => {
-        metadata = metadataForClass(DifferentModel)
+        metadata = metadataForModel(DifferentModel)
       })
 
       it('should add indexes on model', () => {
@@ -289,7 +288,7 @@ describe('Decorators should add correct metadata', () => {
       let metadata: Metadata<ModelWithABunchOfIndexes>
 
       beforeEach(() => {
-        metadata = metadataForClass(ModelWithABunchOfIndexes)
+        metadata = metadataForModel(ModelWithABunchOfIndexes)
       })
 
       it('should add indexes on model', () => {
@@ -322,31 +321,17 @@ describe('Decorators should add correct metadata', () => {
     let metadata: Metadata<ModelWithEnum>
 
     beforeEach(() => {
-      metadata = metadataForClass(ModelWithEnum)
+      metadata = metadataForModel(ModelWithEnum)
     })
 
     it('should add enum type to property', () => {
       const enumPropertyMetadata = metadata.forProperty('type')!
       expect(enumPropertyMetadata.typeInfo).toBeDefined()
-      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number, isCustom: false })
+      expect(enumPropertyMetadata.typeInfo).toEqual({ type: Number })
 
       const strEnumPropertyMetadata = metadata.forProperty('strType')!
       expect(strEnumPropertyMetadata.typeInfo).toBeDefined()
-      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String, isCustom: false })
-    })
-  })
-
-  describe('enum', () => {
-    let metadata: Metadata<ModelWithEnumDeclared>
-
-    beforeEach(() => {
-      metadata = metadataForClass(ModelWithEnumDeclared)
-    })
-
-    it('should add enum type to property', () => {
-      const enumPropertyMetadata = metadata.forProperty('type')!
-      expect(enumPropertyMetadata.typeInfo).toBeDefined()
-      expect(enumPropertyMetadata.typeInfo).toEqual({ type: EnumType, isCustom: true })
+      expect(strEnumPropertyMetadata.typeInfo).toEqual({ type: String })
     })
   })
 
@@ -358,8 +343,19 @@ describe('Decorators should add correct metadata', () => {
       @Model({ tableName: 'my-real-table-name' })
       class B extends A {}
 
-      const metaData = metadataForModel(B)
+      const metaData = metadataForModel(B).modelOptions
       expect(metaData.tableName).toBe('my-real-table-name')
+    })
+
+    it('should not inherit the table name', () => {
+      @Model({ tableName: 'super-table-name' })
+      class A {}
+
+      @Model()
+      class B extends A {}
+
+      const metaData = metadataForModel(B).modelOptions
+      expect(metaData.tableName).toBe('bs')
     })
 
     it("should contain the super-class' and own properties", () => {
@@ -374,18 +370,19 @@ describe('Decorators should add correct metadata', () => {
 
       @Model()
       class B extends A {
-        @SortedSet()
+        @CollectionProperty({ sorted: true })
         myOwnProp: string[]
       }
 
-      const metaData = metadataForModel(B)
+      const metaData = metadataForModel(B).modelOptions
 
       expect(metaData.properties).toBeDefined()
       expect(metaData.properties!.length).toBe(3)
 
-      expect(metadataForProperty(B, 'myPartitionKey')).toBeDefined()
-      expect(metadataForProperty(B, 'mySortKey')).toBeDefined()
-      expect(metadataForProperty(B, 'myOwnProp')).toBeDefined()
+      const bMetadata = metadataForModel(B)
+      expect(bMetadata.forProperty('myPartitionKey')).toBeDefined()
+      expect(bMetadata.forProperty('mySortKey')).toBeDefined()
+      expect(bMetadata.forProperty('myOwnProp')).toBeDefined()
     })
 
     it("should contain the super-class' and own indexes", () => {
@@ -410,16 +407,17 @@ describe('Decorators should add correct metadata', () => {
         myOtherGsiPartitionKey: string
       }
 
-      const metaData = metadataForModel(B)
+      const metaData = metadataForModel(B).modelOptions
 
       expect(metaData.properties).toBeDefined()
       expect(metaData.properties!.length).toBe(5)
 
-      expect(metadataForProperty(B, 'myPartitionKey')).toBeDefined()
-      expect(metadataForProperty(B, 'myGsiPartitionKey')).toBeDefined()
-      expect(metadataForProperty(B, 'myGsiSortKey')).toBeDefined()
-      expect(metadataForProperty(B, 'myLsiSortKey')).toBeDefined()
-      expect(metadataForProperty(B, 'myOtherGsiPartitionKey')).toBeDefined()
+      const bMetadata = metadataForModel(B)
+      expect(bMetadata.forProperty('myPartitionKey')).toBeDefined()
+      expect(bMetadata.forProperty('myGsiPartitionKey')).toBeDefined()
+      expect(bMetadata.forProperty('myGsiSortKey')).toBeDefined()
+      expect(bMetadata.forProperty('myLsiSortKey')).toBeDefined()
+      expect(bMetadata.forProperty('myOtherGsiPartitionKey')).toBeDefined()
 
       expect(metaData.indexes).toBeDefined()
       expect(metaData.indexes!.get('my-gsi')).toBeDefined()
@@ -440,7 +438,7 @@ describe('Decorators should add correct metadata', () => {
         myOtherTransientProp: number
       }
 
-      const metaData = metadataForModel(B)
+      const metaData = metadataForModel(B).modelOptions
       expect(metaData.transientProperties).toBeDefined()
       expect(metaData.transientProperties!.length).toBe(2)
       expect(metaData.transientProperties!.includes('myTransientProp')).toBeTruthy()
@@ -467,21 +465,24 @@ describe('Decorators should add correct metadata', () => {
       }
 
       const aMetaData = metadataForModel(A)
+      const aModelMetadata = aMetaData.modelOptions
       const bMetaData = metadataForModel(B)
+      const bModelMetadata = bMetaData.modelOptions
       const cMetaData = metadataForModel(C)
+      const cModelMetadata = cMetaData.modelOptions
 
-      expect(aMetaData.properties).toBeDefined()
-      expect(aMetaData.properties!.length).toBe(1)
+      expect(aModelMetadata.properties).toBeDefined()
+      expect(aModelMetadata.properties!.length).toBe(1)
 
-      expect(bMetaData.properties).toBeDefined()
-      expect(bMetaData.properties!.length).toBe(2)
-      expect(metadataForProperty(B, 'bProp')).toBeDefined()
-      expect(metadataForProperty(B, 'cProp')).toBeFalsy()
+      expect(bModelMetadata.properties).toBeDefined()
+      expect(bModelMetadata.properties!.length).toBe(2)
+      expect(bMetaData.forProperty('bProp')).toBeDefined()
+      expect(bMetaData.forProperty('cProp')).toBeFalsy()
 
-      expect(cMetaData.properties).toBeDefined()
-      expect(cMetaData.properties!.length).toBe(2)
-      expect(metadataForProperty(C, 'cProp')).toBeDefined()
-      expect(metadataForProperty(C, 'bProp')).toBeFalsy()
+      expect(cModelMetadata.properties).toBeDefined()
+      expect(cModelMetadata.properties!.length).toBe(2)
+      expect(cMetaData.forProperty('cProp')).toBeDefined()
+      expect(cMetaData.forProperty('bProp')).toBeFalsy()
     })
 
     it('should not alter super props', () => {
@@ -498,19 +499,21 @@ describe('Decorators should add correct metadata', () => {
       }
 
       const aMeta = metadataForModel(A)
-      expect(aMeta.properties).toBeDefined()
-      expect(aMeta.properties!.length).toBe(1)
+      const aModelMetadata = aMeta.modelOptions
+      expect(aModelMetadata.properties).toBeDefined()
+      expect(aModelMetadata.properties!.length).toBe(1)
 
-      const aPropMeta = aMeta.properties![0]
+      const aPropMeta = aModelMetadata.properties![0]
       expect(aPropMeta).toBeDefined()
       expect(aPropMeta!.name).toBe('aProp')
       expect(aPropMeta!.nameDb).toBe('aProp')
 
       const bMeta = metadataForModel(B)
-      expect(bMeta.properties).toBeDefined()
-      expect(bMeta.properties!.length).toBe(1)
+      const bModelMetadata = bMeta.modelOptions
+      expect(bModelMetadata.properties).toBeDefined()
+      expect(bModelMetadata.properties!.length).toBe(1)
 
-      const bPropMeta = bMeta.properties![0]
+      const bPropMeta = bModelMetadata.properties![0]
       expect(bPropMeta).toBeDefined()
       expect(bPropMeta!.name).toBe('aProp')
       expect(bPropMeta!.nameDb).toBe('bProp')
@@ -528,15 +531,30 @@ describe('Decorators should add correct metadata', () => {
 
       const bMeta = metadataForModel(B)
 
-      expect(bMeta.properties).toBeDefined()
-      expect(bMeta.properties!.length).toBe(1)
+      expect(bMeta.modelOptions.properties).toBeDefined()
+      expect(bMeta.modelOptions.properties!.length).toBe(1)
     })
 
     it('should work for real world scenario 1', () => {
-      const metadata = metadataForClass(Form)
+      const metadata = metadataForModel(Form)
       expect(metadata.modelOptions.properties!.length).toBe(4)
       const meta = metadata.forProperty('id')
       expect(meta).toBeDefined()
     })
+  })
+
+  describe('should throw when more than one partitionKey was defined in a model', () => {
+    expect(() => {
+      @Model()
+      class InvalidModel {
+        @PartitionKey()
+        partKeyA: string
+
+        @PartitionKey()
+        partKeyB: string
+      }
+
+      return new InvalidModel()
+    }).toThrow()
   })
 })

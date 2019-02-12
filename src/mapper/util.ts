@@ -1,4 +1,9 @@
+/**
+ * @module mapper
+ */
 import { isNumber, isString } from 'lodash'
+import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { ModelConstructor } from '../model/model-constructor'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
 import { Attribute } from './type/attribute.type'
@@ -6,6 +11,31 @@ import { Binary } from './type/binary.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 
+/**
+ * @hidden
+ */
+export function getPropertyPath<T>(modelConstructorOrPropertyMetadata: ModelConstructor<T> | PropertyMetadata<T> | undefined, propertyKey: keyof T): string {
+  if (modelConstructorOrPropertyMetadata && modelConstructorOrPropertyMetadata.name) {
+    return `[${modelConstructorOrPropertyMetadata.name}::${propertyKey}]`
+  } else {
+    return `[unknown::${propertyKey}]`
+  }
+}
+
+/**
+ * @hidden
+ */
+export function messageWithPath(propertyPath: string | null | undefined, message: string): string{
+  if(!!propertyPath){
+    return `${propertyPath} ${message}`
+  }else{
+  return `${message}`
+  }
+}
+
+/**
+ * @hidden
+ */
 const BUFFER_TYPES = [
   'Buffer',
   'File',
@@ -24,66 +54,81 @@ const BUFFER_TYPES = [
 ]
 
 /**
- * Detects the dynamodb type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
+ * Detects the dynamoDB type to which an collection value should be mapped. Empty collections will be mapped to L(ist).
  * Collections of type array where all the values are either String | Number | Binary will be mapped to the corresponding S(et)
  * type. If the item types are heterogeneous or it is a non supported set type the returned type will be L(ist).
  * The logic for collection fo type Set is the same.
  *
  * @param {any[] | Set<any>} collection
  * @returns {AttributeCollectionType}
+ * @hidden
  */
-export function detectCollectionType(collection: any[] | Set<any>): AttributeCollectionType {
+export function detectCollectionTypeFromValue(collection: any[] | Set<any>): AttributeCollectionType {
   if (Array.isArray(collection)) {
-    if (collection.length) {
-      if (collection.every(isString)) {
-        return 'SS'
-      }
-
-      if (collection.every(isNumber)) {
-        return 'NS'
-      }
-
-      if (collection.every(isBinary)) {
-        return 'BS'
-      }
-    }
-
     return 'L'
   } else if (isSet(collection)) {
-    const firstValueType: AttributeType | null = collection.size ? detectType(collection.values().next().value) : null
-    let heterogeneous = false
-
-    for (const item of collection) {
-      const type: AttributeType = detectType(item)
-      if (type !== firstValueType) {
-        heterogeneous = true
-        break
+    if (collection.size) {
+      const { homogeneous, type } = isHomogeneous(collection)
+      if (homogeneous) {
+        switch (type) {
+          case 'S':
+            return 'SS'
+          case 'N':
+            return 'NS'
+          case 'B':
+            return 'BS'
+          default:
+            throw new Error(`"Set<CustomType>" without decorator is not supported. Add the @CollectionProperty() decorator (optionally with {itemType:CustomType}) for a Set<->[L]ist mapping)`)
+        }
+      } else {
+        // sets can not contain items with different types (heterogeneous)
+        throw new Error(`"Set with values of different types without decorator is not supported. Use an array instead.`)
       }
-    }
-
-    if (heterogeneous) {
-      return 'L'
     } else {
-      switch (firstValueType) {
-        case 'S':
-          return 'SS'
-        case 'N':
-          return 'NS'
-        case 'B':
-          return 'BS'
-        default:
-          return 'L'
-      }
+      /*
+       * an empty Set will not be persisted so we just return an arbitrary Set type, it is only important that it is one of
+       * S(et)
+       */
+      return 'SS'
     }
   } else {
-    throw new Error('given collection was no array or Set -> type could not be detected')
+    throw new Error('given collection was neither array nor Set -> type could not be detected')
   }
 }
 
+/**
+ * @hidden
+ */
+export function isHomogeneous(collection: Set<any> | any[]): { homogeneous: boolean, type?: AttributeType | null } {
+  const collectionAsArray = isSet(collection) ? Array.from(collection) : collection
+  const firstValueType: AttributeType | null = collectionAsArray.length ? detectType(collectionAsArray[0]) : null
+
+  let homogeneous = true
+  for (const item of collectionAsArray) {
+    const type: AttributeType = detectType(item)
+    if (type !== firstValueType) {
+      homogeneous = false
+      break
+    }
+  }
+
+  if (homogeneous) {
+    return { homogeneous: true, type: firstValueType }
+  } else {
+    return { homogeneous: false }
+  }
+}
+
+/**
+ * @hidden
+ */
 export function isCollection(value: any): boolean {
   return value && (Array.isArray(value) || isSet(value))
 }
 
+/**
+ * @hidden
+ */
 export function isSet(value: any): value is Set<any> {
   return (
     (value !== null && value !== undefined && value.hasOwnProperty('name') && value.name === 'Set') ||
@@ -91,78 +136,66 @@ export function isSet(value: any): value is Set<any> {
   )
 }
 
+/**
+ * @hidden
+ */
 export function detectType(value: any): AttributeType {
   if (isCollection(value)) {
-    return detectCollectionType(value)
-  } else {
-    if (isString(value)) {
-      return 'S'
-    }
-
-    if (isNumber(value)) {
-      return 'N'
-    }
-
-    if (isBinary(value)) {
-      return 'B'
-    }
-
-    if (value === null) {
-      return 'NULL'
-    }
-
-    if (typeof value === 'boolean') {
-      return 'BOOL'
-    }
-
-    if (typeof value === 'object') {
-      return 'M'
-    }
+    return detectCollectionTypeFromValue(value)
+  } else if (isString(value)) {
+    return 'S'
+  } else if (isNumber(value)) {
+    return 'N'
+  } else if (isBinary(value)) {
+    return 'B'
+  } else if (value === null) {
+    return 'NULL'
+  } else if (typeof value === 'boolean') {
+    return 'BOOL'
+  } else if (typeof value === 'object') {
+    return 'M'
   }
 
   throw new Error(`the type for value ${value} could not be detected`)
 }
 
 /**
- * Will resolve the type based on given data.
- *
- * @param data
- * @returns {AttributeModelTypeName}
+ * Will resolve the type based on given property value
+ * @hidden
  */
-export function typeOf(data: any): AttributeValueType {
-  if (data === null) {
+export function typeOf(propertyValue: any, propertyPath?: string | null): AttributeValueType {
+  if (propertyValue === null) {
     return NullType
+  } else if (Array.isArray(propertyValue)) {
+    return Array
+  } else if (isSet(propertyValue)) {
+    return Set
+  } else if (propertyValue instanceof Map) {
+    return Map
+  } else if (isBinary(propertyValue)) {
+    return Binary
   } else {
-    if (Array.isArray(data)) {
-      return Array
-    } else if (data instanceof Set) {
-      return Set
-    } else if (data instanceof Map) {
-      return Map
-    } else if (isBinary(data)) {
-      return Binary
-    } else {
-      switch (typeof data) {
-        case 'string':
-          return String
-        case 'number':
-          return Number
-        case 'boolean':
-          return Boolean
-        case 'undefined':
-          return UndefinedType
-        case 'object':
-          return Object
-      }
+    switch (typeof propertyValue) {
+      case 'string':
+        return String
+      case 'number':
+        return Number
+      case 'boolean':
+        return Boolean
+      case 'undefined':
+        return UndefinedType
+      case 'object':
+        return Object
     }
   }
 
-  throw new Error(`typeof data ${data} could not be detected`)
+  throw new Error(messageWithPath(propertyPath, `typeof data ${propertyValue} could not be detected`))
 }
 
-/*
+/**
  * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
  * should we work with string match
+ * @hidden
  */
 export function typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
   if (attributeValue) {
@@ -192,9 +225,12 @@ export function typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
   throw new Error(`could not resolve the dynamo db type for attribute value ${attributeValue}`)
 }
 
+/**
+ * @hidden
+ */
 export function isBinary(data: any): boolean {
   if (isNode()) {
-    // TODO LOW:BINARY should add || data instanceof Stream
+    // TODO LOW:ENHANCEMENT should add || data instanceof Stream
     return Buffer.isBuffer(data)
   } else {
     return BUFFER_TYPES.some(
@@ -203,12 +239,16 @@ export function isBinary(data: any): boolean {
   }
 }
 
+/**
+ * @hidden
+ */
 export function isBufferType(type: any): boolean {
   return BUFFER_TYPES.includes(type)
 }
 
-/*
+/**
  * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/js
+ * @hidden
  */
 export function isType(obj: any, type: any): boolean {
   // handle cross-"frame" objects
@@ -216,21 +256,32 @@ export function isType(obj: any, type: any): boolean {
     type = typeName(type)
   }
 
-  return Object.prototype.toString.call(obj) === '[object ' + type + ']'
+  return Object.prototype.toString.call(obj) === `[object ${type}]`
 }
 
+/**
+ * @hidden
+ */
+ // tslint:disable-next-line:function-constructor
+const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
+
+/**
+ * @hidden
+ */
 export function isBrowser() {
-  return process && (<any>process).browser
+  return isGlobalScopeWindow
 }
 
+/**
+ * @hidden
+ */
 export function isNode() {
-  return !isBrowser()
+  return !isGlobalScopeWindow
 }
 
 /**
  * Returns the name of the given Type. null and undefined are special cases were we return 'Null' vs. 'Undefined'
- * @param type
- * @returns {string}
+ * @hidden
  */
 export function typeName(type: any): 'Null' | 'Undefined' | string {
   if (type !== null && type !== undefined) {
@@ -250,14 +301,4 @@ export function typeName(type: any): 'Null' | 'Undefined' | string {
   }
 
   throw new Error(`was not able to resolve type name for type ${type}`)
-}
-
-// FIXME UUID replace with a more bullet proof implementation node uuid module requires crypto, need to figure out how to use it with browser
-export function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    // tslint:disable
-    let r = (Math.random() * 16) | 0,
-      v = c == 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
 }

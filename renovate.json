@@ -3,7 +3,10 @@
     "config:base",
     ":pinOnlyDevDependencies"
   ],
-  "ignoreDeps": ["@types/node"],
+  "ignoreDeps": [
+    "@types/node",
+    "typescript"
+  ],
   "packageRules": [
     {
       "packagePatterns": [ "^@types" ],

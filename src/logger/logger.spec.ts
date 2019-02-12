@@ -1,6 +1,6 @@
 import { Employee } from '../../test/models'
-import { updateDynamoEasyConfig } from '../config'
-import { DynamoStore } from '../dynamo'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
+import { DynamoStore } from '../dynamo/dynamo-store'
 import { LogInfo } from './log-info.type'
 import { LogReceiver } from './log-receiver.type'
 
@@ -18,6 +18,6 @@ describe('log receiver', () => {
     expect(store).toBeDefined()
     expect(logs.length).toBe(1)
     expect(logs[0].timestamp).toBeGreaterThanOrEqual(ts)
-    expect(logs[0].modelClass).toBe(Employee.name)
+    expect(logs[0].modelConstructor).toBe(Employee.name)
   })
 })

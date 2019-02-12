@@ -1,4 +1,4 @@
-import { DateProperty, Model, PartitionKey, Property, SortedSet } from '../../src/dynamo-easy'
+import { CollectionProperty, DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 
 // tslint:disable-next-line:max-classes-per-file
 @Model()
@@ -12,6 +12,9 @@ export class Address {
 @Model()
 export class Info {
   details: string
+
+  @DateProperty()
+  createdAt: Date
 }
 
 // tslint:disable-next-line:max-classes-per-file
@@ -36,12 +39,15 @@ export class UpdateModel {
   // maps to L(ist)
   addresses: Address[]
 
-  @SortedSet()
+  @CollectionProperty({ sorted: true })
   numberValues: number[]
+
+  @CollectionProperty({ itemType: Info })
+  informations: Info[]
 
   // maps to M(ap)
   info: Info
 
   // maps to S(tring)S(et)
-  topics: string[]
+  topics: Set<string>
 }

@@ -1,4 +1,4 @@
-import { DateProperty, Model, SortedSet } from '../../src/dynamo-easy'
+import { CollectionProperty, DateProperty, Model } from '../../src/dynamo-easy'
 
 @Model()
 export class Employee {
@@ -9,7 +9,7 @@ export class Employee {
   @DateProperty()
   createdAt: Date | null
 
-  @SortedSet()
+  @CollectionProperty({ sorted: true })
   sortedSet: Set<string>
 
   constructor(name: string, age: number, createdAt: Date | null, sortedListValues: any[] | null) {

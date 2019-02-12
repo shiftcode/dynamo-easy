@@ -1,4 +1,4 @@
 hooks:
   commit-msg: "commitlint -E HUSKY_GIT_PARAMS"
   pre-commit: "lint-staged"
-  pre-push: "npm run test && npm run build"
+  pre-push: "npm run check-snippets && npm run test && npm run build"

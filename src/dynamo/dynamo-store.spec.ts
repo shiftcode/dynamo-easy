@@ -1,7 +1,20 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
-import { Model } from '../decorator/impl'
+// tslint:disable:no-unused-expression
+import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
+import { SimpleWithPartitionKeyModel } from '../../test/models'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
+import { Model } from '../decorator/impl/model/model.decorator'
 import { DynamoStore } from './dynamo-store'
+import { BatchGetSingleTableRequest } from './request/batchgetsingletable/batch-get-single-table.request'
+import { BatchWriteSingleTableRequest } from './request/batchwritesingletable/batch-write-single-table.request'
+import { DeleteRequest } from './request/delete/delete.request'
+import { GetRequest } from './request/get/get.request'
+import { PutRequest } from './request/put/put.request'
+import { QueryRequest } from './request/query/query.request'
+import { ScanRequest } from './request/scan/scan.request'
+import { TransactGetSingleTableRequest } from './request/transactgetsingletable/transact-get-single-table.request'
+import { UpdateRequest } from './request/update/update.request'
 
 @Model()
 class DynamoStoreModel {}
@@ -11,29 +24,75 @@ class DynamoStoreModel2 {}
 
 describe('dynamo store', () => {
   describe('table name', () => {
-    it('correct table name (default)', () => {
-      const dynamoStore = new DynamoStore(DynamoStoreModel)
+    it('correct table name', () => {
+      const store = new DynamoStore(DynamoStoreModel2)
+      expect(store.tableName).toBe('myTableName')
+    })
+  })
 
-      expect(dynamoStore.tableName).toBe('dynamo-store-models')
+  describe('session validity ensurer', () => {
+    let validityEnsurerSpy: jasmine.Spy
+
+    beforeEach(() => {
+      // Promise.reject to not reach the actual call to the aws sdk
+      validityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.reject())
+      updateDynamoEasyConfig({ sessionValidityEnsurer: validityEnsurerSpy })
     })
 
-    it('correct table name ()', () => {
-      const dynamoStore = new DynamoStore(DynamoStoreModel2)
+    afterEach(resetDynamoEasyConfig)
 
-      expect(dynamoStore.tableName).toBe('myTableName')
+    it('custom session validity ensurer is used', async () => {
+      const store = new DynamoStore(DynamoStoreModel)
+      try {
+        await store.scan().exec()
+      } catch (error) {
+        // ignore
+      }
+      expect(validityEnsurerSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('logger', () => {
+    let logReceiverSpy: jasmine.Spy
+    beforeEach(() => {
+      logReceiverSpy = jasmine.createSpy()
+      updateDynamoEasyConfig({ logReceiver: logReceiverSpy })
+    })
+    it('logs when instance was created', () => {
+      new DynamoStore(DynamoStoreModel)
+      expect(logReceiverSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('should create request objects', () => {
+    let store: DynamoStore<SimpleWithPartitionKeyModel>
+
+    beforeEach(() => {
+      store = new DynamoStore(SimpleWithPartitionKeyModel)
     })
 
-    it('correct table name ()', () => {
-      const dynamoStore = new DynamoStore(DynamoStoreModel2, tableName => `${tableName}-with-special-thing`)
+    it('put', () => expect(store.put({ id: 'id', age: 0 }) instanceof PutRequest).toBeTruthy())
+    it('get', () => expect(store.get('id') instanceof GetRequest).toBeTruthy())
+    it('update', () => expect(store.update('id') instanceof UpdateRequest).toBeTruthy())
+    it('delete', () => expect(store.delete('id') instanceof DeleteRequest).toBeTruthy())
+    it('batchWrite', () => expect(store.batchWrite() instanceof BatchWriteSingleTableRequest).toBeTruthy())
+    it('scan', () => expect(store.scan() instanceof ScanRequest).toBeTruthy())
+    it('query', () => expect(store.query() instanceof QueryRequest).toBeTruthy())
+    it('batchGet', () => expect(store.batchGet([{ id: 'id' }]) instanceof BatchGetSingleTableRequest).toBeTruthy())
+    it('transactGet', () =>
+      expect(store.transactGet([{ id: 'myId' }]) instanceof TransactGetSingleTableRequest).toBeTruthy())
+  })
 
-      expect(dynamoStore.tableName).toBe('myTableName-with-special-thing')
-    })
+  describe('should enable custom requests', () => {
+    const makeRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
+    const store = new DynamoStore(SimpleWithPartitionKeyModel)
+    Object.assign(store, { dynamoDBWrapper: { makeRequest: makeRequestSpy } })
+    store.makeRequest('updateTimeToLive', {})
+    expect(makeRequestSpy).toBeCalled()
+  })
 
-    it('throw error because table name is invalid', () => {
-      expect(() => {
-        // tslint:disable-next-line:no-unused-expression
-        new DynamoStore(DynamoStoreModel2, tableName => `${tableName}$`)
-      }).toThrowError()
-    })
+  describe('allow to get dynamoDB instance', () => {
+    const store = new DynamoStore(SimpleWithPartitionKeyModel)
+    expect(store.dynamoDB).toBeDefined()
   })
 })

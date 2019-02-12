@@ -1,118 +1,67 @@
-import { UpdateItemOutput } from 'aws-sdk/clients/dynamodb'
-import { forEach } from 'lodash'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
-import { hasSortKey } from '../../../decorator/metadata'
+/**
+ * @module store-requests
+ */
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { createLogger, Logger } from '../../../logger/logger'
-import { Attributes, toDbOne } from '../../../mapper'
-import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
-import { addUpdateExpression } from '../../expression/param-util'
-import { Expression, UpdateExpression, UpdateExpressionDefinitionFunction } from '../../expression/type'
-import { UpdateActionKeyword } from '../../expression/type/update-action-keyword.type'
+import { createKeyAttributes } from '../../../mapper/mapper'
+import { ModelConstructor } from '../../../model/model-constructor'
+import { Omit } from '../../../model/omit.type'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { prepareAndAddUpdateExpressions } from '../../expression/prepare-and-add-update-expressions.function'
+import { addUpdate } from '../../expression/request-expression-builder'
+import { RequestUpdateFunction } from '../../expression/type/update-expression-definition-chain'
+import { UpdateExpressionDefinitionFunction } from '../../expression/type/update-expression-definition-function'
 import { WriteRequest } from '../write.request'
+import { UpdateResponse } from './update.response'
 
-export type SortedUpdateExpressions = { [key in UpdateActionKeyword]: UpdateExpression[] }
+type UpdateRequestReturnT<T> = Omit<Omit<UpdateRequest<T>, 'exec'>, 'execFullResponse'> & {
+  exec(): Promise<T>
+  execFullResponse(): Promise<UpdateResponse<T>>
+}
+type UpdateRequestReturnPartialT<T> = Omit<Omit<UpdateRequest<T>, 'exec'>, 'execFullResponse'> & {
+  exec(): Promise<Partial<T>>
+  execFullResponse(): Promise<UpdateResponse<T>>
+}
 
-export class UpdateRequest<T> extends WriteRequest<UpdateRequest<T>, T, any> {
-  private readonly logger: Logger
+/**
+ * Request class for the UpdateItem operation.
+ */
+export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, DynamoDB.UpdateItemOutput, UpdateRequest<T>> {
 
-  constructor(
-    dynamoRx: DynamoRx,
-    modelClazz: ModelConstructor<T>,
-    tableName: string,
-    partitionKey: any,
-    sortKey?: any,
-  ) {
-    super(dynamoRx, modelClazz, tableName)
+  protected readonly logger: Logger
+
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
-
-    if (hasSortKey(this.metadata) && (sortKey === null || sortKey === undefined)) {
-      throw new Error(`please provide the sort key for attribute ${this.metadata.getSortKey()}`)
-    }
-
-    const keyAttributeMap: Attributes<T> = <any>{}
-
-    // partition key
-    const partitionKeyValue = toDbOne(partitionKey, this.metadata.forProperty(this.metadata.getPartitionKey()))
-
-    if (partitionKeyValue === null) {
-      throw new Error('please provide an acutal value for partition key, got null')
-    }
-
-    keyAttributeMap[this.metadata.getPartitionKey()] = partitionKeyValue
-
-    // sort key
-    if (hasSortKey(this.metadata)) {
-      const sortKeyValue = toDbOne(sortKey, this.metadata.forProperty(this.metadata.getSortKey()))
-
-      if (sortKeyValue === null) {
-        throw new Error('please provide an actual value for sort key, got null')
-      }
-
-      keyAttributeMap[this.metadata.getSortKey()] = sortKeyValue
-    }
-
-    this.params.Key = keyAttributeMap
+    this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
+  /**
+   * create and add a single update operation
+   * @example req.updateAttribute('path.to.attr').set('newVal')
+   */
+  updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<UpdateRequest<T>, T, K> {
+    return addUpdate(attributePath, this, this.metadata)
+  }
+
+  /**
+   * add multiple update operations comma separated
+   * @example req.operations(update('path.to.attr).set('newVal'), ... )
+   */
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): UpdateRequest<T> {
-    if (updateDefFns && updateDefFns.length) {
-      const sortedByActionKeyWord: SortedUpdateExpressions = updateDefFns
-        .map(updateDefFn => {
-          return updateDefFn(this.params.ExpressionAttributeValues, this.metadata)
-        })
-        .reduce(
-          (result, expr) => {
-            if (!result[expr.type]) {
-              result[expr.type] = []
-            }
-
-            result[expr.type].push(expr)
-            return result
-          },
-          <SortedUpdateExpressions>{},
-        )
-
-      const actionStatements: string[] = []
-      let attributeValues: Attributes = {}
-      let attributeNames: { [key: string]: string } = {}
-
-      forEach(sortedByActionKeyWord, (value, key) => {
-        const statements: string[] = []
-        if (value && value.length) {
-          value.forEach(updateExpression => {
-            statements.push(updateExpression.statement)
-            attributeValues = { ...attributeValues, ...updateExpression.attributeValues }
-            attributeNames = { ...attributeNames, ...updateExpression.attributeNames }
-          })
-          actionStatements.push(`${key} ${statements.join(', ')}`)
-        }
-      })
-
-      const expression: Expression = {
-        statement: actionStatements.join(' '),
-        attributeValues,
-        attributeNames,
-      }
-
-      addUpdateExpression(expression, this.params)
-      return this
-    } else {
-      throw new Error('at least one update operation must be defined')
-    }
+    prepareAndAddUpdateExpressions(this.metadata, this.params, updateDefFns)
+    return this
   }
 
-  execFullResponse(): Observable<UpdateItemOutput> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.updateItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
+  returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW'): UpdateRequestReturnT<T>
+  returnValues(returnValues: 'UPDATED_OLD' | 'UPDATED_NEW'): UpdateRequestReturnPartialT<T>
+  returnValues(returnValues: 'NONE'): UpdateRequest<T>
+  returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE'): UpdateRequest<T> | UpdateRequestReturnT<T> | UpdateRequestReturnPartialT<T> {
+    this.params.ReturnValues = returnValues
+    return this
   }
 
-  exec(): Observable<void> {
-    return this.execFullResponse().pipe(
-      map(response => {
-        return
-      }),
-    )
+  protected doRequest(params: DynamoDB.UpdateItemInput): Promise<DynamoDB.UpdateItemOutput> {
+    return this.dynamoDBWrapper.updateItem(this.params)
   }
 }

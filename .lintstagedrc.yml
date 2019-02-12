@@ -3,6 +3,13 @@ linters:
     - prettier --write --config ./.prettierrc.yml
     - tslint --project ./tsconfig.json -t codeFrame --fix
     - git add
+  "(src/**/*.spec.ts|test/**/*.ts)":
+    - prettier --write --config ./.prettierrc.yml
+    # TODO LOW tslint will not work because of the following error
+    # ✖ tslint --project ./tsconfig.jest.json -t codeFrame --fix found some errors. Please fix them and try committing again.
+    #'/Users/michaelwittwer/dev/shiftcode/dynamo-easy/test/models/complex.model.ts' is not included in project.
+    # - tslint --project ./tsconfig.jest.json -t codeFrame --fix
+    - git add
   "**/package.json":
     - sort-package-json
     - git add

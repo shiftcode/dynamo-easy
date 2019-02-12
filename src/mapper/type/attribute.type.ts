@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 export type Attribute =
   | StringAttribute
   | NumberAttribute
@@ -6,7 +9,7 @@ export type Attribute =
   | NumberSetAttribute
   | BinarySetAttribute
   | MapAttribute
-  | ListAttribute
+  | ListAttribute<any>
   | NullAttribute
   | BooleanAttribute
 
@@ -15,7 +18,7 @@ export type Attribute =
  * names @Property({name: 'myOtherName'}) and the value is one of Attribute
  * (we can't narrow the type of Attribute)
  */
-export type Attributes<T = {}> = { [key in keyof T | string]: Attribute }
+export type Attributes<T = {}> = Record<keyof T | string, Attribute>
 
 /**
  * An attribute of type String. For example:  "S": "Hello"
@@ -33,6 +36,7 @@ export interface NumberAttribute {
 
 /**
  * An attribute of type Binary. For example:  "B": "dGhpcyB0ZXh0IGlzIGJhc2U2NC1lbmNvZGVk"
+ * TODO ENHANCEMENT:BINARY check for all possible types
  */
 export interface BinaryAttribute {
   B: Buffer | Uint8Array | {} | string
@@ -56,7 +60,7 @@ export interface NumberSetAttribute {
  * An attribute of type Binary Set. For example:  "BS": ["U3Vubnk=", "UmFpbnk=", "U25vd3k="]
  */
 export interface BinarySetAttribute {
-  BS: BinaryAttribute[]
+  BS: Array<Buffer | Uint8Array | {} | string>
 }
 
 /**
@@ -71,9 +75,10 @@ export interface MapAttribute<T = {}> {
  * An attribute of type List. For example:  "L": ["Cookies", "Coffee", 3.14159]
  */
 
-export interface ListAttribute {
-  L: Attribute[]
+export interface ListAttribute<T extends Attribute = Attribute> {
+  L: T[]
 }
+
 
 /**
  * An attribute of type Null. For example:  "NULL": true

@@ -1,45 +1,60 @@
+// tslint:disable:no-unnecessary-class
+
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { of } from 'rxjs'
-import { getTableName } from '../../../../test/helper'
 import { Organization } from '../../../../test/models'
-import { DEFAULT_SESSION_VALIDITY_ENSURER } from '../../default-session-validity-ensurer.const'
-import { DynamoRx } from '../../dynamo-rx'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
 
 describe('batch write single table request', () => {
   const tableName = getTableName(Organization)
+  const item: Organization = <Organization>{
+    id: 'myId',
+    createdAtDate: new Date(),
+    name: 'myOrg',
+  }
 
-  let item: Organization
-  let dynamoRx: DynamoRx
+  let dynamoDBWrapper: DynamoDbWrapper
   let request: BatchWriteSingleTableRequest<Organization>
 
-  let nextSpyFn: () => { value: number }
-  const generatorMock = () => <any>{ next: nextSpyFn }
+  describe('constructor', () => {
+    it('should throw when no class was given', () => {
+      expect(() => new BatchWriteSingleTableRequest(<any>null, <any>null)).toThrow()
+    })
+    it('should throw when class given is not @Model decorated', () => {
+      class NoModel {}
+      expect(() => new BatchWriteSingleTableRequest(<any>null, NoModel)).toThrow()
+    })
 
-  beforeEach(() => {
-    item = <any>{
-      id: 'myId',
-      createdAtDate: new Date(),
-      name: 'myOrg',
-    }
-    nextSpyFn = jest.fn().mockImplementation(() => ({ value: 0 }))
+    it('should initialize params', () => {
+      request = new BatchWriteSingleTableRequest(<any>null, Organization)
+      expect(request.params).toEqual({
+        RequestItems: {
+          [tableName]: [],
+        },
+      })
+    })
   })
 
   describe('correct params', () => {
     beforeEach(() => {
-      dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization, tableName)
-
-      const output: DynamoDB.BatchWriteItemOutput = {}
-      spyOn(dynamoRx, 'batchWriteItem').and.returnValue(of(output))
+      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
     })
 
-    it('delete with complex primary key', async () => {
-      request.delete([item])
-      await request.exec(generatorMock).toPromise()
+    it('returnConsumedCapacity', () => {
+      request.returnConsumedCapacity('TOTAL')
+      expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
+    })
 
-      expect(dynamoRx.batchWriteItem).toHaveBeenCalledTimes(1)
-      expect(dynamoRx.batchWriteItem).toHaveBeenCalledWith({
+    it('returnItemCollectionMetrics', () => {
+      request.returnItemCollectionMetrics('SIZE')
+      expect(request.params.ReturnItemCollectionMetrics).toBe('SIZE')
+    })
+
+    it('delete with composite key', () => {
+      request.delete([item])
+
+      expect(request.params).toEqual({
         RequestItems: {
           [tableName]: [
             {
@@ -53,15 +68,12 @@ describe('batch write single table request', () => {
           ],
         },
       })
-      expect(nextSpyFn).toHaveBeenCalledTimes(0)
     })
 
     it('put object', async () => {
       request.put([item])
-      await request.exec(generatorMock).toPromise()
 
-      expect(dynamoRx.batchWriteItem).toHaveBeenCalledTimes(1)
-      expect(dynamoRx.batchWriteItem).toHaveBeenCalledWith({
+      expect(request.params).toEqual({
         RequestItems: {
           [tableName]: [
             {
@@ -76,50 +88,105 @@ describe('batch write single table request', () => {
           ],
         },
       })
-      expect(nextSpyFn).toHaveBeenCalledTimes(0)
     })
 
-    it('delete >25 items in two requests', async () => {
-      const twentyFiveItems = []
-      for (let i = 0; i < 25; i++) {
-        twentyFiveItems.push(item)
-      }
+    it('adding >25 items in first delete call throws', () => {
+      const twentyFiveItems = new Array(30).map(() => item)
+      expect(() => request.delete(twentyFiveItems)).toThrow()
+    })
+
+    it('adding >25 items in second delete call throws', () => {
+      const twentyFiveItems = new Array(25).map(() => item)
       request.delete(twentyFiveItems)
-      request.delete(twentyFiveItems)
-      await request.exec(generatorMock).toPromise()
-      expect(dynamoRx.batchWriteItem).toHaveBeenCalledTimes(2)
-      expect(nextSpyFn).toHaveBeenCalledTimes(0)
+      expect(() => request.delete(twentyFiveItems)).toThrow()
+    })
+
+    it('adding >25 items in first put call throws', () => {
+      const twentyFiveItems = new Array(30).map(() => item)
+      expect(() => request.put(twentyFiveItems)).toThrow()
+    })
+
+    it('adding >25 items in second put call throws', () => {
+      const twentyFiveItems = new Array(25).map(() => item)
+      request.put(twentyFiveItems)
+      expect(() => request.put(twentyFiveItems)).toThrow()
     })
   })
 
-  describe('correct backoff', () => {
-    beforeEach(() => {
-      dynamoRx = new DynamoRx(DEFAULT_SESSION_VALIDITY_ENSURER)
-      request = new BatchWriteSingleTableRequest(dynamoRx, Organization, tableName)
-
-      const output: DynamoDB.BatchWriteItemOutput = {
-        UnprocessedItems: {
-          [tableName]: [
-            {
-              PutRequest: {
-                Item: {
-                  id: { S: 'myId' },
-                  createdAtDate: { S: item.createdAtDate.toISOString() },
-                  name: { S: 'myOrg' },
-                },
+  describe('Unprocessed items', () => {
+    const output: DynamoDB.BatchWriteItemOutput = {
+      UnprocessedItems: {
+        [tableName]: [
+          {
+            PutRequest: {
+              Item: {
+                id: { S: 'myId' },
+                createdAtDate: { S: item.createdAtDate.toISOString() },
+                name: { S: 'myOrg' },
               },
             },
-          ],
-        },
-      }
-      spyOn(dynamoRx, 'batchWriteItem').and.returnValues(of(output), of({}))
+          },
+        ],
+      },
+    }
+
+    let generatorSpy: jasmine.Spy
+    let nextFnSpy: jasmine.Spy
+    let batchWriteItemSpy: jasmine.Spy
+
+    beforeEach(() => {
+      batchWriteItemSpy = jasmine
+        .createSpy()
+        .and.returnValues(Promise.resolve(output), Promise.resolve(output), Promise.resolve({ MyResult: true }))
+      nextFnSpy = jasmine.createSpy().and.returnValue({ value: 0 })
+      dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: batchWriteItemSpy })
+      generatorSpy = jasmine.createSpy().and.returnValue({ next: nextFnSpy })
+
+      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
     })
 
-    it('should retry when capacity is exceeded', async () => {
+    it('should retry when unprocessed items are returned', async () => {
       request.put([item])
-      await request.exec(generatorMock).toPromise()
-      expect(dynamoRx.batchWriteItem).toHaveBeenCalledTimes(2)
-      expect(nextSpyFn).toHaveBeenCalledTimes(1)
+      await request.exec(<any>generatorSpy)
+
+      // only one instance of the generator should be created
+      expect(generatorSpy).toHaveBeenCalledTimes(1)
+
+      expect(nextFnSpy).toHaveBeenCalledTimes(2)
+
+      expect(batchWriteItemSpy).toHaveBeenCalledTimes(3)
+    })
+
+    it('should keep other params in additional calls', async () => {
+      request.put([item])
+      request.returnConsumedCapacity('TOTAL')
+      request.returnItemCollectionMetrics('SIZE')
+      await request.exec(<any>generatorSpy)
+
+      expect(batchWriteItemSpy).toHaveBeenCalledTimes(3)
+      const paramsThirdCall = <DynamoDB.BatchWriteItemInput>batchWriteItemSpy.calls.all()[2].args[0]
+
+      expect(paramsThirdCall).toBeDefined()
+      expect(paramsThirdCall.ReturnConsumedCapacity).toBe('TOTAL')
+      expect(paramsThirdCall.ReturnItemCollectionMetrics).toBe('SIZE')
+    })
+  })
+
+  describe('exec / execFullResponse', () => {
+    beforeEach(() => {
+      dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
+      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
+      request.delete([item])
+    })
+
+    it('exec should return nothing', async () => {
+      const response = await request.exec()
+      expect(response).toBeUndefined()
+    })
+
+    it('execFullResponse should return BatchWriteItemOutput', async () => {
+      const response = await request.execFullResponse()
+      expect(response).toEqual({ myResponse: true })
     })
   })
 })

@@ -1,45 +1,67 @@
+/**
+ * @module expression
+ */
+import { ExtractListType } from '../../../helper/extract-list-type.type'
+import { ConditionalParamsHost } from '../../operation-params.type'
 import { UpdateExpressionDefinitionFunction } from './update-expression-definition-function'
 
 /**
  * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html for full documentation
+ *
  */
-export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
+export interface UpdateFunctions<T, R> {
   /* ----------------------------------------------------------------
-      SET operation TODO add support for ifNotExists
+      SET operations
    ---------------------------------------------------------------- */
-  incrementBy: (value: number) => UpdateExpressionDefinitionFunction
-  decrementBy: (value: number) => UpdateExpressionDefinitionFunction
+  /**
+   * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   * @param value which maps to NumberAttribute
+   */
+  incrementBy: (value: T) => R
+
+  /**
+   * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   * @param value which maps to NumberAttribute
+   */
+  decrementBy: (value: T) => R
 
   /**
    * will update the item at the path, path can be a top level attribute or a nested attribute.
    * samples:
    * - persons.age
    * - places[0].address.street
+   *
+   * specify ifNotExists to only execute if the property does not exist
    */
-  set: (value: T[K]) => UpdateExpressionDefinitionFunction
+  set: (value: T, ifNotExists?: boolean) => R
 
   /**
-   * appends one or more values to the start or end of a list, value must be of type L(ist)
+   * appends one or more values to the start or end of a list, value must map to ListAttribute
    */
-  appendToList: (value: T[K], position?: 'START' | 'END') => UpdateExpressionDefinitionFunction
+  appendToList: (value: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>, position?: 'START' | 'END') => R
 
   /* ----------------------------------------------------------------
-      REMOVE operation
+      REMOVE operations
    ---------------------------------------------------------------- */
-  remove: () => UpdateExpressionDefinitionFunction
+  /**
+   * removes the attribute from an item
+   */
+  remove: () => R
 
-  /** removes an item at the given position(s), the remaining elements are shifted */
-  removeFromListAt: (...positions: number[]) => UpdateExpressionDefinitionFunction
+  /**
+   * removes item(s) at the given position(s), the remaining elements are shifted
+   */
+  removeFromListAt: (...positions: number[]) => R
 
   /* ----------------------------------------------------------------
-      ADD operation (only supports number and set type)
+      ADD operations (only supports number and set type)
       AWS generally recommends to use SET rather than ADD
    ---------------------------------------------------------------- */
-
   /**
    * adds or manipulates a value to an attribute of type N(umber) or S(et), manipulation behaviour differs based on attribute type
+   * for numbers AWS generally recommends to use SET rather than ADD. See incrementBy and decrementBy.
    *
-   * @param values {multiple values as vararg | Array | Set}
+   * @param values {multiple values as Array | Set}
    *
    * --update-expression "ADD QuantityOnHand :q" \
    * --expression-attribute-values '{":q": {"N": "5"}}' \
@@ -47,79 +69,32 @@ export interface UpdateExpressionDefinitionChainTyped<T, K extends keyof T> {
    *  --update-expression "ADD Color :c" \
    *  --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
    */
-  add: (values: T[K]) => UpdateExpressionDefinitionFunction
+  add: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 
   /* ----------------------------------------------------------------
       DELETE operation (only supports set type)
    ---------------------------------------------------------------- */
   /**
-   * @param values {multiple values as vararg | Array | Set}
-   * @returns {UpdateExpressionDefinitionFunction}
+   * delete items from sets
+   * @param values {multiple values as Array | Set}
+   * @returns {R}
    *
    * --update-expression "DELETE Color :p" \
    * --expression-attribute-values '{":p": {"SS": ["Yellow", "Purple"]}}'
    */
-  removeFromSet: (...values: any[]) => UpdateExpressionDefinitionFunction
+  removeFromSet: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 }
+
+
+export type UpdateExpressionDefinitionChainTyped<T, K extends keyof T> = UpdateFunctions<
+  T[K],
+  UpdateExpressionDefinitionFunction
+>
+
+
+export type UpdateExpressionDefinitionChain = UpdateFunctions<any, UpdateExpressionDefinitionFunction>
 
 /**
- * see http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html for full documentation
+ * @hidden
  */
-export interface UpdateExpressionDefinitionChain {
-  /* ----------------------------------------------------------------
-      SET operation TODO add support for ifNotExists
-   ---------------------------------------------------------------- */
-  incrementBy: (value: number) => UpdateExpressionDefinitionFunction
-  decrementBy: (value: number) => UpdateExpressionDefinitionFunction
-
-  /**
-   * will update the item at the path, path can be a top level attribute or a nested attribute.
-   * samples:
-   * - persons.age
-   * - places[0].address.street
-   */
-  set: (value: any) => UpdateExpressionDefinitionFunction
-
-  /**
-   * appends one or more values to the start or end of a list, value must be of type L(ist)
-   */
-  appendToList: (value: any[], position?: 'START' | 'END') => UpdateExpressionDefinitionFunction
-
-  /* ----------------------------------------------------------------
-      REMOVE operation
-   ---------------------------------------------------------------- */
-  remove: () => UpdateExpressionDefinitionFunction
-
-  /** removes an item at the given position(s), the remaining elements are shifted */
-  removeFromListAt: (...positions: number[]) => UpdateExpressionDefinitionFunction
-
-  /* ----------------------------------------------------------------
-      ADD operation (only supports number and set type)
-      AWS generally recommends to use SET rather than ADD
-   ---------------------------------------------------------------- */
-
-  /**
-   * adds or manipulates a value to an attribute of type N(umber) or S(et), manipulation behaviour differs based on attribute type
-   *
-   * @param values {multiple values as vararg | Array | Set}
-   *
-   * --update-expression "ADD QuantityOnHand :q" \
-   * --expression-attribute-values '{":q": {"N": "5"}}' \
-   *
-   *  --update-expression "ADD Color :c" \
-   *  --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
-   */
-  add: (...values: any[]) => UpdateExpressionDefinitionFunction
-
-  /* ----------------------------------------------------------------
-      DELETE operation (only supports set type)
-   ---------------------------------------------------------------- */
-  /**
-   * @param values {multiple values as vararg | Array | Set}
-   * @returns {UpdateExpressionDefinitionFunction}
-   *
-   * --update-expression "DELETE Color :p" \
-   * --expression-attribute-values '{":p": {"SS": ["Yellow", "Purple"]}}'
-   */
-  removeFromSet: (...values: any[]) => UpdateExpressionDefinitionFunction
-}
+export type RequestUpdateFunction<R extends ConditionalParamsHost, T, K extends keyof T> = UpdateFunctions<T[K], R>

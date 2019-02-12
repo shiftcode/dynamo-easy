@@ -1,13 +1,11 @@
 import {
+  CollectionProperty,
   DateProperty,
   Model,
   PartitionKey,
   Property,
-  SortedSet,
   SortKey,
   Transient,
-  TypedArray,
-  TypedSet,
 } from '../../src/dynamo-easy'
 import { Employee } from './employee.model'
 
@@ -22,7 +20,7 @@ export class Birthday {
   @DateProperty()
   date: Date
 
-  @TypedArray(Gift)
+  @CollectionProperty({ itemType: Gift })
   presents: Gift[]
 
   constructor(date: Date, ...gifts: string[]) {
@@ -45,9 +43,6 @@ export class OrganizationEvent {
     this.participants = participants
   }
 }
-
-// TODO LOW maybe we can map the transient fields to be optional in Attributes
-// export type Transient<T> = T
 
 @Model({ tableName: 'Organization' })
 export class Organization {
@@ -82,14 +77,14 @@ export class Organization {
    * ARRAY
    */
 
-  // simple type (no metadata required)
+  // simple type -> L(ist) (no metadata required)
   domains: string[]
 
   // simple type, mixed (no metadata required)
   randomDetails: any[]
 
   // complex type (requires metadata)
-  @TypedArray(Employee)
+  @CollectionProperty({ itemType: Employee })
   employees: Employee[]
 
   /*
@@ -101,18 +96,18 @@ export class Organization {
   cities: Set<string>
 
   // set with complex type -> L(ist)
-  @TypedSet(Birthday)
+  @CollectionProperty({ itemType: Birthday })
   birthdays: Set<Birthday>
 
-  // set with simple type -> sorted -> L(ist)
-  @SortedSet()
+  // set with simple type but sorted -> L(ist)
+  @CollectionProperty({ sorted: true })
   awards: Set<string>
 
-  // set with complex type -> sorted -> L(ist)
-  @SortedSet(OrganizationEvent)
+  // set with complex type + sorted -> L(ist)
+  @CollectionProperty({ sorted: true, itemType: OrganizationEvent })
   events: Set<OrganizationEvent>
 
-  @TypedSet()
+  @CollectionProperty()
   emptySet: Set<string> = new Set()
 
   // tslint:disable-next-line:no-empty

@@ -1,6 +1,8 @@
 extends:
-- "tslint:latest"
-- "tslint-config-prettier"
+  - "tslint:latest"
+  - "tslint-config-prettier"
+rulesDirectory:
+  - ./tools/tslint
 rules:
   #
   # override rules from tslint:recommended
@@ -11,11 +13,15 @@ rules:
     true,
     {
       order: [
-        "static-field",
-        "instance-field",
-        "static-method",
+        "public-static-field",
+        "private-static-field",
+        "public-instance-field",
+        "private-instance-field",
+        "public-static-method",
+        "private-static-method",
         "constructor",
-        "instance-method"
+        "public-instance-method",
+        "private-instance-method",
       ]
     }
   ]
@@ -41,3 +47,14 @@ rules:
   no-unnecessary-class: true
   no-unnecessary-type-assertion: true
   no-unused-variable: true
+  import-blacklist:
+    - true
+    - aws-sdk
+  # introduced with v5.12.0
+  unnecessary-constructor: true
+  unnecessary-bind: true
+
+  #
+  # custom rules
+  #
+  no-dynamo-named-import: true

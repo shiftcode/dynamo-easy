@@ -1,3 +1,6 @@
+/**
+ * @module mapper
+ */
 import { MapperForType } from '../for-type/base.mapper'
 import { StringAttribute } from '../type/attribute.type'
 
@@ -22,7 +25,7 @@ function dateToDb(modelValue: Date): StringAttribute {
   }
 }
 
-export const DateToStringMapper: MapperForType<Date, StringAttribute> = {
+export const dateToStringMapper: MapperForType<Date, StringAttribute> = {
   fromDb: dateFromDb,
   toDb: dateToDb,
 }

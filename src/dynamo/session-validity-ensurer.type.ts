@@ -1,3 +1,7 @@
-import { Observable } from 'rxjs'
-
-export type SessionValidityEnsurer = () => Observable<void>
+/**
+ * @module dynamo-easy
+ */
+/**
+ * Type for the session validity ensurer
+ */
+export type SessionValidityEnsurer = () => Promise<void>

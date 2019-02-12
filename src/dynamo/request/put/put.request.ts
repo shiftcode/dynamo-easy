@@ -1,53 +1,51 @@
-import { PutItemOutput } from 'aws-sdk/clients/dynamodb'
-import { Observable } from 'rxjs'
-import { map, tap } from 'rxjs/operators'
+/**
+ * @module store-requests
+ */
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { createLogger, Logger } from '../../../logger/logger'
-import { toDb } from '../../../mapper'
-import { ModelConstructor } from '../../../model'
-import { DynamoRx } from '../../dynamo-rx'
-import { attribute } from '../../expression/logical-operator'
+import { toDb } from '../../../mapper/mapper'
+import { ModelConstructor } from '../../../model/model-constructor'
+import { Omit } from '../../../model/omit.type'
+import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { createIfNotExistsCondition } from '../../expression/create-if-not-exists-condition.function'
 import { WriteRequest } from '../write.request'
+import { PutResponse } from './put.response'
 
-export class PutRequest<T> extends WriteRequest<PutRequest<T>, T, any> {
-  private readonly logger: Logger
+type PutRequestReturnT<T> = Omit<Omit<PutRequest<T>, 'exec'>, 'execFullResponse'> & {
+  exec(): Promise<T>
+  execFullResponse(): Promise<PutResponse<T>>
+}
 
-  constructor(dynamoRx: DynamoRx, modelClazz: ModelConstructor<T>, tableName: string, item: T) {
-    super(dynamoRx, modelClazz, tableName)
+/**
+ * Request class for the PutItem operation.
+ */
+export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, DynamoDB.PutItemOutput, PutRequest<T>> {
+  protected readonly logger: Logger
+
+  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, item: T) {
+    super(dynamoDBWrapper, modelClazz)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
     this.params.Item = toDb(item, this.modelClazz)
   }
 
   /**
    * Adds a condition expression to the request, which makes sure the item will only be saved if the id does not exist
-   * @returns {PutRequest<T>}
    */
-  ifNotExists(predicate?: boolean): PutRequest<T> {
-    // FIXME should we check for sort key too?
-    const conditionDefFns = []
-    if (predicate === undefined || (predicate !== undefined && predicate === true)) {
-      conditionDefFns.push(attribute<T>(this.metadata.getPartitionKey()).attributeNotExists())
-
-      const sortKey = this.metadata.getSortKey()
-      if (sortKey !== null) {
-        conditionDefFns.push(attribute<T>(sortKey).attributeNotExists())
-      }
-
-      this.onlyIf(...conditionDefFns)
+  ifNotExists(predicate: boolean = true): PutRequest<T> {
+    if (predicate) {
+      this.onlyIf(...createIfNotExistsCondition(this.metadata))
     }
-
     return this
   }
 
-  execFullResponse(): Observable<PutItemOutput> {
-    this.logger.debug('request', this.params)
-    return this.dynamoRx.putItem(this.params).pipe(tap(response => this.logger.debug('response', response)))
+  returnValues(returnValues: 'ALL_OLD'): PutRequestReturnT<T>
+  returnValues(returnValues: 'NONE'): PutRequest<T>
+  returnValues(returnValues: 'ALL_OLD' | 'NONE'): PutRequest<T> | PutRequestReturnT<T> {
+    this.params.ReturnValues = returnValues
+    return this
   }
 
-  exec(): Observable<void> {
-    return this.execFullResponse().pipe(
-      map(response => {
-        return
-      }),
-    )
+  protected doRequest(params: DynamoDB.PutItemInput): Promise<DynamoDB.PutItemOutput> {
+    return this.dynamoDBWrapper.putItem(params)
   }
 }
