@@ -13,10 +13,36 @@
       "avatar_url": "https://avatars1.githubusercontent.com/u/8394182?v=4",
       "profile": "https://www.shiftcode.ch",
       "contributions": [
+        "ideas",
+        "code",
+        "test",
+        "doc"
+      ]
+    },
+    {
+      "login": "simonmumenthaler",
+      "name": "Simon Mumenthaler",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/37636934?v=4",
+      "profile": "https://github.com/simonmumenthaler",
+      "contributions": [
+        "ideas",
+        "code",
+        "test",
+        "doc",
+        "examples"
+      ]
+    },
+    {
+      "login": "michaellieberherrr",
+      "name": "Michael Lieberherr",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8321523?v=4",
+      "profile": "https://github.com/michaellieberherrr",
+      "contributions": [
         "code",
         "doc",
         "test"
       ]
     }
-  ]
+  ],
+  "repoType": "github"
 }
