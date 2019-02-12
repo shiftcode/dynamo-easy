@@ -39,6 +39,7 @@ personStore
 - 🤓 Learn more visiting the [docs](https://shiftcode.gitbook.io/dynamo-easy)
 - 📖 Checkout the technical API documentation [api docs](https://shiftcode.github.io/dynamo-easy/)
 - 🚀 Check the running sample on [Stackblitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
+  - [demo git repository](https://github.com/shiftcode/dynamo-easy-demo)
 
 ## Credits
 - [https://github.com/alexjoverm/typescript-library-starter](typescript-library-starter) - Starter project which helps creating a TypeScript library project
