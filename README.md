@@ -43,6 +43,8 @@ personStore
 - [typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) - Starter project which helps creating a TypeScript library project
 - [vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the fluent api
 - [typestore](http://densebrain.github.io/typestore/) - Inspiration on how to implement the model decorators
+- [BrowserStack](https://www.browserstack.com) - We use BrowserStack to verify everything works as expected
+![BrowserStack](https://github.com/shiftcode/dynamo-easy/browserstack-logo.png)
 
 ## Contributors
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
