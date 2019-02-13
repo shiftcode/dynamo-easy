@@ -18,6 +18,7 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { attribute } from '../../expression/logical-operator/attribute.function'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 
 describe('query request', () => {
   let querySpy: jasmine.Spy
@@ -60,9 +61,7 @@ describe('query request', () => {
     })
 
     it('defaults should be defined', () => {
-      expect(request.params.TableName).toBe('complex_model')
-      expect(request.params.Limit).toBe(QueryRequest.DEFAULT_LIMIT)
-      expect(Object.keys(request.params).length).toBe(2)
+      expect(request.params).toEqual(<DynamoDB.QueryInput>{ TableName: 'complex_model' })
     })
 
     it('Limit', () => {
