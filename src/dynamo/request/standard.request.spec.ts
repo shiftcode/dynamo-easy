@@ -18,8 +18,8 @@ describe('StandardRequest', () => {
     }
   }
 
-  it('adds table name to params', () => {
+  it('creates default params with table name', () => {
     const msr = new MyStandardRequest(Organization)
-    expect(msr.params.TableName).toEqual(getTableName(Organization))
+    expect(msr.params).toEqual({ TableName: getTableName(Organization) })
   })
 })

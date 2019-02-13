@@ -32,7 +32,8 @@ export abstract class ReadManyRequest<T,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T> | ScanResponse<T>,
   R extends QueryRequest<T> | ScanRequest<T>> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
-  static DEFAULT_LIMIT = 10
+
+  /** Infinite limit will remove the Limit param from request params when calling ReadManyRequest.limit(ReadManyRequest.INFINITE_LIMIT) */
   static INFINITE_LIMIT = -1
 
   protected secondaryIndex?: SecondaryIndex<T>
@@ -46,7 +47,6 @@ export abstract class ReadManyRequest<T,
 
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
     super(dynamoDBWrapper, modelClazz)
-    this.limit(ReadManyRequest.DEFAULT_LIMIT)
   }
 
   /**

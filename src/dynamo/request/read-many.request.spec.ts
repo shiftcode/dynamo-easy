@@ -35,9 +35,9 @@ describe('ReadManyRequest', () => {
     beforeEach(() => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
     })
-    it('should set the default limit to params', () => {
-      expect(request.params).toBeDefined()
-      expect(request.params.Limit).toBe(ReadManyRequest.DEFAULT_LIMIT)
+
+    it('should set the default params', () => {
+      expect(request.params).toEqual({ TableName: getTableName(SimpleWithPartitionKeyModel) })
     })
   })
 
@@ -172,7 +172,7 @@ describe('ReadManyRequest', () => {
 
     it('execSingle should not alter request params', async () => {
       await request.execSingle()
-      expect(request.params.Limit).toBe(ReadManyRequest.DEFAULT_LIMIT)
+      expect(request.params.Limit).toBeUndefined()
     })
 
     it('execSingle empty response', async () => {

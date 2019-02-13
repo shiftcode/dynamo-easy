@@ -28,10 +28,7 @@ describe('scan request', () => {
   })
 
   it('default params', () => {
-    const params: DynamoDB.ScanInput = request.params
-    expect(params.TableName).toBe('complex_model')
-    expect(params.Limit).toBe(ReadManyRequest.DEFAULT_LIMIT)
-    expect(Object.keys(params).length).toBe(2)
+    expect(request.params).toEqual(<DynamoDB.ScanInput>{ TableName: 'complex_model' })
   })
 
   it('execSingle', async () => {
