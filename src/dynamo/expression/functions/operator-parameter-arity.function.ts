@@ -26,6 +26,7 @@ export function operatorParameterArity(operator: ConditionOperator): number {
       case 'begins_with':
       case 'attribute_type':
       case 'contains':
+      case 'not_contains':
       case 'IN':
         return 1
       case 'BETWEEN':

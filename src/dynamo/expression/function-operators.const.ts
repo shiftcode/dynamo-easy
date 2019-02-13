@@ -12,6 +12,7 @@ export const FUNCTION_OPERATORS: FunctionOperator[] = [
   'attribute_type',
   'begins_with',
   'contains',
+  'not_contains',
   'IN',
   'BETWEEN',
 ]

@@ -17,7 +17,7 @@ export type OperatorAlias =
   | 'type'
   | 'beginsWith'
   | 'contains'
-  | 'not_contains'
+  | 'notContains'
   | 'in'
   | 'between'
   | 'attributeExists'
