@@ -5,7 +5,7 @@ const objectToPut: Person = {
   id: 'vogelsw',
   name: 'Werner Hans Peter Vogels',
   yearOfBirth: 1958,
-}
+} // object literal or new Person(...)
 
 new DynamoStore(Person)
   .put(objectToPut)

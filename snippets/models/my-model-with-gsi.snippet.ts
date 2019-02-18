@@ -1,10 +1,12 @@
 import { Model, GSIPartitionKey, GSISortKey } from '@shiftcoders/dynamo-easy'
 
+const MY_MODEL_GSI = 'NameOfGSI'
+
 @Model()
 class MyModel {
-  @GSIPartitionKey('NameOfGSI')
+  @GSIPartitionKey(MY_MODEL_GSI)
   myGsiPartitionKey: string
 
-  @GSISortKey('NameOfGSI')
+  @GSISortKey(MY_MODEL_GSI)
   myGsiSortKey: number
 }
