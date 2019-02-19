@@ -1,6 +1,7 @@
 // tslint:disable:max-classes-per-file
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
 import { updateDynamoEasyConfig } from '../config/update-config.function'
@@ -94,5 +95,14 @@ describe('dynamo store', () => {
   describe('allow to get dynamoDB instance', () => {
     const store = new DynamoStore(SimpleWithPartitionKeyModel)
     expect(store.dynamoDB).toBeDefined()
+  })
+
+  describe('use provided dynamoDB instance', () => {
+    const dynamoDB = new DynamoDB()
+    const store = new DynamoStore(SimpleWithPartitionKeyModel, dynamoDB)
+    expect(store.dynamoDB).toBe(dynamoDB)
+
+    const store2 = new DynamoStore(SimpleWithPartitionKeyModel)
+    expect(store2.dynamoDB).not.toBe(dynamoDB)
   })
 })

@@ -1,7 +1,7 @@
 // tslint:disable:no-empty
 // tslint:disable:no-unnecessary-callback-wrapper
 
-import { Config, Credentials } from 'aws-sdk/global'
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config/update-config.function'
 import { DynamoDbWrapper } from './dynamo-db-wrapper'
@@ -130,10 +130,12 @@ describe('dynamo rx', () => {
     expect(makeRequest.calls.mostRecent().args[0]).toEqual({ ok: true })
   })
 
-  it('should update the credentials', () => {
-    const dynamoDBWrapper = new DynamoDbWrapper()
-    const credentials = new Credentials({ secretAccessKey: '', sessionToken: '', accessKeyId: '' })
-    dynamoDBWrapper.updateAwsConfigCredentials(new Config({ credentials }))
-    expect(dynamoDBWrapper.dynamoDB.config.credentials).toBe(credentials)
+  it('should use given dynamoDB client', () => {
+    const dynamoDB = new DynamoDB()
+    const dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
+    expect(dynamoDBWrapper.dynamoDB).toBe(dynamoDB)
+
+    const dynamoDBWrapper2 = new DynamoDbWrapper()
+    expect(dynamoDBWrapper2.dynamoDB).not.toBe(dynamoDB)
   })
 })
