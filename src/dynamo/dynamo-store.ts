@@ -30,9 +30,9 @@ export class DynamoStore<T> {
   private readonly logger: Logger
   private readonly dynamoDBWrapper: DynamoDbWrapper
 
-  constructor(private modelClazz: ModelConstructor<T>) {
+  constructor(private modelClazz: ModelConstructor<T>, dynamoDB?: DynamoDB) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
-    this.dynamoDBWrapper = new DynamoDbWrapper()
+    this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.tableName = getTableName(modelClazz)
     this.logger.debug('instance created')
   }

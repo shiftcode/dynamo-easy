@@ -2,7 +2,6 @@
  * @module dynamo-easy
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { Config } from 'aws-sdk/global'
 import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 
 /**
@@ -13,13 +12,9 @@ import { dynamoEasyConfig } from '../config/dynamo-easy-config'
 export class DynamoDbWrapper {
   readonly dynamoDB: DynamoDB
 
-  constructor() {
+  constructor(dynamoDB?: DynamoDB) {
     // create the actual dynamoDB client
-    this.dynamoDB = new DynamoDB()
-  }
-
-  updateAwsConfigCredentials(newConfig: Config): void {
-    this.dynamoDB.config.update({ credentials: newConfig.credentials })
+    this.dynamoDB = dynamoDB || new DynamoDB()
   }
 
   /*
