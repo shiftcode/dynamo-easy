@@ -1,18 +1,28 @@
 {
   "name": "@shiftcoders/dynamo-easy",
-  "version": "2.0.0",
-  "description": "Use the power of typescript to define your object mapping when using dynamoDB. This library also provides a fluent api for easy interaction with dynamoDB.",
+  "version": "0.0.0",
+  "description": "DynamoDB client for NodeJS and browser with a fluent api to build requests. We take care of the type mapping between JS and DynamoDB, customizable trough typescript decorators.",
   "keywords": [
     "api",
     "aws",
     "dynamo",
+    "dynamo client",
     "dynamodb",
+    "dynamodb client",
+    "expression",
+    "expression builder",
+    "filter expression",
     "fluent-api",
+    "lambda",
     "mapper",
+    "objectmapper",
     "orm",
+    "serverless",
     "typescript",
-    "typescript-decorators"
+    "typescript-decorators",
+    "update expression"
   ],
+  "homepage": "https://shiftcode.gitbook.io/dynamo-easy/",
   "repository": {
     "type": "git",
     "url": "https://github.com/shiftcode/dynamo-easy"
