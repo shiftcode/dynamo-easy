@@ -14,7 +14,7 @@ import { FormId, formIdMapper } from './form-id.model'
 import { FormType } from './form-type.enum'
 import { OrderId, orderIdMapper } from './order-id.model'
 
-@Model()
+@Model({ tableName: 'BaseOrder' })
 export class BaseOrder {
   @PartitionKey()
   @Property({ mapper: orderIdMapper })
@@ -35,7 +35,7 @@ export class BaseOrder {
   isNew?: boolean
 }
 
-@Model()
+@Model({ tableName: 'Order' })
 export class Order extends BaseOrder {
   // should map to number enum
   types: FormType[]

@@ -20,7 +20,7 @@ import { operatorParameterArity } from './functions/operator-parameter-arity.fun
 import { ConditionOperator } from './type/condition-operator.type'
 import { dynamicTemplate } from './util'
 
-@Model()
+@Model({ tableName: 'MyModel' })
 class MyModel {
   @Property({ name: 'myId' })
   @PartitionKey()
@@ -227,7 +227,7 @@ describe('expressions', () => {
       })
 
       it('value in set with custom mapper', () => {
-        @Model()
+        @Model({ tableName: 'MyModelWithCustomMappedSet' })
         class MyModelWithCustomMappedSet {
           @CollectionProperty({ itemMapper: formIdMapper })
           formIds: Set<FormId>
@@ -262,7 +262,7 @@ describe('expressions', () => {
       })
 
       it('value in set with custom mapper', () => {
-        @Model()
+        @Model({ tableName: 'MyModelWithCustomMappedSet' })
         class MyModelWithCustomMappedSet {
           @CollectionProperty({ itemMapper: formIdMapper })
           formIds: Set<FormId>

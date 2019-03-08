@@ -2,7 +2,7 @@ import { Model } from '../impl/model/model.decorator'
 import { Property } from '../impl/property/property.decorator'
 import { metadataForModel } from './metadata-for-model.function'
 
-@Model()
+@Model({ tableName: 'ModelWithMetadata' })
 class ModelWithMetadata {
   @Property({ name: 'myProp' })
   prop: string

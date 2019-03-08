@@ -1,6 +1,6 @@
 import { DateProperty, Model } from '../../src/dynamo-easy'
 
-@Model()
+@Model({ tableName: 'NestedObject' })
 export class NestedObject {
   id: string
 

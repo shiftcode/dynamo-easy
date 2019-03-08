@@ -37,7 +37,7 @@ export const CustomIdMapper: MapperForType<CustomId, NumberAttribute> = {
   toDb: (propertyValue: CustomId) => ({ N: CustomId.unparse(propertyValue) }),
 }
 
-@Model()
+@Model({ tableName: 'ModelWithCustomMapperForSortKeyModel' })
 export class ModelWithCustomMapperForSortKeyModel {
   @PartitionKey()
   name: string

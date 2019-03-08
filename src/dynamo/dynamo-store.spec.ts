@@ -17,7 +17,7 @@ import { ScanRequest } from './request/scan/scan.request'
 import { TransactGetSingleTableRequest } from './request/transactgetsingletable/transact-get-single-table.request'
 import { UpdateRequest } from './request/update/update.request'
 
-@Model()
+@Model({ tableName: 'DynamoStoreModel' })
 class DynamoStoreModel {}
 
 @Model({ tableName: 'myTableName' })

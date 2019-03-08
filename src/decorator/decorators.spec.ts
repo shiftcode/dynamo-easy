@@ -5,7 +5,6 @@
 import { getMetaDataProperty } from '../../test/helper/get-meta-data-property.function'
 import {
   ComplexModel,
-  CustomTableNameModel,
   DifferentModel,
   IdMapper,
   INDEX_ACTIVE,
@@ -57,7 +56,7 @@ describe('Decorators should add correct metadata', () => {
       modelOptions = metadataForModel(SimpleModel).modelOptions
     })
 
-    it('with default table name', () => {
+    it('with default options', () => {
       expect(modelOptions).toBeDefined()
       expect(modelOptions.tableName).toBe('simple-models')
       expect(modelOptions.clazz).toBe(SimpleModel)
@@ -66,21 +65,6 @@ describe('Decorators should add correct metadata', () => {
 
     it('with no properties', () => {
       expect(modelOptions.properties).toBeUndefined()
-    })
-  })
-
-  describe('for custom table name', () => {
-    let modelOptions: ModelMetadata<CustomTableNameModel>
-
-    beforeEach(() => {
-      modelOptions = metadataForModel(CustomTableNameModel).modelOptions
-    })
-
-    it('with custom table name', () => {
-      expect(modelOptions).toBeDefined()
-      expect(modelOptions.tableName).toBe('myCustomName')
-      expect(modelOptions.clazz).toBe(CustomTableNameModel)
-      expect(modelOptions.clazzName).toBe('CustomTableNameModel')
     })
   })
 
@@ -347,19 +331,8 @@ describe('Decorators should add correct metadata', () => {
       expect(metaData.tableName).toBe('my-real-table-name')
     })
 
-    it('should not inherit the table name', () => {
-      @Model({ tableName: 'super-table-name' })
-      class A {}
-
-      @Model()
-      class B extends A {}
-
-      const metaData = metadataForModel(B).modelOptions
-      expect(metaData.tableName).toBe('bs')
-    })
-
-    it("should contain the super-class' and own properties", () => {
-      @Model()
+    it('should contain the super-class and own properties', () => {
+      @Model({ tableName: 'A' })
       class A {
         @PartitionKey()
         myPartitionKey: string
@@ -368,7 +341,7 @@ describe('Decorators should add correct metadata', () => {
         mySortKey: number
       }
 
-      @Model()
+      @Model({ tableName: 'B' })
       class B extends A {
         @CollectionProperty({ sorted: true })
         myOwnProp: string[]
@@ -386,7 +359,7 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it("should contain the super-class' and own indexes", () => {
-      @Model()
+      @Model({ tableName: 'A' })
       class A {
         @PartitionKey()
         myPartitionKey: string
@@ -401,7 +374,7 @@ describe('Decorators should add correct metadata', () => {
         myLsiSortKey: number
       }
 
-      @Model()
+      @Model({ tableName: 'B' })
       class B extends A {
         @GSIPartitionKey('my-other-gsi')
         myOtherGsiPartitionKey: string
@@ -426,13 +399,13 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it("should contain the super-class' and own transient properties", () => {
-      @Model()
+      @Model({ tableName: 'A' })
       class A {
         @Transient()
         myTransientProp: string
       }
 
-      @Model()
+      @Model({ tableName: 'B' })
       class B extends A {
         @Transient()
         myOtherTransientProp: number
@@ -446,19 +419,19 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it(`should not contains 'sibling' props `, () => {
-      @Model()
+      @Model({ tableName: 'A' })
       class A {
         @Property()
         aProp: string
       }
 
-      @Model()
+      @Model({ tableName: 'B' })
       class B extends A {
         @Property()
         bProp: string
       }
 
-      @Model()
+      @Model({ tableName: 'C' })
       class C extends A {
         @Property()
         cProp: string
@@ -486,13 +459,13 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it('should not alter super props', () => {
-      @Model()
+      @Model({ tableName: 'A' })
       class A {
         @Property()
         aProp: string
       }
 
-      @Model()
+      @Model({ tableName: 'B' })
       class B extends A {
         @Property({ name: 'bProp' })
         aProp: string
@@ -520,13 +493,13 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it('should have all parents props even if empty', () => {
-      @Model()
+      @Model({ tableName: 'A' })
       class A {
         @Property()
         aProp: string
       }
 
-      @Model()
+      @Model({ tableName: 'B' })
       class B extends A {}
 
       const bMeta = metadataForModel(B)
@@ -545,7 +518,7 @@ describe('Decorators should add correct metadata', () => {
 
   describe('should throw when more than one partitionKey was defined in a model', () => {
     expect(() => {
-      @Model()
+      @Model({ tableName: 'InvalidModel' })
       class InvalidModel {
         @PartitionKey()
         partKeyA: string

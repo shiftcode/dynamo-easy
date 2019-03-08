@@ -3,7 +3,7 @@ import { NestedModelWithDate } from './nested-model-with-date.model'
 import { NestedObject } from './nested-object.model'
 import { FormId, formIdMapper } from './real-world'
 
-@Model()
+@Model({ tableName: 'ModelWithCollections' })
 export class ModelWithCollections {
   // ================================================================
   // should be mapped to (L)ist of (M)aps since itemType is complex

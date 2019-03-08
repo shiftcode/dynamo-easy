@@ -8,7 +8,7 @@ import { and, or, update2 } from './logical-operator/public.api'
 import { addExpression, mergeUpdateExpressions } from './param-util'
 
 describe('ParamUtils', () => {
-  @Model()
+  @Model({ tableName: 'FooBar' })
   class FooBar {
     @PartitionKey()
     a: number

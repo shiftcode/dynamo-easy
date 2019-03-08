@@ -7,7 +7,7 @@ import { CollectionProperty } from './collection-property.decorator'
 
 describe('@CollectionProperty', () => {
   it('name', () => {
-    @Model()
+    @Model({ tableName: 'Test' })
     class Test {
       @CollectionProperty({ name: 'my_collection' })
       myCollection: Set<FormId>
@@ -20,7 +20,7 @@ describe('@CollectionProperty', () => {
   })
 
   it('sorted', () => {
-    @Model()
+    @Model({ tableName: 'Test' })
     class Test {
       @CollectionProperty({ sorted: true })
       myCollection: Set<FormId>
@@ -32,7 +32,7 @@ describe('@CollectionProperty', () => {
   })
 
   it('itemMapper', () => {
-    @Model()
+    @Model({ tableName: 'Test' })
     class Test {
       @CollectionProperty({ itemMapper: formIdMapper })
       myCollection: Set<FormId>
@@ -46,7 +46,7 @@ describe('@CollectionProperty', () => {
   })
 
   it('itemType', () => {
-    @Model()
+    @Model({ tableName: 'Test' })
     class Test {
       @CollectionProperty({ itemType: FormId })
       myCollection: FormId[]
@@ -60,7 +60,7 @@ describe('@CollectionProperty', () => {
 
   it('throws when not on an array or set', () => {
     expect(() => {
-      @Model()
+      @Model({ tableName: 'Test' })
       class Test {
         @CollectionProperty()
         myCollection: FormId
@@ -72,7 +72,7 @@ describe('@CollectionProperty', () => {
 
   it('throws when not both itemMapper and itemType are set', () => {
     expect(() => {
-      @Model()
+      @Model({ tableName: 'Test' })
       class Test {
         @CollectionProperty({
           itemMapper: formIdMapper,

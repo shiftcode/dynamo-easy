@@ -1,6 +1,6 @@
 import { DateProperty, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
-@Model()
+@Model({ tableName: 'SimpleWithCompositePartitionKeyModel' })
 export class SimpleWithCompositePartitionKeyModel {
   @PartitionKey()
   id: string

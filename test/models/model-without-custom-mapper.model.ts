@@ -1,7 +1,7 @@
 // tslint:disable:max-classes-per-file
 import { GSIPartitionKey, Model, PartitionKey } from '../../src/dynamo-easy'
 
-@Model()
+@Model({ tableName: 'ModelWithoutCustomMapper' })
 export class ModelWithoutCustomMapper {
   @PartitionKey()
   id: { key: string; value: string }
@@ -14,7 +14,7 @@ export class ModelWithoutCustomMapper {
   }
 }
 
-@Model()
+@Model({ tableName: 'ModelWithoutCustomMapperOnIndex' })
 export class ModelWithoutCustomMapperOnIndex {
   @PartitionKey()
   id: string

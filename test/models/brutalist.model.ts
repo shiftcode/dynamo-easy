@@ -2,7 +2,7 @@
 import { CollectionProperty, DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 import { FormId, formIdMapper } from './real-world'
 
-@Model()
+@Model({ tableName: 'BrutalistModelLevel4' })
 export class BrutalistModelLevel4 {
   @DateProperty({ name: 'level4_date' })
   level4Date: Date
@@ -19,7 +19,7 @@ export class BrutalistModelLevel4 {
   level4Set: Set<FormId>
 }
 
-@Model()
+@Model({ tableName: 'BrutalistModelLevel3' })
 export class BrutalistModelLevel3 {
   @CollectionProperty({
     itemType: BrutalistModelLevel4,
@@ -29,7 +29,7 @@ export class BrutalistModelLevel3 {
   level3Prop: Set<BrutalistModelLevel4>
 }
 
-@Model()
+@Model({ tableName: 'BrutalistModelLevel2' })
 export class BrutalistModelLevel2 {
   @CollectionProperty({
     itemType: BrutalistModelLevel3,
@@ -38,7 +38,7 @@ export class BrutalistModelLevel2 {
   level2Prop: BrutalistModelLevel3[]
 }
 
-@Model()
+@Model({ tableName: 'BrutalistModel' })
 export class BrutalistModel {
   @PartitionKey()
   @Property({ mapper: formIdMapper })

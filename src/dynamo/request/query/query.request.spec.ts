@@ -73,7 +73,7 @@ describe('query request', () => {
   describe('wherePartitionKey', () => {
     let request: QueryRequest<any>
 
-    @Model()
+    @Model({ tableName: 'ModelWithoutGsiPartitionKey' })
     class ModelWithoutGsiPartitionKey {
       @PartitionKey()
       id: string

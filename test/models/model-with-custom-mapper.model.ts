@@ -31,7 +31,7 @@ export const IdMapper: MapperForType<Id, StringAttribute> = {
   toDb: (propertyValue: Id) => ({ S: `${Id.unparse(propertyValue)}` }),
 }
 
-@Model()
+@Model({ tableName: 'ModelWithCustomMapperModel' })
 export class ModelWithCustomMapperModel {
   @Property({ mapper: IdMapper })
   @PartitionKey()

@@ -2,7 +2,7 @@
 import { CollectionProperty, Model, Property } from '../../src/dynamo-easy'
 import { NestedComplexModel } from './nested-complex.model'
 
-@Model()
+@Model({ tableName: 'ProductNested' })
 export class ProductNested {
   @CollectionProperty({ sorted: true })
   collection: Set<string>
@@ -17,7 +17,7 @@ export class ProductNested {
   }
 }
 
-@Model()
+@Model({ tableName: 'Product' })
 export class Product {
   @Property()
   nestedValue: NestedComplexModel

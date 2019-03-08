@@ -1,6 +1,6 @@
 import { Model, LSISortKey, PartitionKey, SortKey } from '@shiftcoders/dynamo-easy'
 
-@Model()
+@Model({tableName: 'my-models'})
 class MyModel {
   @PartitionKey()
   myPartitionKey: string

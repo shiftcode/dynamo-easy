@@ -2,7 +2,7 @@
 import { Model, Property } from '../../src/dynamo-easy'
 import { Id, IdMapper } from './model-with-custom-mapper.model'
 
-@Model()
+@Model({ tableName: 'NestedModelWithCustomMapper' })
 export class NestedModelWithCustomMapper {
   @Property({ mapper: IdMapper })
   id: Id
@@ -12,7 +12,7 @@ export class NestedModelWithCustomMapper {
   }
 }
 
-@Model()
+@Model({ tableName: 'ModelWithNestedModelWithCustomMapper' })
 export class ModelWithNestedModelWithCustomMapper {
   @Property()
   nestedModel: NestedModelWithCustomMapper

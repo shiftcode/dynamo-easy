@@ -1,7 +1,7 @@
 import { Model, PartitionKey, Property } from '../../src/dynamo-easy'
 import { StringType, Type } from './types.enum'
 
-@Model()
+@Model({ tableName: 'ModelWithEnum' })
 export class ModelWithEnum {
   @PartitionKey()
   id: string
@@ -13,7 +13,7 @@ export class ModelWithEnum {
   strType: StringType
 }
 
-@Model()
+@Model({ tableName: 'ModelWithNonDecoratedEnum' })
 export class ModelWithNonDecoratedEnum {
   @PartitionKey()
   id: string

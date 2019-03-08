@@ -15,7 +15,7 @@ Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 ```typescript
 import { Model, PartitionKey, DynamoStore } from '@shiftcoders/dynamo-easy'
 
-@Model()
+@Model({tableName: 'Person'})
 export class Person {
   @PartitionKey()
   id: string

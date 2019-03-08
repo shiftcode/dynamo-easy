@@ -1,6 +1,6 @@
 import { Model, PartitionKey } from '@shiftcoders/dynamo-easy'
 
-@Model()
+@Model({tableName: 'persons'})
 export class Person {
   @PartitionKey()
   id: string

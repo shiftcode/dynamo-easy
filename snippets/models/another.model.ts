@@ -1,6 +1,6 @@
 import { CollectionProperty, DateProperty, Model, PartitionKey, SortKey } from '@shiftcoders/dynamo-easy'
 
-@Model()
+@Model({tableName: 'another-models'})
 export class AnotherModel {
   @PartitionKey()
   propA: string

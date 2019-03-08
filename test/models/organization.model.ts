@@ -10,12 +10,12 @@ import {
 import { Employee } from './employee.model'
 
 // tslint:disable:max-classes-per-file
-@Model()
+@Model({ tableName: 'Gift' })
 export class Gift {
   description: string
 }
 
-@Model()
+@Model({ tableName: 'Birthday' })
 export class Birthday {
   @DateProperty()
   date: Date
@@ -31,7 +31,7 @@ export class Birthday {
   }
 }
 
-@Model()
+@Model({ tableName: 'OrganizationEvent' })
 export class OrganizationEvent {
   name: string
 

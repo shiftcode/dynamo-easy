@@ -13,7 +13,7 @@ import { ModelData } from './model-data.model'
 /**
  * decorator to define a model for dynamo easy
  */
-export function Model(opts: ModelData = {}): ClassDecorator {
+export function Model(opts: ModelData): ClassDecorator {
   // tslint:disable-next-line:ban-types
   return (constructor: Function) => {
     const type = constructor as any

@@ -10,7 +10,7 @@ class FailModelNestedFail {
   id: number
 }
 
-@Model()
+@Model({ tableName: 'FailModel' })
 export class FailModel {
   // array <-> (S)et
   @CollectionProperty({ itemMapper: <any>strangeMapper })

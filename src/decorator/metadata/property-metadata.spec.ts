@@ -7,7 +7,7 @@ import { Property } from '../impl/property/property.decorator'
 import { metadataForModel } from './metadata-for-model.function'
 import { alterCollectionPropertyMetadataForSingleItem } from './property-metadata.model'
 
-@Model()
+@Model({ tableName: 'NestedModel' })
 class NestedModel {
   info: string
 
@@ -15,7 +15,7 @@ class NestedModel {
   createdAt: Date
 }
 
-@Model()
+@Model({ tableName: 'TestModel' })
 class TestModel {
   @CollectionProperty()
   myStringArray: string[]

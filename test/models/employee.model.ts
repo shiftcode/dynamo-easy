@@ -1,6 +1,6 @@
 import { CollectionProperty, DateProperty, Model } from '../../src/dynamo-easy'
 
-@Model()
+@Model({ tableName: 'Employee' })
 export class Employee {
   name: string
 

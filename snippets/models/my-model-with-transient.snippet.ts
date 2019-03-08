@@ -1,6 +1,6 @@
 import { Model, Transient } from '@shiftcoders/dynamo-easy'
 
-@Model()
+@Model( {tableName: 'my-models'} )
 class MyModel {
   @Transient()
   myPropertyToIgnore: any

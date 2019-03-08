@@ -8,7 +8,7 @@ import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { Model } from '../model/model.decorator'
 import { DateProperty } from './date-property.decorator'
 
-@Model()
+@Model({ tableName: 'ModelWithDate' })
 class ModelWithDate {
   @DateProperty()
   aDate: Date

@@ -12,7 +12,7 @@ import {
 
 export const INDEX_ACTIVE = 'active-index'
 
-@Model()
+@Model({ tableName: 'ModelWithGSI' })
 export class ModelWithGSI {
   @PartitionKey()
   id: string
@@ -24,7 +24,7 @@ export class ModelWithGSI {
   active: boolean
 }
 
-@Model()
+@Model({ tableName: 'ModelWithLSI' })
 export class ModelWithLSI {
   @PartitionKey()
   id: string
@@ -39,7 +39,7 @@ export class ModelWithLSI {
 export const INDEX_COUNT = 'count-index'
 export const INDEX_ACTIVE_CREATED_AT = 'active-createdAt-index'
 
-@Model()
+@Model({ tableName: 'ModelWithABunchOfIndexes' })
 export class ModelWithABunchOfIndexes {
   @Property({ name: 'myId' })
   @PartitionKey()
@@ -57,7 +57,7 @@ export class ModelWithABunchOfIndexes {
   count: number
 }
 
-@Model()
+@Model({ tableName: 'DifferentModel' })
 export class DifferentModel {
   @PartitionKey()
   id: string
@@ -69,7 +69,7 @@ export class DifferentModel {
   active: boolean
 }
 
-@Model()
+@Model({ tableName: 'ModelWithWrongIndexes' })
 export class ModelWithWrongIndexes {
   @PartitionKey()
   id: string

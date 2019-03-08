@@ -1,7 +1,7 @@
 import { CollectionProperty, DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 
 // tslint:disable-next-line:max-classes-per-file
-@Model()
+@Model({ tableName: 'Address' })
 export class Address {
   street: string
   place: string
@@ -9,7 +9,7 @@ export class Address {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-@Model()
+@Model({ tableName: 'Info' })
 export class Info {
   details: string
 
@@ -18,7 +18,7 @@ export class Info {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-@Model()
+@Model({ tableName: 'UpdateModel' })
 export class UpdateModel {
   @PartitionKey()
   id: string

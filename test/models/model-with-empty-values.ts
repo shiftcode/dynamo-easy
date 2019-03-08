@@ -1,6 +1,6 @@
 import { Model, PartitionKey } from '../../src/dynamo-easy'
 
-@Model()
+@Model({ tableName: 'ModelWithEmptyValue' })
 export class ModelWithEmptyValues {
   @PartitionKey()
   id: string
