@@ -2,7 +2,6 @@
  * @module decorators
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { kebabCase } from 'lodash'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'
@@ -46,7 +45,6 @@ export function Model(opts: ModelData): ClassDecorator {
     const metaData: ModelMetadata<any> = {
       clazz: constructor,
       clazzName: type.name,
-      tableName: `${kebabCase(type.name)}s`,
       properties,
       transientProperties,
       indexes,
