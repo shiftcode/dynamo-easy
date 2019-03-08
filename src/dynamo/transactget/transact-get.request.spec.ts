@@ -18,6 +18,15 @@ describe('TransactGetRequest', () => {
       expect(req.params.TransactItems).toBeDefined()
       expect(req.params.TransactItems.length).toBe(0)
     })
+
+    it('use provided DynamoDB instance', () => {
+      const dynamoDB = new DynamoDB()
+      const transactGetRequest = new TransactGetRequest(dynamoDB)
+      expect(transactGetRequest.dynamoDB).toBe(dynamoDB)
+
+      const transactGetRequest2 = new TransactGetRequest()
+      expect(transactGetRequest2.dynamoDB).not.toBe(dynamoDB)
+    })
   })
 
   describe('returnConsumedCapacity', () => {
