@@ -51,7 +51,6 @@ export function Model(opts: ModelData): ClassDecorator {
       ...opts,
     }
 
-    // console.log(`Decorating: ${metaData.clazzName}`, metaData);
     Reflect.defineMetadata(KEY_MODEL, metaData, constructor)
   }
 }

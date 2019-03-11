@@ -8,6 +8,10 @@ import { PropertyMetadata } from './property-metadata.model'
  * Options provided to model decorator annotation
  */
 export interface ModelMetadata<T> {
+  /**
+   * clazzName using constructor.name, be aware of changes between development & production environments when using
+   * uglify tooling
+   */
   clazzName: string
   clazz: any
   tableName: string
