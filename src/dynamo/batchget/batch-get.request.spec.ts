@@ -10,6 +10,17 @@ import { BatchGetRequest } from './batch-get.request'
 describe('batch get', () => {
   let request: BatchGetRequest
 
+  describe('constructor', () => {
+    it('use provided DynamoDB instance', () => {
+      const dynamoDB = new DynamoDB()
+      const batchGetRequest = new BatchGetRequest(dynamoDB)
+      expect(batchGetRequest.dynamoDB).toBe(dynamoDB)
+
+      const batchGetRequest2 = new BatchGetRequest()
+      expect(batchGetRequest2.dynamoDB).not.toBe(dynamoDB)
+    })
+  })
+
   describe('params', () => {
     beforeEach(() => (request = new BatchGetRequest()))
 

@@ -1,4 +1,5 @@
 // tslint:disable:no-non-null-assertion
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { update } from '../expression/logical-operator/update.function'
@@ -21,6 +22,15 @@ describe('TransactWriteRequest', () => {
       expect(req.params).toEqual({
         TransactItems: [],
       })
+    })
+
+    it('use provided DynamoDB instance', () => {
+      const dynamoDB = new DynamoDB()
+      const transactWriteRequest = new TransactWriteRequest(dynamoDB)
+      expect(transactWriteRequest.dynamoDB).toBe(dynamoDB)
+
+      const transactWriteRequest2 = new TransactWriteRequest()
+      expect(transactWriteRequest2.dynamoDB).not.toBe(dynamoDB)
     })
   })
 
