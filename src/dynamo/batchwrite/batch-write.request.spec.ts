@@ -1,3 +1,4 @@
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { getTableName } from '../get-table-name.function'
 import { BatchWriteRequest } from './batch-write.request'
@@ -10,6 +11,15 @@ describe('batchWriteRequest', () => {
       req = new BatchWriteRequest()
       expect(req.params.RequestItems).toBeDefined()
       expect(req.params.RequestItems).toEqual({})
+    })
+
+    describe('use provided DynamoDB instance', () => {
+      const dynamoDB = new DynamoDB()
+      const batchWriteRequest = new BatchWriteRequest(dynamoDB)
+      expect(batchWriteRequest.dynamoDB).toBe(dynamoDB)
+
+      const batchWriteRequest2 = new BatchWriteRequest()
+      expect(batchWriteRequest2.dynamoDB).not.toBe(dynamoDB)
     })
   })
 

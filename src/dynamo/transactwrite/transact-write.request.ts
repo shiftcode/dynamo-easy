@@ -9,11 +9,15 @@ import { TransactOperation } from './transact-operation.type'
  * Request class for the TransactWriteItems operation. Write up to 10 items to one or many tables in a transaction.
  */
 export class TransactWriteRequest {
+  get dynamoDB(): DynamoDB {
+    return this.dynamoDBWrapper.dynamoDB
+  }
+
   readonly params: DynamoDB.TransactWriteItemsInput
   private readonly dynamoDBWrapper: DynamoDbWrapper
 
-  constructor() {
-    this.dynamoDBWrapper = new DynamoDbWrapper()
+  constructor(dynamoDB?: DynamoDB) {
+    this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       TransactItems: [],
     }
