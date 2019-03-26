@@ -53,7 +53,7 @@ describe('update request', () => {
       expect(req.params.ReturnValues).toEqual('UPDATED_OLD')
     })
 
-    it('should add operations', () => {
+    it('should add operation 1', () => {
       const now = new Date()
       const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
       request.operations(update<UpdateModel>('lastUpdated').set(now))
@@ -62,6 +62,16 @@ describe('update request', () => {
       expect(request.params.ExpressionAttributeNames).toEqual({ '#lastUpdated': 'lastUpdated' })
       expect(request.params.ExpressionAttributeValues).toEqual({
         ':lastUpdated': { S: now.toISOString() },
+      })
+    })
+    it('should add operation 2', () => {
+      const request = new UpdateRequest(<any>null, UpdateModel, 'myId')
+      request.operations(update('numberValues[1]').incrementBy(42))
+
+      expect(request.params.UpdateExpression).toBe('SET #numberValues[1] = #numberValues[1] + :numberValues_at_1')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#numberValues': 'numberValues' })
+      expect(request.params.ExpressionAttributeValues).toEqual({
+        ':numberValues_at_1': { N: '42' },
       })
     })
 
