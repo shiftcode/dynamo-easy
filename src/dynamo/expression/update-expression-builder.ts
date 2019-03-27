@@ -99,7 +99,9 @@ function buildDefaultExpression(
 
     // special case: [same as in buildDefaultConditionExpression]
     // we have the metadata for an Array/Set of an Object,
-    // but only get a single item when using `attribute('myCollectionProp[0]').set({})`
+    // but only get a single item when using list indexes in attributePath
+    // e.g. `attribute('myCollectionProp[0]').set(...)`
+    // (not exclusive to `.set(...)` but all updateActions)
     if (/\[\d+\]$/.test(attributePath)) {
       attribute = toDbOne(values[0], getPropertyPath(propertyMetadata, attributePath), alterCollectionPropertyMetadataForSingleItem(propertyMetadata))
     } else {
