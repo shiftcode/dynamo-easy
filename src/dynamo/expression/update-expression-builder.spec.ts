@@ -26,6 +26,16 @@ describe('buildUpdateExpression', () => {
       })
     })
 
+    it('should build expression for number at document path ', () => {
+      const exp = buildUpdateExpression('numberValues[0]', op, [23], [], metaDataU)
+      expect(exp).toEqual({
+        attributeNames: { '#numberValues': 'numberValues' },
+        attributeValues: { ':numberValues_at_0': { N: '23' } },
+        statement: '#numberValues[0] = #numberValues[0] + :numberValues_at_0',
+        type: 'SET',
+      })
+    })
+
     it('should throw when not number', () => {
       expect(() => buildUpdateExpression('age', op, ['notANumber'], [], metaDataS)).toThrow()
     })
@@ -39,6 +49,16 @@ describe('buildUpdateExpression', () => {
         attributeNames: { '#age': 'age' },
         attributeValues: { ':age': { N: '23' } },
         statement: '#age = #age - :age',
+        type: 'SET',
+      })
+    })
+
+    it('should build expression for number at document path ', () => {
+      const exp = buildUpdateExpression('numberValues[0]', op, [23], [], metaDataU)
+      expect(exp).toEqual({
+        attributeNames: { '#numberValues': 'numberValues' },
+        attributeValues: { ':numberValues_at_0': { N: '23' } },
+        statement: '#numberValues[0] = #numberValues[0] - :numberValues_at_0',
         type: 'SET',
       })
     })
