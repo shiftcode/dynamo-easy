@@ -30,7 +30,8 @@
   "license": "MIT",
   "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
   "files": [
-    "dist"
+    "dist",
+    "!dist/docs"
   ],
   "main": "./dist/dynamo-easy.js",
   "module": "./dist/_esm5/dynamo-easy.js",
