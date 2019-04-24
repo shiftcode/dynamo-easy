@@ -94,7 +94,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
               throw new Error(
                 `there is already a partition key defined for global secondary index ${indexName} (property name: ${
                   property.nameDb
-                })`,
+                  })`,
               )
             }
 
@@ -105,7 +105,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
               throw new Error(
                 `there is already a sort key defined for global secondary index ${indexName} (property name: ${
                   property.nameDb
-                })`,
+                  })`,
               )
             }
 
@@ -113,16 +113,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
             break
         }
 
-        if (map.has(indexName)) {
-          map.set(indexName, gsi)
-        } else {
-          if (map.size < 5) {
-            map.set(indexName, gsi)
-          } else {
-            // a maximum of 5 global secondary indexes can be defined per table
-            throw new Error('make sure to define no more than 5 global secondary indexes per model')
-          }
-        }
+        map.set(indexName, gsi)
       })
 
       return map
@@ -148,7 +139,7 @@ function getLocalSecondaryIndexes(
           throw new Error(
             `only one sort key can be defined for the same local secondary index, ${
               property.nameDb
-            } is already defined as sort key for index ${indexName}`,
+              } is already defined as sort key for index ${indexName}`,
           )
         }
 
