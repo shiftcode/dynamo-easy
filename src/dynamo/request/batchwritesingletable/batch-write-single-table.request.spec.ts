@@ -5,6 +5,7 @@ import { Organization } from '../../../../test/models'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
+import * as batchWriteUtils from '../../batchwrite/batch-write-utils'
 
 describe('batch write single table request', () => {
   const tableName = getTableName(Organization)
@@ -173,7 +174,12 @@ describe('batch write single table request', () => {
   })
 
   describe('exec / execFullResponse', () => {
+    let batchWriteItemsWriteAllSpy: jasmine.Spy
+
     beforeEach(() => {
+      batchWriteItemsWriteAllSpy = spyOn(batchWriteUtils, 'batchWriteItemsWriteAll').and.callFake(() =>
+        Promise.resolve({ myResponse: true }),
+      )
       dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
       request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
       request.delete([item])
@@ -184,9 +190,39 @@ describe('batch write single table request', () => {
       expect(response).toBeUndefined()
     })
 
+    it('exec should call batchWriteItemsWriteAll with the correct maxRetries', async () => {
+      const maxRetries = 3
+
+      await request.exec(undefined, undefined, maxRetries)
+
+      expect(batchWriteItemsWriteAllSpy).toHaveBeenCalledTimes(1)
+      expect(batchWriteItemsWriteAllSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+        expect.any(Object),
+        expect.any(Number),
+        3,
+      )
+    })
+
     it('execFullResponse should return BatchWriteItemOutput', async () => {
       const response = await request.execFullResponse()
       expect(response).toEqual({ myResponse: true })
+    })
+
+    it('execFullResponse should call batchWriteItemsWriteAll with the correct maxRetries', async () => {
+      const maxRetries = 4
+
+      await request.execFullResponse(undefined, undefined, maxRetries)
+
+      expect(batchWriteItemsWriteAllSpy).toHaveBeenCalledTimes(1)
+      expect(batchWriteItemsWriteAllSpy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+        expect.any(Object),
+        expect.any(Number),
+        4,
+      )
     })
   })
 })

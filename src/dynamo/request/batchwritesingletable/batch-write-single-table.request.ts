@@ -14,9 +14,11 @@ import { BaseRequest } from '../base.request'
 /**
  * Request class for BatchWriteItem operation which supports a single model class only.
  */
-export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
+export class BatchWriteSingleTableRequest<T> extends BaseRequest<
+  T,
   DynamoDB.BatchWriteItemInput,
-  BatchWriteSingleTableRequest<T>> {
+  BatchWriteSingleTableRequest<T>
+> {
   private readonly logger: Logger
   private toKey = createToKeyFn(this.modelClazz)
 
@@ -55,31 +57,45 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
    * execute the request
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
+   * @param maxRetries the maximum number of times to retry the unprocessed items
    */
   exec(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
+    maxRetries?: number,
   ): Promise<void> {
     this.logger.debug('starting batchWriteItem')
-    return this.write(backoffTimer, throttleTimeSlot).then(() => {return})
+    return this.write(backoffTimer, throttleTimeSlot, maxRetries).then(() => {
+      return
+    })
   }
 
   /**
    * execute the request and return the full response
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
+   * @param maxRetries the maximum number of times to retry the unprocessed items
    */
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
+    maxRetries?: number,
   ): Promise<DynamoDB.BatchWriteItemOutput> {
-    return this.write(backoffTimer, throttleTimeSlot)
+    return this.write(backoffTimer, throttleTimeSlot, maxRetries)
   }
 
-  private write(backoffTimer: () => IterableIterator<number>, throttleTimeSlot: number) {
-    return batchWriteItemsWriteAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
+  private write(backoffTimer: () => IterableIterator<number>, throttleTimeSlot: number, maxRetries?: number) {
+    return batchWriteItemsWriteAll(
+      this.dynamoDBWrapper,
+      { ...this.params },
+      backoffTimer(),
+      throttleTimeSlot,
+      maxRetries,
+    )
   }
 
-  private createDeleteRequest = (item: Partial<T>): DynamoDB.WriteRequest => ({ DeleteRequest: { Key: this.toKey(item) } })
+  private createDeleteRequest = (item: Partial<T>): DynamoDB.WriteRequest => ({
+    DeleteRequest: { Key: this.toKey(item) },
+  })
   private createPutRequest = (item: T): DynamoDB.WriteRequest => ({ PutRequest: { Item: toDb(item, this.modelClazz) } })
 }
