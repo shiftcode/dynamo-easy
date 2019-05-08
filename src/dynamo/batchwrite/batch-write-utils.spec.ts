@@ -4,38 +4,102 @@ import { batchWriteItemsWriteAll, hasUnprocessedItems } from './batch-write-util
 
 describe('batch-write-utils', () => {
   describe('batchWriteItemsWriteAll', () => {
-    let batchWriteItemSpy: jasmine.Spy
-    let dynamoDBWrapper: DynamoDbWrapper
-    let backoffTimerMock: { next: jasmine.Spy }
+    describe('indefinite retries', () => {
+      let batchWriteItemSpy: jasmine.Spy
+      let dynamoDBWrapper: DynamoDbWrapper
+      let backoffTimerMock: { next: jasmine.Spy }
 
-    const output1: DynamoDB.BatchWriteItemOutput = {
-      UnprocessedItems: {
-        tableA: [
-          {
-            PutRequest: { Item: { id: { S: 'id-A' } } },
-          },
-        ],
-      },
-    }
-    const output2: DynamoDB.BatchWriteItemOutput = {}
+      const unsuccessfulOutput: DynamoDB.BatchWriteItemOutput = {
+        UnprocessedItems: {
+          tableA: [
+            {
+              PutRequest: { Item: { id: { S: 'id-A' } } },
+            },
+          ],
+        },
+      }
+      const successfulOutput: DynamoDB.BatchWriteItemOutput = {
+        UnprocessedItems: {},
+      }
 
-    beforeEach(async () => {
-      batchWriteItemSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemSpy }
-      backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
+      beforeEach(async () => {
+        batchWriteItemSpy = jasmine
+          .createSpy()
+          .and.returnValues(
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(successfulOutput),
+          )
 
-      await batchWriteItemsWriteAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
+        dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemSpy }
+        backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
+
+        await batchWriteItemsWriteAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
+      })
+
+      it('should use UnprocessedKeys for next request', () => {
+        expect(batchWriteItemSpy).toHaveBeenCalledTimes(5)
+        expect(batchWriteItemSpy.calls.mostRecent().args[0]).toBeDefined()
+        expect(batchWriteItemSpy.calls.mostRecent().args[0].RequestItems).toBeDefined()
+        expect(batchWriteItemSpy.calls.mostRecent().args[0].RequestItems).toEqual(unsuccessfulOutput.UnprocessedItems)
+      })
+
+      it('should backoff when UnprocessedItems', () => {
+        expect(backoffTimerMock.next).toHaveBeenCalledTimes(4)
+      })
     })
 
-    it('should use UnprocessedKeys for next request', () => {
-      expect(batchWriteItemSpy).toHaveBeenCalledTimes(2)
-      expect(batchWriteItemSpy.calls.mostRecent().args[0]).toBeDefined()
-      expect(batchWriteItemSpy.calls.mostRecent().args[0].RequestItems).toBeDefined()
-      expect(batchWriteItemSpy.calls.mostRecent().args[0].RequestItems).toEqual(output1.UnprocessedItems)
-    })
+    describe('with maxRetries', () => {
+      let batchWriteItemSpy: jasmine.Spy
+      let dynamoDBWrapper: DynamoDbWrapper
+      let backoffTimerMock: { next: jasmine.Spy }
+      const maxRetries = 2
 
-    it('should backoff when UnprocessedItems', () => {
-      expect(backoffTimerMock.next).toHaveBeenCalledTimes(1)
+      const unsuccessfulOutput: DynamoDB.BatchWriteItemOutput = {
+        UnprocessedItems: {
+          tableA: [
+            {
+              PutRequest: { Item: { id: { S: 'id-A' } } },
+            },
+          ],
+        },
+      }
+
+      beforeEach(async () => {
+        batchWriteItemSpy = jasmine
+          .createSpy()
+          .and.returnValues(
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+            Promise.resolve(unsuccessfulOutput),
+          )
+        dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemSpy }
+        backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
+
+        await batchWriteItemsWriteAll(
+          dynamoDBWrapper,
+          <any>{},
+          <IterableIterator<number>>(<any>backoffTimerMock),
+          0,
+          maxRetries,
+        )
+      })
+
+      it('should use UnprocessedKeys for next request', () => {
+        expect(batchWriteItemSpy).toHaveBeenCalledTimes(3)
+        expect(batchWriteItemSpy.calls.mostRecent().args[0]).toBeDefined()
+        expect(batchWriteItemSpy.calls.mostRecent().args[0].RequestItems).toBeDefined()
+        expect(batchWriteItemSpy.calls.mostRecent().args[0].RequestItems).toEqual(unsuccessfulOutput.UnprocessedItems)
+      })
+
+      it('should backoff when UnprocessedItems', () => {
+        expect(backoffTimerMock.next).toHaveBeenCalledTimes(2)
+      })
     })
   })
 
