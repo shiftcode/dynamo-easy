@@ -1,19 +1,4 @@
 module.exports = {
-  testEnvironment: "node",
-  globals: {
-    "ts-jest": {
-      tsConfig: "./tsconfig.jest.json"
-    }
-  },
-  transform: {
-    ".(ts|tsx|js)": "ts-jest"
-  },
-  testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-  moduleFileExtensions: [
-    "ts",
-    "tsx",
-    "js"
-  ],
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/test/"
@@ -26,8 +11,26 @@ module.exports = {
       statements: 10
     }
   },
+  globals: {
+    "ts-jest": {
+      diagnostics: {
+        ignoreCodes: [151001]
+      },
+      tsConfig: "./tsconfig.jest.json"
+    }
+  },
+  moduleFileExtensions: [
+    "ts",
+    "tsx",
+    "js"
+  ],
   setupFiles: [
     "reflect-metadata",
     './test/jest-setup.ts'
-  ]
-};
+  ],
+  testEnvironment: "node",
+  testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+  transform: {
+    ".(ts|tsx|js)": "ts-jest"
+  }
+}
