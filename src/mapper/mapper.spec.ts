@@ -682,7 +682,7 @@ describe('Mapper', () => {
       describe('model with combined decorators', () => {
         const toDbValue: SimpleWithRenamedPartitionKeyModel = { id: 'idValue', age: 30 }
         const mapped = toDb(toDbValue, SimpleWithRenamedPartitionKeyModel)
-        expect(mapped).toEqual({ custom_id: { S: 'idValue' } })
+        expect(mapped).toEqual({ custom_id: { S: 'idValue' }, age: { N: '30' } })
       })
 
       describe('model with non string/number/binary keys', () => {
