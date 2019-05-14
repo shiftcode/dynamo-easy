@@ -33,7 +33,6 @@ import {
   StringType,
   Type,
 } from '../../test/models'
-import { ModelWithCombinedDecoratorsModel } from '../../test/models/model-with-combined-decorators.model'
 import { IdMapper } from '../../test/models/model-with-custom-mapper.model'
 import { ModelWithEmptyValues } from '../../test/models/model-with-empty-values'
 import {
