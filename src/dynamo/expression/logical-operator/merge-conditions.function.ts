@@ -57,7 +57,8 @@ export function mergeConditions(
       statements.push(condition.statement)
     })
 
-    mergedCondition.statement = `(${statements.join(' ' + operator + ' ')})`
+
+    mergedCondition.statement = statements.length === 1 ? statements[0] : `(${statements.join(' ' + operator + ' ')})`
     return mergedCondition
   }
 }

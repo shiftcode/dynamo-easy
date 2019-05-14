@@ -81,7 +81,7 @@ describe('write request', () => {
 
     it('[onlyIf] should set condition', () => {
       req.onlyIf(or(attribute('age').lt(10), attribute('age').gt(20)))
-      expect(req.params.ConditionExpression).toEqual('((#age < :age OR #age > :age_2))')
+      expect(req.params.ConditionExpression).toEqual('(#age < :age OR #age > :age_2)')
       expect(req.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
       expect(req.params.ExpressionAttributeValues).toEqual({
         ':age': { N: '10' },

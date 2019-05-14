@@ -46,7 +46,7 @@ describe('TransactPut', () => {
     expect(op.params).toEqual({
       TableName: getTableName(UpdateModel),
       Item: toDb(item, UpdateModel),
-      ConditionExpression: '(attribute_not_exists (#id))',
+      ConditionExpression: 'attribute_not_exists (#id)',
       ExpressionAttributeNames: { '#id': 'id' },
     })
   })
