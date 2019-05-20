@@ -354,7 +354,7 @@ describe('PrepareExpressions function', () => {
           ':name': { S: 'newName' },
           ':topics': { S: 'otherTopic' },
         })
-        expect(params.ConditionExpression).toBe('(NOT contains (#topics, :topics))')
+        expect(params.ConditionExpression).toBe('NOT contains (#topics, :topics)')
       })
 
       it('with name conflicting where clause', () => {
@@ -378,7 +378,7 @@ describe('PrepareExpressions function', () => {
           ':topics': { SS: ['myTopic'] },
           ':topics_2': { S: 'otherTopic' },
         })
-        expect(params.ConditionExpression).toBe('(NOT contains (#topics, :topics_2))')
+        expect(params.ConditionExpression).toBe('NOT contains (#topics, :topics_2)')
       })
     })
 
