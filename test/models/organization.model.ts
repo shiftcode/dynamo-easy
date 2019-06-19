@@ -110,6 +110,10 @@ export class Organization {
   @CollectionProperty()
   emptySet: Set<string> = new Set()
 
+  get getter(): string {
+    return `${this.id}:${this.name}`
+  }
+
   // tslint:disable-next-line:no-empty
   constructor() {}
 }

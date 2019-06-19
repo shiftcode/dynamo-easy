@@ -460,7 +460,7 @@ describe('Mapper', () => {
 
         describe('creates correct attribute map', () => {
           it('all properties are mapped', () => {
-            expect(Object.keys(organizationAttrMap).length).toBe(13)
+            expect(Object.keys(organizationAttrMap).length).toBe(14)
           })
 
           it('id', () => {
@@ -651,6 +651,10 @@ describe('Mapper', () => {
           it('emptySet', () => {
             expect(organizationAttrMap.emptySet).toBeUndefined()
             // expect(organizationAttrMap.emptySet).toEqual({ NULL: true })
+          })
+
+          it('getter', () => {
+            expect(organizationAttrMap.getter).toEqual({ S: 'myId:shiftcode GmbH' })
           })
         })
       })

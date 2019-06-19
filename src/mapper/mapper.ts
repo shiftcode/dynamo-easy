@@ -46,6 +46,8 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
     }
   }
 
+  item = getES6ClassProperties(item)
+
   const propertyNames = <Array<keyof T>>Object.getOwnPropertyNames(item) || []
   propertyNames.forEach(propertyKey => {
     /*
@@ -344,4 +346,20 @@ export function getPropertyValue(item: any, propertyKey: PropertyKey): any {
       `there is no property descriptor for item ${JSON.stringify(item)} and property key ${<string>propertyKey}`,
     )
   }
+}
+
+/**
+ * @hidden
+ */
+function getES6ClassProperties<T>(item: T) {
+  const jsonObj: any = Object.assign({}, item)
+  const proto = Object.getPrototypeOf(item)
+  for (const key of Object.getOwnPropertyNames(proto)) {
+    const desc = Object.getOwnPropertyDescriptor(proto, key)
+    const hasGetter = desc && typeof desc.get === 'function'
+    if (hasGetter) {
+      jsonObj[key] = (item as any)[key]
+    }
+  }
+  return jsonObj
 }
