@@ -352,7 +352,7 @@ export function getPropertyValue(item: any, propertyKey: PropertyKey): any {
  * @hidden
  */
 function getES6ClassProperties<T>(item: T) {
-  const jsonObj: any = Object.assign({}, item)
+  const jsonObj: any = {...(item as any)}
   const proto = Object.getPrototypeOf(item)
   for (const key of Object.getOwnPropertyNames(proto)) {
     const desc = Object.getOwnPropertyDescriptor(proto, key)
