@@ -17,9 +17,11 @@ import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 /**
  * Request class for BatchGetItem operation which supports a single model class only.
  */
-export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
+export class BatchGetSingleTableRequest<T> extends BaseRequest<
+  T,
   DynamoDB.BatchGetItemInput,
-  BatchGetSingleTableRequest<T>> {
+  BatchGetSingleTableRequest<T>
+> {
   private readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
@@ -97,7 +99,8 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<T,
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
-    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
-      .then(promiseTap(response => this.logger.debug('response', response)))
+    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot).then(
+      promiseTap(response => this.logger.debug('response', response)),
+    )
   }
 }

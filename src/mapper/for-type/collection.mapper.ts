@@ -99,7 +99,7 @@ function collectionToDb(
       } else {
         return {
           L: propertyValue
-          // tslint:disable-next-line:no-unnecessary-callback-wrapper
+            // tslint:disable-next-line:no-unnecessary-callback-wrapper
             .map(v => toDbOne(v))
             .filter(notNull),
         }
@@ -107,7 +107,6 @@ function collectionToDb(
     default:
       throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
   }
-
 }
 
 export const CollectionMapper: MapperForType<any[] | Set<any>, CollectionAttributeTypes> = {
@@ -115,8 +114,10 @@ export const CollectionMapper: MapperForType<any[] | Set<any>, CollectionAttribu
   toDb: collectionToDb,
 }
 
-
-function detectCollectionTypeFromMetadata(propertyMetadata: PropertyMetadata<any, CollectionAttributeTypes>, propertyValue: any): AttributeCollectionType {
+function detectCollectionTypeFromMetadata(
+  propertyMetadata: PropertyMetadata<any, CollectionAttributeTypes>,
+  propertyValue: any,
+): AttributeCollectionType {
   const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
 
   if (!(explicitType === Array || explicitType === Set)) {
@@ -154,8 +155,7 @@ function detectCollectionTypeFromMetadata(propertyMetadata: PropertyMetadata<any
      * S(et)
      */
     return 'SS'
-  }
-  else {
+  } else {
     const { homogeneous, type } = isHomogeneous(propertyValue)
     if (homogeneous) {
       switch (type) {
@@ -169,5 +169,4 @@ function detectCollectionTypeFromMetadata(propertyMetadata: PropertyMetadata<any
     }
     return 'L'
   }
-
 }

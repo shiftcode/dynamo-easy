@@ -8,4 +8,3 @@ export interface PutResponse<T> {
   ItemCollectionMetrics?: DynamoDB.ItemCollectionMetrics
   Item: T
 }
-

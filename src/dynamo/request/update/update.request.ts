@@ -26,8 +26,12 @@ type UpdateRequestReturnPartialT<T> = Omit<Omit<UpdateRequest<T>, 'exec'>, 'exec
 /**
  * Request class for the UpdateItem operation.
  */
-export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, DynamoDB.UpdateItemOutput, UpdateRequest<T>> {
-
+export class UpdateRequest<T> extends WriteRequest<
+  T,
+  DynamoDB.UpdateItemInput,
+  DynamoDB.UpdateItemOutput,
+  UpdateRequest<T>
+> {
   protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
@@ -56,7 +60,9 @@ export class UpdateRequest<T> extends WriteRequest<T, DynamoDB.UpdateItemInput, 
   returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW'): UpdateRequestReturnT<T>
   returnValues(returnValues: 'UPDATED_OLD' | 'UPDATED_NEW'): UpdateRequestReturnPartialT<T>
   returnValues(returnValues: 'NONE'): UpdateRequest<T>
-  returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE'): UpdateRequest<T> | UpdateRequestReturnT<T> | UpdateRequestReturnPartialT<T> {
+  returnValues(
+    returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE',
+  ): UpdateRequest<T> | UpdateRequestReturnT<T> | UpdateRequestReturnPartialT<T> {
     this.params.ReturnValues = returnValues
     return this
   }

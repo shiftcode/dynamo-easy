@@ -10,7 +10,7 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { WriteRequest } from '../write.request'
 import { DeleteResponse } from './delete.response'
 
-type DeleteRequestReturnT<T> = Omit<Omit<DeleteRequest<T>, 'exec'>,'execFullResponse'> & {
+type DeleteRequestReturnT<T> = Omit<Omit<DeleteRequest<T>, 'exec'>, 'execFullResponse'> & {
   exec(): Promise<T>
   execFullResponse(): Promise<DeleteResponse<T>>
 }
@@ -18,7 +18,12 @@ type DeleteRequestReturnT<T> = Omit<Omit<DeleteRequest<T>, 'exec'>,'execFullResp
 /**
  * Request class for the DeleteItem operation.
  */
-export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, DynamoDB.DeleteItemOutput, DeleteRequest<T>> {
+export class DeleteRequest<T> extends WriteRequest<
+  T,
+  DynamoDB.DeleteItemInput,
+  DynamoDB.DeleteItemOutput,
+  DeleteRequest<T>
+> {
   protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
@@ -26,7 +31,6 @@ export class DeleteRequest<T> extends WriteRequest<T, DynamoDB.DeleteItemInput, 
     this.logger = createLogger('dynamo.request.DeleteRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
-
 
   returnValues(returnValues: 'ALL_OLD'): DeleteRequestReturnT<T>
   returnValues(returnValues: 'NONE'): DeleteRequest<T>

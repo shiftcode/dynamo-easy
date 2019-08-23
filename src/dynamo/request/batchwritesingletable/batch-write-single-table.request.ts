@@ -14,9 +14,11 @@ import { BaseRequest } from '../base.request'
 /**
  * Request class for BatchWriteItem operation which supports a single model class only.
  */
-export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
+export class BatchWriteSingleTableRequest<T> extends BaseRequest<
+  T,
   DynamoDB.BatchWriteItemInput,
-  BatchWriteSingleTableRequest<T>> {
+  BatchWriteSingleTableRequest<T>
+> {
   private readonly logger: Logger
   private toKey = createToKeyFn(this.modelClazz)
 
@@ -56,12 +58,11 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
-  exec(
-    backoffTimer = randomExponentialBackoffTimer,
-    throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Promise<void> {
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Promise<void> {
     this.logger.debug('starting batchWriteItem')
-    return this.write(backoffTimer, throttleTimeSlot).then(() => {return})
+    return this.write(backoffTimer, throttleTimeSlot).then(() => {
+      return
+    })
   }
 
   /**
@@ -80,6 +81,8 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<T,
     return batchWriteItemsWriteAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
-  private createDeleteRequest = (item: Partial<T>): DynamoDB.WriteRequest => ({ DeleteRequest: { Key: this.toKey(item) } })
+  private createDeleteRequest = (item: Partial<T>): DynamoDB.WriteRequest => ({
+    DeleteRequest: { Key: this.toKey(item) },
+  })
   private createPutRequest = (item: T): DynamoDB.WriteRequest => ({ PutRequest: { Item: toDb(item, this.modelClazz) } })
 }

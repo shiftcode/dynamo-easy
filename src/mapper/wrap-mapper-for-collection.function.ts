@@ -20,18 +20,17 @@ import { isSet } from './util'
 export type SetAttributeOf<A extends StringAttribute | NumberAttribute | BinaryAttribute> = A extends StringAttribute
   ? StringSetAttribute
   : A extends NumberAttribute
-    ? NumberSetAttribute
-    : BinarySetAttribute
-
+  ? NumberSetAttribute
+  : BinarySetAttribute
 
 /**
  * @hidden
  */
-export function arrayToListAttribute<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>) {
+export function arrayToListAttribute<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+) {
   return (values: T[]): ListAttribute<A> | null => {
-    const mapped = values
-      .map(v => customMapper.toDb(v))
-      .filter(notNull)
+    const mapped = values.map(v => customMapper.toDb(v)).filter(notNull)
     return <ListAttribute<A>>{ L: mapped }
   }
 }
@@ -39,14 +38,18 @@ export function arrayToListAttribute<T, A extends StringAttribute | NumberAttrib
 /**
  * @hidden
  */
-export function listAttributeToArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>) {
+export function listAttributeToArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+) {
   return (attributeValues: ListAttribute<A>): T[] => attributeValues.L.map(i => customMapper.fromDb(i))
 }
 
 /**
  * @hidden
  */
-export function setAttributeToArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>) {
+export function setAttributeToArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+) {
   return (attributeValues: SetAttributeOf<A>): T[] => {
     switch (Object.keys(attributeValues)[0]) {
       case 'SS':
@@ -64,11 +67,11 @@ export function setAttributeToArray<T, A extends StringAttribute | NumberAttribu
 /**
  * @hidden
  */
-export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>) {
+export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+) {
   return (values: T[]): SetAttributeOf<A> | null => {
-    const mapped = values
-      .map(v => customMapper.toDb(v))
-      .filter(notNull)
+    const mapped = values.map(v => customMapper.toDb(v)).filter(notNull)
     if (mapped.length === 0) {
       return null
     }
@@ -84,7 +87,6 @@ export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribu
     }
   }
 }
-
 
 /**
  * returns a function which takes a Set which will be spread when applied to the given function
@@ -110,7 +112,9 @@ function applyFnWrapWithSet<A, R>(fn: (arg: A) => R[]) {
 /**
  * @hidden
  */
-export function wrapMapperForDynamoSetJsArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>): MapperForType<T[], SetAttributeOf<A>> {
+export function wrapMapperForDynamoSetJsArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+): MapperForType<T[], SetAttributeOf<A>> {
   return {
     fromDb: setAttributeToArray(customMapper),
     toDb: arrayToSetAttribute(customMapper),
@@ -119,7 +123,9 @@ export function wrapMapperForDynamoSetJsArray<T, A extends StringAttribute | Num
 /**
  * @hidden
  */
-export function wrapMapperForDynamoSetJsSet<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>): MapperForType<Set<T>, SetAttributeOf<A>> {
+export function wrapMapperForDynamoSetJsSet<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+): MapperForType<Set<T>, SetAttributeOf<A>> {
   return {
     fromDb: applyFnWrapWithSet(setAttributeToArray(customMapper)),
     toDb: spreadSetAndApplyToFn(arrayToSetAttribute(customMapper)),
@@ -129,7 +135,9 @@ export function wrapMapperForDynamoSetJsSet<T, A extends StringAttribute | Numbe
 /**
  * @hidden
  */
-export function wrapMapperForDynamoListJsArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>): MapperForType<T[], ListAttribute<A>> {
+export function wrapMapperForDynamoListJsArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+): MapperForType<T[], ListAttribute<A>> {
   return {
     fromDb: listAttributeToArray(customMapper),
     toDb: arrayToListAttribute(customMapper),
@@ -139,10 +147,11 @@ export function wrapMapperForDynamoListJsArray<T, A extends StringAttribute | Nu
 /**
  * @hidden
  */
-export function wrapMapperForDynamoListJsSet<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(customMapper: MapperForType<T, A>): MapperForType<Set<T>, ListAttribute<A>> {
+export function wrapMapperForDynamoListJsSet<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  customMapper: MapperForType<T, A>,
+): MapperForType<Set<T>, ListAttribute<A>> {
   return {
     fromDb: applyFnWrapWithSet(listAttributeToArray(customMapper)),
     toDb: spreadSetAndApplyToFn(arrayToListAttribute(customMapper)),
   }
 }
-

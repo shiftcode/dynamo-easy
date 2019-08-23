@@ -8,4 +8,3 @@ export interface DeleteResponse<T> {
   ItemCollectionMetrics?: DynamoDB.ItemCollectionMetrics
   Item: T
 }
-

@@ -27,12 +27,13 @@ import { StandardRequest } from './standard.request'
 /**
  * abstract class for query and scan request classes.
  */
-export abstract class ReadManyRequest<T,
+export abstract class ReadManyRequest<
+  T,
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T> | ScanResponse<T>,
-  R extends QueryRequest<T> | ScanRequest<T>> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
-
+  R extends QueryRequest<T> | ScanRequest<T>
+> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
   /** Infinite limit will remove the Limit param from request params when calling ReadManyRequest.limit(ReadManyRequest.INFINITE_LIMIT) */
   static INFINITE_LIMIT = -1
 
@@ -103,7 +104,9 @@ export abstract class ReadManyRequest<T,
    */
   whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
   whereAttribute(attributePath: string): RequestConditionFunction<R, T>
-  whereAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
+  whereAttribute<K extends keyof T>(
+    attributePath: string | K,
+  ): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
     return addCondition<R, T, any>('FilterExpression', attributePath, <any>this, this.metadata)
   }
 
@@ -123,8 +126,7 @@ export abstract class ReadManyRequest<T,
    */
   execNoMap() {
     this.logger.debug('request (noMap)', this.params)
-    return this.doRequest(this.params)
-      .then(promiseTap(response => this.logger.debug('response', response)))
+    return this.doRequest(this.params).then(promiseTap(response => this.logger.debug('response', response)))
   }
 
   /**
@@ -144,7 +146,6 @@ export abstract class ReadManyRequest<T,
       .then(this.mapFromDb)
       .then(r => (r.Items && r.Items.length ? r.Items[0] : null))
       .then(promiseTap(item => this.logger.debug('mapped item', item)))
-
   }
 
   /**

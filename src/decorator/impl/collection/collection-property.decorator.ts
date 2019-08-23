@@ -15,25 +15,29 @@ import { getMetadataType } from '../../util'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { CollectionPropertyData } from './collection-property-data.model'
 
-
-export function CollectionProperty<R, T extends StringAttribute | NumberAttribute | BinaryAttribute>(opts: CollectionPropertyData<R, T> = {}): PropertyDecorator {
+export function CollectionProperty<R, T extends StringAttribute | NumberAttribute | BinaryAttribute>(
+  opts: CollectionPropertyData<R, T> = {},
+): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-
       const type: ModelConstructor<any> = getMetadataType(target, propertyKey)
 
-      if(type === undefined){
-        throw new Error('make sure you have enabled the typescript compiler options which enable us to work with decorators (see doc)')
+      if (type === undefined) {
+        throw new Error(
+          'make sure you have enabled the typescript compiler options which enable us to work with decorators (see doc)',
+        )
       }
 
       if (type !== Set && type !== Array) {
-        throw new Error(`[${target.constructor.name}::${propertyKey}] The CollectionProperty decorator is meant for properties of type Set or Array`)
+        throw new Error(
+          `[${target.constructor.name}::${propertyKey}] The CollectionProperty decorator is meant for properties of type Set or Array`,
+        )
       }
 
       const meta: Partial<PropertyMetadata<any>> & { typeInfo: TypeInfo } = {
         name: propertyKey,
-        nameDb: opts && opts.name || propertyKey,
-        typeInfo: {type},
+        nameDb: (opts && opts.name) || propertyKey,
+        typeInfo: { type },
         isSortedCollection: !!opts.sorted,
       }
 
@@ -51,11 +55,12 @@ export function CollectionProperty<R, T extends StringAttribute | NumberAttribut
       if (hasItemMapper) {
         const itemMapper = <MapperForType<any, any>>opts.itemMapper
 
-        const wrappedMapper: MapperForType<any, any> = type === Array
-          ? !!opts.sorted
-            ? wrapMapperForDynamoListJsArray(itemMapper)
-            : wrapMapperForDynamoSetJsArray(itemMapper)
-          : !!opts.sorted
+        const wrappedMapper: MapperForType<any, any> =
+          type === Array
+            ? !!opts.sorted
+              ? wrapMapperForDynamoListJsArray(itemMapper)
+              : wrapMapperForDynamoSetJsArray(itemMapper)
+            : !!opts.sorted
             ? wrapMapperForDynamoListJsSet(itemMapper)
             : wrapMapperForDynamoSetJsSet(itemMapper)
 

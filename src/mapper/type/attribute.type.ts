@@ -79,7 +79,6 @@ export interface ListAttribute<T extends Attribute = Attribute> {
   L: T[]
 }
 
-
 /**
  * An attribute of type Null. For example:  "NULL": true
  */

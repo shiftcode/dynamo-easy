@@ -20,24 +20,24 @@ export function batchGetItemsFetchAll(
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
 ): Promise<DynamoDB.BatchGetItemOutput> {
-  return dynamoDBWrapper.batchGetItems(params)
-    .then(response => {
-        if (hasUnprocessedKeys(response)) {
-          // in case of unprocessedKeys do a follow-up requests
-          return Promise.resolve(response.UnprocessedKeys)
+  return dynamoDBWrapper.batchGetItems(params).then(response => {
+    if (hasUnprocessedKeys(response)) {
+      // in case of unprocessedKeys do a follow-up requests
+      return (
+        Promise.resolve(response.UnprocessedKeys)
           // delay before doing the follow-up request
-            .then(promiseDelay(backoffTimer.next().value * throttleTimeSlot))
-            .then(UnprocessedKeys => {
-              const nextParams = { ...params, RequestItems: UnprocessedKeys }
-              // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
-              return batchGetItemsFetchAll(dynamoDBWrapper, nextParams, backoffTimer, throttleTimeSlot)
-            })
-            .then(combineBatchGetResponses(response))
-        }
-        // no follow-up request necessary, return result
-        return response
-      },
-    )
+          .then(promiseDelay(backoffTimer.next().value * throttleTimeSlot))
+          .then(UnprocessedKeys => {
+            const nextParams = { ...params, RequestItems: UnprocessedKeys }
+            // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
+            return batchGetItemsFetchAll(dynamoDBWrapper, nextParams, backoffTimer, throttleTimeSlot)
+          })
+          .then(combineBatchGetResponses(response))
+      )
+    }
+    // no follow-up request necessary, return result
+    return response
+  })
 }
 
 /**
