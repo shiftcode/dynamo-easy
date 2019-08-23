@@ -43,7 +43,7 @@ describe('TransactBaseOperation', () => {
       op.onlyIf(attribute('age').gt(20))
       expect(op.params).toEqual({
         TableName: 'simple-with-partition-key-models',
-        ConditionExpression: '(#age > :age)',
+        ConditionExpression: '#age > :age',
         ExpressionAttributeNames: { '#age': 'age' },
         ExpressionAttributeValues: { ':age': { N: '20' } },
       })

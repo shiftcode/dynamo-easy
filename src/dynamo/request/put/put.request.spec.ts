@@ -23,7 +23,7 @@ describe('put request', () => {
       request.ifNotExists()
 
       const params: DynamoDB.PutItemInput = request.params
-      expect(params.ConditionExpression).toBe('(attribute_not_exists (#id))')
+      expect(params.ConditionExpression).toBe('attribute_not_exists (#id)')
       expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
       expect(params.ExpressionAttributeValues).toBeUndefined()
     })

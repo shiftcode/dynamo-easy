@@ -39,7 +39,7 @@ describe('ParamUtils', () => {
       ':c': { N: '3' },
       ':c_2': { N: '5' },
     })
-    expect(params.ConditionExpression).toBe('((#a = :a AND (#b = :b OR #c BETWEEN :c AND :c_2)))')
+    expect(params.ConditionExpression).toBe('(#a = :a AND (#b = :b OR #c BETWEEN :c AND :c_2))')
   })
 
   it('should build correct UpdateExpression', () => {

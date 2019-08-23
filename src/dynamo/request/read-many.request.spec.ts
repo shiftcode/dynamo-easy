@@ -119,14 +119,14 @@ describe('ReadManyRequest', () => {
       expect(request.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
       expect(request.params.ExpressionAttributeValues).toEqual({ ':age': { N: '20' } })
     })
+
     it('where', () => {
-      request.where(or(attribute('age').lt(10), attribute('age').gt(20)))
-      expect(request.params.FilterExpression).toEqual('((#age < :age OR #age > :age_2))')
-      expect(request.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
-      expect(request.params.ExpressionAttributeValues).toEqual({
-        ':age': { N: '10' },
-        ':age_2': { N: '20' },
-      })
+      const conditions = or(attribute('age').lt(10), attribute('age').gt(20))
+      const expression = conditions(undefined, undefined)
+      request.where(conditions)
+      expect(request.params.FilterExpression).toEqual(expression.statement)
+      expect(request.params.ExpressionAttributeNames).toEqual(expression.attributeNames)
+      expect(request.params.ExpressionAttributeValues).toEqual(expression.attributeValues)
     })
   })
 

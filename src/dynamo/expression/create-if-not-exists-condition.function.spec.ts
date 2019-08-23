@@ -35,7 +35,7 @@ describe('create ifNotExistsCondition', () => {
     const condition = and(...res)(undefined, metaSimple)
     addExpression('ConditionExpression', condition, paramsSimple)
 
-    expect(paramsSimple.ConditionExpression).toBe('(attribute_not_exists (#id))')
+    expect(paramsSimple.ConditionExpression).toBe('attribute_not_exists (#id)')
     expect(paramsSimple.ExpressionAttributeNames).toEqual({ '#id': 'id' })
     expect(paramsSimple.ExpressionAttributeValues).toBeUndefined()
   })

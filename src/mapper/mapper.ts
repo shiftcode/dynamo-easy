@@ -167,7 +167,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
           throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
         }
         const propertyValue = getPropertyValue(item, propMeta.name)
-        key[propMeta.name] = <Attribute>toDbOne(propertyValue, propMeta)
+        key[propMeta.nameDb] = <Attribute>toDbOne(propertyValue, propMeta)
         return key
       },
       <Attributes<T>>{},
@@ -192,8 +192,14 @@ export function createKeyAttributes<T>(
 ): Attributes<Partial<T>> {
   const partitionKeyProp = metadata.getPartitionKey()
 
+  const partitionKeyMetadata = metadata.forProperty(partitionKeyProp)
+
+  if (!partitionKeyMetadata) {
+    throw new Error('metadata for partition key must be defined')
+  }
+
   const keyAttributeMap = <Attributes<T>>{
-    [partitionKeyProp]: toDbOne(partitionKey, metadata.forProperty(partitionKeyProp)),
+    [partitionKeyMetadata.nameDb]: toDbOne(partitionKey, partitionKeyMetadata),
   }
 
   if (hasSortKey(metadata)) {
@@ -201,7 +207,12 @@ export function createKeyAttributes<T>(
       throw new Error(`please provide the sort key for attribute ${metadata.getSortKey()}`)
     }
     const sortKeyProp = metadata.getSortKey()
-    keyAttributeMap[sortKeyProp] = <Attribute>toDbOne(sortKey, metadata.forProperty(sortKeyProp))
+    const sortKeyMetadata = metadata.forProperty(sortKeyProp)
+    if (!sortKeyMetadata) {
+      throw new Error('metadata for sort key must be defined')
+    }
+
+    keyAttributeMap[sortKeyMetadata.nameDb] = <Attribute>toDbOne(sortKey,sortKeyMetadata)
   }
 
   return keyAttributeMap
