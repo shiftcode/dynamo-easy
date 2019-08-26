@@ -41,7 +41,7 @@
     "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
     "check-snippets": "npx tsc --outDir ./dist-snippets --project ./snippets/tsconfig.json && rimraf dist-snippets",
     "commity": "commit",
-    "docs:build": "rimraf ./dist/docs && typedoc --out dist/docs --readme ./doc-intro.md --target es6 --hideGenerator --theme minimal --excludePrivate --stripInternal",
+    "docs:build": "rimraf ./dist/docs && typedoc --out dist/docs --readme ./doc-intro.md --target es6 --hideGenerator --theme minimal --excludePrivate --stripInternal --ignoreCompilerErrors",
     "docs:deploy": "ts-node tools/gh-pages-publish",
     "lint": "tslint --project tsconfig.json -t codeFrame --fix",
     "lint:ci": "tslint --project tsconfig.json -t codeFrame",
