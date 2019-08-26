@@ -13,8 +13,10 @@ import { getTableName } from '../get-table-name.function'
  * which means they have only one table they work with
  * (even if the actual operation would allow to use multiple tables. e.g. BatchWriteSingleTable)
  */
-export abstract class BaseRequest<T,
-  I extends | DynamoDB.DeleteItemInput
+export abstract class BaseRequest<
+  T,
+  I extends
+    | DynamoDB.DeleteItemInput
     | DynamoDB.GetItemInput
     | DynamoDB.PutItemInput
     | DynamoDB.UpdateItemInput
@@ -24,8 +26,8 @@ export abstract class BaseRequest<T,
     | DynamoDB.BatchWriteItemInput
     | DynamoDB.TransactGetItemsInput
     | DynamoDB.TransactWriteItemsInput,
-  R extends BaseRequest<T, I, any>> {
-
+  R extends BaseRequest<T, I, any>
+> {
   readonly dynamoDBWrapper: DynamoDbWrapper
 
   /**
@@ -47,7 +49,6 @@ export abstract class BaseRequest<T,
    * request input object
    */
   readonly params: I
-
 
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
     this.dynamoDBWrapper = dynamoDBWrapper

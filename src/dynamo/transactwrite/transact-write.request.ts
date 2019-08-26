@@ -59,7 +59,8 @@ export class TransactWriteRequest {
    * execute the request.
    */
   exec(): Promise<void> {
-    return this.dynamoDBWrapper.transactWriteItems(this.params)
-      .then(response => { return })
+    return this.dynamoDBWrapper.transactWriteItems(this.params).then(response => {
+      return
+    })
   }
 }

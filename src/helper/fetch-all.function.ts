@@ -16,13 +16,11 @@ export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?
   if (startKey) {
     request.exclusiveStartKey(startKey)
   }
-  return request.execFullResponse()
-    .then(response => {
-      if (response.LastEvaluatedKey) {
-        return fetchAll(request, response.LastEvaluatedKey)
-          .then(innerResponse => [...response.Items, ...innerResponse])
-      } else {
-        return response.Items
-      }
-    })
+  return request.execFullResponse().then(response => {
+    if (response.LastEvaluatedKey) {
+      return fetchAll(request, response.LastEvaluatedKey).then(innerResponse => [...response.Items, ...innerResponse])
+    } else {
+      return response.Items
+    }
+  })
 }

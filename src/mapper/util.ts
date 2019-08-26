@@ -14,7 +14,10 @@ import { UndefinedType } from './type/undefined.type'
 /**
  * @hidden
  */
-export function getPropertyPath<T>(modelConstructorOrPropertyMetadata: ModelConstructor<T> | PropertyMetadata<T> | undefined, propertyKey: keyof T): string {
+export function getPropertyPath<T>(
+  modelConstructorOrPropertyMetadata: ModelConstructor<T> | PropertyMetadata<T> | undefined,
+  propertyKey: keyof T,
+): string {
   if (modelConstructorOrPropertyMetadata && modelConstructorOrPropertyMetadata.name) {
     return `[${modelConstructorOrPropertyMetadata.name}::${propertyKey}]`
   } else {
@@ -25,11 +28,11 @@ export function getPropertyPath<T>(modelConstructorOrPropertyMetadata: ModelCons
 /**
  * @hidden
  */
-export function messageWithPath(propertyPath: string | null | undefined, message: string): string{
-  if(!!propertyPath){
+export function messageWithPath(propertyPath: string | null | undefined, message: string): string {
+  if (!!propertyPath) {
     return `${propertyPath} ${message}`
-  }else{
-  return `${message}`
+  } else {
+    return `${message}`
   }
 }
 
@@ -78,7 +81,9 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
           case 'B':
             return 'BS'
           default:
-            throw new Error(`"Set<CustomType>" without decorator is not supported. Add the @CollectionProperty() decorator (optionally with {itemType:CustomType}) for a Set<->[L]ist mapping)`)
+            throw new Error(
+              `"Set<CustomType>" without decorator is not supported. Add the @CollectionProperty() decorator (optionally with {itemType:CustomType}) for a Set<->[L]ist mapping)`,
+            )
         }
       } else {
         // sets can not contain items with different types (heterogeneous)
@@ -99,7 +104,7 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
 /**
  * @hidden
  */
-export function isHomogeneous(collection: Set<any> | any[]): { homogeneous: boolean, type?: AttributeType | null } {
+export function isHomogeneous(collection: Set<any> | any[]): { homogeneous: boolean; type?: AttributeType | null } {
   const collectionAsArray = isSet(collection) ? Array.from(collection) : collection
   const firstValueType: AttributeType | null = collectionAsArray.length ? detectType(collectionAsArray[0]) : null
 
@@ -262,7 +267,7 @@ export function isType(obj: any, type: any): boolean {
 /**
  * @hidden
  */
- // tslint:disable-next-line:function-constructor
+// tslint:disable-next-line:function-constructor
 const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
 
 /**

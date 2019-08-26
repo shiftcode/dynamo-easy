@@ -98,8 +98,7 @@ export class BatchGetRequest {
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
   ): Promise<BatchGetFullResponse> {
-    return this.fetch(backoffTimer, throttleTimeSlot)
-      .then(this.mapResponse)
+    return this.fetch(backoffTimer, throttleTimeSlot).then(this.mapResponse)
   }
 
   /**

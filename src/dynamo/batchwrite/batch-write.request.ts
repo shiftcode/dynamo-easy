@@ -22,7 +22,7 @@ export class BatchWriteRequest {
   private readonly dynamoDBWrapper: DynamoDbWrapper
   private itemCount = 0
 
-  constructor(dynamoDB? : DynamoDB) {
+  constructor(dynamoDB?: DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       RequestItems: {},
@@ -70,12 +70,10 @@ export class BatchWriteRequest {
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
    * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
    */
-  exec(
-    backoffTimer = randomExponentialBackoffTimer,
-    throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Promise<void> {
-    return this.write(backoffTimer, throttleTimeSlot)
-      .then(() => { return })
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Promise<void> {
+    return this.write(backoffTimer, throttleTimeSlot).then(() => {
+      return
+    })
   }
 
   /**

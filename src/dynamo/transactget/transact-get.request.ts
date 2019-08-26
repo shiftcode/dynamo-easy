@@ -83,21 +83,27 @@ export class TransactGetRequest {
   /**
    * execute request and return full response with the mapped js objects.
    */
-  execFullResponse(): Promise<TransactGetFullResponse<any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */>> {
-    return this.dynamoDBWrapper.transactGetItems(this.params)
-      .then(this.mapResponse)
+  execFullResponse(): Promise<
+    TransactGetFullResponse<any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */>
+  > {
+    return this.dynamoDBWrapper.transactGetItems(this.params).then(this.mapResponse)
   }
 
   /**
    * execute request and return the parsed items.
    */
   exec(): Promise<any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */> {
-    return this.dynamoDBWrapper.transactGetItems(this.params)
+    return this.dynamoDBWrapper
+      .transactGetItems(this.params)
       .then(this.mapResponse)
       .then(r => r.Items)
   }
 
-  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetFullResponse<any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */> => {
+  private mapResponse = (
+    response: DynamoDB.TransactGetItemsOutput,
+  ): TransactGetFullResponse<
+    any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */
+  > => {
     const Items: any =
       response.Responses && Object.keys(response.Responses).length
         ? response.Responses.map((item, ix) => fromDb(<Attributes>item.Item, this.tables[ix]))

@@ -85,8 +85,8 @@ export class DynamoStore<T> {
 
   makeRequest<Z>(operation: DynamoApiOperations, params?: Record<string, any>): Promise<Z> {
     this.logger.debug('request', params)
-    return this.dynamoDBWrapper.makeRequest(operation, params)
+    return this.dynamoDBWrapper
+      .makeRequest(operation, params)
       .then(promiseTap((r: Z) => this.logger.debug('response', r)))
   }
 }
-

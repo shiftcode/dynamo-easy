@@ -22,7 +22,7 @@ function numberToDb(modelValue: number): NumberAttribute | null {
     throw new Error('this mapper only support values of type number')
   }
 
-  if(isNaN(modelValue)){
+  if (isNaN(modelValue)) {
     return null
   }
 

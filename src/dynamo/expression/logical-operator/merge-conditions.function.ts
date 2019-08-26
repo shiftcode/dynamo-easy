@@ -25,7 +25,7 @@ export function mergeConditions(
     conditionDefinitionFns.forEach(conditionDefinitionFn => {
       // we can reuse the same for multiple conditions
       const condition = conditionDefinitionFn(expressionAttributeValues, metadata)
-      mergedCondition.attributeNames = {...mergedCondition.attributeNames, ...condition.attributeNames}
+      mergedCondition.attributeNames = { ...mergedCondition.attributeNames, ...condition.attributeNames }
 
       /*
        * we need to make sure the value variable name is unique, this wont' work so the second :name must be renamed
@@ -53,10 +53,9 @@ export function mergeConditions(
         attributeValues[unique] = condition.attributeValues[key]
       })
 
-      mergedCondition.attributeValues = {...mergedCondition.attributeValues, ...attributeValues }
+      mergedCondition.attributeValues = { ...mergedCondition.attributeValues, ...attributeValues }
       statements.push(condition.statement)
     })
-
 
     mergedCondition.statement = statements.length === 1 ? statements[0] : `(${statements.join(' ' + operator + ' ')})`
     return mergedCondition

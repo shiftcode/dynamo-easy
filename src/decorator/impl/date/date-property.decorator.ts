@@ -9,7 +9,6 @@ import { DatePropertyData } from './date-property-data.model'
 export function DateProperty(opts: Partial<DatePropertyData> = {}): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     if (typeof propertyKey === 'string') {
-
       const propertyOptions: Partial<PropertyMetadata<any>> = {
         name: propertyKey,
         nameDb: opts.name || propertyKey,

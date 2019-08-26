@@ -44,11 +44,13 @@ function createNewProperty(
 ): PropertyMetadata<any> {
   const propertyType: ModelConstructor<any> = getMetadataType(target, propertyKey)
 
-  if(propertyType === undefined){
-    throw new Error('make sure you have enabled the typescript compiler options which enable us to work with decorators (see doc)')
+  if (propertyType === undefined) {
+    throw new Error(
+      'make sure you have enabled the typescript compiler options which enable us to work with decorators (see doc)',
+    )
   }
 
-  const typeInfo: TypeInfo = { type: propertyType}
+  const typeInfo: TypeInfo = { type: propertyType }
 
   propertyOptions = {
     name: propertyKey,
