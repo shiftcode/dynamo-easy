@@ -24,16 +24,14 @@ export function prepareAndAddUpdateExpressions(
         return updateDefFn(<any>params.ExpressionAttributeNames, metadata)
       })
       .reduce((result, expr) => {
-          const actionKeyword = expr.type
-          if (!result.has(actionKeyword)) {
-            result.set(actionKeyword, [])
-          }
+        const actionKeyword = expr.type
+        if (!result.has(actionKeyword)) {
+          result.set(actionKeyword, [])
+        }
 
-          result.get(actionKeyword).push(expr)
-          return result
-        },
-        new Map(),
-      )
+        result.get(actionKeyword).push(expr)
+        return result
+      }, new Map())
 
     const actionStatements: string[] = []
     let attributeValues: Attributes = {}

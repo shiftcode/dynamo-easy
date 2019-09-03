@@ -11,11 +11,13 @@ import { ScanResponse } from './scan.response'
 /**
  * Request class for the Scan operation.
  */
-export class ScanRequest<T> extends ReadManyRequest<T,
+export class ScanRequest<T> extends ReadManyRequest<
+  T,
   DynamoDB.ScanInput,
   DynamoDB.ScanOutput,
   ScanResponse<T>,
-  ScanRequest<T>> {
+  ScanRequest<T>
+> {
   protected readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {

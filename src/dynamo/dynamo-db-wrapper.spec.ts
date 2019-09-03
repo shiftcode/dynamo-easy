@@ -86,7 +86,7 @@ describe('dynamo rx', () => {
     })
   })
 
-  describe('makeRequest', async () => {
+  describe('makeRequest', () => {
     let dynamoDBWrapper: DynamoDbWrapper
     let sessionValidityEnsurerSpy: jasmine.Spy
     let dynamoDBSpy: jasmine.Spy

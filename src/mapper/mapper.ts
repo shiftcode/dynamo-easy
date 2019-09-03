@@ -107,14 +107,22 @@ export function toDbOne(propertyValue: any, propertyMetadata?: PropertyMetadata<
  * @param propertyPath The property path is only used for logging purposes
  * @param propertyMetadata Some optional metadata
  */
-export function toDbOne(propertyValue: any, propertyPath: string, propertyMetadata?: PropertyMetadata<any>): Attribute | null
-export function toDbOne(propertyValue: any, propertyPathOrMetadata?: string | PropertyMetadata<any>, propertyMetadata?: PropertyMetadata<any>): Attribute | null {
-  const propertyPath = propertyPathOrMetadata && typeof propertyPathOrMetadata === 'string' ? propertyPathOrMetadata : null
-  propertyMetadata = propertyPathOrMetadata && typeof propertyPathOrMetadata !== 'string' ? propertyPathOrMetadata : propertyMetadata
+export function toDbOne(
+  propertyValue: any,
+  propertyPath: string,
+  propertyMetadata?: PropertyMetadata<any>,
+): Attribute | null
+export function toDbOne(
+  propertyValue: any,
+  propertyPathOrMetadata?: string | PropertyMetadata<any>,
+  propertyMetadata?: PropertyMetadata<any>,
+): Attribute | null {
+  const propertyPath =
+    propertyPathOrMetadata && typeof propertyPathOrMetadata === 'string' ? propertyPathOrMetadata : null
+  propertyMetadata =
+    propertyPathOrMetadata && typeof propertyPathOrMetadata !== 'string' ? propertyPathOrMetadata : propertyMetadata
 
-  const explicitType: AttributeValueType | null = hasType(propertyMetadata)
-    ? propertyMetadata.typeInfo.type
-    : null
+  const explicitType: AttributeValueType | null = hasType(propertyMetadata) ? propertyMetadata.typeInfo.type : null
   const type: AttributeValueType = explicitType || typeOf(propertyValue, propertyPath)
 
   const mapper = propertyMetadata && propertyMetadata.mapper ? propertyMetadata.mapper() : forType(type)
@@ -212,7 +220,7 @@ export function createKeyAttributes<T>(
       throw new Error('metadata for sort key must be defined')
     }
 
-    keyAttributeMap[sortKeyMetadata.nameDb] = <Attribute>toDbOne(sortKey,sortKeyMetadata)
+    keyAttributeMap[sortKeyMetadata.nameDb] = <Attribute>toDbOne(sortKey, sortKeyMetadata)
   }
 
   return keyAttributeMap

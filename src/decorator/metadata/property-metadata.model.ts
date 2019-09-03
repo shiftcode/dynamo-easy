@@ -72,7 +72,9 @@ export function hasType(
 /**
  * @hidden
  */
-export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: PropertyMetadata<T> | null): PropertyMetadata<T> | undefined {
+export function alterCollectionPropertyMetadataForSingleItem<T>(
+  propertyMeta?: PropertyMetadata<T> | null,
+): PropertyMetadata<T> | undefined {
   if (!propertyMeta) {
     return
   }
@@ -82,9 +84,9 @@ export function alterCollectionPropertyMetadataForSingleItem<T>(propertyMeta?: P
   }
 
   if (propertyMeta.typeInfo && (propertyMeta.typeInfo.type === Set || propertyMeta.typeInfo.type === Array)) {
-    if(hasGenericType(propertyMeta)){
-      return <PropertyMetadata<T>>{ ...propertyMeta, typeInfo: {type: propertyMeta.typeInfo.genericType } }
-    }else{
+    if (hasGenericType(propertyMeta)) {
+      return <PropertyMetadata<T>>{ ...propertyMeta, typeInfo: { type: propertyMeta.typeInfo.genericType } }
+    } else {
       return
     }
   }

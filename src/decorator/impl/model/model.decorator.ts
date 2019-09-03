@@ -92,9 +92,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
           case 'HASH':
             if (gsi.partitionKey) {
               throw new Error(
-                `there is already a partition key defined for global secondary index ${indexName} (property name: ${
-                  property.nameDb
-                  })`,
+                `there is already a partition key defined for global secondary index ${indexName} (property name: ${property.nameDb})`,
               )
             }
 
@@ -103,9 +101,7 @@ function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Ma
           case 'RANGE':
             if (gsi.sortKey) {
               throw new Error(
-                `there is already a sort key defined for global secondary index ${indexName} (property name: ${
-                  property.nameDb
-                  })`,
+                `there is already a sort key defined for global secondary index ${indexName} (property name: ${property.nameDb})`,
               )
             }
 
@@ -137,9 +133,7 @@ function getLocalSecondaryIndexes(
       property.sortKeyForLSI.forEach(indexName => {
         if (map.has(indexName)) {
           throw new Error(
-            `only one sort key can be defined for the same local secondary index, ${
-              property.nameDb
-              } is already defined as sort key for index ${indexName}`,
+            `only one sort key can be defined for the same local secondary index, ${property.nameDb} is already defined as sort key for index ${indexName}`,
           )
         }
 

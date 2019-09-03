@@ -24,7 +24,6 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
 
-
   /**
    * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
    */
@@ -45,7 +44,8 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
 
   execFullResponse(): Promise<GetResponse<T>> {
     this.logger.debug('request', this.params)
-    return this.dynamoDBWrapper.getItem(this.params)
+    return this.dynamoDBWrapper
+      .getItem(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(getItemResponse => {
         const response: GetResponse<T> = <any>{ ...getItemResponse }
@@ -59,7 +59,6 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
         return response
       })
       .then(promiseTap(response => this.logger.debug('mapped item', response.Item)))
-
   }
 
   /**
@@ -67,7 +66,8 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
    */
   exec(): Promise<T | null> {
     this.logger.debug('request', this.params)
-    return this.dynamoDBWrapper.getItem(this.params)
+    return this.dynamoDBWrapper
+      .getItem(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(response => {
         if (response.Item) {

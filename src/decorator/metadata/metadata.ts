@@ -28,10 +28,15 @@ export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSo
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata<T>
 
-  private static findMetaDataForProperty<M>(modelOpts: ModelMetadata<M>, propertyName: keyof M): PropertyMetadata<M> | undefined {
-    return modelOpts.properties && modelOpts.properties.find(
-      property => property.name === propertyName || property.nameDb === propertyName,
-    ) || undefined
+  private static findMetaDataForProperty<M>(
+    modelOpts: ModelMetadata<M>,
+    propertyName: keyof M,
+  ): PropertyMetadata<M> | undefined {
+    return (
+      (modelOpts.properties &&
+        modelOpts.properties.find(property => property.name === propertyName || property.nameDb === propertyName)) ||
+      undefined
+    )
   }
 
   constructor(modelConstructor: ModelConstructor<T>) {
@@ -54,7 +59,9 @@ export class Metadata<T> {
         lastPropMeta = Metadata.findMetaDataForProperty(currentMeta, <any>lastPathPart)
         if (lastPropMeta && lastPropMeta.typeInfo) {
           currentMeta = new Metadata(lastPropMeta.typeInfo.genericType || lastPropMeta.typeInfo.type).modelOptions
-        } else { break }
+        } else {
+          break
+        }
       }
       if (lastPropMeta && (lastPathPart === lastPropMeta.name || lastPathPart === lastPropMeta.nameDb)) {
         return lastPropMeta

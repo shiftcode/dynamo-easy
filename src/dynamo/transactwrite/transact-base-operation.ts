@@ -19,9 +19,11 @@ import { ConditionalParamsHost } from '../operation-params.type'
 /**
  * Abstract base class for all transact items.
  */
-export abstract class TransactBaseOperation<T,
+export abstract class TransactBaseOperation<
+  T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
-  R extends TransactBaseOperation<T, I, any>> implements ConditionalParamsHost {
+  R extends TransactBaseOperation<T, I, any>
+> implements ConditionalParamsHost {
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>
@@ -50,7 +52,9 @@ export abstract class TransactBaseOperation<T,
    */
   onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
   onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
-  onlyIfAttribute<K extends keyof T>(attributePath: string | K): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
+  onlyIfAttribute<K extends keyof T>(
+    attributePath: string | K,
+  ): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
     return addCondition<R, T, any>('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
   }
 

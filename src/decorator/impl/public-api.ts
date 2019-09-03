@@ -23,6 +23,3 @@ export * from './model/model.decorator'
 export * from './property/property.decorator'
 // transient
 export * from './transient/transient.decorator'
-
-
-

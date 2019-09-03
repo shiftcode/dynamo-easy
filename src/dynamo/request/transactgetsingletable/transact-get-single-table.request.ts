@@ -12,9 +12,11 @@ import { TransactGetResponse } from './transact-get-single-table.response'
 /**
  * Request class for TransactGetItems operation which supports a single model class only.
  */
-export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
+export class TransactGetSingleTableRequest<T> extends BaseRequest<
+  T,
   DynamoDB.TransactGetItemsInput,
-  TransactGetSingleTableRequest<T>> {
+  TransactGetSingleTableRequest<T>
+> {
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoDBWrapper, modelClazz)
 
@@ -34,18 +36,17 @@ export class TransactGetSingleTableRequest<T> extends BaseRequest<T,
   }
 
   execFullResponse(): Promise<TransactGetResponse<T>> {
-    return this.dynamoDBWrapper.transactGetItems(this.params)
-      .then(this.mapResponse)
+    return this.dynamoDBWrapper.transactGetItems(this.params).then(this.mapResponse)
   }
 
   /**
    * execute request and return the parsed items
    */
   exec(): Promise<T[]> {
-    return this.dynamoDBWrapper.transactGetItems(this.params)
+    return this.dynamoDBWrapper
+      .transactGetItems(this.params)
       .then(this.mapResponse)
       .then(r => r.Items)
-
   }
 
   private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetResponse<T> => {
