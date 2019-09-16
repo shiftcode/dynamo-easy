@@ -99,6 +99,14 @@ export abstract class ReadManyRequest<
   }
 
   /**
+   * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
+   */
+  consistentRead(consistentRead: boolean = true): R {
+    this.params.ConsistentRead = consistentRead
+    return <any>this
+  }
+
+  /**
    * add a condition for propertyPath
    * @example req.whereAttribute('path.to.prop').eq('value')
    */
