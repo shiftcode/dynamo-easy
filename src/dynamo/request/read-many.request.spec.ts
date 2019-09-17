@@ -108,6 +108,22 @@ describe('ReadManyRequest', () => {
     })
   })
 
+  describe('consistentRead', () => {
+    beforeEach(() => {
+      request = new TestRequest(SimpleWithCompositePartitionKeyModel)
+    })
+
+    it('should set param for consistent read', () => {
+      request.consistentRead(true)
+      expect(request.params.ConsistentRead).toBe(true)
+    })
+
+    it('should return instance', () => {
+      const r = request.consistentRead(true)
+      expect(r).toBe(request)
+    })
+  })
+
   describe('conditions functions', () => {
     beforeEach(() => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
