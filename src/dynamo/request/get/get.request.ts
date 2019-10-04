@@ -32,6 +32,10 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
     return this
   }
 
+  /**
+   * Specifies the list of document attributes to be returned from the table instead of returning the entire document
+   * @param attributesToGet List of document attributes to be returned
+   */
   projectionExpression(...attributesToGet: string[]): GetRequest<T> {
     // tslint:disable-next-line:no-unnecessary-callback-wrapper
     const resolved = attributesToGet.map(a => resolveAttributeNames(a))

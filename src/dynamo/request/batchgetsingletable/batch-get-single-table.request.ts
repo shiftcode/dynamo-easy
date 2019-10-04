@@ -11,6 +11,7 @@ import { ModelConstructor } from '../../../model/model-constructor'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
 import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget/batch-get.const'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
+import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 import { BaseRequest } from '../base.request'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
@@ -39,8 +40,28 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
     }
   }
 
+  /**
+   * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
+   */
   consistentRead(value: boolean = true): BatchGetSingleTableRequest<T> {
     this.params.RequestItems[this.tableName].ConsistentRead = value
+    return this
+  }
+
+  /**
+   * Specifies the list of document attributes to be returned from the table instead of returning the entire document
+   * @param attributesToGet List of document attributes to be returned
+   */
+  projectionExpression(...attributesToGet: string[]): BatchGetSingleTableRequest<T> {
+    // tslint:disable-next-line:no-unnecessary-callback-wrapper
+    const resolved = attributesToGet.map(a => resolveAttributeNames(a))
+    this.params.RequestItems[this.tableName].ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
+    Object.values(resolved).forEach(r => {
+      this.params.RequestItems[this.tableName].ExpressionAttributeNames = {
+        ...this.params.RequestItems[this.tableName].ExpressionAttributeNames,
+        ...r.attributeNames,
+      }
+    })
     return this
   }
 
