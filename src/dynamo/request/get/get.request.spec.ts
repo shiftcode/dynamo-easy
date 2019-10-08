@@ -1,6 +1,10 @@
 // tslint:disable:no-unused-expression
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
+import {
+  ComplexModel,
+  SimpleWithCompositePartitionKeyModel,
+  SimpleWithPartitionKeyModel,
+} from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { getTableName } from '../../get-table-name.function'
@@ -19,7 +23,7 @@ describe('GetRequest', () => {
     })
   })
 
-  describe('correct params', () => {
+  describe('correct params (simple model)', () => {
     let request: GetRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
@@ -50,6 +54,23 @@ describe('GetRequest', () => {
     it('should set param for ReturnConsumedCapacity', () => {
       request.returnConsumedCapacity('TOTAL')
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
+    })
+  })
+
+  describe('correct params (complex model)', () => {
+    let request: GetRequest<ComplexModel>
+
+    beforeEach(() => {
+      request = new GetRequest(<any>null, ComplexModel, 'partitionKeyValue', new Date())
+    })
+
+    it('projection expression', () => {
+      request.projectionExpression('active')
+
+      const params = request.params
+      expect(params.ProjectionExpression).toBe('#active')
+      expect(params.ExpressionAttributeNames).toEqual({ '#active': 'isActive' })
+      expect(Object.keys(params).length).toBe(4)
     })
   })
 

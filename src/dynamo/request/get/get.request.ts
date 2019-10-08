@@ -8,9 +8,15 @@ import { createKeyAttributes, fromDb } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
-import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
+import { addProjectionExpressionParam } from '../helper/add-projection-expression-param.function'
 import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
+
+export interface GetRequestProjected<T>
+  extends StandardRequest<Partial<T>, DynamoDB.GetItemInput, GetRequest<Partial<T>>> {
+  execFullResponse(): Promise<GetResponse<Partial<T>>>
+  exec(): Promise<Partial<T> | null>
+}
 
 /**
  * Request class for the GetItem operation.
@@ -33,17 +39,12 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
   }
 
   /**
-   * Specifies the list of document attributes to be returned from the table instead of returning the entire document
-   * @param attributesToGet List of document attributes to be returned
+   * Specifies the list of model attributes to be returned from the table instead of returning the entire document
+   * @param attributesToGet List of model attributes to be returned
    */
-  projectionExpression(...attributesToGet: string[]): GetRequest<T> {
-    // tslint:disable-next-line:no-unnecessary-callback-wrapper
-    const resolved = attributesToGet.map(a => resolveAttributeNames(a))
-    this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
-    Object.values(resolved).forEach(r => {
-      this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
-    })
-    return this
+  projectionExpression(...attributesToGet: Array<keyof T | string>): GetRequestProjected<T> {
+    addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
+    return <GetRequestProjected<T>>(<any>this)
   }
 
   execFullResponse(): Promise<GetResponse<T>> {

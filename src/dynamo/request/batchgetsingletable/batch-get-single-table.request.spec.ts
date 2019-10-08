@@ -3,7 +3,11 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 // tslint:disable:no-unused-expression
 // tslint:disable:no-non-null-assertion
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
-import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
+import {
+  ComplexModel,
+  SimpleWithCompositePartitionKeyModel,
+  SimpleWithPartitionKeyModel,
+} from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { getTableName } from '../../get-table-name.function'
 import { BatchGetSingleTableRequest } from './batch-get-single-table.request'
@@ -60,7 +64,7 @@ describe('batch get', () => {
       })
     })
 
-    it('ConsistentRead', () => {
+    it('consistent read', () => {
       const request = new BatchGetSingleTableRequest<any>(<any>null, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
       request.consistentRead()
       expect(request.params.RequestItems).toBeDefined()
@@ -76,6 +80,19 @@ describe('batch get', () => {
       expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)].ProjectionExpression).toBe('#name')
       expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)].ExpressionAttributeNames).toEqual({
         '#name': 'name',
+      })
+    })
+
+    it('projection expression (custom db attribute name)', () => {
+      const request = new BatchGetSingleTableRequest<ComplexModel>(<any>null, ComplexModel, [
+        { id: 'myId', creationDate: new Date() },
+      ])
+      request.projectionExpression('active')
+      expect(request.params.RequestItems).toBeDefined()
+      expect(request.params.RequestItems[getTableName(ComplexModel)]).toBeDefined()
+      expect(request.params.RequestItems[getTableName(ComplexModel)].ProjectionExpression).toBe('#active')
+      expect(request.params.RequestItems[getTableName(ComplexModel)].ExpressionAttributeNames).toEqual({
+        '#active': 'isActive',
       })
     })
   })
