@@ -10,6 +10,7 @@ import { fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
+import { resolveAttributeNames } from '../expression/functions/attribute-names.function'
 import { and } from '../expression/logical-operator/and.function'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -103,6 +104,20 @@ export abstract class ReadManyRequest<
    */
   consistentRead(consistentRead: boolean = true): R {
     this.params.ConsistentRead = consistentRead
+    return <any>this
+  }
+
+  /**
+   * Specifies the list of document attributes to be returned from the table instead of returning the entire document
+   * @param attributesToGet List of document attributes to be returned
+   */
+  projectionExpression(...attributesToGet: string[]): R {
+    // tslint:disable-next-line:no-unnecessary-callback-wrapper
+    const resolved = attributesToGet.map(a => resolveAttributeNames(a))
+    this.params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
+    Object.values(resolved).forEach(r => {
+      this.params.ExpressionAttributeNames = { ...this.params.ExpressionAttributeNames, ...r.attributeNames }
+    })
     return <any>this
   }
 

@@ -67,6 +67,17 @@ describe('batch get', () => {
       expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)]).toBeDefined()
       expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)].ConsistentRead).toBeTruthy()
     })
+
+    it('projection expression', () => {
+      const request = new BatchGetSingleTableRequest<any>(<any>null, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
+      request.projectionExpression('name')
+      expect(request.params.RequestItems).toBeDefined()
+      expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)]).toBeDefined()
+      expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)].ProjectionExpression).toBe('#name')
+      expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)].ExpressionAttributeNames).toEqual({
+        '#name': 'name',
+      })
+    })
   })
 
   describe('should return appropriate value', () => {
