@@ -19,7 +19,8 @@ export class QueryRequest<T, T2 = T> extends ReadManyRequest<
   DynamoDB.QueryInput,
   DynamoDB.QueryOutput,
   QueryResponse<T2>,
-  QueryRequest<T, T2>
+  QueryRequest<T, T2>,
+  QueryRequest<T, Partial<T>>
 > {
   protected readonly logger: Logger
 
@@ -45,7 +46,7 @@ export class QueryRequest<T, T2 = T> extends ReadManyRequest<
   /**
    * used to define some condition for the sort key, use the secondary index to query based on a custom index
    */
-  whereSortKey(): SortKeyConditionFunction<QueryRequest<T, T2>> {
+  whereSortKey(): SortKeyConditionFunction<this> {
     let sortKey: keyof T | null
     if (this.secondaryIndex) {
       if (!this.secondaryIndex.sortKey) {

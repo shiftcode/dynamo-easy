@@ -14,7 +14,7 @@ import { or } from '../expression/logical-operator/public.api'
 import { getTableName } from '../get-table-name.function'
 import { ReadManyRequest } from './read-many.request'
 
-class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any> {
+class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any, any> {
   constructor(modelClazz: ModelConstructor<T>) {
     super(<any>null, modelClazz)
     this.logger = createLogger('TestRequest', modelClazz)

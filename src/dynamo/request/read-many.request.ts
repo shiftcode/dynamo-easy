@@ -34,8 +34,9 @@ export abstract class ReadManyRequest<
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T2> | ScanResponse<T2>,
-  R extends QueryRequest<T, T2> | ScanRequest<T, T2>
-> extends StandardRequest<T, T2, I, ReadManyRequest<T, T2, I, O, Z, R>> {
+  R extends QueryRequest<T, T2> | ScanRequest<T, T2>,
+  R2 extends QueryRequest<T, Partial<T>> | ScanRequest<T, Partial<T>>
+> extends StandardRequest<T, T2, I, ReadManyRequest<T, T2, I, O, Z, R, R2>> {
   /** Infinite limit will remove the Limit param from request params when calling ReadManyRequest.limit(ReadManyRequest.INFINITE_LIMIT) */
   static INFINITE_LIMIT = -1
 
@@ -112,7 +113,7 @@ export abstract class ReadManyRequest<
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
    * @param attributesToGet List of model attributes to be returned
    */
-  projectionExpression(...attributesToGet: Array<keyof T | string>): ReadManyRequest<T, Partial<T>, I, O, Z, R> {
+  projectionExpression(...attributesToGet: Array<keyof T | string>): R2 {
     addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
     return <any>this
   }
@@ -121,12 +122,12 @@ export abstract class ReadManyRequest<
    * add a condition for propertyPath
    * @example req.whereAttribute('path.to.prop').eq('value')
    */
-  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
-  whereAttribute(attributePath: string): RequestConditionFunction<R, T>
+  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
+  whereAttribute(attributePath: string): RequestConditionFunction<this, T>
   whereAttribute<K extends keyof T>(
     attributePath: string | K,
-  ): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
-    return addCondition<R, T, any>('FilterExpression', attributePath, <any>this, this.metadata)
+  ): RequestConditionFunction<this, T> | RequestConditionFunctionTyped<this, T, K> {
+    return addCondition<this, T, any>('FilterExpression', attributePath, this, this.metadata)
   }
 
   /**

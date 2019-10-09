@@ -17,7 +17,8 @@ export class ScanRequest<T, T2 = T> extends ReadManyRequest<
   DynamoDB.ScanInput,
   DynamoDB.ScanOutput,
   ScanResponse<T2>,
-  ScanRequest<T, T2>
+  ScanRequest<T, T2>,
+  ScanRequest<T, Partial<T>>
 > {
   protected readonly logger: Logger
 
