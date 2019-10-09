@@ -12,12 +12,6 @@ import { addProjectionExpressionParam } from '../helper/add-projection-expressio
 import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
 
-export interface GetRequestProjected<T>
-  extends StandardRequest<Partial<T>, DynamoDB.GetItemInput, GetRequest<Partial<T>>> {
-  execFullResponse(): Promise<GetResponse<Partial<T>>>
-  exec(): Promise<Partial<T> | null>
-}
-
 /**
  * Request class for the GetItem operation.
  */
@@ -42,9 +36,9 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
    * @param attributesToGet List of model attributes to be returned
    */
-  projectionExpression(...attributesToGet: Array<keyof T | string>): GetRequestProjected<T> {
+  projectionExpression(...attributesToGet: Array<keyof T | string>): GetRequest<T> {
     addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
-    return <GetRequestProjected<T>>(<any>this)
+    return this
   }
 
   execFullResponse(): Promise<GetResponse<T>> {
