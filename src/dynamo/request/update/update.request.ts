@@ -15,7 +15,7 @@ import { WriteRequest } from '../write.request'
 /**
  * Request class for the UpdateItem operation.
  */
-export class UpdateRequest<T, T2 = T> extends WriteRequest<
+export class UpdateRequest<T, T2 = void> extends WriteRequest<
   T,
   T2,
   DynamoDB.UpdateItemInput,

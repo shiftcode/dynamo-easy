@@ -34,7 +34,7 @@ export abstract class ReadManyRequest<
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
   Z extends QueryResponse<T2> | ScanResponse<T2>,
-  R extends QueryRequest<T2> | ScanRequest<T2>
+  R extends QueryRequest<T, T2> | ScanRequest<T, T2>
 > extends StandardRequest<T, T2, I, ReadManyRequest<T, T2, I, O, Z, R>> {
   /** Infinite limit will remove the Limit param from request params when calling ReadManyRequest.limit(ReadManyRequest.INFINITE_LIMIT) */
   static INFINITE_LIMIT = -1
@@ -112,7 +112,6 @@ export abstract class ReadManyRequest<
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
    * @param attributesToGet List of model attributes to be returned
    */
-  // @ts-ignore: type R does not satisfy the constraint, don't know how to resolve
   projectionExpression(...attributesToGet: Array<keyof T | string>): ReadManyRequest<T, Partial<T>, I, O, Z, R> {
     addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
     return <any>this
@@ -213,7 +212,7 @@ export abstract class ReadManyRequest<
    * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
    */
   execFetchAll(): Promise<T2[]> {
-    return fetchAll(<R>(<any>this))
+    return fetchAll(<any>this)
   }
 
   protected mapFromDb = (output: O) => {

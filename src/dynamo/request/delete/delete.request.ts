@@ -11,7 +11,7 @@ import { WriteRequest } from '../write.request'
 /**
  * Request class for the DeleteItem operation.
  */
-export class DeleteRequest<T, T2 = T> extends WriteRequest<
+export class DeleteRequest<T, T2 = void> extends WriteRequest<
   T,
   T2,
   DynamoDB.DeleteItemInput,

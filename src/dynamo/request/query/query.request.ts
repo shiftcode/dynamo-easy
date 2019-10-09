@@ -19,7 +19,7 @@ export class QueryRequest<T, T2 = T> extends ReadManyRequest<
   DynamoDB.QueryInput,
   DynamoDB.QueryOutput,
   QueryResponse<T2>,
-  QueryRequest<T2>
+  QueryRequest<T, T2>
 > {
   protected readonly logger: Logger
 
