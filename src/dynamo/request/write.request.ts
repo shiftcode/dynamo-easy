@@ -45,29 +45,29 @@ export abstract class WriteRequest<
   /**
    * return item collection metrics.
    */
-  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): R {
+  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): this {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return <R>(<any>this)
+    return this
   }
 
   /**
    * add a condition for propertyPath
    * @param attributePath
    */
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
-  onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
-  onlyIfAttribute<K extends keyof T>(attributePath: K | string): RequestConditionFunctionTyped<R, T, K> {
-    return addCondition<R, T, any>('ConditionExpression', attributePath, <any>this, this.metadata)
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
+  onlyIfAttribute(attributePath: string): RequestConditionFunction<this, T>
+  onlyIfAttribute<K extends keyof T>(attributePath: K | string): RequestConditionFunctionTyped<this, T, K> {
+    return addCondition<this, T, any>('ConditionExpression', attributePath, <any>this, this.metadata)
   }
 
   /**
    * @example writeRequest.onlyIf( attribute('age').eq(23) )
    * @example writeRequest.onlyIf( or( attribute('age').lt(18), attribute('age').gt(65) ) )
    */
-  onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
+  onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): this {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
-    return <any>this
+    return this
   }
 
   /**

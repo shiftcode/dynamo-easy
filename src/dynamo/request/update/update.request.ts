@@ -34,7 +34,7 @@ export class UpdateRequest<T, T2 = void> extends WriteRequest<
    * create and add a single update operation
    * @example req.updateAttribute('path.to.attr').set('newVal')
    */
-  updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<UpdateRequest<T, T2>, T, K> {
+  updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<this, T, K> {
     return addUpdate(attributePath, this, this.metadata)
   }
 
