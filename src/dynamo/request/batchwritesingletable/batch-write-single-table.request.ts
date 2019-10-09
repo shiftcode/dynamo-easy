@@ -34,8 +34,9 @@ export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
   /**
    * return item collection metrics.
    */
-  returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics) {
+  returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics): this {
     this.params.ReturnItemCollectionMetrics = value
+    return this
   }
 
   delete(items: Array<Partial<T>>): this {
