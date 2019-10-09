@@ -15,7 +15,7 @@ import { GetResponse } from './get.response'
 /**
  * Request class for the GetItem operation.
  */
-export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, GetRequest<T>> {
+export class GetRequest<T, T2 = T> extends StandardRequest<T, T2, DynamoDB.GetItemInput, GetRequest<T, T2>> {
   private readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
@@ -27,7 +27,7 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
   /**
    * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
    */
-  consistentRead(consistentRead: boolean = true): GetRequest<T> {
+  consistentRead(consistentRead: boolean = true): this {
     this.params.ConsistentRead = consistentRead
     return this
   }
@@ -36,21 +36,21 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
    * @param attributesToGet List of model attributes to be returned
    */
-  projectionExpression(...attributesToGet: Array<keyof T | string>): GetRequest<T> {
+  projectionExpression(...attributesToGet: Array<keyof T | string>): GetRequest<T, Partial<T>> {
     addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
     return this
   }
 
-  execFullResponse(): Promise<GetResponse<T>> {
+  execFullResponse(): Promise<GetResponse<T2>> {
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper
       .getItem(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(getItemResponse => {
-        const response: GetResponse<T> = <any>{ ...getItemResponse }
+        const response: GetResponse<T2> = <any>{ ...getItemResponse }
 
         if (getItemResponse.Item) {
-          response.Item = fromDb(<Attributes<T>>getItemResponse.Item, this.modelClazz)
+          response.Item = fromDb(<Attributes<T2>>getItemResponse.Item, <any>this.modelClazz)
         } else {
           response.Item = null
         }
@@ -63,14 +63,14 @@ export class GetRequest<T> extends StandardRequest<T, DynamoDB.GetItemInput, Get
   /**
    * execute request and return the parsed item
    */
-  exec(): Promise<T | null> {
+  exec(): Promise<T2 | null> {
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper
       .getItem(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
       .then(response => {
         if (response.Item) {
-          return fromDb(<Attributes<T>>response.Item, this.modelClazz)
+          return fromDb(<Attributes<T2>>response.Item, <any>this.modelClazz)
         } else {
           return null
         }

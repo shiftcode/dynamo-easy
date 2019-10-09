@@ -151,18 +151,18 @@ export function doAddCondition<T, R extends ConditionalParamsHost>(
 /**
  * @hidden
  */
-export function addPartitionKeyCondition<R extends StandardRequest<any, any, any>>(
+export function addPartitionKeyCondition<R extends StandardRequest<any, any, any, any>>(
   keyName: keyof any,
   keyValue: any,
   request: R,
 ): R
-export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, any>>(
+export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, any, any>>(
   keyName: keyof T,
   keyValue: any,
   request: R,
   metadata: Metadata<T>,
 ): R
-export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, any>>(
+export function addPartitionKeyCondition<T, R extends StandardRequest<T, any, any, any>>(
   keyName: keyof T,
   keyValue: any,
   request: R,

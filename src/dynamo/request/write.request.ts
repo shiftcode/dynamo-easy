@@ -29,10 +29,11 @@ type WriteResponse<O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput 
  */
 export abstract class WriteRequest<
   T,
+  T2,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
   O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput | DynamoDB.UpdateItemOutput,
-  R extends WriteRequest<T, I, O, R>
-> extends StandardRequest<T, I, R> {
+  R extends WriteRequest<T, T2, I, O, R>
+> extends StandardRequest<T, T2, I, R> {
   protected abstract readonly logger: Logger
 
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
@@ -72,18 +73,18 @@ export abstract class WriteRequest<
   /**
    * @returns { void } if no ReturnValues are requested, { T } if the requested ReturnValues are ALL_OLD|ALL_NEW or {Partial<T>} if the requested ReturnValues are UPDATED_OLD|UPDATED_NEW
    */
-  exec(): Promise<void> {
+  exec(): Promise<T2> {
     /*
      * kind a hacky - this is just for typing reasons so Promise<void> is the default return type when not defining a
      * returnValues other than NONE
      */
-    return this.execFullResponse().then(r => <void>(<any>r).Item)
+    return this.execFullResponse().then(r => (<any>r).Item)
   }
 
   /**
    * execute request and return the full response
    */
-  execFullResponse(): Promise<WriteResponse<O, T>> {
+  execFullResponse(): Promise<WriteResponse<O, T2>> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))

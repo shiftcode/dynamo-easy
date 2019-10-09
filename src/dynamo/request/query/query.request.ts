@@ -13,12 +13,13 @@ import { QueryResponse } from './query.response'
 /**
  * Request class for the Query operation.
  */
-export class QueryRequest<T> extends ReadManyRequest<
+export class QueryRequest<T, T2 = T> extends ReadManyRequest<
   T,
+  T2,
   DynamoDB.QueryInput,
   DynamoDB.QueryOutput,
-  QueryResponse<T>,
-  QueryRequest<T>
+  QueryResponse<T2>,
+  QueryRequest<T2>
 > {
   protected readonly logger: Logger
 
@@ -27,10 +28,7 @@ export class QueryRequest<T> extends ReadManyRequest<
     this.logger = createLogger('dynamo.request.QueryRequest', modelClazz)
   }
 
-  /**
-   *
-   */
-  wherePartitionKey(partitionKeyValue: any): QueryRequest<T> {
+  wherePartitionKey(partitionKeyValue: any): this {
     let partitionKey: keyof T
     if (this.secondaryIndex) {
       if (!this.secondaryIndex.partitionKey) {
@@ -47,7 +45,7 @@ export class QueryRequest<T> extends ReadManyRequest<
   /**
    * used to define some condition for the sort key, use the secondary index to query based on a custom index
    */
-  whereSortKey(): SortKeyConditionFunction<QueryRequest<T>> {
+  whereSortKey(): SortKeyConditionFunction<QueryRequest<T, T2>> {
     let sortKey: keyof T | null
     if (this.secondaryIndex) {
       if (!this.secondaryIndex.sortKey) {
@@ -65,12 +63,12 @@ export class QueryRequest<T> extends ReadManyRequest<
     return addSortKeyCondition(sortKey, this, this.metadata)
   }
 
-  ascending(): QueryRequest<T> {
+  ascending(): this {
     this.params.ScanIndexForward = true
     return this
   }
 
-  descending(): QueryRequest<T> {
+  descending(): this {
     this.params.ScanIndexForward = false
     return this
   }
