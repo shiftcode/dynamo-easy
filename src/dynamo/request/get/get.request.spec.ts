@@ -34,10 +34,6 @@ describe('GetRequest', () => {
     })
 
     it('projection expression', () => {
-      // const item = await request.consistentRead().exec()
-      // const item = await request.consistentRead().projectionExpression('age').exec()
-      // const item2 = await request.projectionExpression('age').exec()
-      // const item3 = await request.projectionExpression('age').consistentRead().exec()
       request.projectionExpression('age')
       const params = request.params
       expect(params.ProjectionExpression).toBe('#age')
