@@ -1,6 +1,5 @@
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
-  ComplexModel,
   ModelWithABunchOfIndexes,
   SimpleWithCompositePartitionKeyModel,
   SimpleWithPartitionKeyModel,
@@ -125,19 +124,19 @@ describe('ReadManyRequest', () => {
     })
   })
 
-  describe('projectionExpression', () => {
+  describe('projection expression', () => {
     beforeEach(() => {
-      request = new TestRequest(ComplexModel)
+      request = new TestRequest(SimpleWithPartitionKeyModel)
     })
 
     it('should set param for projection expression', () => {
-      request.projectionExpression('active', 'lastUpdated')
-      expect(request.params.ProjectionExpression).toBe('#active, #lastUpdated')
-      expect(request.params.ExpressionAttributeNames).toEqual({ '#active': 'isActive', '#lastUpdated': 'lastUpdated' })
+      ;(request as TestRequest<SimpleWithPartitionKeyModel>).projectionExpression('age')
+      expect(request.params.ProjectionExpression).toBe('#age')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
     })
 
     it('should return instance', () => {
-      const r = request.projectionExpression('active')
+      const r = request.projectionExpression('age')
       expect(r).toBe(request)
     })
   })
