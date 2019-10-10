@@ -11,5 +11,6 @@
   "include": [
     "src/**/*.spec.ts",
     "test/**/*"
-  ]
+  ],
+  "exclude": []
 }

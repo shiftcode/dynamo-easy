@@ -7,6 +7,7 @@ import { Attributes, MapAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 function objectFromDb(val: MapAttribute, propertyMetadata?: PropertyMetadata<any, MapAttribute>): any {
+  // todo: shouldn't we check for existence off 'M' here? (and throw if undefined)
   if (hasType(propertyMetadata)) {
     return fromDb(val.M, propertyMetadata.typeInfo.type)
   } else {

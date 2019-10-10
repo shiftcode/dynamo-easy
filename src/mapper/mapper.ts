@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
 import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
 import { hasType, Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { createOptModelLogger } from '../logger/logger'
 import { ModelConstructor } from '../model/model-constructor'
 import { MapperForType } from './for-type/base.mapper'
 import { BooleanMapper } from './for-type/boolean.mapper'
@@ -26,9 +27,15 @@ import { getPropertyPath, typeOf, typeOfFromDb } from './util'
 const mapperForType: Map<AttributeValueType, MapperForType<any, any>> = new Map()
 
 /**
+ * @hidden
+ */
+const logger = createOptModelLogger('dynamo.mapper.mapper')
+
+/**
  * mapps an item according to given model constructor [its meta data] to attributes
  */
 export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attributes<T> {
+  logger.verbose('map toDb', modelConstructor, { item })
   const mapped = <Attributes<T>>{}
 
   if (modelConstructor) {
@@ -117,6 +124,7 @@ export function toDbOne(
   propertyPathOrMetadata?: string | PropertyMetadata<any>,
   propertyMetadata?: PropertyMetadata<any>,
 ): Attribute | null {
+  logger.verbose('map toDbOne', null, { propertyValue, propertyPathOrMetadata, propertyMetadata })
   const propertyPath =
     propertyPathOrMetadata && typeof propertyPathOrMetadata === 'string' ? propertyPathOrMetadata : null
   propertyMetadata =
@@ -168,8 +176,9 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
 
   const keyProperties = properties.filter(testForKey)
 
-  return (item: Partial<T>) =>
-    keyProperties.reduce(
+  return (item: Partial<T>) => {
+    logger.verbose('create key', null, { item, propertyMeta: keyProperties })
+    return keyProperties.reduce(
       (key, propMeta) => {
         if (item[propMeta.name] === null || item[propMeta.name] === undefined) {
           throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
@@ -180,6 +189,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
       },
       <Attributes<T>>{},
     )
+  }
 }
 
 /**
@@ -230,6 +240,7 @@ export function createKeyAttributes<T>(
  * parses attributes to a js item according to the given model constructor [its meta data]
  */
 export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelConstructor<T>): T {
+  logger.verbose('parse fromDb', modelConstructor, { attributeMap })
   const model: T = <T>{}
 
   Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {
@@ -277,6 +288,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
  * parses an attribute to a js value according to the given property metadata
  */
 export function fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: PropertyMetadata<any, any>): T {
+  logger.verbose('parse fromDbOne', null, { attributeValue, propertyMetadata })
   const explicitType: AttributeValueType | null = hasType(propertyMetadata) ? propertyMetadata.typeInfo.type : null
   const type: AttributeValueType = explicitType || typeOfFromDb(attributeValue)
 
@@ -318,6 +330,9 @@ export function forType(type: AttributeValueType): MapperForType<any, Attribute>
         mapper = NullMapper
         break
       case Binary:
+        // The applications must encode binary values in base64-encoded format before sending them to DynamoDB.
+        // Upon receipt of these values,
+        // DynamoDB decodes the data into an unsigned byte array and uses that as the length of the binary attribute.
         throw new Error('no mapper for binary type implemented yet')
       case UndefinedType:
         mapper = ObjectMapper

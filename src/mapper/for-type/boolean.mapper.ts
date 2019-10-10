@@ -4,16 +4,16 @@
 import { BooleanAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
-function booleanFromDb(dbValue: BooleanAttribute): boolean {
-  if (dbValue.BOOL === undefined) {
-    throw new Error('only attribute values with BOOL value can be mapped to a boolean')
+function booleanFromDb(attributeValue: BooleanAttribute): boolean {
+  if (attributeValue.BOOL === undefined) {
+    throw new Error(`there is no BOOL(ean) value defined on given attribute value: ${JSON.stringify(attributeValue)}`)
   }
-  return dbValue.BOOL === true
+  return attributeValue.BOOL === true
 }
 
 function booleanToDb(modelValue: boolean): BooleanAttribute {
   if (!(modelValue === true || modelValue === false)) {
-    throw new Error('only boolean values are mapped to a BOOl attribute')
+    throw new Error(`only boolean values are mapped to a BOOl attribute, given: ${JSON.stringify(modelValue)}`)
   }
   return { BOOL: modelValue }
 }
