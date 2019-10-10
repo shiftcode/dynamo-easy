@@ -170,8 +170,8 @@ function testForKey<T>(p: PropertyMetadata<T>): p is PropertyMetadata<T> & { key
 export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: Partial<T>) => Attributes<T> {
   const metadata = metadataForModel(modelConstructor)
   const properties = metadata.modelOptions.properties
-  if (!properties) {
-    throw new Error('metadata properties is not defined')
+  if (!properties.length) {
+    throw new Error('no properties defined on metadata')
   }
 
   const keyProperties = properties.filter(testForKey)

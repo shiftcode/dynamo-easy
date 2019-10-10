@@ -32,11 +32,7 @@ export class Metadata<T> {
     modelOpts: ModelMetadata<M>,
     propertyName: keyof M,
   ): PropertyMetadata<M> | undefined {
-    return (
-      (modelOpts.properties &&
-        modelOpts.properties.find(property => property.name === propertyName || property.nameDb === propertyName)) ||
-      undefined
-    )
+    return modelOpts.properties.find(property => property.name === propertyName || property.nameDb === propertyName)
   }
 
   constructor(modelConstructor: ModelConstructor<T>) {
@@ -44,7 +40,7 @@ export class Metadata<T> {
   }
 
   forProperty(propertyKey: keyof T | string): PropertyMetadata<T> | undefined {
-    if (!this.modelOptions.properties) {
+    if (this.modelOptions.properties.length === 0) {
       return
     }
     if (typeof propertyKey === 'string' && NESTED_ATTR_PATH_REGEX.test(<string>propertyKey)) {
@@ -90,7 +86,11 @@ export class Metadata<T> {
     if (indexName) {
       const index = this.getIndex(indexName)
       if (index) {
-        return index.partitionKey
+        if (index.partitionKey) {
+          return index.partitionKey
+        } else {
+          throw new Error('the index exists but no partition key for it was defined. use @GSIPartitionKey(indexName)')
+        }
       } else {
         throw new Error(`there is no index defined for name ${indexName}`)
       }
@@ -133,11 +133,7 @@ export class Metadata<T> {
    * @returns {SecondaryIndex[]} Returns all the secondary indexes if exists or an empty array if none is defined
    */
   getIndexes(): Array<SecondaryIndex<T>> {
-    if (this.modelOptions.indexes && this.modelOptions.indexes.size) {
-      return Array.from(this.modelOptions.indexes.values())
-    } else {
-      return []
-    }
+    return Array.from(this.modelOptions.indexes.values())
   }
 
   /**
@@ -145,12 +141,7 @@ export class Metadata<T> {
    * @returns {SecondaryIndex} Returns the index if one with given name exists, null otherwise
    */
   getIndex(indexName: string): SecondaryIndex<T> | null {
-    if (this.modelOptions.indexes) {
-      const index = this.modelOptions.indexes.get(indexName)
-      return index ? index : null
-    }
-
-    return null
+    return this.modelOptions.indexes.get(indexName) || null
   }
 }
 
@@ -162,9 +153,9 @@ function filterBy<T, R>(
   predicate: (property: PropertyMetadata<any>) => boolean,
   defaultValue: R,
 ): Array<PropertyMetadata<any>> | R {
-  if (modelOptions && modelOptions.properties) {
+  if (modelOptions) {
     const properties = modelOptions.properties.filter(predicate)
-    if (properties && properties.length) {
+    if (properties.length) {
       return properties
     }
   }

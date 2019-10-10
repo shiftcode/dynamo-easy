@@ -65,7 +65,7 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it('with no properties', () => {
-      expect(modelOptions.properties).toBeUndefined()
+      expect(modelOptions.properties).toEqual([])
     })
   })
 
