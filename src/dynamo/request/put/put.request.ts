@@ -30,6 +30,7 @@ export class PutRequest<T> extends WriteRequest<T, DynamoDB.PutItemInput, Dynamo
 
   /**
    * Adds a condition expression to the request, which makes sure the item will only be saved if the id does not exist
+   * @param predicate if false is provided nothing happens (it does NOT remove the condition)
    */
   ifNotExists(predicate: boolean = true): PutRequest<T> {
     if (predicate) {
