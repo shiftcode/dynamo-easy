@@ -15,6 +15,7 @@ import { getTableName } from '../get-table-name.function'
  */
 export abstract class BaseRequest<
   T,
+  T2,
   I extends
     | DynamoDB.DeleteItemInput
     | DynamoDB.GetItemInput
@@ -26,7 +27,7 @@ export abstract class BaseRequest<
     | DynamoDB.BatchWriteItemInput
     | DynamoDB.TransactGetItemsInput
     | DynamoDB.TransactWriteItemsInput,
-  R extends BaseRequest<T, I, any>
+  R extends BaseRequest<T, T2, I, any>
 > {
   readonly dynamoDBWrapper: DynamoDbWrapper
 
@@ -86,5 +87,5 @@ export abstract class BaseRequest<
   /**
    * execute request and return the parsed item(s) or void if none were requested.
    */
-  abstract exec(): Promise<T | T[] | void | null>
+  abstract exec(): Promise<T2 | T2[] | void | null>
 }

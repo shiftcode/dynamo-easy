@@ -12,15 +12,17 @@ import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
 import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget/batch-get.const'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
+import { addProjectionExpressionParam } from '../helper/add-projection-expression-param.function'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 
 /**
  * Request class for BatchGetItem operation which supports a single model class only.
  */
-export class BatchGetSingleTableRequest<T> extends BaseRequest<
+export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   T,
+  T2,
   DynamoDB.BatchGetItemInput,
-  BatchGetSingleTableRequest<T>
+  BatchGetSingleTableRequest<T, T2>
 > {
   private readonly logger: Logger
 
@@ -39,8 +41,20 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
     }
   }
 
-  consistentRead(value: boolean = true): BatchGetSingleTableRequest<T> {
+  /**
+   * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
+   */
+  consistentRead(value: boolean = true): this {
     this.params.RequestItems[this.tableName].ConsistentRead = value
+    return this
+  }
+
+  /**
+   * Specifies the list of model attributes to be returned from the table instead of returning the entire document
+   * @param attributesToGet List of model attributes to be returned
+   */
+  projectionExpression(...attributesToGet: Array<keyof T | string>): BatchGetSingleTableRequest<T, Partial<T>> {
+    addProjectionExpressionParam(attributesToGet, this.params.RequestItems[this.tableName], this.metadata)
     return this
   }
 
@@ -64,7 +78,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT,
-  ): Promise<BatchGetSingleTableResponse<T>> {
+  ): Promise<BatchGetSingleTableResponse<T2>> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
       .then(promiseTap(response => this.logger.debug('mapped items', response.Items)))
@@ -75,7 +89,7 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
-  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Promise<T[]> {
+  exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Promise<T2[]> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
       .then(r => r.Items)
@@ -83,10 +97,10 @@ export class BatchGetSingleTableRequest<T> extends BaseRequest<
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
-    let items: T[] = []
+    let items: T2[] = []
     if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-      const mapped: T[] = response.Responses[this.tableName].map(attributeMap =>
-        fromDb(<Attributes<T>>attributeMap, this.modelClazz),
+      const mapped: T2[] = response.Responses[this.tableName].map(attributeMap =>
+        fromDb(<Attributes<T2>>attributeMap, <any>this.modelClazz),
       )
       items = mapped
     }

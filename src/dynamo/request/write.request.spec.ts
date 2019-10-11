@@ -7,7 +7,7 @@ import { or } from '../expression/logical-operator/public.api'
 import { WriteRequest } from './write.request'
 
 describe('write request', () => {
-  class TestWriteRequest<T> extends WriteRequest<T, any, any, TestWriteRequest<T>> {
+  class TestWriteRequest<T> extends WriteRequest<T, T, any, any, TestWriteRequest<T>> {
     protected readonly logger: Logger
     readonly params: any = {}
 

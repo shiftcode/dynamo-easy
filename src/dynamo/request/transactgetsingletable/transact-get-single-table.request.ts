@@ -12,10 +12,11 @@ import { TransactGetResponse } from './transact-get-single-table.response'
 /**
  * Request class for TransactGetItems operation which supports a single model class only.
  */
-export class TransactGetSingleTableRequest<T> extends BaseRequest<
+export class TransactGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   T,
+  T2,
   DynamoDB.TransactGetItemsInput,
-  TransactGetSingleTableRequest<T>
+  TransactGetSingleTableRequest<T, T2>
 > {
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoDBWrapper, modelClazz)
@@ -35,24 +36,24 @@ export class TransactGetSingleTableRequest<T> extends BaseRequest<
     return this.dynamoDBWrapper.transactGetItems(this.params)
   }
 
-  execFullResponse(): Promise<TransactGetResponse<T>> {
+  execFullResponse(): Promise<TransactGetResponse<T2>> {
     return this.dynamoDBWrapper.transactGetItems(this.params).then(this.mapResponse)
   }
 
   /**
    * execute request and return the parsed items
    */
-  exec(): Promise<T[]> {
+  exec(): Promise<T2[]> {
     return this.dynamoDBWrapper
       .transactGetItems(this.params)
       .then(this.mapResponse)
       .then(r => r.Items)
   }
 
-  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetResponse<T> => {
+  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetResponse<T2> => {
     return {
       ConsumedCapacity: response.ConsumedCapacity,
-      Items: (response.Responses || []).map(item => fromDb(<Attributes<T>>item.Item, this.modelClazz)),
+      Items: (response.Responses || []).map(item => fromDb(<Attributes<T2>>item.Item, <any>this.modelClazz)),
     }
   }
 }

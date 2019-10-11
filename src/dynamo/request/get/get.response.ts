@@ -9,7 +9,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
  */
 export interface GetResponse<T> {
   /**
-   * A map of attribute names to AttributeValue objects, as specified by ProjectionExpression.
+   * A map of attribute names to AttributeValue objects (subset if ProjectionExpression was defined).
    */
   Item: T | null
   /**
