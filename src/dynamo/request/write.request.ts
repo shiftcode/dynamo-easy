@@ -29,10 +29,11 @@ type WriteResponse<O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput 
  */
 export abstract class WriteRequest<
   T,
+  T2,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
   O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput | DynamoDB.UpdateItemOutput,
-  R extends WriteRequest<T, I, O, R>
-> extends StandardRequest<T, I, R> {
+  R extends WriteRequest<T, T2, I, O, R>
+> extends StandardRequest<T, T2, I, R> {
   protected abstract readonly logger: Logger
 
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
@@ -44,46 +45,46 @@ export abstract class WriteRequest<
   /**
    * return item collection metrics.
    */
-  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): R {
+  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): this {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
-    return <R>(<any>this)
+    return this
   }
 
   /**
    * add a condition for propertyPath
    * @param attributePath
    */
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
-  onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
-  onlyIfAttribute<K extends keyof T>(attributePath: K | string): RequestConditionFunctionTyped<R, T, K> {
-    return addCondition<R, T, any>('ConditionExpression', attributePath, <any>this, this.metadata)
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
+  onlyIfAttribute(attributePath: string): RequestConditionFunction<this, T>
+  onlyIfAttribute<K extends keyof T>(attributePath: K | string): RequestConditionFunctionTyped<this, T, K> {
+    return addCondition<this, T, any>('ConditionExpression', attributePath, <any>this, this.metadata)
   }
 
   /**
    * @example writeRequest.onlyIf( attribute('age').eq(23) )
    * @example writeRequest.onlyIf( or( attribute('age').lt(18), attribute('age').gt(65) ) )
    */
-  onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
+  onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): this {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
-    return <any>this
+    return this
   }
 
   /**
    * @returns { void } if no ReturnValues are requested, { T } if the requested ReturnValues are ALL_OLD|ALL_NEW or {Partial<T>} if the requested ReturnValues are UPDATED_OLD|UPDATED_NEW
    */
-  exec(): Promise<void> {
+  exec(): Promise<T2> {
     /*
      * kind a hacky - this is just for typing reasons so Promise<void> is the default return type when not defining a
      * returnValues other than NONE
      */
-    return this.execFullResponse().then(r => <void>(<any>r).Item)
+    return this.execFullResponse().then(r => (<any>r).Item)
   }
 
   /**
    * execute request and return the full response
    */
-  execFullResponse(): Promise<WriteResponse<O, T>> {
+  execFullResponse(): Promise<WriteResponse<O, T2>> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))

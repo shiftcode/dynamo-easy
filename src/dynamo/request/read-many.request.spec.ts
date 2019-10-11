@@ -14,7 +14,7 @@ import { or } from '../expression/logical-operator/public.api'
 import { getTableName } from '../get-table-name.function'
 import { ReadManyRequest } from './read-many.request'
 
-class TestRequest<T> extends ReadManyRequest<T, any, any, any, any> {
+class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any, any> {
   constructor(modelClazz: ModelConstructor<T>) {
     super(<any>null, modelClazz)
     this.logger = createLogger('TestRequest', modelClazz)
@@ -120,6 +120,23 @@ describe('ReadManyRequest', () => {
 
     it('should return instance', () => {
       const r = request.consistentRead(true)
+      expect(r).toBe(request)
+    })
+  })
+
+  describe('projection expression', () => {
+    beforeEach(() => {
+      request = new TestRequest(SimpleWithPartitionKeyModel)
+    })
+
+    it('should set param for projection expression', () => {
+      ;(request as TestRequest<SimpleWithPartitionKeyModel>).projectionExpression('age')
+      expect(request.params.ProjectionExpression).toBe('#age')
+      expect(request.params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
+    })
+
+    it('should return instance', () => {
+      const r = request.projectionExpression('age')
       expect(r).toBe(request)
     })
   })

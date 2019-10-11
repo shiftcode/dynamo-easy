@@ -9,7 +9,7 @@ import * as DynamoDB from 'aws-sdk/clients/dynamodb'
  */
 export interface QueryResponse<T> {
   /**
-   * An array of item attributes that match the query criteria. Each element in this array consists of an attribute name and the value for that attribute.
+   * An array of item attributes that match the query criteria. Each element in this array consists of an attribute name and the value for that attribute (subset of attributes if ProjectionExpression was defined).
    */
   Items: T[]
   /**
