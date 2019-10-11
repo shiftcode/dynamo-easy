@@ -4,7 +4,7 @@ import { ModelConstructor } from '../../model/model-constructor'
 import { BaseRequest } from './base.request'
 
 describe('base request', () => {
-  class TestRequest<T> extends BaseRequest<T, any, BaseRequest<T, any, any>> {
+  class TestRequest<T> extends BaseRequest<T, T, any, BaseRequest<T, T, any, any>> {
     constructor(modelClazz: ModelConstructor<T>) {
       super(<any>null, modelClazz)
     }

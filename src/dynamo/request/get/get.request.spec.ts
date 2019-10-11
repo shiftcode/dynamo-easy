@@ -19,7 +19,7 @@ describe('GetRequest', () => {
     })
   })
 
-  describe('correct params', () => {
+  describe('correct params (simple model)', () => {
     let request: GetRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
@@ -34,11 +34,10 @@ describe('GetRequest', () => {
     })
 
     it('projection expression', () => {
-      request.projectionExpression('name')
-
+      request.projectionExpression('age')
       const params = request.params
-      expect(params.ProjectionExpression).toBe('#name')
-      expect(params.ExpressionAttributeNames).toEqual({ '#name': 'name' })
+      expect(params.ProjectionExpression).toBe('#age')
+      expect(params.ExpressionAttributeNames).toEqual({ '#age': 'age' })
       expect(Object.keys(params).length).toBe(4)
     })
 

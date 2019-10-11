@@ -23,7 +23,10 @@ export class TransactWriteRequest {
     }
   }
 
-  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): TransactWriteRequest {
+  /**
+   * return ConsumedCapacity of the corresponding table(s) in the response
+   */
+  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): this {
     this.params.ReturnConsumedCapacity = level
     return this
   }
@@ -31,12 +34,17 @@ export class TransactWriteRequest {
   /**
    * return item collection metrics.
    */
-  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): TransactWriteRequest {
+  returnItemCollectionMetrics(returnItemCollectionMetrics: DynamoDB.ReturnItemCollectionMetrics): this {
     this.params.ReturnItemCollectionMetrics = returnItemCollectionMetrics
     return this
   }
 
-  transact(...writeOperations: TransactOperation[]): TransactWriteRequest {
+  /**
+   * add up to 10 transaction operations
+   * create the operations with:
+   * {@link TransactConditionCheck}, {@link TransactDelete}, {@link TransactPut}, {@link TransactUpdate}
+   */
+  transact(...writeOperations: TransactOperation[]): this {
     if (!writeOperations || writeOperations.length === 0) {
       throw new Error('at least one transaction operation must be added')
     }

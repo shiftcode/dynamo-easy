@@ -60,12 +60,24 @@ describe('batch get', () => {
       })
     })
 
-    it('ConsistentRead', () => {
+    it('consistent read', () => {
       const request = new BatchGetSingleTableRequest<any>(<any>null, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
       request.consistentRead()
       expect(request.params.RequestItems).toBeDefined()
       expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)]).toBeDefined()
       expect(request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)].ConsistentRead).toBeTruthy()
+    })
+
+    it('projection expression', () => {
+      const request = new BatchGetSingleTableRequest<any>(<any>null, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
+      request.projectionExpression('age')
+      expect(request.params.RequestItems).toBeDefined()
+      const params = request.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)]
+      expect(params).toBeDefined()
+      expect(params.ProjectionExpression).toBe('#age')
+      expect(params.ExpressionAttributeNames).toEqual({
+        '#age': 'age',
+      })
     })
   })
 

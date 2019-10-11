@@ -13,6 +13,7 @@ import { BaseRequest } from './base.request'
  */
 export abstract class StandardRequest<
   T,
+  T2,
   I extends
     | DynamoDB.DeleteItemInput
     | DynamoDB.GetItemInput
@@ -20,8 +21,8 @@ export abstract class StandardRequest<
     | DynamoDB.UpdateItemInput
     | DynamoDB.QueryInput
     | DynamoDB.ScanInput,
-  R extends StandardRequest<T, I, any>
-> extends BaseRequest<T, I, R> {
+  R extends StandardRequest<T, T2, I, any>
+> extends BaseRequest<T, T2, I, R> {
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
     super(dynamoDBWrapper, modelClazz)
     this.params.TableName = getTableName(this.metadata)

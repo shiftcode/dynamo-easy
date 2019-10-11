@@ -16,7 +16,10 @@ export class TransactPut<T> extends TransactBaseOperation<T, DynamoDB.Put, Trans
     this.params.Item = toDb(item, this.modelClazz)
   }
 
-  ifNotExists(predicate: boolean = true): TransactPut<T> {
+  /**
+   * Adds a condition expression to the request, which makes sure the item will only be saved if the id does not exist
+   */
+  ifNotExists(predicate: boolean = true): this {
     if (predicate) {
       this.onlyIf(...createIfNotExistsCondition(this.metadata))
     }

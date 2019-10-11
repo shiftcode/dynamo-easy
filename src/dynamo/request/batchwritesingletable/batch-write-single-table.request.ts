@@ -14,10 +14,11 @@ import { BaseRequest } from '../base.request'
 /**
  * Request class for BatchWriteItem operation which supports a single model class only.
  */
-export class BatchWriteSingleTableRequest<T> extends BaseRequest<
+export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
   T,
+  T2,
   DynamoDB.BatchWriteItemInput,
-  BatchWriteSingleTableRequest<T>
+  BatchWriteSingleTableRequest<T, T2>
 > {
   private readonly logger: Logger
   private toKey = createToKeyFn(this.modelClazz)
@@ -33,11 +34,12 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<
   /**
    * return item collection metrics.
    */
-  returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics) {
+  returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics): this {
     this.params.ReturnItemCollectionMetrics = value
+    return this
   }
 
-  delete(items: Array<Partial<T>>): BatchWriteSingleTableRequest<T> {
+  delete(items: Array<Partial<T>>): this {
     if (this.params.RequestItems[this.tableName].length + items.length > BATCH_WRITE_MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`batch write takes at max ${BATCH_WRITE_MAX_REQUEST_ITEM_COUNT} items`)
     }
@@ -45,7 +47,7 @@ export class BatchWriteSingleTableRequest<T> extends BaseRequest<
     return this
   }
 
-  put(items: T[]): BatchWriteSingleTableRequest<T> {
+  put(items: T[]): this {
     if (this.params.RequestItems[this.tableName].length + items.length > BATCH_WRITE_MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`batch write takes at max ${BATCH_WRITE_MAX_REQUEST_ITEM_COUNT} items`)
     }

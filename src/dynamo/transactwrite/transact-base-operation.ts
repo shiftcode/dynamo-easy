@@ -50,29 +50,29 @@ export abstract class TransactBaseOperation<
    * create a condition on given attributePath
    * @example req.onlyIfAttribute('age').lt(10)
    */
-  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
-  onlyIfAttribute(attributePath: string): RequestConditionFunction<R, T>
+  onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
+  onlyIfAttribute(attributePath: string): RequestConditionFunction<this, T>
   onlyIfAttribute<K extends keyof T>(
     attributePath: string | K,
-  ): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
-    return addCondition<R, T, any>('ConditionExpression', attributePath, <R>(<any>this), this.metadata)
+  ): RequestConditionFunction<this, T> | RequestConditionFunctionTyped<this, T, K> {
+    return addCondition<this, T, any>('ConditionExpression', attributePath, this, this.metadata)
   }
 
   /**
    * add a condition necessary for the transaction to succeed
    * @example req.onlyIf(or(attribute('age').lt(10), attribute('age').gt(20)))
    */
-  onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
+  onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): this {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('ConditionExpression', condition, this.params)
-    return <R>(<any>this)
+    return this
   }
 
   /**
    * get the item attributes if the condition fails
    */
-  returnValuesOnConditionCheckFailure(value: DynamoDB.ReturnValuesOnConditionCheckFailure): R {
+  returnValuesOnConditionCheckFailure(value: DynamoDB.ReturnValuesOnConditionCheckFailure): this {
     this.params.ReturnValuesOnConditionCheckFailure = value
-    return <R>(<any>this)
+    return this
   }
 }
