@@ -1,12 +1,13 @@
 /**
  * @module expression
  */
-import { curry, isPlainObject } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
 import {
   alterCollectionPropertyMetadataForSingleItem,
   PropertyMetadata,
 } from '../../decorator/metadata/property-metadata.model'
+import { curry } from '../../helper/curry.function'
+import { isPlainObject } from '../../helper/is-plain-object.function'
 import { toDbOne } from '../../mapper/mapper'
 import { Attribute, Attributes } from '../../mapper/type/attribute.type'
 import { typeOf } from '../../mapper/util'

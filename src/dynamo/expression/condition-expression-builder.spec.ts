@@ -1,5 +1,4 @@
 // tslint:disable:max-classes-per-file
-import { has } from 'lodash'
 import { ComplexModel } from '../../../test/models'
 import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
 import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'
@@ -304,9 +303,9 @@ describe('expressions', () => {
 
       expect(condition.attributeValues).toBeDefined()
       expect(Object.keys(condition.attributeValues).length).toBe(2)
-      expect(has(condition.attributeValues, ':counter')).toBeTruthy()
+      expect(':counter' in condition.attributeValues).toBeTruthy()
       expect(condition.attributeValues[':counter']).toEqual({ N: '2' })
-      expect(has(condition.attributeValues, ':counter_2')).toBeTruthy()
+      expect(':counter_2' in condition.attributeValues).toBeTruthy()
       expect(condition.attributeValues[':counter_2']).toEqual({ N: '5' })
     })
 
@@ -331,9 +330,9 @@ describe('expressions', () => {
 
       expect(condition.attributeValues).toBeDefined()
       expect(Object.keys(condition.attributeValues).length).toBe(2)
-      expect(has(condition.attributeValues, ':creationDate')).toBeTruthy()
+      expect(':creationDate' in condition.attributeValues).toBeTruthy()
       expect(condition.attributeValues[':creationDate']).toEqual({ S: date1.toISOString() })
-      expect(has(condition.attributeValues, ':creationDate_2')).toBeTruthy()
+      expect(':creationDate_2' in condition.attributeValues).toBeTruthy()
       expect(condition.attributeValues[':creationDate_2']).toEqual({ S: date2.toISOString() })
     })
   })

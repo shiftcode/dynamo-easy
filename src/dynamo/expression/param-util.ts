@@ -2,11 +2,12 @@
  * @module expression
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash'
+import { isEmpty } from '../../helper/is-empty.function'
 import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type/expression.type'
 import { UpdateActionKeyword } from './type/update-action-keyword.type'
+
 /**
  * @hidden
  */
@@ -43,7 +44,7 @@ export function addExpression(
   }
 
   const statement = params[expressionType]
-  if (isString(statement) && statement !== '') {
+  if (typeof statement === 'string' && statement !== '') {
     switch (expressionType) {
       case 'UpdateExpression':
         ;(<any>params)[expressionType] = mergeUpdateExpressions(statement, nameSafeCondition.statement)

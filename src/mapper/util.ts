@@ -1,7 +1,6 @@
 /**
  * @module mapper
  */
-import { isNumber, isString } from 'lodash'
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { ModelConstructor } from '../model/model-constructor'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
@@ -147,9 +146,9 @@ export function isSet(value: any): value is Set<any> {
 export function detectType(value: any): AttributeType {
   if (isCollection(value)) {
     return detectCollectionTypeFromValue(value)
-  } else if (isString(value)) {
+  } else if (typeof value === 'string') {
     return 'S'
-  } else if (isNumber(value)) {
+  } else if (typeof value === 'number') {
     return 'N'
   } else if (isBinary(value)) {
     return 'B'
