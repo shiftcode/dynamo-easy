@@ -70,10 +70,10 @@ export class Metadata<T> {
 
   /**
    *
-   * @returns {Array<PropertyMetadata<any>>} Returns all the properties property the @PartitionKeyUUID decorator is present, returns an empty array by default
+   * @returns {Array<PropertyMetadata<any>>} Returns all the properties a defaultValueProvider, returns an empty array by default
    */
-  getKeysWithUUID(): Array<PropertyMetadata<any>> {
-    return filterBy(this.modelOptions, p => !!(p.key && p.key.uuid), [])
+  getPropertiesWithDefaultValueProvider(): Array<PropertyMetadata<any>> {
+    return filterBy(this.modelOptions, p => !!p.defaultValueProvider, [])
   }
 
   /**
