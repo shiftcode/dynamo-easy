@@ -12,13 +12,13 @@ function numberFromDb(attributeValue: NumberAttribute): number {
     }
     return numberValue
   } else {
-    throw new Error('there is no N(umber) value defiend on given attribute value')
+    throw new Error(`there is no N(umber) value defined on given attribute value: ${JSON.stringify(attributeValue)}`)
   }
 }
 
 function numberToDb(modelValue: number): NumberAttribute | null {
   if (typeof modelValue !== 'number') {
-    throw new Error('this mapper only support values of type number')
+    throw new Error(`this mapper only support values of type number, value given: ${JSON.stringify(modelValue)}`)
   }
 
   if (isNaN(modelValue)) {

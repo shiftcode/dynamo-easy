@@ -96,6 +96,7 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
       return 'SS'
     }
   } else {
+    // basically can't happen since collectionmapper already checks for arr/set or throws
     throw new Error('given collection was neither array nor Set -> type could not be detected')
   }
 }
@@ -144,9 +145,7 @@ export function isSet(value: any): value is Set<any> {
  * @hidden
  */
 export function detectType(value: any): AttributeType {
-  if (isCollection(value)) {
-    return detectCollectionTypeFromValue(value)
-  } else if (typeof value === 'string') {
+  if (typeof value === 'string') {
     return 'S'
   } else if (typeof value === 'number') {
     return 'N'
@@ -156,11 +155,13 @@ export function detectType(value: any): AttributeType {
     return 'NULL'
   } else if (typeof value === 'boolean') {
     return 'BOOL'
+  } else if (isCollection(value)) {
+    return detectCollectionTypeFromValue(value)
   } else if (typeof value === 'object') {
     return 'M'
   }
 
-  throw new Error(`the type for value ${value} could not be detected`)
+  throw new Error(`the type for value ${value} could not be detected.`)
 }
 
 /**

@@ -28,5 +28,8 @@ describe('string mapper', () => {
       const stringValue = StringMapper.fromDb({ S: 'myStringValue' })
       expect(stringValue).toBe('myStringValue')
     })
+    it('should throw if not a string attribute', () => {
+      expect(() => StringMapper.fromDb(<any>{ N: '8' })).toThrow()
+    })
   })
 })

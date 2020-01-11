@@ -6,9 +6,13 @@ import { PutRequest } from './put.request'
 
 describe('put request', () => {
   describe('params', () => {
-    const request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, {
-      id: 'myId',
-      age: 45,
+    let request: PutRequest<SimpleWithPartitionKeyModel>
+
+    beforeEach(() => {
+      request = new PutRequest(<any>null, SimpleWithPartitionKeyModel, {
+        id: 'myId',
+        age: 45,
+      })
     })
 
     it('constructor', () => {
@@ -25,6 +29,16 @@ describe('put request', () => {
       const params: DynamoDB.PutItemInput = request.params
       expect(params.ConditionExpression).toBe('attribute_not_exists (#id)')
       expect(params.ExpressionAttributeNames).toEqual({ '#id': 'id' })
+      expect(params.ExpressionAttributeValues).toBeUndefined()
+    })
+
+    it('ifNotExists with false  does add the predicate', () => {
+      // but it also does not remove it. it actually does nothing with false but returning the request instance
+      request.ifNotExists(false)
+
+      const params: DynamoDB.PutItemInput = request.params
+      expect(params.ConditionExpression).toBeUndefined()
+      expect(params.ExpressionAttributeNames).toBeUndefined()
       expect(params.ExpressionAttributeValues).toBeUndefined()
     })
 

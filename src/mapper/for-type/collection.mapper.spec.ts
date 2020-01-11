@@ -64,6 +64,16 @@ describe('collection mapper', () => {
       it('heterogeneous set should throw', () => {
         expect(() => CollectionMapper.toDb(new Set(['value1', 10]))).toThrow()
       })
+
+      /*
+       * neither set nor arr or not primitive in set
+       */
+      it('should throw if neither array nor set', () => {
+        expect(() => CollectionMapper.toDb(<any>{ aValue: true })).toThrow()
+      })
+      it('should throw if set of non primitives', () => {
+        expect(() => CollectionMapper.toDb(new Set([{ aValue: true }]))).toThrow()
+      })
     })
 
     describe('with metadata', () => {
@@ -116,6 +126,42 @@ describe('collection mapper', () => {
         expect(Array.isArray(attributeValue.L)).toBeTruthy()
         expect(attributeValue.L.length).toBe(2)
         expect(attributeValue.L).toEqual([{ N: '5' }, { N: '10' }])
+      })
+
+      it('set with generic number type', () => {
+        const meta: PropertyMetadata<any, NumberSetAttribute> = {
+          name: 'aName',
+          nameDb: 'aName',
+          typeInfo: {
+            type: Set,
+            genericType: Number,
+          },
+        }
+        const r = CollectionMapper.toDb(new Set([1, 2, 3, 5]), <any>meta)
+        expect(r).toEqual({ NS: ['1', '2', '3', '5'] })
+      })
+
+      it('without generic type but actually set of numbers', () => {
+        const meta: PropertyMetadata<any, NumberSetAttribute> = {
+          name: 'aName',
+          nameDb: 'aName',
+          typeInfo: {
+            type: Set,
+          },
+        }
+        const r = CollectionMapper.toDb(new Set([1, 2, 3, 5]), <any>meta)
+        expect(r).toEqual({ NS: ['1', '2', '3', '5'] })
+      })
+
+      it('throws if explicit type is neither array nor set', () => {
+        const meta: PropertyMetadata<any, NumberSetAttribute> = {
+          name: 'aName',
+          nameDb: 'aName',
+          typeInfo: {
+            type: Number,
+          },
+        }
+        expect(() => CollectionMapper.toDb(new Set([0, 1, 1, 2, 3, 5]), <any>meta)).toThrow()
       })
     })
 
@@ -194,6 +240,10 @@ describe('collection mapper', () => {
         expect(numberSet instanceof Set).toBeTruthy()
         expect(numberSet.size).toBe(2)
         expect(typeof Array.from(numberSet)[0]).toBe('number')
+      })
+
+      it('throws if not a L|SS|NS|BS', () => {
+        expect(() => CollectionMapper.fromDb(<any>{ S: 'not a list' })).toThrow()
       })
     })
   })
