@@ -3,6 +3,7 @@
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { isEmpty } from '../../helper/is-empty.function'
+import { isString } from '../../helper/is-string.function'
 import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type/expression.type'
@@ -44,7 +45,7 @@ export function addExpression(
   }
 
   const statement = params[expressionType]
-  if (typeof statement === 'string' && statement !== '') {
+  if (isString(statement) && statement !== '') {
     switch (expressionType) {
       case 'UpdateExpression':
         ;(<any>params)[expressionType] = mergeUpdateExpressions(statement, nameSafeCondition.statement)
