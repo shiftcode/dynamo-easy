@@ -2,6 +2,8 @@
  * @module mapper
  */
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { isNumber } from '../helper/is-number.function'
+import { isString } from '../helper/is-string.function'
 import { ModelConstructor } from '../model/model-constructor'
 import { AttributeCollectionType, AttributeType } from './type/attribute-type.type'
 import { AttributeValueType } from './type/attribute-value-type.type'
@@ -145,9 +147,9 @@ export function isSet(value: any): value is Set<any> {
  * @hidden
  */
 export function detectType(value: any): AttributeType {
-  if (typeof value === 'string') {
+  if (isString(value)) {
     return 'S'
-  } else if (typeof value === 'number') {
+  } else if (isNumber(value)) {
     return 'N'
   } else if (isBinary(value)) {
     return 'B'
