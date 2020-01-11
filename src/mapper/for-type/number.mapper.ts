@@ -1,6 +1,7 @@
 /**
  * @module mapper
  */
+import { isNumber } from '../../helper/is-number.function'
 import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
@@ -17,7 +18,7 @@ function numberFromDb(attributeValue: NumberAttribute): number {
 }
 
 function numberToDb(modelValue: number): NumberAttribute | null {
-  if (typeof modelValue !== 'number') {
+  if (!isNumber(modelValue)) {
     throw new Error(`this mapper only support values of type number, value given: ${JSON.stringify(modelValue)}`)
   }
 
