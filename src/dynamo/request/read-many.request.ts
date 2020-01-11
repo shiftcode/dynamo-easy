@@ -18,6 +18,7 @@ import {
   RequestConditionFunctionTyped,
 } from '../expression/type/condition-expression-definition-chain'
 import { ConditionExpressionDefinitionFunction } from '../expression/type/condition-expression-definition-function'
+import { addProjectionExpressionParam } from './helper/add-projection-expression-param.function'
 import { QueryRequest } from './query/query.request'
 import { QueryResponse } from './query/query.response'
 import { ScanRequest } from './scan/scan.request'
@@ -29,11 +30,13 @@ import { StandardRequest } from './standard.request'
  */
 export abstract class ReadManyRequest<
   T,
+  T2,
   I extends DynamoDB.QueryInput | DynamoDB.ScanInput,
   O extends DynamoDB.QueryOutput | DynamoDB.ScanOutput,
-  Z extends QueryResponse<T> | ScanResponse<T>,
-  R extends QueryRequest<T> | ScanRequest<T>
-> extends StandardRequest<T, I, ReadManyRequest<T, I, O, Z, R>> {
+  Z extends QueryResponse<T2> | ScanResponse<T2>,
+  R extends QueryRequest<T, T2> | ScanRequest<T, T2>,
+  R2 extends QueryRequest<T, Partial<T>> | ScanRequest<T, Partial<T>>
+> extends StandardRequest<T, T2, I, ReadManyRequest<T, T2, I, O, Z, R, R2>> {
   /** Infinite limit will remove the Limit param from request params when calling ReadManyRequest.limit(ReadManyRequest.INFINITE_LIMIT) */
   static INFINITE_LIMIT = -1
 
@@ -55,7 +58,7 @@ export abstract class ReadManyRequest<
    * @param key A map representing the start id which is included in next call, if null is delivered
    * startKey will be removed from params
    */
-  exclusiveStartKey(key: DynamoDB.Key | null): R {
+  exclusiveStartKey(key: DynamoDB.Key | null): this {
     // TODO ENHANCEMENT exclusiveStartKey(item: Partial<T>)
     if (key) {
       this.params.ExclusiveStartKey = key
@@ -63,13 +66,13 @@ export abstract class ReadManyRequest<
       delete this.params.ExclusiveStartKey
     }
 
-    return <any>this
+    return this
   }
 
   /**
    * query items on the given index.
    */
-  index(indexName: string): R {
+  index(indexName: string): this {
     const index = this.metadata.getIndex(indexName)
 
     if (index) {
@@ -78,13 +81,13 @@ export abstract class ReadManyRequest<
     } else {
       throw new Error(`there is no index with name <${indexName}> defined for model ${this.modelClazz.name}`)
     }
-    return <any>this
+    return this
   }
 
   /**
    * set Limit to params - The maximum number of items to evaluate (not necessarily the number of matching items)
    */
-  limit(limit: number): R {
+  limit(limit: number): this {
     if (limit === ReadManyRequest.INFINITE_LIMIT) {
       delete this.params.Limit
     } else {
@@ -95,14 +98,23 @@ export abstract class ReadManyRequest<
       }
     }
 
-    return <any>this
+    return this
   }
 
   /**
    * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
    */
-  consistentRead(consistentRead: boolean = true): R {
+  consistentRead(consistentRead: boolean = true): this {
     this.params.ConsistentRead = consistentRead
+    return this
+  }
+
+  /**
+   * Specifies the list of model attributes to be returned from the table instead of returning the entire document
+   * @param attributesToGet List of model attributes to be returned
+   */
+  projectionExpression(...attributesToGet: Array<keyof T | string>): R2 {
+    addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
     return <any>this
   }
 
@@ -110,12 +122,12 @@ export abstract class ReadManyRequest<
    * add a condition for propertyPath
    * @example req.whereAttribute('path.to.prop').eq('value')
    */
-  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<R, T, K>
-  whereAttribute(attributePath: string): RequestConditionFunction<R, T>
+  whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
+  whereAttribute(attributePath: string): RequestConditionFunction<this, T>
   whereAttribute<K extends keyof T>(
     attributePath: string | K,
-  ): RequestConditionFunction<R, T> | RequestConditionFunctionTyped<R, T, K> {
-    return addCondition<R, T, any>('FilterExpression', attributePath, <any>this, this.metadata)
+  ): RequestConditionFunction<this, T> | RequestConditionFunctionTyped<this, T, K> {
+    return addCondition<this, T, any>('FilterExpression', attributePath, this, this.metadata)
   }
 
   /**
@@ -123,10 +135,10 @@ export abstract class ReadManyRequest<
    * @example req.where( attribute('age').eq(23) )
    * @example req.where( or( attribute('age').lt(18), attribute('age').gt(65) ) )
    */
-  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): R {
+  where(...conditionDefFns: ConditionExpressionDefinitionFunction[]): this {
     const condition = and(...conditionDefFns)(undefined, this.metadata)
     addExpression('FilterExpression', condition, this.params)
-    return <any>this
+    return this
   }
 
   /**
@@ -140,7 +152,7 @@ export abstract class ReadManyRequest<
   /**
    * Execute with Limit: 1 to read the first item only
    */
-  execSingle(): Promise<T | null> {
+  execSingle(): Promise<T2 | null> {
     // do not alter the params on the instance but add the additional 'Limit' param to a copy.
     // otherwise a follow-up request with the very same request-object would be wrong
     const params = {
@@ -177,7 +189,7 @@ export abstract class ReadManyRequest<
   /**
    * execute request and return the parsed items
    */
-  exec(): Promise<T[]> {
+  exec(): Promise<T2[]> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
       .then(promiseTap(response => this.logger.debug('response', response)))
@@ -200,13 +212,13 @@ export abstract class ReadManyRequest<
   /**
    * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
    */
-  execFetchAll(): Promise<T[]> {
-    return fetchAll(<R>(<any>this))
+  execFetchAll(): Promise<T2[]> {
+    return fetchAll(<any>this)
   }
 
   protected mapFromDb = (output: O) => {
     const response: Z = { ...(<any>output) }
-    response.Items = (output.Items || []).map(item => fromDb(<Attributes<T>>item, this.modelClazz))
+    response.Items = (output.Items || []).map(item => fromDb(<Attributes<T2>>item, <any>this.modelClazz))
 
     return response
   }
