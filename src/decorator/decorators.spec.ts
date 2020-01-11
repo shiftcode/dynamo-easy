@@ -19,6 +19,8 @@ import {
   SimpleModel,
 } from '../../test/models'
 import { Form } from '../../test/models/real-world'
+import { updateDynamoEasyConfig } from '../config/update-config.function'
+import { LogLevel } from '../logger/log-level.type'
 import { CollectionProperty } from './impl/collection/collection-property.decorator'
 import { GSIPartitionKey } from './impl/index/gsi-partition-key.decorator'
 import { GSISortKey } from './impl/index/gsi-sort-key.decorator'
@@ -65,7 +67,7 @@ describe('Decorators should add correct metadata', () => {
     })
 
     it('with no properties', () => {
-      expect(modelOptions.properties).toBeUndefined()
+      expect(modelOptions.properties).toEqual([])
     })
   })
 
@@ -317,6 +319,77 @@ describe('Decorators should add correct metadata', () => {
     })
   })
 
+  describe('multiple property decorators', () => {
+    const REVERSE_INDEX = 'reverse-index'
+    const OTHER_INDEX = 'other-index'
+    const LSI_1 = 'lsi-1'
+    const LSI_2 = 'lsi-2'
+
+    @Model()
+    class ABC {
+      @PartitionKey()
+      @Property({ name: 'pk' })
+      @GSISortKey(REVERSE_INDEX)
+      id: string
+
+      @SortKey()
+      @Property({ name: 'sk' })
+      @GSIPartitionKey(REVERSE_INDEX)
+      @GSISortKey(OTHER_INDEX)
+      timestamp: number
+
+      @GSIPartitionKey(OTHER_INDEX)
+      @LSISortKey(LSI_1)
+      @LSISortKey(LSI_2)
+      otherId: string
+    }
+
+    let metaData: Metadata<ABC>
+
+    beforeEach(() => (metaData = metadataForModel(ABC)))
+
+    it('PartitionKey & Property & GSISortKey should combine the data', () => {
+      const propData = metaData.forProperty('id')
+      expect(propData).toEqual({
+        key: { type: 'HASH' },
+        name: 'id',
+        nameDb: 'pk',
+        typeInfo: { type: String },
+        keyForGSI: { [REVERSE_INDEX]: 'RANGE' },
+      })
+    })
+    it('SortKey & Property & GSIPartitionKey & GSISortKey should combine the data', () => {
+      const propData = metaData.forProperty('timestamp')
+      expect(propData).toEqual({
+        key: { type: 'RANGE' },
+        name: 'timestamp',
+        nameDb: 'sk',
+        typeInfo: { type: Number },
+        keyForGSI: { [REVERSE_INDEX]: 'HASH', [OTHER_INDEX]: 'RANGE' },
+      })
+    })
+    it('GSIPartitionKey & multiple LSISortkey should combine the data', () => {
+      const propData = metaData.forProperty('otherId')
+      expect(propData).toBeDefined()
+      expect(propData!.name).toEqual('otherId')
+      expect(propData!.nameDb).toEqual('otherId')
+      expect(propData!.typeInfo).toEqual({ type: String })
+      expect(propData!.keyForGSI).toEqual({ [OTHER_INDEX]: 'HASH' })
+      expect(propData!.sortKeyForLSI).toContain(LSI_1)
+      expect(propData!.sortKeyForLSI).toContain(LSI_2)
+    })
+    it('correctly defines the indexes', () => {
+      const reverseIndex = metaData.getIndex(REVERSE_INDEX)
+      const otherIndex = metaData.getIndex(OTHER_INDEX)
+      const lsi1 = metaData.getIndex(LSI_1)
+      const lsi2 = metaData.getIndex(LSI_2)
+      expect(reverseIndex).toEqual({ partitionKey: 'sk', sortKey: 'pk' })
+      expect(otherIndex).toEqual({ partitionKey: 'otherId', sortKey: 'sk' })
+      expect(lsi1).toEqual({ partitionKey: 'pk', sortKey: 'otherId' })
+      expect(lsi2).toEqual({ partitionKey: 'pk', sortKey: 'otherId' })
+    })
+  })
+
   describe('enum (no Enum decorator)', () => {
     let metadata: Metadata<ModelWithEnum>
 
@@ -544,17 +617,43 @@ describe('Decorators should add correct metadata', () => {
   })
 
   describe('should throw when more than one partitionKey was defined in a model', () => {
-    expect(() => {
-      @Model()
-      class InvalidModel {
-        @PartitionKey()
-        partKeyA: string
+    it('does so', () => {
+      expect(() => {
+        @Model()
+        class InvalidModel {
+          @PartitionKey()
+          partKeyA: string
 
+          @PartitionKey()
+          partKeyB: string
+        }
+
+        return new InvalidModel()
+      }).toThrow()
+    })
+  })
+
+  describe('decorate property multiple times identically', () => {
+    let logReceiver: jest.Mock
+
+    beforeEach(() => {
+      logReceiver = jest.fn()
+      updateDynamoEasyConfig({ logReceiver })
+    })
+
+    it('should not throw but warn, if the PartitionKey is two times annotated', () => {
+      @Model()
+      class NotCoolButOkModel {
         @PartitionKey()
-        partKeyB: string
+        @PartitionKey()
+        doppeltGemoppelt: string
       }
 
-      return new InvalidModel()
-    }).toThrow()
+      const propertyMetaData = metadataForModel(NotCoolButOkModel).forProperty('doppeltGemoppelt')
+      expect(propertyMetaData).toBeDefined()
+      expect(propertyMetaData!.key).toEqual({ type: 'HASH' })
+      expect(logReceiver).toBeCalledTimes(1)
+      expect(logReceiver.mock.calls[0][0].level).toBe(LogLevel.WARNING)
+    })
   })
 })

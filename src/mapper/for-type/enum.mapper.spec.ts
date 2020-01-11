@@ -51,15 +51,27 @@ describe('enum mapper', () => {
     })
 
     it('should throw', () => {
-      expect(() => {
-        EnumMapper.fromDb(<any>{ S: '2' }, propertyMetadata)
-      }).toThrowError()
+      expect(() => EnumMapper.fromDb(<any>{ S: '2' }, propertyMetadata)).toThrow()
     })
 
     it('should throw', () => {
-      expect(() => {
-        EnumMapper.fromDb(<any>{ S: '2' })
-      }).toThrowError()
+      expect(() => EnumMapper.fromDb(<any>{ S: '2' })).toThrow()
+    })
+
+    it('should throw', () => {
+      enum anEnum {
+        OK,
+        NOK,
+      }
+      const meta: PropertyMetadata<any> = <any>{
+        name: 'aName',
+        nameDb: 'sameName',
+        typeInfo: {
+          type: String,
+          genericType: anEnum,
+        },
+      }
+      expect(() => EnumMapper.fromDb(<any>{ N: '2' }, <any>meta)).toThrow()
     })
   })
 })

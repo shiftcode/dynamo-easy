@@ -8,7 +8,7 @@ function stringFromDb(attributeValue: StringAttribute): string {
   if (attributeValue.S) {
     return attributeValue.S
   } else {
-    throw new Error('there is no S(tring) value defiend on given attribute value')
+    throw new Error(`there is no S(tring) value defined on given attribute value: ${JSON.stringify(attributeValue)}`)
   }
 }
 

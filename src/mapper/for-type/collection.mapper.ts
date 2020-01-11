@@ -4,7 +4,7 @@
 import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { notNull } from '../../helper/not-null.function'
 import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'
-import { AttributeCollectionType, AttributeType } from '../type/attribute-type.type'
+import { AttributeCollectionType } from '../type/attribute-type.type'
 import {
   BinarySetAttribute,
   ListAttribute,
@@ -43,14 +43,18 @@ function collectionFromDb(
   }
 
   // if [(N|S|B)S]et
-  if ('SS' in attributeValue) {
+  else if ('SS' in attributeValue) {
     arr = attributeValue.SS
   } else if ('NS' in attributeValue) {
     arr = attributeValue.NS.map(parseFloat)
   } else if ('BS' in attributeValue) {
     arr = attributeValue.BS
   } else {
-    throw new Error('No Collection Data (SS | NS | BS | L) was found in attribute data')
+    throw new Error(
+      `No Collection Data (SS | NS | BS | L) was found in attribute data, given attributeValue: ${JSON.stringify(
+        attributeValue,
+      )}`,
+    )
   }
   return explicitType && explicitType === Array ? arr : new Set(arr)
 }
@@ -60,16 +64,17 @@ function collectionToDb(
   propertyMetadata?: PropertyMetadata<any, CollectionAttributeTypes>,
 ): CollectionAttributeTypes | null {
   if (!(Array.isArray(propertyValue) || isSet(propertyValue))) {
-    throw new Error(`Given value must be either Array or Set ${propertyValue}`)
+    throw new Error(`Given value must be either Array or Set ${JSON.stringify(propertyValue)}`)
   }
 
-  let collectionType: AttributeType
+  let collectionType: AttributeCollectionType
   // detect collection type
   if (propertyMetadata) {
     // based on metadata
     collectionType = detectCollectionTypeFromMetadata(propertyMetadata, propertyValue)
   } else {
     // based on value
+    // or throw if not a collectionType
     collectionType = detectCollectionTypeFromValue(propertyValue)
   }
 
@@ -77,7 +82,7 @@ function collectionToDb(
   propertyValue = isSet(propertyValue) ? Array.from(propertyValue) : propertyValue
 
   // empty values are not allowed for S(et) types only for L(ist)
-  if ((collectionType === 'SS' || collectionType === 'NS' || collectionType === 'BS') && propertyValue.length === 0) {
+  if (collectionType !== 'L' && propertyValue.length === 0) {
     return null
   }
 
@@ -104,8 +109,7 @@ function collectionToDb(
             .filter(notNull),
         }
       }
-    default:
-      throw new Error(`Collection type must be one of SS | NS | BS | L found type ${collectionType}`)
+    // no 'default' necessary, all possible cases caught
   }
 }
 
@@ -121,7 +125,11 @@ function detectCollectionTypeFromMetadata(
   const explicitType = propertyMetadata && propertyMetadata.typeInfo ? propertyMetadata.typeInfo.type : null
 
   if (!(explicitType === Array || explicitType === Set)) {
-    throw new Error(`only 'Array' and 'Set' are valid values for explicit type, found ${explicitType}`)
+    throw new Error(
+      `only 'Array' and 'Set' are valid values for explicit type, found ${explicitType} on value ${JSON.stringify(
+        propertyValue,
+      )}`,
+    )
   }
 
   if (propertyMetadata.isSortedCollection) {

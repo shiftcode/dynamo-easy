@@ -36,6 +36,7 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
         indexData,
       )
       break
+    // `default` is actually unnecessary - but could only be removed by cast or nonNullAssertion of `propertyMetadata`
     default:
       throw new Error(`unsupported index type ${indexType}`)
   }
