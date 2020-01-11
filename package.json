@@ -73,7 +73,7 @@
     "prettier": "^1.18.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
-    "semantic-release": "^16.0.0-beta.18",
+    "semantic-release": "^16.0.1",
     "sort-package-json": "^1.22.1",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
@@ -89,6 +89,7 @@
     "aws-sdk": "^2.401.0",
     "lodash": "^4.17.11",
     "reflect-metadata": "^0.1.12",
+    "tslib": "^1.10.0",
     "uuid": "^3.3.2"
   }
 }
