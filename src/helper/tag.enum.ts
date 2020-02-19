@@ -3,4 +3,5 @@ export enum Tag {
   OBJECT = '[object Object]',
   STRING = '[object String]',
   NUMBER = '[object Number]',
+  BOOLEAN = '[object Boolean]',
 }

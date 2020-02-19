@@ -2,6 +2,7 @@
  * @module mapper
  */
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
+import { isBoolean } from '../helper/is-boolean.function'
 import { isNumber } from '../helper/is-number.function'
 import { isString } from '../helper/is-string.function'
 import { ModelConstructor } from '../model/model-constructor'
@@ -155,7 +156,7 @@ export function detectType(value: any): AttributeType {
     return 'B'
   } else if (value === null) {
     return 'NULL'
-  } else if (typeof value === 'boolean') {
+  } else if (isBoolean(value)) {
     return 'BOOL'
   } else if (isCollection(value)) {
     return detectCollectionTypeFromValue(value)
@@ -181,19 +182,16 @@ export function typeOf(propertyValue: any, propertyPath?: string | null): Attrib
     return Map
   } else if (isBinary(propertyValue)) {
     return Binary
-  } else {
-    switch (typeof propertyValue) {
-      case 'string':
-        return String
-      case 'number':
-        return Number
-      case 'boolean':
-        return Boolean
-      case 'undefined':
-        return UndefinedType
-      case 'object':
-        return Object
-    }
+  } else if (isString(propertyValue)) {
+    return String
+  } else if (isNumber(propertyValue)) {
+    return Number
+  } else if (isBoolean(propertyValue)) {
+    return Boolean
+  } else if (typeof propertyValue === 'undefined') {
+    return UndefinedType
+  } else if (typeof propertyValue === 'object') {
+    return Object
   }
 
   throw new Error(messageWithPath(propertyPath, `typeof data ${propertyValue} could not be detected`))

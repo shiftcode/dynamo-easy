@@ -118,6 +118,8 @@ describe('Util', () => {
     it('detects bool', () => {
       expect(detectType(true)).toBe('BOOL')
       expect(detectType(false)).toBe('BOOL')
+      // tslint:disable-next-line:no-construct
+      expect(detectType(new Boolean(1))).toBe('BOOL')
     })
     it('detects collection', () => {
       expect(detectType(new Set(['a']))).toBe('SS')
