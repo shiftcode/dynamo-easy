@@ -59,7 +59,6 @@
     "@commitlint/config-conventional": "^8.1.0",
     "@commitlint/prompt-cli": "^8.1.0",
     "@types/jest": "^24.0.18",
-    "@types/lodash": "^4.14.137",
     "@types/node": "8.10.40",
     "@types/uuid": "^3.4.5",
     "aws-sdk": "^2.401.0",
