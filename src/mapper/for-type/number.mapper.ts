@@ -1,7 +1,7 @@
 /**
  * @module mapper
  */
-import { isNumber } from 'lodash'
+import { isNumber } from '../../helper/is-number.function'
 import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 

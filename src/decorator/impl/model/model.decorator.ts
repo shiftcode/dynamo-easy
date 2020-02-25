@@ -2,7 +2,7 @@
  * @module decorators
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { kebabCase } from 'lodash'
+import { kebabCase } from '../../../helper/kebab-case.function'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { SecondaryIndex } from '../index/secondary-index'
