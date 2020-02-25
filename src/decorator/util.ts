@@ -27,12 +27,6 @@ export const getMetadataType = makeMetadataGetter<ModelConstructor<any>>(KEY_TYP
 /**
  * @hidden
  */
-export function makeMetadataGetter<T>(metadataKey: string): (target: any, targetKey?: string) => T {
-  return (target: any, targetKey?: string) => {
-    if (targetKey) {
-      return Reflect.getMetadata(metadataKey, target, targetKey)
-    } else {
-      return Reflect.getMetadata(metadataKey, target)
-    }
-  }
+export function makeMetadataGetter<T>(metadataKey: string): (target: any, targetKey: string) => T {
+  return (target: any, targetKey: string) => Reflect.getMetadata(metadataKey, target, targetKey)
 }

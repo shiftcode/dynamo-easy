@@ -1,8 +1,8 @@
 /**
  * @module expression
  */
-import { curry } from 'lodash'
 import { Metadata } from '../../decorator/metadata/metadata'
+import { curry } from '../../helper/curry.function'
 import { ConditionalParamsHost, UpdateParamsHost } from '../operation-params.type'
 import { StandardRequest } from '../request/standard.request'
 import { buildFilterExpression } from './condition-expression-builder'

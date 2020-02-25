@@ -7,7 +7,7 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
 
 
-A dynamoDB client which provides an easy to use fluent api to execute requests. It supports typescript decorators, to define the necessary metadata for your models. You don't need to care about the mapping of javascript types to their dynamo types any more. We got you covered.
+A DynamoDB client which provides an easy to use fluent api to execute requests. It supports TypeScript decorators to define the necessary metadata for your models. You don't need to care about the mapping of JavaScript types to their DynamoDB types any more. We've got you covered.
 
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
@@ -33,10 +33,10 @@ personStore
 
 ```
 
-## Ressources
+## Resources
 - 🤓 Learn more visiting the [docs](https://shiftcode.gitbook.io/dynamo-easy)
 - 📖 Checkout the technical API documentation [api docs](https://shiftcode.github.io/dynamo-easy/)
-- 🚀 Check the running sample on [Stackblitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
+- 🚀 Check the running sample on [StackBlitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
   - [demo git repository](https://github.com/shiftcode/dynamo-easy-demo)
 
 ## Credits

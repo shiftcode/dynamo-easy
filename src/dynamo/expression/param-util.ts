@@ -2,11 +2,13 @@
  * @module expression
  */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { isEmpty, isString } from 'lodash'
+import { isEmpty } from '../../helper/is-empty.function'
+import { isString } from '../../helper/is-string.function'
 import { ConditionalParams } from '../operation-params.type'
 import { resolveAttributeValueNameConflicts } from './functions/resolve-attribute-value-name-conflicts.function'
 import { Expression } from './type/expression.type'
 import { UpdateActionKeyword } from './type/update-action-keyword.type'
+
 /**
  * @hidden
  */

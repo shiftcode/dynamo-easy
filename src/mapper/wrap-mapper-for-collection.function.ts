@@ -120,6 +120,7 @@ export function wrapMapperForDynamoSetJsArray<T, A extends StringAttribute | Num
     toDb: arrayToSetAttribute(customMapper),
   }
 }
+
 /**
  * @hidden
  */

@@ -3,8 +3,10 @@ import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
 import {
   detectCollectionTypeFromValue,
+  detectType,
   isCollection,
   isHomogeneous,
+  isNode,
   isSet,
   typeName,
   typeOf,
@@ -85,6 +87,51 @@ describe('Util', () => {
     it('set with values of different type should throw', () => {
       const collection: Set<any> = new Set(['foo', 5])
       expect(() => detectCollectionTypeFromValue(collection)).toThrow()
+    })
+  })
+
+  describe('detect type', () => {
+    it('detects string', () => {
+      expect(detectType('aString')).toBe('S')
+      expect(detectType(String('aString'))).toBe('S')
+      // tslint:disable-next-line:no-construct
+      expect(detectType(new String('aString'))).toBe('S')
+    })
+    it('detects number', () => {
+      expect(detectType(3)).toBe('N')
+      expect(detectType(Number(-5))).toBe('N')
+      // tslint:disable-next-line:no-construct
+      expect(detectType(new Number(83))).toBe('N')
+    })
+    it('detects binary', () => {
+      let buffer: any
+      if (isNode()) {
+        buffer = Buffer.alloc(5)
+      } else {
+        buffer = new ArrayBuffer(8)
+      }
+      expect(detectType(buffer)).toBe('B')
+    })
+    it('detects null', () => {
+      expect(detectType(null)).toBe('NULL')
+    })
+    it('detects bool', () => {
+      expect(detectType(true)).toBe('BOOL')
+      expect(detectType(false)).toBe('BOOL')
+      // tslint:disable-next-line:no-construct
+      expect(detectType(new Boolean(1))).toBe('BOOL')
+    })
+    it('detects collection', () => {
+      expect(detectType(new Set(['a']))).toBe('SS')
+      expect(detectType(new Set([2]))).toBe('NS')
+      expect(detectType([0, 1, 1, 2, 3, 5])).toBe('L')
+    })
+    it('detects object', () => {
+      expect(detectType({})).toBe('M')
+      expect(detectType({ foo: 'bar' })).toBe('M')
+    })
+    it('throws if not such a type', () => {
+      expect(() => detectType(undefined)).toThrow()
     })
   })
 
