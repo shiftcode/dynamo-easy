@@ -151,6 +151,7 @@ export function detectType(value: any): AttributeType {
   if (isString(value)) {
     return 'S'
   } else if (isNumber(value)) {
+    // TODO LOW: we should probably use _.isFinite --> otherwise Infinity & NaN are numbers as well
     return 'N'
   } else if (isBinary(value)) {
     return 'B'
