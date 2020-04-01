@@ -135,7 +135,7 @@ describe('batch get', () => {
     it('execNoMap should log params and response', async () => {
       await req.execNoMap()
       expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
@@ -143,7 +143,7 @@ describe('batch get', () => {
     it('execFullResponse should log params and response', async () => {
       await req.execFullResponse()
       expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
@@ -151,7 +151,7 @@ describe('batch get', () => {
     it('exec should log params and response', async () => {
       await req.exec()
       expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })

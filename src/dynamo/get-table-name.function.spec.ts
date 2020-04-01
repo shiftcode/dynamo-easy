@@ -20,14 +20,14 @@ describe('getTableName', () => {
   })
 
   it('correct table name - by tableNameResolver', () => {
-    updateDynamoEasyConfig({ tableNameResolver: tableName => `${tableName}-with-special-thing` })
+    updateDynamoEasyConfig({ tableNameResolver: (tableName) => `${tableName}-with-special-thing` })
     expect(getTableName(SimpleModel)).toBe('simple-models-with-special-thing')
     expect(getTableName(metadataForModel(Organization))).toBe('Organization-with-special-thing')
   })
 
   it('throw error because table name is invalid', () => {
     // tslint:disable-next-line:no-unused-expression
-    updateDynamoEasyConfig({ tableNameResolver: tableName => `${tableName}$` })
+    updateDynamoEasyConfig({ tableNameResolver: (tableName) => `${tableName}$` })
     expect(() => getTableName(metadataForModel(SimpleModel))).toThrowError()
     expect(() => getTableName(Organization)).toThrowError()
   })

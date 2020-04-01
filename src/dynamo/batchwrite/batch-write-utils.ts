@@ -20,14 +20,14 @@ export function batchWriteItemsWriteAll(
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
 ): Promise<DynamoDB.BatchGetItemOutput> {
-  return dynamoDBWrapper.batchWriteItem(params).then(response => {
+  return dynamoDBWrapper.batchWriteItem(params).then((response) => {
     if (hasUnprocessedItems(response)) {
       // in case of unprocessedItems do a follow-up requests
       return (
         Promise.resolve(response.UnprocessedItems)
           // delay before doing the follow-up request
           .then(promiseDelay(backoffTimer.next().value * throttleTimeSlot))
-          .then(unprocessedKeys => {
+          .then((unprocessedKeys) => {
             const nextParams: DynamoDB.BatchWriteItemInput = { ...params, RequestItems: unprocessedKeys }
             // call recursively batchWriteItemsWriteAll with the returned UnprocessedItems params
             return batchWriteItemsWriteAll(dynamoDBWrapper, nextParams, backoffTimer, throttleTimeSlot)
@@ -56,5 +56,5 @@ export function hasUnprocessedItems(
   if (!response.UnprocessedItems) {
     return false
   }
-  return Object.values(response.UnprocessedItems).some(t => !!t && t.length > 0)
+  return Object.values(response.UnprocessedItems).some((t) => !!t && t.length > 0)
 }

@@ -21,7 +21,7 @@ export class TransactGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
     super(dynamoDBWrapper, modelClazz)
 
-    this.params.TransactItems = keys.map(key => ({
+    this.params.TransactItems = keys.map((key) => ({
       Get: {
         TableName: this.tableName,
         Key: createToKeyFn(this.modelClazz)(key),
@@ -47,13 +47,13 @@ export class TransactGetSingleTableRequest<T, T2 = T> extends BaseRequest<
     return this.dynamoDBWrapper
       .transactGetItems(this.params)
       .then(this.mapResponse)
-      .then(r => r.Items)
+      .then((r) => r.Items)
   }
 
   private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetResponse<T2> => {
     return {
       ConsumedCapacity: response.ConsumedCapacity,
-      Items: (response.Responses || []).map(item => fromDb(<Attributes<T2>>item.Item, <any>this.modelClazz)),
+      Items: (response.Responses || []).map((item) => fromDb(<Attributes<T2>>item.Item, <any>this.modelClazz)),
     }
   }
 }

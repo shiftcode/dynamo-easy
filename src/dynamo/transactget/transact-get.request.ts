@@ -96,7 +96,7 @@ export class TransactGetRequest {
     return this.dynamoDBWrapper
       .transactGetItems(this.params)
       .then(this.mapResponse)
-      .then(r => r.Items)
+      .then((r) => r.Items)
   }
 
   private mapResponse = (

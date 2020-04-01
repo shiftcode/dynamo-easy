@@ -81,7 +81,7 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   ): Promise<BatchGetSingleTableResponse<T2>> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
-      .then(promiseTap(response => this.logger.debug('mapped items', response.Items)))
+      .then(promiseTap((response) => this.logger.debug('mapped items', response.Items)))
   }
 
   /**
@@ -92,14 +92,14 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT): Promise<T2[]> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
-      .then(r => r.Items)
-      .then(promiseTap(items => this.logger.debug('mapped items', items)))
+      .then((r) => r.Items)
+      .then(promiseTap((items) => this.logger.debug('mapped items', items)))
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
     let items: T2[] = []
     if (response.Responses && Object.keys(response.Responses).length && response.Responses[this.tableName]) {
-      const mapped: T2[] = response.Responses[this.tableName].map(attributeMap =>
+      const mapped: T2[] = response.Responses[this.tableName].map((attributeMap) =>
         fromDb(<Attributes<T2>>attributeMap, <any>this.modelClazz),
       )
       items = mapped
@@ -114,7 +114,7 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
     return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot).then(
-      promiseTap(response => this.logger.debug('response', response)),
+      promiseTap((response) => this.logger.debug('response', response)),
     )
   }
 }

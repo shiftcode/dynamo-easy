@@ -22,7 +22,7 @@ export function mergeConditions(
     }
 
     const statements: string[] = []
-    conditionDefinitionFns.forEach(conditionDefinitionFn => {
+    conditionDefinitionFns.forEach((conditionDefinitionFn) => {
       // we can reuse the same for multiple conditions
       const condition = conditionDefinitionFn(expressionAttributeValues, metadata)
       mergedCondition.attributeNames = { ...mergedCondition.attributeNames, ...condition.attributeNames }
@@ -43,7 +43,7 @@ export function mergeConditions(
        *
        */
       const attributeValues: Record<string, Attribute> = {}
-      Object.keys(condition.attributeValues).forEach(key => {
+      Object.keys(condition.attributeValues).forEach((key) => {
         const unique = uniqueAttributeValueName(key.replace(':', ''), Object.keys(mergedCondition.attributeValues))
         if (key !== unique) {
           // rename of the attributeName is required in condition

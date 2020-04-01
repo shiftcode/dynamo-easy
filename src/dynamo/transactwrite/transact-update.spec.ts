@@ -38,15 +38,10 @@ describe('TransactUpdate', () => {
   })
 
   it('correct transactItem [operations]', () => {
-    op.operations(update2(UpdateModel, 'lastUpdated').set(now, true))
-      .onlyIfAttribute('name')
-      .eq('Foo Bar')
+    op.operations(update2(UpdateModel, 'lastUpdated').set(now, true)).onlyIfAttribute('name').eq('Foo Bar')
   })
 
   it('correct transactItem [updateAttribute]', () => {
-    op.updateAttribute('lastUpdated')
-      .set(now, true)
-      .onlyIfAttribute('name')
-      .eq('Foo Bar')
+    op.updateAttribute('lastUpdated').set(now, true).onlyIfAttribute('name').eq('Foo Bar')
   })
 })

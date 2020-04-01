@@ -20,7 +20,7 @@ export interface IndexData {
  */
 export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, target: any, propertyKey: string): void {
   const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
-  const existingProperty = properties.find(property => property.name === propertyKey)
+  const existingProperty = properties.find((property) => property.name === propertyKey)
 
   let propertyMetadata: Partial<PropertyMetadata<any>>
   switch (indexType) {

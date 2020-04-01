@@ -34,10 +34,10 @@ function collectionFromDb(
   // if [L]ist
   if ('L' in attributeValue) {
     if (hasGenericType(propertyMetadata)) {
-      arr = attributeValue.L.map(item => fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType))
+      arr = attributeValue.L.map((item) => fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType))
     } else {
       // tslint:disable-next-line:no-unnecessary-callback-wrapper
-      arr = attributeValue.L.map(v => fromDbOne(v))
+      arr = attributeValue.L.map((v) => fromDbOne(v))
     }
     return explicitType && explicitType === Set ? new Set(arr) : arr
   }
@@ -91,13 +91,13 @@ function collectionToDb(
     case 'SS':
       return { SS: propertyValue }
     case 'NS':
-      return { NS: propertyValue.map(num => num.toString()) }
+      return { NS: propertyValue.map((num) => num.toString()) }
     case 'BS':
       return { BS: propertyValue }
     case 'L':
       if (hasGenericType(propertyMetadata)) {
         return {
-          L: propertyValue.map(value => ({
+          L: propertyValue.map((value) => ({
             M: toDb(value, propertyMetadata.typeInfo.genericType),
           })),
         }
@@ -105,7 +105,7 @@ function collectionToDb(
         return {
           L: propertyValue
             // tslint:disable-next-line:no-unnecessary-callback-wrapper
-            .map(v => toDbOne(v))
+            .map((v) => toDbOne(v))
             .filter(notNull),
         }
       }

@@ -10,7 +10,7 @@ const capitals = /[A-Z\u00C0-\u00D6\u00D9-\u00DD]/g
  */
 export function kebabCase(str: string): string {
   return str
-    .replace(capitals, match => ' ' + (match.toLowerCase() || match))
+    .replace(capitals, (match) => ' ' + (match.toLowerCase() || match))
     .trim()
     .split(wordSeparators)
     .join('-')

@@ -88,7 +88,7 @@ describe('GetRequest', () => {
     it('exec should log params and response', async () => {
       await req.exec()
       expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
@@ -96,7 +96,7 @@ describe('GetRequest', () => {
     it('execFullResponse should log params and response', async () => {
       await req.execFullResponse()
       expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })

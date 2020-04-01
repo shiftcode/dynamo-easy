@@ -109,11 +109,7 @@ describe('query request', () => {
 
       const now = new Date()
 
-      request
-        .index(INDEX_ACTIVE_CREATED_AT)
-        .wherePartitionKey(true)
-        .whereSortKey()
-        .lt(now)
+      request.index(INDEX_ACTIVE_CREATED_AT).wherePartitionKey(true).whereSortKey().lt(now)
 
       expect(request.params.IndexName).toBe(INDEX_ACTIVE_CREATED_AT)
 

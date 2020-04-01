@@ -148,7 +148,7 @@ export function curry(fn: (...args: any[]) => any, arity?: number) {
       // @ts-ignore
       return fn.apply(this, args)
     } else {
-      return function() {
+      return function () {
         // @ts-ignore
         return curried.apply(this, args.concat([].slice.call(arguments)))
       }

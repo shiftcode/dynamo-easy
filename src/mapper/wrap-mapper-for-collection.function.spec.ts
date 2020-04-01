@@ -25,12 +25,12 @@ class MyChar {
 }
 
 const myNumberToStringAttrMapper: MapperForType<MyNumber, StringAttribute> = {
-  toDb: propertyValue => ({ S: `${propertyValue.value}` }),
-  fromDb: attributeValue => ({ value: parseInt(attributeValue.S, 10) }),
+  toDb: (propertyValue) => ({ S: `${propertyValue.value}` }),
+  fromDb: (attributeValue) => ({ value: parseInt(attributeValue.S, 10) }),
 }
 const myCharToNumberAttrMapper: MapperForType<MyChar, NumberAttribute> = {
-  toDb: propertyValue => ({ N: `${propertyValue.value.charCodeAt(0)}` }),
-  fromDb: attributeValue => ({ value: String.fromCharCode(parseInt(attributeValue.N, 10)) }),
+  toDb: (propertyValue) => ({ N: `${propertyValue.value.charCodeAt(0)}` }),
+  fromDb: (attributeValue) => ({ value: String.fromCharCode(parseInt(attributeValue.N, 10)) }),
 }
 describe('wrap mapper for collection', () => {
   describe('arrayToListAttribute', () => {

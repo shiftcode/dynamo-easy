@@ -52,7 +52,7 @@ export class TransactWriteRequest {
       throw new Error(`Each transaction can include up to 10 unique items, including conditions.\
        Given operations count: ${this.params.TransactItems.length + writeOperations.length}`)
     }
-    this.params.TransactItems.push(...writeOperations.map(wo => wo.transactItem))
+    this.params.TransactItems.push(...writeOperations.map((wo) => wo.transactItem))
     return this
   }
 
@@ -67,7 +67,7 @@ export class TransactWriteRequest {
    * execute the request.
    */
   exec(): Promise<void> {
-    return this.dynamoDBWrapper.transactWriteItems(this.params).then(response => {
+    return this.dynamoDBWrapper.transactWriteItems(this.params).then((response) => {
       return
     })
   }

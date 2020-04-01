@@ -240,7 +240,7 @@ export function isBinary(data: any): boolean {
     return Buffer.isBuffer(data)
   } else {
     return BUFFER_TYPES.some(
-      type => data !== undefined && data.constructor && (isType(data, type) || typeName(data.constructor) === type),
+      (type) => data !== undefined && data.constructor && (isType(data, type) || typeName(data.constructor) === type),
     )
   }
 }
