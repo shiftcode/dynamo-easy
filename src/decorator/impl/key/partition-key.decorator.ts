@@ -14,9 +14,9 @@ export function PartitionKey(): PropertyDecorator {
       // check for existing properties marked as partition key
       const properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
       if (properties && properties.length) {
-        const existingPartitionKeys = properties.filter(property => property.key && property.key.type === 'HASH')
+        const existingPartitionKeys = properties.filter((property) => property.key && property.key.type === 'HASH')
         if (existingPartitionKeys.length) {
-          if (properties.find(property => property.name === propertyKey)) {
+          if (properties.find((property) => property.name === propertyKey)) {
             // just ignore this and go on, somehow the partition key gets defined two times
             logger.warn(
               `this is the second execution to define the partitionKey for property ${propertyKey}`,

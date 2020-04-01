@@ -8,7 +8,7 @@ import { createLogger, createOptModelLogger, Logger, OptModelLogger } from './lo
 
 describe('log receiver', () => {
   let logs: LogInfo[] = []
-  const logReceiver: LogReceiver = logInfo => logs.push(logInfo)
+  const logReceiver: LogReceiver = (logInfo) => logs.push(logInfo)
   updateDynamoEasyConfig({ logReceiver })
 
   beforeEach(() => (logs = []))

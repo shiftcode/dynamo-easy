@@ -259,7 +259,7 @@ describe('ReadManyRequest', () => {
     it('exec should log params and response', async () => {
       await request.exec()
       expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiver.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(request.params)).toBeTruthy()
       expect(logInfoData.includes(output)).toBeTruthy()
     })
@@ -267,7 +267,7 @@ describe('ReadManyRequest', () => {
     it('execFullResponse should log params and response', async () => {
       await request.execFullResponse()
       expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map(i => i[0].data)
+      const logInfoData = logReceiver.calls.allArgs().map((i) => i[0].data)
       expect(logInfoData.includes(request.params)).toBeTruthy()
       expect(logInfoData.includes(output)).toBeTruthy()
     })

@@ -32,7 +32,7 @@ export class Metadata<T> {
     modelOpts: ModelMetadata<M>,
     propertyName: keyof M,
   ): PropertyMetadata<M> | undefined {
-    return modelOpts.properties.find(property => property.name === propertyName || property.nameDb === propertyName)
+    return modelOpts.properties.find((property) => property.name === propertyName || property.nameDb === propertyName)
   }
 
   constructor(modelConstructor: ModelConstructor<T>) {
@@ -73,7 +73,7 @@ export class Metadata<T> {
    * @returns {Array<PropertyMetadata<any>>} Returns all the properties property the @PartitionKeyUUID decorator is present, returns an empty array by default
    */
   getKeysWithUUID(): Array<PropertyMetadata<any>> {
-    return filterBy(this.modelOptions, p => !!(p.key && p.key.uuid), [])
+    return filterBy(this.modelOptions, (p) => !!(p.key && p.key.uuid), [])
   }
 
   /**
@@ -95,7 +95,7 @@ export class Metadata<T> {
         throw new Error(`there is no index defined for name ${indexName}`)
       }
     } else {
-      const property = filterByFirst(this.modelOptions, p => !!(p.key && p.key.type === 'HASH'))
+      const property = filterByFirst(this.modelOptions, (p) => !!(p.key && p.key.type === 'HASH'))
 
       if (property) {
         return property.name
@@ -123,7 +123,7 @@ export class Metadata<T> {
         throw new Error(`there is no index defined for name ${indexName}`)
       }
     } else {
-      const property = filterByFirst(this.modelOptions, p => !!(p.key && p.key.type === 'RANGE'))
+      const property = filterByFirst(this.modelOptions, (p) => !!(p.key && p.key.type === 'RANGE'))
       return property ? property.name : null
     }
   }

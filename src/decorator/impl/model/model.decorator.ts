@@ -28,7 +28,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
         : Reflect.getMetadata(KEY_PROPERTY, constructor)) || []
 
     // get partition key
-    const partitionKeys = properties.filter(property => property.key && property.key.type === 'HASH')
+    const partitionKeys = properties.filter((property) => property.key && property.key.type === 'HASH')
 
     const partitionKeyName: string | null = partitionKeys.length ? partitionKeys[0].nameDb : null
 
@@ -40,7 +40,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
     const indexes: Map<string, SecondaryIndex<any>> = new Map([...globalSecondaryIndexes, ...localSecondaryIndexes])
 
     const transientProperties = properties.length
-      ? properties.filter(property => property.transient === true).map(property => property.name)
+      ? properties.filter((property) => property.transient === true).map((property) => property.name)
       : []
 
     const metaData: ModelMetadata<any> = {
@@ -80,7 +80,7 @@ function testForLSI<T>(property: PropertyMetadata<T>): property is PropertyMetad
 function getGlobalSecondaryIndexes(properties: Array<PropertyMetadata<any>>): Map<string, SecondaryIndex<any>> {
   return properties.filter(testForGSI).reduce((map, property): Map<string, SecondaryIndex<any>> => {
     let gsi: SecondaryIndex<any>
-    Object.keys(property.keyForGSI).forEach(indexName => {
+    Object.keys(property.keyForGSI).forEach((indexName) => {
       if (map.has(indexName)) {
         gsi = map.get(indexName)
       } else {
@@ -119,7 +119,7 @@ function getLocalSecondaryIndexes(
   return properties.filter(testForLSI).reduce((map, property): Map<string, SecondaryIndex<any>> => {
     let lsi: SecondaryIndex<any>
 
-    property.sortKeyForLSI.forEach(indexName => {
+    property.sortKeyForLSI.forEach((indexName) => {
       if (map.has(indexName)) {
         throw new Error(modelErrors.lsiMultipleSk(indexName, property.nameDb))
       }

@@ -30,7 +30,7 @@ export function arrayToListAttribute<T, A extends StringAttribute | NumberAttrib
   customMapper: MapperForType<T, A>,
 ) {
   return (values: T[]): ListAttribute<A> | null => {
-    const mapped = values.map(v => customMapper.toDb(v)).filter(notNull)
+    const mapped = values.map((v) => customMapper.toDb(v)).filter(notNull)
     return <ListAttribute<A>>{ L: mapped }
   }
 }
@@ -41,7 +41,7 @@ export function arrayToListAttribute<T, A extends StringAttribute | NumberAttrib
 export function listAttributeToArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
   customMapper: MapperForType<T, A>,
 ) {
-  return (attributeValues: ListAttribute<A>): T[] => attributeValues.L.map(i => customMapper.fromDb(i))
+  return (attributeValues: ListAttribute<A>): T[] => attributeValues.L.map((i) => customMapper.fromDb(i))
 }
 
 /**
@@ -53,11 +53,11 @@ export function setAttributeToArray<T, A extends StringAttribute | NumberAttribu
   return (attributeValues: SetAttributeOf<A>): T[] => {
     switch (Object.keys(attributeValues)[0]) {
       case 'SS':
-        return (<StringSetAttribute>attributeValues).SS.map(v => customMapper.fromDb(<A>{ S: v }))
+        return (<StringSetAttribute>attributeValues).SS.map((v) => customMapper.fromDb(<A>{ S: v }))
       case 'NS':
-        return (<NumberSetAttribute>attributeValues).NS.map(v => customMapper.fromDb(<A>{ N: v }))
+        return (<NumberSetAttribute>attributeValues).NS.map((v) => customMapper.fromDb(<A>{ N: v }))
       case 'BS':
-        return (<BinarySetAttribute>attributeValues).BS.map(v => customMapper.fromDb(<A>{ B: v }))
+        return (<BinarySetAttribute>attributeValues).BS.map((v) => customMapper.fromDb(<A>{ B: v }))
       default:
         throw new Error(`given attribute (${JSON.stringify(attributeValues)}) value is not a SetAttribute`)
     }
@@ -71,17 +71,17 @@ export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribu
   customMapper: MapperForType<T, A>,
 ) {
   return (values: T[]): SetAttributeOf<A> | null => {
-    const mapped = values.map(v => customMapper.toDb(v)).filter(notNull)
+    const mapped = values.map((v) => customMapper.toDb(v)).filter(notNull)
     if (mapped.length === 0) {
       return null
     }
     switch (Object.keys(mapped[0])[0]) {
       case 'S':
-        return <SetAttributeOf<A>>{ SS: (<StringAttribute[]>mapped).map(sa => sa.S) }
+        return <SetAttributeOf<A>>{ SS: (<StringAttribute[]>mapped).map((sa) => sa.S) }
       case 'N':
-        return <SetAttributeOf<A>>{ NS: (<NumberAttribute[]>mapped).map(na => na.N) }
+        return <SetAttributeOf<A>>{ NS: (<NumberAttribute[]>mapped).map((na) => na.N) }
       case 'B':
-        return <SetAttributeOf<A>>{ BS: (<BinaryAttribute[]>mapped).map(ba => ba.B) }
+        return <SetAttributeOf<A>>{ BS: (<BinaryAttribute[]>mapped).map((ba) => ba.B) }
       default:
         throw new Error('values given are not of type string, number or binary after applying the custom mapper')
     }

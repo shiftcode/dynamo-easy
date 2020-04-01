@@ -49,7 +49,7 @@ type BuildFilterFn = (
 export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
   if (Array.isArray(obj)) {
     const returnArr: any[] = []
-    obj.forEach(i => {
+    obj.forEach((i) => {
       const item = deepFilter(i, filterFn)
       if (item !== null) {
         returnArr.push(item)
@@ -59,7 +59,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
     return returnArr.length ? returnArr : null
   } else if (obj instanceof Set) {
     const returnArr: any[] = []
-    Array.from(obj).forEach(i => {
+    Array.from(obj).forEach((i) => {
       const item = deepFilter(i, filterFn)
       if (item !== null) {
         returnArr.push(item)
@@ -110,7 +110,7 @@ export function buildFilterExpression(
   metadata: Metadata<any> | undefined,
 ): Expression {
   // metadata get rid of undefined values
-  values = deepFilter(values, value => value !== undefined)
+  values = deepFilter(values, (value) => value !== undefined)
 
   // check if provided values are valid for given operator
   validateForOperator(operator, values)
@@ -179,17 +179,14 @@ function buildInConditionExpression(
   propertyMetadata: PropertyMetadata<any> | undefined,
 ): Expression {
   const attributeValues: Attributes<any> = (<any[]>values[0])
-    .map(value => toDbOne(value, propertyMetadata))
-    .reduce(
-      (result, mappedValue: Attribute | null, index: number) => {
-        if (mappedValue !== null) {
-          validateAttributeType('IN condition', mappedValue, 'S', 'N', 'B')
-          result[`${valuePlaceholder}_${index}`] = mappedValue
-        }
-        return result
-      },
-      <Attributes<any>>{},
-    )
+    .map((value) => toDbOne(value, propertyMetadata))
+    .reduce((result, mappedValue: Attribute | null, index: number) => {
+      if (mappedValue !== null) {
+        validateAttributeType('IN condition', mappedValue, 'S', 'N', 'B')
+        result[`${valuePlaceholder}_${index}`] = mappedValue
+      }
+      return result
+    }, <Attributes<any>>{})
 
   const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
@@ -219,7 +216,7 @@ function buildBetweenConditionExpression(
   if (mappedValue1 === null || mappedValue2 === null) {
     throw new Error('make sure to provide an actual value for te BETWEEN operator')
   }
-  ;[mappedValue1, mappedValue2].forEach(mv => validateAttributeType('between', mv, 'S', 'N', 'B'))
+  ;[mappedValue1, mappedValue2].forEach((mv) => validateAttributeType('between', mv, 'S', 'N', 'B'))
 
   const value2Placeholder = uniqueAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 

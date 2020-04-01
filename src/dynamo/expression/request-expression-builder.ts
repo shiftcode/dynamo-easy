@@ -236,14 +236,11 @@ export function propertyDefinitionFunction<T>(attributePath: keyof T): Condition
  * @hidden
  */
 function createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T {
-  return UPDATE_ACTION_DEFS.reduce(
-    (result: T, updateActionDef: UpdateActionDef) => {
-      Reflect.set(<any>result, updateActionDef.action, impl(updateActionDef))
+  return UPDATE_ACTION_DEFS.reduce((result: T, updateActionDef: UpdateActionDef) => {
+    Reflect.set(<any>result, updateActionDef.action, impl(updateActionDef))
 
-      return result
-    },
-    <T>{},
-  )
+    return result
+  }, <T>{})
 }
 
 /**
@@ -259,17 +256,14 @@ function createConditionFunctions<T>(impl: (operator: ConditionOperator) => any,
   const includedAlias: ConditionOperator[] =
     operators && operators.length ? operators : <ConditionOperator[]>Object.keys(OPERATOR_TO_ALIAS_MAP)
 
-  return includedAlias.reduce(
-    (result: T, operator: ConditionOperator) => {
-      const alias: OperatorAlias | OperatorAlias[] = OPERATOR_TO_ALIAS_MAP[operator]
-      if (Array.isArray(alias)) {
-        alias.forEach(a => Reflect.set(<any>result, a, impl(operator)))
-      } else {
-        Reflect.set(<any>result, alias, impl(operator))
-      }
+  return includedAlias.reduce((result: T, operator: ConditionOperator) => {
+    const alias: OperatorAlias | OperatorAlias[] = OPERATOR_TO_ALIAS_MAP[operator]
+    if (Array.isArray(alias)) {
+      alias.forEach((a) => Reflect.set(<any>result, a, impl(operator)))
+    } else {
+      Reflect.set(<any>result, alias, impl(operator))
+    }
 
-      return result
-    },
-    <T>{},
-  )
+    return result
+  }, <T>{})
 }

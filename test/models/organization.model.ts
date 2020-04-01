@@ -26,7 +26,7 @@ export class Birthday {
   constructor(date: Date, ...gifts: string[]) {
     this.date = date
     const giftArr: Gift[] = []
-    gifts.forEach(giftDescription => giftArr.push({ description: giftDescription }))
+    gifts.forEach((giftDescription) => giftArr.push({ description: giftDescription }))
     this.presents = giftArr
   }
 }
