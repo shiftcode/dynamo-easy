@@ -79,7 +79,7 @@
     "tslint-config-prettier": "^1.18.0",
     "tsutils": "^3.17.1",
     "typedoc": "0.14.0",
-    "typedoc-plugin-external-module-name": "^2.1.0",
+    "typedoc-plugin-external-module-name": "^3.0.0",
     "typescript": ">=2.9.1",
     "uuid": "^3.3.2"
   },
