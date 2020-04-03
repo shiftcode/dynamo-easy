@@ -11,12 +11,16 @@
   ],
   "packageRules": [
     {
-      "packagePatterns": [ "^@types" ],
-      "groupName": "@types"
-    },
-    {
       "packagePatterns": [ "^@commitlint" ],
       "groupName": "@commitlint"
+    },
+    {
+      "packagePatterns": ["jest"],
+      "groupName": "jest"
+    },
+    {
+      "packagePatterns": ["uuid"],
+      "groupName": "uuid"
     }
   ]
 }
