@@ -1,8 +1,6 @@
 /**
  * @module multi-model-requests/batch-get
  */
-
-// tslint:disable-next-line:interface-over-type-literal
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { BatchGetResponse } from './batch-get.response'
 

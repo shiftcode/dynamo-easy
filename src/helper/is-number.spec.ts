@@ -1,3 +1,5 @@
+/* eslint-disable no-new-wrappers */
+
 import { isNumber } from './is-number.function'
 
 describe('is number', () => {
@@ -5,7 +7,6 @@ describe('is number', () => {
     expect(isNumber(3)).toBeTruthy()
     expect(isNumber(NaN)).toBeTruthy()
     expect(isNumber(Infinity)).toBeTruthy()
-    // tslint:disable:no-construct
     expect(isNumber(new Number('2'))).toBeTruthy()
     expect(isNumber(new Number('myNumber'))).toBeTruthy()
   })

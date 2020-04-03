@@ -10,12 +10,13 @@ import {
 
 /**
  * Use this method when accessing a top level attribute of a model with strict typing of the value in chained function
+ *
  * @example
  * ```typescript
- * @Model()
+ * \@Model()
  * class Person {
  *
- *   @PartitionKeyUUID()
+ *   \@PartitionKeyUUID()
  *   id: string
  *   age: number
  * }
@@ -38,6 +39,7 @@ export function update2<T, K extends keyof T>(
 
 /**
  * Use this method when accessing a top level attribute of a model to have type checking for attributePath
+ *
  * @example
  * ```typescript
  * update('myProp').set('foo')

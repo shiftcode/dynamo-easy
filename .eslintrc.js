@@ -1,0 +1,178 @@
+module.exports = {
+  'env': {
+    'browser': true,
+    'es6': true,
+    'node': true,
+  },
+  'parser': '@typescript-eslint/parser',
+  'parserOptions': {
+    // 'project': 'tsconfig.json',
+    'sourceType': 'module',
+  },
+  'plugins': [
+    '@typescript-eslint',
+    'import',
+    'prefer-arrow',
+    'local-rules',
+    'jsdoc',
+    'promise'
+  ],
+  // extends: ['prettier/@typescript-eslint'],
+  'rules': {
+    '@typescript-eslint/adjacent-overload-signatures': 'error',
+    '@typescript-eslint/array-type': ['error', { default: 'array-simple' }], // was not correctly migrated
+    '@typescript-eslint/ban-types': 'error',
+    '@typescript-eslint/class-name-casing': 'error',
+    '@typescript-eslint/consistent-type-assertions': 'off',
+    '@typescript-eslint/consistent-type-definitions': 'error',
+    '@typescript-eslint/indent': 'off',
+    '@typescript-eslint/interface-name-prefix': 'error',
+    '@typescript-eslint/member-delimiter-style': [
+      'off',
+      {
+        'multiline': { 'delimiter': 'none', 'requireLast': true },
+        'singleline': { 'delimiter': 'semi', 'requireLast': false },
+      },
+    ],
+    '@typescript-eslint/member-ordering': 'error',
+    '@typescript-eslint/no-empty-function': 'error',
+    '@typescript-eslint/no-empty-interface': 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-extraneous-class': 'error',
+    '@typescript-eslint/no-inferrable-types': 'error',
+    '@typescript-eslint/no-misused-new': 'error',
+    '@typescript-eslint/no-namespace': 'error',
+    '@typescript-eslint/no-non-null-assertion': 'error',
+    '@typescript-eslint/no-parameter-properties': 'off',
+    '@typescript-eslint/no-this-alias': 'error',
+    // '@typescript-eslint/no-unnecessary-type-assertion': 'error',  // need typescript
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-var-requires': 'error',
+    '@typescript-eslint/prefer-for-of': 'error',
+    '@typescript-eslint/prefer-function-type': 'error',
+    '@typescript-eslint/prefer-namespace-keyword': 'error',
+    '@typescript-eslint/quotes': ['error', 'single', { 'avoidEscape': true,allowTemplateLiterals:true }],
+    '@typescript-eslint/semi': ['off', null],
+    '@typescript-eslint/triple-slash-reference': 'error',
+    '@typescript-eslint/type-annotation-spacing': 'off',
+    '@typescript-eslint/unified-signatures': 'error',
+    'arrow-body-style': 'error',
+    'camelcase': 'error',
+    'comma-dangle': 'off',
+    'complexity': 'off',
+    'constructor-super': 'error',
+    'curly': 'error',
+    'dot-notation': 'error',
+    'eol-last': 'off',
+    'eqeqeq': ['error', 'smart'],
+    'guard-for-in': 'error',
+    // 'id-blacklist': [ // rule is totally shit and not working at all.
+    //   should actually just ban these names as var names but reports errors when ever your using them like (x !== undefined)
+    //   'error',
+    //   'any',
+    //   'Number',
+    //   'number',
+    //   'String',
+    //   'string',
+    //   'Boolean',
+    //   'boolean',
+    //   'Undefined',
+    // ],
+    'id-match': 'error',
+    'import/no-extraneous-dependencies': 'error',
+    'import/no-internal-modules': ['error', {
+      'allow': ['aws-sdk/**/*', 'rxjs/operators/*'],
+    }],
+    'import/order': 'error',
+    'jsdoc/check-alignment': 1, // Recommended
+    // 'jsdoc/check-examples': 1, // its typescript..
+    'jsdoc/check-indentation': 1,
+    'jsdoc/check-param-names': 1, // Recommended
+    'jsdoc/check-syntax': 1,
+    // 'jsdoc/check-tag-names': 1, // Recommended
+    'jsdoc/check-types': 1, // Recommended
+    'jsdoc/implements-on-classes': 1, // Recommended
+    // 'jsdoc/match-description': 1,
+    'jsdoc/newline-after-description': 1, // Recommended
+    'jsdoc/no-types': 1,
+    'jsdoc/no-undefined-types': 1, // Recommended
+    // 'jsdoc/require-description': 1,
+    // 'jsdoc/require-description-complete-sentence': 1,
+    // 'jsdoc/require-example': 1,
+    // 'jsdoc/require-hyphen-before-param-description': 1,
+    // 'jsdoc/require-jsdoc': 1, // Recommended
+    // 'jsdoc/require-param': 1, // Recommended
+    // 'jsdoc/require-param-description': 1, // Recommended
+    // 'jsdoc/require-param-name': 1, // Recommended
+    // 'jsdoc/require-param-type': 1, // Recommended
+    // 'jsdoc/require-returns': 1, // Recommended
+    'jsdoc/require-returns-check': 1, // Recommended
+    'jsdoc/require-returns-description': 1, // Recommended
+    // 'jsdoc/require-returns-type': 1, // Recommended
+    'jsdoc/valid-types': 1, // Recommended
+    'linebreak-style': 'off',
+    'max-classes-per-file': ['error', 1],
+    'max-len': 'off',
+    'new-parens': 'off',
+    'newline-per-chained-call': 'off',
+    'no-bitwise': 'error',
+    'no-caller': 'error',
+    'no-cond-assign': ['error', 'always'],
+    'no-console': 'error',
+    'no-debugger': 'error',
+    'no-duplicate-case': 'error',
+    'no-duplicate-imports': 'error',
+    'no-empty': 'error',
+    'no-eval': 'error',
+    'no-extra-bind': 'error',
+    'no-extra-semi': 'off',
+    'no-fallthrough': 'off',
+    'no-invalid-this': 'off',
+    'no-irregular-whitespace': 'off',
+    'no-multiple-empty-lines': 'off',
+    'no-new-func': 'error',
+    'no-new-wrappers': 'error',
+    'no-redeclare': 'error',
+    'no-restricted-imports': ['error', 'aws-sdk'],
+    'no-return-await': 'error',
+    'no-sequences': 'error',
+    'no-shadow': ['error', { 'hoist': 'all' }],
+    'no-sparse-arrays': 'error',
+    'no-template-curly-in-string': 'error',
+    'no-throw-literal': 'error',
+    'no-trailing-spaces': 'off',
+    'no-undef-init': 'error',
+    'no-underscore-dangle': 'error',
+    'no-unsafe-finally': 'error',
+    'no-unused-expressions': 'error',
+    'no-unused-labels': 'error',
+    'no-useless-constructor': 'error',
+    // 'no-unused-vars': 'error', // seems not to work fine in TS
+    'no-var': 'error',
+    'object-shorthand': 'error',
+    'one-var': ['error', 'never'],
+    // 'prefer-arrow/prefer-arrow-functions': 'error', // TODO --> SEE tslint-eeslint-config.log
+    'prefer-const': 'error',
+    'prefer-object-spread': 'error',
+    'promise/always-return': 'error',
+    'promise/no-return-wrap': 'error',
+    'promise/param-names': 'error',
+    'promise/catch-or-return': 'error',
+    'promise/no-native': 'off',
+    // 'promise/no-nesting': 'warn',
+    'promise/no-promise-in-callback': 'warn',
+    'promise/no-callback-in-promise': 'warn',
+    // 'promise/avoid-new': 'warn',
+    'promise/no-new-statics': 'error',
+    'promise/no-return-in-finally': 'warn',
+    'promise/valid-params': 'warn',
+    'quote-props': 'off',
+    'radix': 'error',
+    'space-before-function-paren': 'off',
+    'space-in-parens': ['off', 'never'],
+    'spaced-comment': 'error',
+    'use-isnan': 'error',
+    'valid-typeof': 'off',
+    'local-rules/no-named-dynamo-import': 'error',
+  },
+}

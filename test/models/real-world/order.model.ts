@@ -1,5 +1,4 @@
-// tslint:disable:max-classes-per-file
-
+/* eslint-disable max-classes-per-file */
 import {
   CollectionProperty,
   DateProperty,

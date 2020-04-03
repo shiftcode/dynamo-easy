@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Model, PartitionKey, Property } from '../../src/dynamo-easy'
 import { StringType, Type } from './types.enum'
 

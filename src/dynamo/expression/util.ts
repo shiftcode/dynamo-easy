@@ -1,3 +1,5 @@
+// TODO: I'd say this dynamic template function could be replaced with specific functions like x = (a,b)=>`${a}
+
 /**
  * @module expression
  */
@@ -8,7 +10,7 @@
 export function dynamicTemplate(templateString: string, templateVariables: Record<string, any>) {
   const keys = Object.keys(templateVariables)
   const values = Object.values(templateVariables)
-  // tslint:disable-next-line:function-constructor
+  /* eslint-disable-next-line no-new-func */
   const templateFunction = new Function(...keys, `return \`${templateString}\`;`)
   return templateFunction(...values)
 }

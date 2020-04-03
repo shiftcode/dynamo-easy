@@ -20,9 +20,7 @@ export function prepareAndAddUpdateExpressions(
 ) {
   if (updateDefFns && updateDefFns.length) {
     const sortedByActionKeyWord: Map<UpdateActionKeyword, UpdateExpression[]> = updateDefFns
-      .map((updateDefFn) => {
-        return updateDefFn(<any>params.ExpressionAttributeNames, metadata)
-      })
+      .map((updateDefFn) => updateDefFn(<any>params.ExpressionAttributeNames, metadata))
       .reduce((result, expr) => {
         const actionKeyword = expr.type
         if (!result.has(actionKeyword)) {

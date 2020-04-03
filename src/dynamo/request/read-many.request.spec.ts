@@ -15,12 +15,12 @@ import { getTableName } from '../get-table-name.function'
 import { ReadManyRequest } from './read-many.request'
 
 class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any, any> {
+  protected readonly logger: Logger
+
   constructor(modelClazz: ModelConstructor<T>) {
     super(<any>null, modelClazz)
     this.logger = createLogger('TestRequest', modelClazz)
   }
-
-  protected readonly logger: Logger
 
   protected doRequest(params: any): Promise<any> {
     return Promise.resolve({})

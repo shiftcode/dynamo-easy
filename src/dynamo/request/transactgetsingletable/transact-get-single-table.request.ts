@@ -50,10 +50,8 @@ export class TransactGetSingleTableRequest<T, T2 = T> extends BaseRequest<
       .then((r) => r.Items)
   }
 
-  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetResponse<T2> => {
-    return {
-      ConsumedCapacity: response.ConsumedCapacity,
-      Items: (response.Responses || []).map((item) => fromDb(<Attributes<T2>>item.Item, <any>this.modelClazz)),
-    }
-  }
+  private mapResponse = (response: DynamoDB.TransactGetItemsOutput): TransactGetResponse<T2> => ({
+    ConsumedCapacity: response.ConsumedCapacity,
+    Items: (response.Responses || []).map((item) => fromDb(<Attributes<T2>>item.Item, <any>this.modelClazz)),
+  })
 }

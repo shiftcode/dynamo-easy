@@ -6,9 +6,7 @@ import { promiseTap } from '../../helper/promise-tap.function'
 import { Logger } from '../../logger/logger'
 import { fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../model/model-constructor'
 import { Omit } from '../../model/omit.type'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/public.api'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -36,12 +34,6 @@ export abstract class WriteRequest<
 > extends StandardRequest<T, T2, I, R> {
   protected abstract readonly logger: Logger
 
-  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
-    super(dynamoDBWrapper, modelClazz)
-  }
-
-  protected abstract doRequest(params: I): Promise<O>
-
   /**
    * return item collection metrics.
    */
@@ -52,6 +44,7 @@ export abstract class WriteRequest<
 
   /**
    * add a condition for propertyPath
+   *
    * @param attributePath
    */
   onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
@@ -70,6 +63,7 @@ export abstract class WriteRequest<
     return this
   }
 
+  /* eslint-disable-next-line jsdoc/no-types */
   /**
    * @returns { void } if no ReturnValues are requested, { T } if the requested ReturnValues are ALL_OLD|ALL_NEW or {Partial<T>} if the requested ReturnValues are UPDATED_OLD|UPDATED_NEW
    */
@@ -111,4 +105,6 @@ export abstract class WriteRequest<
     this.logger.debug('request', this.params)
     return this.doRequest(this.params).then(promiseTap((response) => this.logger.debug('response', response)))
   }
+
+  protected abstract doRequest(params: I): Promise<O>
 }

@@ -1,4 +1,4 @@
-// tslint:disable:no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { dateToStringMapper } from './date-to-string.mapper'
 
 describe('dateToStringMapper', () => {

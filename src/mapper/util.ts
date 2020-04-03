@@ -64,8 +64,6 @@ const BUFFER_TYPES = [
  * type. If the item types are heterogeneous or it is a non supported set type the returned type will be L(ist).
  * The logic for collection fo type Set is the same.
  *
- * @param {any[] | Set<any>} collection
- * @returns {AttributeCollectionType}
  * @hidden
  */
 export function detectCollectionTypeFromValue(collection: any[] | Set<any>): AttributeCollectionType {
@@ -84,12 +82,12 @@ export function detectCollectionTypeFromValue(collection: any[] | Set<any>): Att
             return 'BS'
           default:
             throw new Error(
-              `"Set<CustomType>" without decorator is not supported. Add the @CollectionProperty() decorator (optionally with {itemType:CustomType}) for a Set<->[L]ist mapping)`,
+              '"Set<CustomType>" without decorator is not supported. Add the @CollectionProperty() decorator (optionally with {itemType:CustomType}) for a Set<->[L]ist mapping)',
             )
         }
       } else {
         // sets can not contain items with different types (heterogeneous)
-        throw new Error(`"Set with values of different types without decorator is not supported. Use an array instead.`)
+        throw new Error('"Set with values of different types without decorator is not supported. Use an array instead.')
       }
     } else {
       /*
@@ -169,7 +167,8 @@ export function detectType(value: any): AttributeType {
 }
 
 /**
- * Will resolve the type based on given property value
+ * Will resolve the type based on given property value.
+ *
  * @hidden
  */
 export function typeOf(propertyValue: any, propertyPath?: string | null): AttributeValueType {
@@ -201,6 +200,7 @@ export function typeOf(propertyValue: any, propertyPath?: string | null): Attrib
 /**
  * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/dynamodb/types.js
  * should we work with string match
+ *
  * @hidden
  */
 export function typeOfFromDb(attributeValue?: Attribute): AttributeValueType {
@@ -254,6 +254,7 @@ export function isBufferType(type: any): boolean {
 
 /**
  * copied from https://github.com/aws/aws-sdk-js/blob/0c974a7ff6749a541594de584b43a040978d4b72/lib/js
+ *
  * @hidden
  */
 export function isType(obj: any, type: any): boolean {
@@ -268,7 +269,7 @@ export function isType(obj: any, type: any): boolean {
 /**
  * @hidden
  */
-// tslint:disable-next-line:function-constructor
+/* eslint-disable-next-line no-new-func */
 const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
 
 /**
@@ -287,6 +288,7 @@ export function isNode() {
 
 /**
  * Returns the name of the given Type. null and undefined are special cases were we return 'Null' vs. 'Undefined'
+ *
  * @hidden
  */
 export function typeName(type: any): 'Null' | 'Undefined' | string {

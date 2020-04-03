@@ -21,12 +21,11 @@ import { UpdateExpression } from './type/update-expression.type'
  * Will create a condition which can be added to a request using the param object.
  * It will create the expression statement and the attribute names and values.
  *
- * @param {string} attributePath
- * @param {ConditionOperator} operation
- * @param {any[]} values Depending on the operation the amount of values differs
- * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
- * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
- * @returns {Expression}
+ * @param attributePath
+ * @param operation
+ * @param values Depending on the operation the amount of values differs
+ * @param existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
+ * @param metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
  * @hidden
  */
 export function buildUpdateExpression(

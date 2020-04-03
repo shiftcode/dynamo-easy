@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import {
   CollectionProperty,
   DateProperty,
@@ -9,7 +10,6 @@ import {
 } from '../../src/dynamo-easy'
 import { Employee } from './employee.model'
 
-// tslint:disable:max-classes-per-file
 @Model()
 export class Gift {
   description: string
@@ -109,7 +109,4 @@ export class Organization {
 
   @CollectionProperty()
   emptySet: Set<string> = new Set()
-
-  // tslint:disable-next-line:no-empty
-  constructor() {}
 }

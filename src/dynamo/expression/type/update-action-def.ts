@@ -5,5 +5,11 @@ import { UpdateActionKeyword } from './update-action-keyword.type'
 import { UpdateAction } from './update-action.type'
 
 export class UpdateActionDef {
-  constructor(public actionKeyword: UpdateActionKeyword, public action: UpdateAction) {}
+  actionKeyword: UpdateActionKeyword
+  action: UpdateAction
+
+  constructor(actionKeyword: UpdateActionKeyword, action: UpdateAction) {
+    this.actionKeyword = actionKeyword
+    this.action = action
+  }
 }

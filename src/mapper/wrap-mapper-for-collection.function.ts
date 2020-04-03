@@ -90,6 +90,7 @@ export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribu
 
 /**
  * returns a function which takes a Set which will be spread when applied to the given function
+ *
  * @hidden
  */
 function spreadSetAndApplyToFn<T, R>(fn: (values: T[]) => R) {
@@ -103,6 +104,7 @@ function spreadSetAndApplyToFn<T, R>(fn: (values: T[]) => R) {
 
 /**
  * returns a function which will execute the given function and wraps its return value in a Set
+ *
  * @hidden
  */
 function applyFnWrapWithSet<A, R>(fn: (arg: A) => R[]) {

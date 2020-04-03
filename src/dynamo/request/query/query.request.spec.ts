@@ -1,6 +1,5 @@
-// tslint:disable:no-non-null-assertion
-// tslint:disable:max-classes-per-file
-
+/* eslint-disable max-classes-per-file,@typescript-eslint/no-non-null-assertion */
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
   ComplexModel,
   CustomId,
@@ -18,7 +17,6 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { attribute } from '../../expression/logical-operator/attribute.function'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 
 describe('query request', () => {
   let querySpy: jasmine.Spy

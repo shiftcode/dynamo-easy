@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { DateProperty, Model, PartitionKey, Property, SortKey } from '../../src/dynamo-easy'
 
 @Model()

@@ -7,6 +7,7 @@ import { Expression } from '../type/expression.type'
 
 /**
  * function to negate a condition
+ *
  * @example
  * ```typescript
  * not(attribute('propA').eq('foo'))

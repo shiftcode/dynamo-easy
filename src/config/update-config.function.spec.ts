@@ -1,5 +1,3 @@
-// tslint:disable:no-empty
-
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { dateToNumberMapper } from '../mapper/custom/date-to-number.mapper'
 import { dynamoEasyConfig } from './dynamo-easy-config'
@@ -42,6 +40,7 @@ describe('updateDynamoEasyConfig', () => {
   })
 
   it('should work when providing valid stuff', () => {
+    /* eslint-disable-next-line  @typescript-eslint/no-empty-function */
     const myLogReceiver = () => {}
     const myDateMapper = { ...dateToNumberMapper }
     updateDynamoEasyConfig({

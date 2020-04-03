@@ -101,6 +101,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
 /**
  * maps a js value to its dynamoDB attribute
+ *
  * @param propertyValue The value which should be mapped
  * @param propertyMetadata Some optional metadata
  */
@@ -165,6 +166,7 @@ function testForKey<T>(p: PropertyMetadata<T>): p is PropertyMetadata<T> & { key
 
 /**
  * returns the function for the given ModelConstructor to create the AttributeMap with HASH (and RANGE) Key of a given item.
+ *
  * @param modelConstructor
  */
 export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: Partial<T>) => Attributes<T> {
@@ -191,6 +193,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
 
 /**
  * creates toKeyFn and applies item to it.
+ *
  * @see {@link createToKeyFn}
  */
 export function toKey<T>(item: T, modelConstructor: ModelConstructor<T>): Attributes<T> {

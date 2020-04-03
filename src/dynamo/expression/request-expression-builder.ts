@@ -34,6 +34,7 @@ import { buildUpdateExpression } from './update-expression-builder'
 /**
  * return the update-functions which then can apply an updateDefinition to the given request.params
  * and afterwards will return the request object (which allows chaining)
+ *
  * @param attributePath
  * @param request
  * @param metadata
@@ -45,9 +46,9 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
   metadata: Metadata<T>,
 ): RequestUpdateFunction<R, T, K> {
   // f the function to create the update functions
-  const f = (operator: UpdateActionDef) => {
+  const f = (operator: UpdateActionDef) =>
     // return the function the user will call in the end
-    return (...values: any[]): R => {
+    (...values: any[]): R => {
       const copy = [...values]
       const curried = curry<
         string,
@@ -62,7 +63,7 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
       // return the request so the user can continue to chain
       return request
     }
-  }
+
   // let the update functions be created with f
   return createUpdateFunctions<RequestUpdateFunction<R, T, K>>(f)
 }
@@ -70,6 +71,7 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
 /**
  * return the condition-functions which then can apply a conditionDefinition to the given request.params
  * and afterwards will return the request object (which allows chaining)
+ *
  * @hidden
  */
 export function addCondition<R extends ConditionalParamsHost, T, K extends keyof T>(
@@ -79,12 +81,11 @@ export function addCondition<R extends ConditionalParamsHost, T, K extends keyof
   metadata?: Metadata<T>,
 ): RequestConditionFunctionTyped<R, T, K> {
   // f the function to create the condition functions
-  const f = (operator: ConditionOperator) => {
+  const f = (operator: ConditionOperator) =>
     // return the function the user will call in the end
-    return (...values: any[]): R => {
-      return doAddCondition(expressionType, <string>attributePath, request, metadata, operator, ...values)
-    }
-  }
+    (...values: any[]): R =>
+      doAddCondition(expressionType, <string>attributePath, request, metadata, operator, ...values)
+
   return createConditionFunctions<RequestConditionFunctionTyped<R, T, K>>(f)
 }
 
@@ -114,12 +115,10 @@ export function addSortKeyCondition<T, R extends ConditionalParamsHost>(
   metadata?: Metadata<T>,
 ): SortKeyConditionFunction<R> {
   // f the function to create the condition functions
-  const f = (operator: ConditionOperator) => {
+  const f = (operator: ConditionOperator) =>
     // return the function the user will call in the end
-    return (...values: any[]): R => {
-      return doAddCondition('KeyConditionExpression', <string>keyName, request, metadata, operator, ...values)
-    }
-  }
+    (...values: any[]): R =>
+      doAddCondition('KeyConditionExpression', <string>keyName, request, metadata, operator, ...values)
 
   // only a subset of available operators are supported for sort keys
   return createConditionFunctions(f, '=', '<=', '<', '>', '>=', 'begins_with', 'BETWEEN')
@@ -185,9 +184,9 @@ export function updateDefinitionFunction<T, K extends keyof T>(
 ): UpdateExpressionDefinitionChainTyped<T, K>
 export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpressionDefinitionChain {
   // f the function to create the update functions
-  const f = (operation: UpdateActionDef) => {
+  const f = (operation: UpdateActionDef) =>
     // return the function the user will call in the end
-    return (...values: any[]): UpdateExpressionDefinitionFunction => {
+    (...values: any[]): UpdateExpressionDefinitionFunction => {
       const copy = [...values]
       const curried = curry<
         string,
@@ -200,7 +199,7 @@ export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpre
       // return the UpdateExpressionDefinitionFunction which the request will execute
       return curried(<string>attributePath, operation, copy)
     }
-  }
+
   // let the update functions be created with f
   return createUpdateFunctions<UpdateExpressionDefinitionChain>(f)
 }
@@ -213,14 +212,10 @@ export function propertyDefinitionFunction<T, K extends keyof T>(
   attributePath: K,
 ): ConditionExpressionDefinitionChainTyped<T, K>
 export function propertyDefinitionFunction<T>(attributePath: keyof T): ConditionExpressionDefinitionChain {
-  const f = (operator: ConditionOperator) => {
-    return (...values: any[]): ConditionExpressionDefinitionFunction => {
-      const copy = [...values]
-      const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, Expression>(
-        buildFilterExpression,
-      )
-      return <ConditionExpressionDefinitionFunction>curried(<string>attributePath, operator, copy)
-    }
+  const f = (operator: ConditionOperator) => (...values: any[]): ConditionExpressionDefinitionFunction => {
+    const copy = [...values]
+    const curried = curry<string, ConditionOperator, any[], string[], Metadata<any>, Expression>(buildFilterExpression)
+    return <ConditionExpressionDefinitionFunction>curried(<string>attributePath, operator, copy)
   }
 
   return createConditionFunctions<ConditionExpressionDefinitionChain>(f)
@@ -230,7 +225,7 @@ export function propertyDefinitionFunction<T>(attributePath: keyof T): Condition
  * Creates an object which contains callable functions for all update operations defined in update-operation type
  * for all the values included in operators
  *
- * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
+ * @param impl The function which is called with the operator and returns a function which expects the value
  * for the condition. when executed the implementation defines what to do with the condition, just return it for example or add the condition to the request
  * parameters as another example
  * @hidden
@@ -247,7 +242,7 @@ function createUpdateFunctions<T>(impl: (operation: UpdateActionDef) => any): T 
  * Creates an object which contains callable functions for all aliases defined in CONDITION_OPERATOR_ALIAS or if operators parameter is defined,
  * for all the values included in operators
  *
- * @param {(operator: ConditionOperator) => any} impl The function which is called with the operator and returns a function which expects the value
+ * @param impl The function which is called with the operator and returns a function which expects the value
  * for the condition. when executed the implementation defines what to do with the condition, just return it for example or add the condition to the request
  * parameters as another example
  * @hidden

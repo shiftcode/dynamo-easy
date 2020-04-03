@@ -8,6 +8,7 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 /**
  * Function which executes batchGetItem operations until all given items (as params) are processed (fetched).
  * Between each follow-up request (in case of unprocessed items) a delay is interposed calculated by the given backoffTime and throttleTimeSlot.
+ *
  * @param dynamoDBWrapper
  * @param params containing the keys per table to create the batchGet operation
  * @param backoffTimer used to determine how many time slots the follow-up request should be delayed
@@ -61,6 +62,7 @@ export function hasUnprocessedKeys(
 
 /**
  * combines a first with a second response. ConsumedCapacity is always from the latter.
+ *
  * @hidden
  */
 export function combineBatchGetResponses(response1: DynamoDB.BatchGetItemOutput) {

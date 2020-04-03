@@ -55,7 +55,7 @@ export abstract class BaseRequest<
     this.dynamoDBWrapper = dynamoDBWrapper
 
     if (modelClazz === null || modelClazz === undefined) {
-      throw new Error(`please provide the ModelConstructor for the request, won't work otherwise`)
+      throw new Error("please provide the ModelConstructor for the request, won't work otherwise")
     }
     this.modelClazz = modelClazz
 
@@ -72,6 +72,7 @@ export abstract class BaseRequest<
 
   /**
    * return ConsumedCapacity of the corresponding table(s) in the response
+   *
    * @param level not all requests support all values
    */
   returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): R {

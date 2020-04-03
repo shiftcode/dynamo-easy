@@ -21,6 +21,7 @@ export class TransactUpdate<T> extends TransactBaseOperation<T, DynamoDB.Update,
 
   /**
    * create and add a single update operation
+   *
    * @example updtTrans.updateAttribute('path.to.attr').set('newVal')
    */
   updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<this, T, K> {
@@ -29,6 +30,7 @@ export class TransactUpdate<T> extends TransactBaseOperation<T, DynamoDB.Update,
 
   /**
    * add multiple update ops
+   *
    * @example updtTrans.operations(update('path.to.attr).set('newVal'), ... )
    */
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): this {

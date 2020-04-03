@@ -67,6 +67,7 @@ export class TransactWriteRequest {
    * execute the request.
    */
   exec(): Promise<void> {
+    /* eslint-disable-next-line arrow-body-style */
     return this.dynamoDBWrapper.transactWriteItems(this.params).then((response) => {
       return
     })

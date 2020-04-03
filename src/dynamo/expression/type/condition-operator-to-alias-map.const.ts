@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /**
  * @module expression
  */
@@ -6,6 +7,7 @@ import { ConditionOperator } from './condition-operator.type'
 
 /**
  * mapped type
+ *
  * @hidden
  */
 export interface AliasedOperatorMapEntry extends Record<ConditionOperator, OperatorAlias | OperatorAlias[]> {

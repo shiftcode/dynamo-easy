@@ -1,5 +1,5 @@
 /**
  * @module mapper
  */
-// tslint:disable:no-unnecessary-class
+/* eslint "@typescript-eslint/no-extraneous-class": 0 */
 export class UndefinedType {}

@@ -9,6 +9,7 @@ import { ModelConstructor } from '../model/model-constructor'
 /**
  * only contains these characters «a-z A-Z 0-9 - _ .» and is between 3 and 255 characters long
  * http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Limits.html#limits-naming-rules
+ *
  * @hidden
  */
 const REGEX_TABLE_NAME = /^[a-zA-Z0-9_\-.]{3,255}$/

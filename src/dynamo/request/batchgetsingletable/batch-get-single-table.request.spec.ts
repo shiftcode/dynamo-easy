@@ -1,7 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion,@typescript-eslint/no-extraneous-class */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-// tslint:disable:no-unnecessary-class
-// tslint:disable:no-unused-expression
-// tslint:disable:no-non-null-assertion
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'

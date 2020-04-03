@@ -36,6 +36,7 @@ export class TransactGetRequest {
 
   /**
    * read item of model by key
+   *
    * @param modelClazz the corresponding ModelConstructor
    * @param key partial of T that contains PartitionKey and SortKey (if necessary). Throws if missing.
    */
