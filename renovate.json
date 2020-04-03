@@ -5,12 +5,18 @@
   ],
   "ignoreDeps": [
     "@types/node",
-    "typescript"
+    "typescript",
+    "typedoc",
+    "typedoc-plugin-external-module-name"
   ],
   "packageRules": [
     {
       "packagePatterns": [ "^@types" ],
       "groupName": "@types"
+    },
+    {
+      "packagePatterns": [ "^@commitlint" ],
+      "groupName": "@commitlint"
     }
   ]
 }
