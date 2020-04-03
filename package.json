@@ -81,12 +81,12 @@
     "typedoc": "0.14.0",
     "typedoc-plugin-external-module-name": "^2.1.0",
     "typescript": ">=2.9.1",
-    "uuid": "^3.3.2"
+    "uuid": "^7.0.0"
   },
   "peerDependencies": {
     "aws-sdk": "^2.401.0",
     "reflect-metadata": "^0.1.12",
     "tslib": "^1.10.0",
-    "uuid": "^3.3.2"
+    "uuid": "^7.0.0"
   }
 }
