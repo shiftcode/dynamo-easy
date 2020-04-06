@@ -47,7 +47,6 @@
     "lint:ci": "tslint --project tsconfig.json -t codeFrame",
     "prettier": "prettier --write --config ./.prettierrc.yml '{src,test}/**/*.ts'",
     "report-coverage": "cat ./coverage/lcov.info | coveralls",
-    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "test": "jest",
     "test:ci": "jest --coverage --no-cache",
     "test:watch": "jest --watch",
