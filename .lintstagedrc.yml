@@ -1,7 +1,5 @@
 "{src,test}/**/*.ts":
   - prettier --write --config ./.prettierrc.yml
   - eslint --config .eslintrc.js --ext .ts --fix
-  - git add
 "**/package.json":
   - sort-package-json
-  - git add
