@@ -1,5 +1,5 @@
 "{src,test}/**/*.ts":
   - prettier --write --config ./.prettierrc.yml
-  - eslint --config .eslintrc.js --ext .ts --fix
+  - eslint --config .eslintrc.yml --ext .ts --fix
 "**/package.json":
   - sort-package-json
