@@ -17,7 +17,7 @@ module.exports = {
     'jsdoc',
     'promise'
   ],
-  // extends: ['prettier/@typescript-eslint'],
+  extends: ['prettier/@typescript-eslint'],
   'rules': {
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': ['error', { default: 'array-simple' }], // was not correctly migrated
@@ -25,15 +25,7 @@ module.exports = {
     '@typescript-eslint/class-name-casing': 'error',
     '@typescript-eslint/consistent-type-assertions': 'off',
     '@typescript-eslint/consistent-type-definitions': 'error',
-    '@typescript-eslint/indent': 'off',
     '@typescript-eslint/interface-name-prefix': 'error',
-    '@typescript-eslint/member-delimiter-style': [
-      'off',
-      {
-        'multiline': { 'delimiter': 'none', 'requireLast': true },
-        'singleline': { 'delimiter': 'semi', 'requireLast': false },
-      },
-    ],
     '@typescript-eslint/member-ordering': 'error',
     '@typescript-eslint/no-empty-function': 'error',
     '@typescript-eslint/no-empty-interface': 'error',
@@ -51,10 +43,7 @@ module.exports = {
     '@typescript-eslint/prefer-for-of': 'error',
     '@typescript-eslint/prefer-function-type': 'error',
     '@typescript-eslint/prefer-namespace-keyword': 'error',
-    '@typescript-eslint/quotes': ['error', 'single', { 'avoidEscape': true,allowTemplateLiterals:true }],
-    '@typescript-eslint/semi': ['off', null],
     '@typescript-eslint/triple-slash-reference': 'error',
-    '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/unified-signatures': 'error',
     'arrow-body-style': 'error',
     'camelcase': 'error',
@@ -168,7 +157,6 @@ module.exports = {
     'promise/valid-params': 'warn',
     'quote-props': 'off',
     'radix': 'error',
-    'space-before-function-paren': 'off',
     'space-in-parens': ['off', 'never'],
     'spaced-comment': 'error',
     'use-isnan': 'error',
