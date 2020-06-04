@@ -33,6 +33,6 @@ export class Duration {
 }
 
 export const durationMapper: MapperForType<Duration, NumberAttribute> = {
-  fromDb: attr => new Duration(parseInt(attr.N, 10)),
-  toDb: val => ({ N: `${val.value}` }),
+  fromDb: (attr) => new Duration(parseInt(attr.N, 10)),
+  toDb: (val) => ({ N: `${val.value}` }),
 }

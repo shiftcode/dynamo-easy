@@ -10,9 +10,9 @@ export function addProjectionExpressionParam<T>(
   params: DynamoDB.QueryInput | DynamoDB.ScanInput | DynamoDB.GetItemInput | DynamoDB.KeysAndAttributes,
   metadata?: Metadata<T>,
 ): void {
-  const resolved = attributesToGet.map(attributeToGet => resolveAttributeNames(<string>attributeToGet, metadata))
-  params.ProjectionExpression = resolved.map(attr => attr.placeholder).join(', ')
-  resolved.forEach(r => {
+  const resolved = attributesToGet.map((attributeToGet) => resolveAttributeNames(<string>attributeToGet, metadata))
+  params.ProjectionExpression = resolved.map((attr) => attr.placeholder).join(', ')
+  resolved.forEach((r) => {
     params.ExpressionAttributeNames = { ...params.ExpressionAttributeNames, ...r.attributeNames }
   })
 }

@@ -20,14 +20,14 @@ export function batchGetItemsFetchAll(
   backoffTimer: IterableIterator<number>,
   throttleTimeSlot: number,
 ): Promise<DynamoDB.BatchGetItemOutput> {
-  return dynamoDBWrapper.batchGetItems(params).then(response => {
+  return dynamoDBWrapper.batchGetItems(params).then((response) => {
     if (hasUnprocessedKeys(response)) {
       // in case of unprocessedKeys do a follow-up requests
       return (
         Promise.resolve(response.UnprocessedKeys)
           // delay before doing the follow-up request
           .then(promiseDelay(backoffTimer.next().value * throttleTimeSlot))
-          .then(UnprocessedKeys => {
+          .then((UnprocessedKeys) => {
             const nextParams = { ...params, RequestItems: UnprocessedKeys }
             // call recursively batchGetItemsFetchAll with the returned UnprocessedItems params
             return batchGetItemsFetchAll(dynamoDBWrapper, nextParams, backoffTimer, throttleTimeSlot)
@@ -56,7 +56,7 @@ export function hasUnprocessedKeys(
   if (!response.UnprocessedKeys) {
     return false
   }
-  return Object.values(response.UnprocessedKeys).some(t => !!t && t.Keys && t.Keys.length > 0)
+  return Object.values(response.UnprocessedKeys).some((t) => !!t && t.Keys && t.Keys.length > 0)
 }
 
 /**
@@ -68,8 +68,8 @@ export function combineBatchGetResponses(response1: DynamoDB.BatchGetItemOutput)
     const tableNames: string[] = Object.keys(response1.Responses || {})
 
     Object.keys(response2.Responses || {})
-      .filter(tn => !tableNames.includes(tn))
-      .forEach(tn => tableNames.push(tn))
+      .filter((tn) => !tableNames.includes(tn))
+      .forEach((tn) => tableNames.push(tn))
 
     const Responses = tableNames.reduce(
       (u, tableName) => ({

@@ -45,8 +45,8 @@ export class GetRequest<T, T2 = T> extends StandardRequest<T, T2, DynamoDB.GetIt
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper
       .getItem(this.params)
-      .then(promiseTap(response => this.logger.debug('response', response)))
-      .then(getItemResponse => {
+      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then((getItemResponse) => {
         const response: GetResponse<T2> = <any>{ ...getItemResponse }
 
         if (getItemResponse.Item) {
@@ -57,7 +57,7 @@ export class GetRequest<T, T2 = T> extends StandardRequest<T, T2, DynamoDB.GetIt
 
         return response
       })
-      .then(promiseTap(response => this.logger.debug('mapped item', response.Item)))
+      .then(promiseTap((response) => this.logger.debug('mapped item', response.Item)))
   }
 
   /**
@@ -67,14 +67,14 @@ export class GetRequest<T, T2 = T> extends StandardRequest<T, T2, DynamoDB.GetIt
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper
       .getItem(this.params)
-      .then(promiseTap(response => this.logger.debug('response', response)))
-      .then(response => {
+      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then((response) => {
         if (response.Item) {
           return fromDb(<Attributes<T2>>response.Item, <any>this.modelClazz)
         } else {
           return null
         }
       })
-      .then(promiseTap(item => this.logger.debug('mapped item', item)))
+      .then(promiseTap((item) => this.logger.debug('mapped item', item)))
   }
 }

@@ -112,7 +112,7 @@ export class BatchGetRequest {
   ): Promise<BatchGetResponse> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
-      .then(r => r.Responses)
+      .then((r) => r.Responses)
   }
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
@@ -124,7 +124,7 @@ export class BatchGetRequest {
 
     if (response.Responses && Object.keys(response.Responses).length) {
       Responses = Object.entries(response.Responses).reduce((u: BatchGetResponse, [key, val]) => {
-        u[key] = val.map(attributes => fromDb(<Attributes>attributes, this.tables.get(key)))
+        u[key] = val.map((attributes) => fromDb(<Attributes>attributes, this.tables.get(key)))
         return u
       }, {})
     }

@@ -45,7 +45,7 @@ describe('expressions', () => {
       new Set(arr),
     ]
 
-    const filteredObj = deepFilter(obj, item => item !== undefined)
+    const filteredObj = deepFilter(obj, (item) => item !== undefined)
     expect(filteredObj).toEqual([{ street: 'street', zip: 1524 }, [{ age: 25 }], new Set([arr[0], arr[1]])])
   })
 

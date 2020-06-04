@@ -20,7 +20,7 @@ export function prepareAndAddUpdateExpressions(
 ) {
   if (updateDefFns && updateDefFns.length) {
     const sortedByActionKeyWord: Map<UpdateActionKeyword, UpdateExpression[]> = updateDefFns
-      .map(updateDefFn => {
+      .map((updateDefFn) => {
         return updateDefFn(<any>params.ExpressionAttributeNames, metadata)
       })
       .reduce((result, expr) => {
@@ -40,7 +40,7 @@ export function prepareAndAddUpdateExpressions(
     for (const [actionKeyword, updateExpressions] of sortedByActionKeyWord) {
       const statements: string[] = []
       if (updateExpressions && updateExpressions.length) {
-        updateExpressions.forEach(updateExpression => {
+        updateExpressions.forEach((updateExpression) => {
           statements.push(updateExpression.statement)
           attributeValues = { ...attributeValues, ...updateExpression.attributeValues }
           attributeNames = { ...attributeNames, ...updateExpression.attributeNames }

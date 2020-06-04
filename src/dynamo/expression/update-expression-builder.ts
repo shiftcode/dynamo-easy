@@ -37,7 +37,7 @@ export function buildUpdateExpression(
   metadata: Metadata<any> | undefined,
 ): UpdateExpression {
   // metadata get rid of undefined values
-  values = deepFilter(values, value => value !== undefined) || []
+  values = deepFilter(values, (value) => value !== undefined) || []
 
   // load property metadata if model metadata was provided
   let propertyMetadata: PropertyMetadata<any> | undefined
@@ -145,7 +145,7 @@ function buildDefaultExpression(
       statement = `${namePlaceholder}`
       break
     case 'removeFromListAt':
-      statement = values.map(pos => `${namePlaceholder}[${pos}]`).join(', ')
+      statement = values.map((pos) => `${namePlaceholder}[${pos}]`).join(', ')
       break
     case 'add':
       validateAttributeType(operator.action, attribute, 'N', 'SS', 'NS', 'BS')

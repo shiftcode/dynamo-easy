@@ -168,9 +168,10 @@ describe('Mapper', () => {
       })
 
       it('array -> L(ist) (homogeneous, complex type)', () => {
-        const attrValue = <ListAttribute>(
-          toDbOne([{ name: 'max', age: 25, sortedSet: null }, { name: 'anna', age: 65, sortedSet: null }])!
-        )
+        const attrValue = <ListAttribute>toDbOne([
+          { name: 'max', age: 25, sortedSet: null },
+          { name: 'anna', age: 65, sortedSet: null },
+        ])!
 
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('L')
@@ -208,7 +209,14 @@ describe('Mapper', () => {
       })
 
       it('Set of objects without decorator should throw', () => {
-        expect(() => toDbOne(new Set([{ name: 'foo', age: 7 }, { name: 'bar', age: 42 }]))).toThrow()
+        expect(() =>
+          toDbOne(
+            new Set([
+              { name: 'foo', age: 7 },
+              { name: 'bar', age: 42 },
+            ]),
+          ),
+        ).toThrow()
       })
 
       it('Set of objects with decorator -> L(ist)', () => {
@@ -217,7 +225,13 @@ describe('Mapper', () => {
             type: Set,
           },
         }
-        const attrValue = <ListAttribute>toDbOne(new Set([{ name: 'foo', age: 7 }, { name: 'bar', age: 42 }]), meta)
+        const attrValue = <ListAttribute>toDbOne(
+          new Set([
+            { name: 'foo', age: 7 },
+            { name: 'bar', age: 42 },
+          ]),
+          meta,
+        )
 
         expect(attrValue).toEqual({
           L: [{ M: { name: { S: 'foo' }, age: { N: '7' } } }, { M: { name: { S: 'bar' }, age: { N: '42' } } }],
@@ -252,7 +266,10 @@ describe('Mapper', () => {
         const attrValue = <MapAttribute<ObjType>>toDbOne({
           name: 'Max',
           age: 35,
-          children: [{ name: 'Anna', age: 5 }, { name: 'Hans', age: 7 }],
+          children: [
+            { name: 'Anna', age: 5 },
+            { name: 'Hans', age: 7 },
+          ],
         })!
         expect(attrValue).toBeDefined()
         expect(keyOf(attrValue)).toBe('M')
@@ -493,7 +510,7 @@ describe('Mapper', () => {
 
           it('domains', () => {
             expect(organizationAttrMap.domains).toEqual({
-              L: ['shiftcode.ch', 'shiftcode.io', 'shiftcode.it'].map(v => ({ S: v })),
+              L: ['shiftcode.ch', 'shiftcode.io', 'shiftcode.it'].map((v) => ({ S: v })),
             })
           })
 

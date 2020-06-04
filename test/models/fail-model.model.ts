@@ -2,8 +2,8 @@
 import { CollectionProperty, MapAttribute, MapperForType, Model, StringAttribute } from '../../src/dynamo-easy'
 
 const strangeMapper: MapperForType<FailModelNestedFail, MapAttribute> = {
-  toDb: propertyValue => ({ M: { id: { S: `${propertyValue}` } } }),
-  fromDb: attributeValue => ({ id: parseInt((<StringAttribute>attributeValue.M.id).S, 10) }),
+  toDb: (propertyValue) => ({ M: { id: { S: `${propertyValue}` } } }),
+  fromDb: (attributeValue) => ({ id: parseInt((<StringAttribute>attributeValue.M.id).S, 10) }),
 }
 
 class FailModelNestedFail {

@@ -20,7 +20,7 @@ export function resolveAttributeValueNameConflicts(expression: Expression, param
   if (params.ExpressionAttributeValues) {
     const existingAttributeValueNames = Object.keys(params.ExpressionAttributeValues)
     Object.keys(expression.attributeValues)
-      .map(key => [key, uniqueAttributeValueName(key.replace(':', ''), existingAttributeValueNames)])
+      .map((key) => [key, uniqueAttributeValueName(key.replace(':', ''), existingAttributeValueNames)])
       .forEach(([oldValName, newValName]) => {
         attributeValues[newValName] = expression.attributeValues[oldValName]
         // split-join based replaceAll

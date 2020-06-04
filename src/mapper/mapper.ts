@@ -55,7 +55,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
   }
 
   const propertyNames = <Array<keyof T>>Object.getOwnPropertyNames(item) || []
-  propertyNames.forEach(propertyKey => {
+  propertyNames.forEach((propertyKey) => {
     /*
      * 1) get the value of the property
      */
@@ -179,17 +179,14 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
 
   return (item: Partial<T>) => {
     logger.verbose('create key', null, { item, propertyMeta: keyProperties })
-    return keyProperties.reduce(
-      (key, propMeta) => {
-        if (item[propMeta.name] === null || item[propMeta.name] === undefined) {
-          throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
-        }
-        const propertyValue = getPropertyValue(item, propMeta.name)
-        key[propMeta.nameDb] = <Attribute>toDbOne(propertyValue, propMeta)
-        return key
-      },
-      <Attributes<T>>{},
-    )
+    return keyProperties.reduce((key, propMeta) => {
+      if (item[propMeta.name] === null || item[propMeta.name] === undefined) {
+        throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
+      }
+      const propertyValue = getPropertyValue(item, propMeta.name)
+      key[propMeta.nameDb] = <Attribute>toDbOne(propertyValue, propMeta)
+      return key
+    }, <Attributes<T>>{})
   }
 }
 
@@ -244,7 +241,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
   logger.verbose('parse fromDb', modelConstructor, { attributeMap })
   const model: T = <T>{}
 
-  Object.getOwnPropertyNames(attributeMap).forEach(attributeName => {
+  Object.getOwnPropertyNames(attributeMap).forEach((attributeName) => {
     /*
      * 1) get the value of the property
      */

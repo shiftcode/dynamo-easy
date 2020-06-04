@@ -20,12 +20,12 @@ export function initOrUpdateProperty(
 
   // Update the attribute array
   let properties: Array<PropertyMetadata<any>> = Reflect.getMetadata(KEY_PROPERTY, target.constructor) || []
-  const existingProperty = properties.find(p => p.name === propertyKey)
+  const existingProperty = properties.find((p) => p.name === propertyKey)
   if (existingProperty) {
     // create new property with merged options
     property = { ...existingProperty, ...propertyMetadata }
     // remove existing from array
-    properties = properties.filter(p => p !== existingProperty)
+    properties = properties.filter((p) => p !== existingProperty)
   } else {
     // add new options
     property = createNewProperty(propertyMetadata, target, propertyKey)

@@ -212,7 +212,7 @@ describe('collection mapper', () => {
         const propMeta = metadata.forProperty('arrayOfStringToSet')
         const val: ModelWithCollections['arrayOfStringToSet'] = aStringArray
 
-        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({ L: aStringArray.map(t => ({ S: t })) })
+        expect(CollectionMapper.toDb(val, <any>propMeta)).toEqual({ L: aStringArray.map((t) => ({ S: t })) })
       })
       it('set to (S)et (primitive type)', () => {
         const propMeta = metadata.forProperty('setOfStringToSet')

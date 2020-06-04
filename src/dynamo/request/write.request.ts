@@ -78,7 +78,7 @@ export abstract class WriteRequest<
      * kind a hacky - this is just for typing reasons so Promise<void> is the default return type when not defining a
      * returnValues other than NONE
      */
-    return this.execFullResponse().then(r => (<any>r).Item)
+    return this.execFullResponse().then((r) => (<any>r).Item)
   }
 
   /**
@@ -87,8 +87,8 @@ export abstract class WriteRequest<
   execFullResponse(): Promise<WriteResponse<O, T2>> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
-      .then(promiseTap(response => this.logger.debug('response', response)))
-      .then(resp => {
+      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then((resp) => {
         const attrs = resp.Attributes
         delete resp.Attributes // delete Attributes on response so it will not be on returned value
         const r = <WriteResponse<O, T>>resp
@@ -101,7 +101,7 @@ export abstract class WriteRequest<
         }
         return r
       })
-      .then(promiseTap(resp => this.logger.debug('mapped response', resp)))
+      .then(promiseTap((resp) => this.logger.debug('mapped response', resp)))
   }
 
   /**
@@ -109,6 +109,6 @@ export abstract class WriteRequest<
    */
   execNoMap(): Promise<O> {
     this.logger.debug('request', this.params)
-    return this.doRequest(this.params).then(promiseTap(response => this.logger.debug('response', response)))
+    return this.doRequest(this.params).then(promiseTap((response) => this.logger.debug('response', response)))
   }
 }

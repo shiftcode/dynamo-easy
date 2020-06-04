@@ -10,7 +10,7 @@ import { ConditionOperator } from '../type/condition-operator.type'
  */
 export function operatorForAlias(alias: OperatorAlias): ConditionOperator | undefined {
   let operator: ConditionOperator | undefined
-  Object.keys(OPERATOR_TO_ALIAS_MAP).forEach(key => {
+  Object.keys(OPERATOR_TO_ALIAS_MAP).forEach((key) => {
     const a = OPERATOR_TO_ALIAS_MAP[key]
     if (Array.isArray(a)) {
       if (a.includes(alias)) {
