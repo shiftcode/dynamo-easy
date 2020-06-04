@@ -201,6 +201,22 @@ describe('update request', () => {
     })
   })
 
+  describe('exec', async () => {
+    const updateItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve({
+      Attributes: {
+        id: { S: 'partKey' },
+        creationDate: { S: new Date().toISOString() },
+      },
+    }))
+    const res = await new UpdateRequest(<any>{ updateItem: updateItemSpy }, UpdateModel, 'myId')
+      .updateAttribute('counter').set(25, true)
+      .returnValues('ALL_OLD')
+      .exec()
+
+    expect(res).toBeInstanceOf(UpdateModel)
+
+  })
+
   describe('logger', () => {
     const sampleResponse: DynamoDB.UpdateItemOutput = { Attributes: undefined }
     let logReceiver: jasmine.Spy

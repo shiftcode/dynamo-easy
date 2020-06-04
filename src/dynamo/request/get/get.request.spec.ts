@@ -65,10 +65,14 @@ describe('GetRequest', () => {
       req = new GetRequest(<any>{ getItem: getItemSpy }, SimpleWithPartitionKeyModel, 'my-id')
     })
     it('exec', async () => {
-      expect(await req.exec()).toEqual(jsItem)
+      const res = await req.exec()
+      expect(res).toEqual(jsItem)
+      expect(res).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
     it('execFullResponse', async () => {
-      expect(await req.execFullResponse()).toEqual({ Item: jsItem })
+      const res = await req.execFullResponse()
+      expect(res).toEqual({ Item: jsItem })
+      expect(res.Item).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
   })
 

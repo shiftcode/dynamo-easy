@@ -109,10 +109,12 @@ describe('batch get', () => {
       expect(result).toBeDefined()
       expect(result.Items).toBeDefined()
       expect(result.Items).toEqual([jsItem])
+      expect(result.Items[0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
     it('exec', async () => {
       const result = await req.exec()
       expect(result).toEqual([jsItem])
+      expect(result[0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
   })
 

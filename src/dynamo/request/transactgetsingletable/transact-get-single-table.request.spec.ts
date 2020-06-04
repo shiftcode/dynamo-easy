@@ -48,6 +48,7 @@ describe('TransactGetSingleTableRequest', () => {
         id: 'myId',
         age: 20,
       })
+      expect(resp[0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
 
     it('execNoMap should return the raw value', async () => {
@@ -64,6 +65,7 @@ describe('TransactGetSingleTableRequest', () => {
         id: 'myId',
         age: 20,
       })
+      expect(resp.Items[0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
   })
 

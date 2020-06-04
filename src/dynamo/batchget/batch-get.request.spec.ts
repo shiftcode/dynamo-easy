@@ -209,6 +209,7 @@ describe('batch get', () => {
       const result = await request.exec()
       expect(batchGetItemsSpy).toHaveBeenCalled()
       expect(result).toEqual({ [getTableName(SimpleWithPartitionKeyModel)]: [jsItem] })
+      expect(result[getTableName(SimpleWithPartitionKeyModel)][0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
 
     it('execFullResponse', async () => {
@@ -218,6 +219,7 @@ describe('batch get', () => {
         Responses: { [getTableName(SimpleWithPartitionKeyModel)]: [jsItem] },
         UnprocessedKeys: {},
       })
+      expect(result.Responses[getTableName(SimpleWithPartitionKeyModel)][0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
     })
   })
 })

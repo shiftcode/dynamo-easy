@@ -114,10 +114,12 @@ describe('TransactGetRequest', () => {
       const result = await req2.exec()
       expect(Array.isArray(result)).toBeTruthy()
       expect(result.length).toBe(2)
+      expect(result[0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
       expect(result[0]).toEqual({
         id: 'myId',
         age: 20,
       })
+      expect(result[1]).toBeInstanceOf(SimpleWithCompositePartitionKeyModel)
       expect(result[1]).toEqual({
         id: 'myId',
         age: 22,
@@ -130,10 +132,12 @@ describe('TransactGetRequest', () => {
       expect(result).toBeDefined()
       expect(result.ConsumedCapacity).toEqual([])
       expect(result.Items).toBeDefined()
+      expect(result.Items[0]).toBeInstanceOf(SimpleWithPartitionKeyModel)
       expect(result.Items[0]).toEqual({
         id: 'myId',
         age: 20,
       })
+      expect(result.Items[1]).toBeInstanceOf(SimpleWithCompositePartitionKeyModel)
       expect(result.Items[1]).toEqual({
         id: 'myId',
         age: 22,

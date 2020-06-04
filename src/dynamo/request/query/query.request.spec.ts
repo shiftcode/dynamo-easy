@@ -176,4 +176,10 @@ describe('query request', () => {
       expect(req.params.ScanIndexForward).toBeFalsy()
     })
   })
+
+  // describe('exec', () => {
+  //   it('maps the item', async () => {
+  //
+  //   })
+  // })
 })

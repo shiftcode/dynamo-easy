@@ -846,6 +846,10 @@ describe('Mapper', () => {
           product = fromDb(productFromDb, Product)
         })
 
+        it('instance', () => {
+          expect(product).toBeInstanceOf(Product)
+        })
+
         it('nested value', () => {
           expect(product.nestedValue).toBeDefined()
           expect(Object.getOwnPropertyNames(product.nestedValue).length).toBe(1)
@@ -861,6 +865,10 @@ describe('Mapper', () => {
         beforeEach(() => {
           organization = fromDb(organizationFromDb, Organization)
         })
+
+       it('instance', () => {
+         expect(organization).toBeInstanceOf(Organization)
+       })
 
         it('id', () => {
           expect(organization.id).toBe('myId')
@@ -975,6 +983,10 @@ describe('Mapper', () => {
         }
 
         const fromDbVal: ModelWithNonDecoratedEnum = fromDb(attributes, ModelWithNonDecoratedEnum)
+
+        it('instance', () => {
+          expect(fromDbVal).toBeInstanceOf(ModelWithNonDecoratedEnum)
+        })
 
         it('should map all properties', () => {
           expect(fromDbVal).toBeDefined()

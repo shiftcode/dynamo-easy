@@ -278,7 +278,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
     }
   })
 
-  return model
+  return modelConstructor ? Object.assign(new modelConstructor(), model) : model
 }
 
 /**
