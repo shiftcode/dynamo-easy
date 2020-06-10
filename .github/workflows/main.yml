@@ -1,6 +1,6 @@
 name: Node CI
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
         npm run docs:build
       env:
         CI: true
-    - name: Coveralls
+    - name: coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,8 +44,8 @@ jobs:
 
     # publish pre-release if on PR branch
     - name: release PR version
-      if: ${{ startsWith(github.ref, 'refs/pull/') }}
-      run: npx semantic-release -- --debug
+      if: ${{ github.ref != 'master' }}
+      run: npx semantic-release --debug
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
