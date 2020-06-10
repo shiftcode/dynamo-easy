@@ -1,0 +1,52 @@
+name: Node CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2.2.0
+    - name: Install Node v12
+      uses: actions/setup-node@v2-beta
+      with:
+        node-version: 12
+    - uses: actions/cache@v2
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - name: npm install, build, and test
+      run: |
+        npm install
+        npm run lint:ci
+        npm run test:ci
+        npm run build
+        npm run docs:build
+      env:
+        CI: true
+  # release for master branch
+  release:
+    if: ${{ github.ref == 'master' }}
+    needs: build
+
+    steps:
+      - name: Echo
+        run:
+          echo "release because we are on master branch"
+
+  # release for PR branch
+  releasePr:
+    if: ${{ startsWith(github.ref, 'refs/pull/') }}
+    needs: build
+
+    steps:
+      - name: Echo
+        run:
+          echo "pre-release because we are on a pull request"
+      - name: Publish
+        run: |
+          npm run-report coverage
+          npx semantic-release
