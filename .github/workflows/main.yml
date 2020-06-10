@@ -27,14 +27,17 @@ jobs:
         npm run docs:build
       env:
         CI: true
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
     # publish to latest if on master branch
     - name: release master
       if: ${{ github.ref == 'master' }}
       run:
-        echo "release because we are on master branch"
-        npm run report-coverage
-        npm run docs:deploy
         npx semantic-release
+        npm run docs:deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -42,9 +45,7 @@ jobs:
     # publish pre-release if on PR branch
     - name: release PR version
       if: ${{ startsWith(github.ref, 'refs/pull/') }}
-      run: |
-        echo "pre-release because we are on a pull request"
-        npx semantic-release -- --dry-run --debug
+      run: npx semantic-release -- --dry-run --debug
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
