@@ -43,35 +43,9 @@ jobs:
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
     # publish pre-release if on PR branch
-    - name: release PR version
+    - name: release non-master version
       if: ${{ github.ref != 'master' }}
       run: npx semantic-release --debug
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  # release for master branch
-#  release:
-#    runs-on: ubuntu-latest
-#    if: ${{ github.ref == 'master' }}
-#    needs: build
-#
-#    steps:
-#      - name: Echo
-#        run:
-#          echo "release because we are on master branch"
-
-  # release for PR branch
-#  releasePr:
-#    runs-on: ubuntu-latest
-#    if: ${{ startsWith(github.ref, 'refs/pull/') }}
-#    needs: build
-#
-#    steps:
-#      - name: Echo
-#        run:
-#          echo "pre-release because we are on a pull request"
-#      - name: Publish
-#        run: |
-#          npm run-report coverage
-#          npx semantic-release
