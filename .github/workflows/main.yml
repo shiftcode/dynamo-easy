@@ -44,7 +44,7 @@ jobs:
       if: ${{ startsWith(github.ref, 'refs/pull/') }}
       run: |
         echo "pre-release because we are on a pull request"
-        npm run-report coverage
+        npm run report-coverage
         npx semantic-release --dry-run
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
