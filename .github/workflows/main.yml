@@ -27,28 +27,51 @@ jobs:
         npm run docs:build
       env:
         CI: true
-  # release for master branch
-  release:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'master' }}
-    needs: build
+    # publish to latest if on master branch
+    - name: release master
+      if: ${{ github.ref == 'master' }}
+      run:
+        echo "release because we are on master branch"
+        npm run report-coverage
+        npm run docs:deploy
+        npx semantic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-    steps:
-      - name: Echo
-        run:
-          echo "release because we are on master branch"
+    # publish pre-release if on PR branch
+    - name: release PR version
+      if: ${{ startsWith(github.ref, 'refs/pull/') }}
+      run: |
+        echo "pre-release because we are on a pull request"
+        npm run-report coverage
+        npx semantic-release --dry-run
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # release for master branch
+#  release:
+#    runs-on: ubuntu-latest
+#    if: ${{ github.ref == 'master' }}
+#    needs: build
+#
+#    steps:
+#      - name: Echo
+#        run:
+#          echo "release because we are on master branch"
 
   # release for PR branch
-  releasePr:
-    runs-on: ubuntu-latest
-    if: ${{ startsWith(github.ref, 'refs/pull/') }}
-    needs: build
-
-    steps:
-      - name: Echo
-        run:
-          echo "pre-release because we are on a pull request"
-      - name: Publish
-        run: |
-          npm run-report coverage
-          npx semantic-release
+#  releasePr:
+#    runs-on: ubuntu-latest
+#    if: ${{ startsWith(github.ref, 'refs/pull/') }}
+#    needs: build
+#
+#    steps:
+#      - name: Echo
+#        run:
+#          echo "pre-release because we are on a pull request"
+#      - name: Publish
+#        run: |
+#          npm run-report coverage
+#          npx semantic-release
