@@ -45,7 +45,7 @@ jobs:
     # publish pre-release if on PR branch
     - name: release non-master version
       if: ${{ github.ref != 'master' }}
-      run: npx semantic-release --debug
+      run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
