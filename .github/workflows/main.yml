@@ -1,7 +1,18 @@
-name: Node CI
+name: Lint
 
-on: [push]
-
+on:
+  # push only for branches (ignore tags)
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    # pull request only for branches (ignore tags)
+    pull_request:
+      branches:
+        - '**'
+      tags-ignore:
+        - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,16 +29,18 @@ jobs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
-    - name: npm install, build, and test
+    - name: install
+      run: npm ci
+    - name: lint, test, and build
       run: |
-        npm install
         npm run lint:ci
         npm run test:ci
         npm run build
-        npm run docs:build
       env:
         CI: true
+    # report coverage only for non PR
     - name: coveralls
+      if: ${{ startsWith(github.ref, 'refs/pull/') == false }}
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -35,16 +48,17 @@ jobs:
     # publish to latest if on master branch
     - name: release master
       if: ${{ github.ref == 'master' }}
-      run:
+      run: |
+        npm run docs:build
         npx semantic-release
         npm run docs:deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-    # publish pre-release if on PR branch
+    # publish pre-release if non master branch and allowed by .releaserc.yml configuration (only for non-PR branches)
     - name: release non-master version
-      if: ${{ github.ref != 'master' }}
+      if: ${{ github.ref != 'master' && startsWith(github.ref, 'refs/pull/') == false }}
       run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
