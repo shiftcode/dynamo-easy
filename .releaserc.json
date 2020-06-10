@@ -5,7 +5,8 @@
     },
     {
       "name": "#311-prerelease-deployment",
-      "channel": "pr311"
+      "channel": "pr311",
+      "prerelease": "pr311"
     }
   ]
 }
