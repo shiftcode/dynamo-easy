@@ -1,4 +1,4 @@
-name: Lint
+name: Lint, Test, Build and optionally Publish
 
 on:
   # push only for branches (ignore tags)
