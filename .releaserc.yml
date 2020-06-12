@@ -1,2 +1,5 @@
-# run semantic-release on master branch
-branch: master
+branches:
+  - name: master
+  - name: "lab/#278-model-instance"
+    channel: pr278
+    prerelease: pr278
