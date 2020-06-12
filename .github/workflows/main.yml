@@ -1,0 +1,65 @@
+name: Lint, Test, Build and optionally Publish
+
+on:
+  # push only for branches (ignore tags)
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+    # pull request only for branches (ignore tags)
+  pull_request:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.2.0
+      - name: Install Node v12
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: 12
+      - uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: install
+        run: npm ci
+      - name: lint, test, and build
+        run: |
+          npm run lint:ci
+          npm run test:ci
+          npm run build
+        env:
+          CI: true
+      # report coverage only for non PR
+      - name: coveralls
+        if: ${{ startsWith(github.ref, 'refs/pull/') == false }}
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # publish to latest if on master branch
+      - name: release master
+        if: ${{ github.ref == 'master' }}
+        run: |
+          npm run docs:build
+          npx semantic-release
+          npm run docs:deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # publish pre-release if non master branch and allowed by .releaserc.yml configuration (only for non-PR branches)
+      - name: release non-master version
+        if: ${{ github.ref != 'master' && startsWith(github.ref, 'refs/pull/') == false }}
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
