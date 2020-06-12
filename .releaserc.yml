@@ -1,2 +1,5 @@
-# run semantic-release on master branch
-branch: master
+branches:
+  - name: master
+  - name: "#91-default-value-provider"
+    channel: pr91
+    prerelease: pr91
