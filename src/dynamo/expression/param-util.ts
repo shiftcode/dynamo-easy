@@ -86,6 +86,7 @@ export function mergeUpdateExpressions(expression1: string, expression2: string)
 
 /**
  * Will return an object containing all the update statements mapped to an update action keyword
+ *
  * @hidden
  */
 function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateExpressionsByKeyword {

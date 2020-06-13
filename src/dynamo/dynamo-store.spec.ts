@@ -1,6 +1,4 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-unnecessary-class
-// tslint:disable:no-unused-expression
+/* eslint-disable max-classes-per-file, @typescript-eslint/no-extraneous-class */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithPartitionKeyModel } from '../../test/models'

@@ -1,5 +1,4 @@
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-unnecessary-class
+/* eslint-disable @typescript-eslint/no-extraneous-class,@typescript-eslint/no-non-null-assertion */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes } from '../../mapper/type/attribute.type'

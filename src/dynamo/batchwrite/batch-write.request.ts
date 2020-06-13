@@ -47,6 +47,7 @@ export class BatchWriteRequest {
 
   /**
    * add keys for deletion
+   *
    * @param modelClazz the corresponding ModelConstructor
    * @param keys an array of partials of T that contains PartitionKey and SortKey (if necessary). Throws if missing.
    */
@@ -57,6 +58,7 @@ export class BatchWriteRequest {
 
   /**
    * add items to put
+   *
    * @param modelClazz the corresponding ModelConstructor
    * @param items the items to put
    */
@@ -67,10 +69,12 @@ export class BatchWriteRequest {
 
   /**
    * execute request
+   *
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
    * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
    */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Promise<void> {
+    /* eslint-disable-next-line arrow-body-style */
     return this.write(backoffTimer, throttleTimeSlot).then(() => {
       return
     })
@@ -78,6 +82,7 @@ export class BatchWriteRequest {
 
   /**
    * execute request and return (last) response
+   *
    * @param backoffTimer generator for how much timeSlots should be waited before requesting next batch. only used when capacity was exceeded. default randomExponentialBackoffTimer
    * @param throttleTimeSlot defines how long one timeSlot is for throttling, default 1 second
    */
@@ -107,7 +112,7 @@ export class BatchWriteRequest {
     return (item: Partial<T>): DynamoDB.WriteRequest => ({ DeleteRequest: { Key: toKey(item) } })
   }
 
-  private createPutRequest = <T>(modelClazz: ModelConstructor<T>) => {
-    return (item: T): DynamoDB.WriteRequest => ({ PutRequest: { Item: toDb(item, modelClazz) } })
-  }
+  private createPutRequest = <T>(modelClazz: ModelConstructor<T>) => (item: T): DynamoDB.WriteRequest => ({
+    PutRequest: { Item: toDb(item, modelClazz) },
+  })
 }

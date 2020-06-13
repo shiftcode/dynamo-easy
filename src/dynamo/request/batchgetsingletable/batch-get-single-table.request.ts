@@ -44,13 +44,14 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
   /**
    * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
    */
-  consistentRead(value: boolean = true): this {
+  consistentRead(value = true): this {
     this.params.RequestItems[this.tableName].ConsistentRead = value
     return this
   }
 
   /**
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
+   *
    * @param attributesToGet List of model attributes to be returned
    */
   projectionExpression(...attributesToGet: Array<keyof T | string>): BatchGetSingleTableRequest<T, Partial<T>> {
@@ -60,6 +61,7 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
 
   /**
    * fetch all entries and return the raw response (without parsing the attributes to js objects)
+   *
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
@@ -72,6 +74,7 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
 
   /**
    * fetch all entries and return an object containing the mapped items and the other response data
+   *
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
@@ -86,6 +89,7 @@ export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
 
   /**
    * fetch all entries and return the parsed items
+   *
    * @param backoffTimer when unprocessed keys are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */

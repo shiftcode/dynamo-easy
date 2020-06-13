@@ -1,4 +1,4 @@
-// tslint:disable:max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { ComplexModel } from '../../../test/models'
 import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
 import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'

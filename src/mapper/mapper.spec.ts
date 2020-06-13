@@ -1,5 +1,5 @@
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-string-literal
+/* eslint-disable dot-notation,camelcase,@typescript-eslint/no-non-null-assertion */
+
 import * as DynamoDb from 'aws-sdk/clients/dynamodb'
 import {
   organization1CreatedAt,

@@ -1,5 +1,5 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-unnecessary-class
+/* eslint-disable max-classes-per-file */
+/* eslint "@typescript-eslint/no-extraneous-class": 0 */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model/model-constructor'
@@ -8,6 +8,7 @@ import { TransactBaseOperation } from './transact-base-operation'
 
 describe('TransactBaseOperation', () => {
   class TestOperation<T> extends TransactBaseOperation<T, DynamoDB.Delete, TestOperation<T>> {
+    /* eslint-disable-next-line no-useless-constructor */
     constructor(modelClazz: ModelConstructor<T>) {
       super(modelClazz)
     }

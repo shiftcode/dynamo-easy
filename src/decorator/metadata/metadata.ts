@@ -19,6 +19,7 @@ export type MetadataWithSortKey<T> = Omit<Metadata<T>, 'getSortKey'> & { getSort
 
 /**
  * Checks if given metadata returns a sort key when calling metadata.getSortKey
+ *
  * @hidden
  */
 export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSortKey<T> {
@@ -28,15 +29,15 @@ export function hasSortKey<T>(metadata: Metadata<T>): metadata is MetadataWithSo
 export class Metadata<T> {
   readonly modelOptions: ModelMetadata<T>
 
+  constructor(modelConstructor: ModelConstructor<T>) {
+    this.modelOptions = Reflect.getMetadata(KEY_MODEL, modelConstructor)
+  }
+
   private static findMetaDataForProperty<M>(
     modelOpts: ModelMetadata<M>,
     propertyName: keyof M,
   ): PropertyMetadata<M> | undefined {
     return modelOpts.properties.find((property) => property.name === propertyName || property.nameDb === propertyName)
-  }
-
-  constructor(modelConstructor: ModelConstructor<T>) {
-    this.modelOptions = Reflect.getMetadata(KEY_MODEL, modelConstructor)
   }
 
   forProperty(propertyKey: keyof T | string): PropertyMetadata<T> | undefined {
@@ -49,7 +50,7 @@ export class Metadata<T> {
       let currentMeta: ModelMetadata<T> = this.modelOptions
       let lastPropMeta: PropertyMetadata<any> | undefined
       let lastPathPart = ''
-      // tslint:disable-next-line:no-conditional-assignment
+      /* eslint-disable-next-line no-cond-assign */
       while ((re = regex.exec(<string>propertyKey)) !== null) {
         lastPathPart = re[1]
         lastPropMeta = Metadata.findMetaDataForProperty(currentMeta, <any>lastPathPart)
@@ -70,15 +71,15 @@ export class Metadata<T> {
 
   /**
    *
-   * @returns {Array<PropertyMetadata<any>>} Returns all the properties property the @PartitionKeyUUID decorator is present, returns an empty array by default
+   * @returns Returns all the properties property the @PartitionKeyUUID decorator is present, returns an empty array by default
    */
   getKeysWithUUID(): Array<PropertyMetadata<any>> {
     return filterBy(this.modelOptions, (p) => !!(p.key && p.key.uuid), [])
   }
 
   /**
-   * @param {string} indexName
-   * @returns {string} Returns the name of partition key (not the db name if it differs from property name)
+   * @param indexName
+   * @returns Returns the name of partition key (not the db name if it differs from property name)
    * @throws Throws an error if no partition key was defined for the current model
    * @throws Throws an error if an indexName was delivered but no index was found for given name
    */
@@ -106,8 +107,8 @@ export class Metadata<T> {
   }
 
   /**
-   * @param {string} indexName
-   * @returns {keyof T} Returns the name of sort key (not the db name if it differs from property name) or null if none was defined
+   * @param indexName
+   * @returns Returns the name of sort key (not the db name if it differs from property name) or null if none was defined
    * @throws Throws an error if an indexName was delivered but no index was found for given name or the found index has no sort key defined
    */
   getSortKey(indexName?: string): keyof T | null {
@@ -130,15 +131,15 @@ export class Metadata<T> {
 
   /**
    *
-   * @returns {SecondaryIndex[]} Returns all the secondary indexes if exists or an empty array if none is defined
+   * @returns Returns all the secondary indexes if exists or an empty array if none is defined
    */
   getIndexes(): Array<SecondaryIndex<T>> {
     return Array.from(this.modelOptions.indexes.values())
   }
 
   /**
-   * @param {string} indexName
-   * @returns {SecondaryIndex} Returns the index if one with given name exists, null otherwise
+   * @param indexName
+   * @returns Returns the index if one with given name exists, null otherwise
    */
   getIndex(indexName: string): SecondaryIndex<T> | null {
     return this.modelOptions.indexes.get(indexName) || null

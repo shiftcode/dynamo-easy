@@ -8,8 +8,6 @@ import { promiseTap } from '../../helper/promise-tap.function'
 import { Logger } from '../../logger/logger'
 import { fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
-import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/and.function'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -43,15 +41,6 @@ export abstract class ReadManyRequest<
   protected secondaryIndex?: SecondaryIndex<T>
 
   protected abstract readonly logger: Logger
-
-  /**
-   * method that executes the actual call on dynamoDBWrapper with the given params.
-   */
-  protected abstract doRequest(params: I): Promise<O>
-
-  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
-    super(dynamoDBWrapper, modelClazz)
-  }
 
   /**
    *
@@ -104,13 +93,14 @@ export abstract class ReadManyRequest<
   /**
    * Determines the read consistency model: If set to true, then the operation uses strongly consistent reads; otherwise, the operation uses eventually consistent reads.
    */
-  consistentRead(consistentRead: boolean = true): this {
+  consistentRead(consistentRead = true): this {
     this.params.ConsistentRead = consistentRead
     return this
   }
 
   /**
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
+   *
    * @param attributesToGet List of model attributes to be returned
    */
   projectionExpression(...attributesToGet: Array<keyof T | string>): R2 {
@@ -120,6 +110,7 @@ export abstract class ReadManyRequest<
 
   /**
    * add a condition for propertyPath
+   *
    * @example req.whereAttribute('path.to.prop').eq('value')
    */
   whereAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
@@ -132,6 +123,7 @@ export abstract class ReadManyRequest<
 
   /**
    * add one or multiple conditions.
+   *
    * @example req.where( attribute('age').eq(23) )
    * @example req.where( or( attribute('age').lt(18), attribute('age').gt(65) ) )
    */
@@ -222,4 +214,9 @@ export abstract class ReadManyRequest<
 
     return response
   }
+
+  /**
+   * method that executes the actual call on dynamoDBWrapper with the given params.
+   */
+  protected abstract doRequest(params: I): Promise<O>
 }

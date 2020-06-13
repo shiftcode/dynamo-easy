@@ -1,5 +1,4 @@
-// tslint:disable:no-non-null-assertion
-
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { MapperForType, StringAttribute } from '../../../src/dynamo-easy'
 import { FormType } from './form-type.enum'
 
@@ -33,6 +32,13 @@ export class FormId {
   counter: number
   year: number
 
+  constructor(type: FormType, counter: number, year: number, postfix: string | null = null) {
+    this.type = type
+    this.postfix = postfix
+    this.year = year
+    this.counter = counter
+  }
+
   // BE00042018(-postfix)
   static parse(formId: string): FormId {
     // formType BEL / DBL has 3 digits prefix for type. if so we add +1 otherwise +0
@@ -53,10 +59,6 @@ export class FormId {
    * full: Bestellung00012017(-postfix)
    * print: Bestellung BE00012017(-postfix)
    *
-   * @param formId
-   * @param mode
-   * @param hidePostfix
-   * @returns {string}
    */
   static unparse(formId: FormId, hidePostfix?: boolean): string {
     // use the join method with array length to produce leading zeroes
@@ -74,13 +76,6 @@ export class FormId {
       formId.year +
       (formId.postfix && hidePostfix !== true ? `-${formId.postfix}` : '')
     )
-  }
-
-  constructor(type: FormType, counter: number, year: number, postfix: string | null = null) {
-    this.type = type
-    this.postfix = postfix
-    this.year = year
-    this.counter = counter
   }
 }
 

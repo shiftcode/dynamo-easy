@@ -1,4 +1,4 @@
-// tslint:disable:no-unnecessary-class
+/* eslint-disable @typescript-eslint/no-extraneous-class */
 import { Model } from '../../src/dynamo-easy'
 
 @Model()

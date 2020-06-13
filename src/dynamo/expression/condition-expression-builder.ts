@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 /**
  * @module expression
  */
@@ -41,9 +42,7 @@ type BuildFilterFn = (
 
 /**
  * Will walk the object tree recursively and removes all items which do not satisfy the filterFn
- * @param obj
- * @param {(value: any) => boolean} filterFn
- * @returns {any}
+ *
  * @hidden
  */
 export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
@@ -94,12 +93,11 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
  * Will create a condition which can be added to a request using the param object.
  * It will create the expression statement and the attribute names and values.
  *
- * @param {string} attributePath
- * @param {ConditionOperator} operator
- * @param {any[]} values Depending on the operator the amount of values differs
- * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
- * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
- * @returns {Expression}
+ * @param attributePath
+ * @param operator
+ * @param values Depending on the operator the amount of values differs
+ * @param existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
+ * @param metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
  * @hidden
  */
 export function buildFilterExpression(
@@ -162,11 +160,6 @@ export function buildFilterExpression(
 /**
  * IN expression is unlike all the others property the operand is an array of unwrapped values (not attribute values)
  *
- * @param {string} attributePath
- * @param {string[]} values
- * @param {string[]} existingValueNames
- * @param {PropertyMetadata<any>} propertyMetadata
- * @returns {Expression}
  * @hidden
  */
 function buildInConditionExpression(
@@ -317,7 +310,6 @@ function validateForOperator(operator: ConditionOperator, values?: any[]) {
   }
 }
 
-// tslint:disable:no-invalid-template-strings
 /*
  * error messages for arity issues
  */
@@ -329,11 +321,11 @@ export const ERR_ARITY_IN =
 
 /**
  * @hidden
+ * TODO: fix. stop using {@link dynamicTemplate}
  */
 export const ERR_ARITY_DEFAULT =
   'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator'
 
-// tslint:enable:no-invalid-template-strings
 /**
  * @hidden
  */
@@ -362,7 +354,6 @@ function validateArity(operator: ConditionOperator, values?: any[]) {
 /*
  * error message for wrong operator values
  */
-// tslint:disable:no-invalid-template-strings
 /**
  * @hidden
  */
@@ -373,11 +364,10 @@ export const ERR_VALUES_BETWEEN_TYPE =
  */
 export const ERR_VALUES_IN = 'the provided value for IN operator must be an array'
 
-// tslint:enable:no-invalid-template-strings
-
 /**
  * Every operator has some constraints about the values it supports, this method makes sure everything is fine for given
  * operator and values
+ *
  * @hidden
  */
 function validateValues(operator: ConditionOperator, values: any[]) {

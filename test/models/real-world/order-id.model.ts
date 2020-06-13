@@ -4,6 +4,11 @@ export class OrderId {
   counter: number
   year: number
 
+  constructor(counter: number, year: number) {
+    this.counter = counter
+    this.year = year
+  }
+
   static parse(orderId?: string): OrderId {
     if (orderId) {
       const counter: number = parseInt(orderId.slice(0, 4).replace('0', ''), 10)
@@ -19,11 +24,6 @@ export class OrderId {
     // use the join method with array length to produce leading zeroes
     const leadingZeroes: string = new Array(4 + 1 - (formId.counter + '').length).join('0')
     return leadingZeroes + formId.counter + formId.year
-  }
-
-  constructor(counter: number, year: number) {
-    this.counter = counter
-    this.year = year
   }
 }
 

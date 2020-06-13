@@ -32,7 +32,7 @@ export abstract class TransactBaseOperation<
 
   protected constructor(modelClazz: ModelConstructor<T>) {
     if (!modelClazz) {
-      throw new Error(`please provide the model class`)
+      throw new Error('please provide the model class')
     }
     this.modelClazz = modelClazz
 
@@ -48,6 +48,7 @@ export abstract class TransactBaseOperation<
 
   /**
    * create a condition on given attributePath
+   *
    * @example req.onlyIfAttribute('age').lt(10)
    */
   onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
@@ -60,6 +61,7 @@ export abstract class TransactBaseOperation<
 
   /**
    * add a condition necessary for the transaction to succeed
+   *
    * @example req.onlyIf(or(attribute('age').lt(10), attribute('age').gt(20)))
    */
   onlyIf(...conditionDefFns: ConditionExpressionDefinitionFunction[]): this {

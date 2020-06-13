@@ -5,7 +5,7 @@ import { NON_PARAM_FUNCTION_OPERATORS } from '../non-param-function-operators.co
 import { FunctionOperator } from '../type/function-operator.type'
 
 /**
- * @returns {boolean} Returns true for all function operators with no param false otherwise
+ * @returns Returns true for all function operators with no param false otherwise
  * @hidden
  */
 export function isNoParamFunctionOperator(operator: FunctionOperator): boolean {

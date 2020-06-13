@@ -44,6 +44,7 @@ export class BatchGetRequest {
 
   /**
    * read items of model by key
+   *
    * @param modelClazz the corresponding ModelConstructor
    * @param keys an array of partials of T that contains PartitionKey and SortKey (if necessary). Throws if missing.
    * @param consistentRead set to true so the operation uses strongly consistent reads, default false
@@ -79,6 +80,7 @@ export class BatchGetRequest {
 
   /**
    * execute the request and return the raw response (without parsing the attributes to js objects)
+   *
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
@@ -91,6 +93,7 @@ export class BatchGetRequest {
 
   /**
    * execute and return full response with the mapped js objects per table
+   *
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
@@ -103,6 +106,7 @@ export class BatchGetRequest {
 
   /**
    * execute and return the parsed items per table
+   *
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */

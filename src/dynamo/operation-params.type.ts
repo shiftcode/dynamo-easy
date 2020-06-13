@@ -14,9 +14,9 @@ export interface ConditionalParamsHost {
  * @hidden
  */
 export interface ConditionalParams {
+  [key: string]: any
   expressionAttributeNames?: DynamoDB.ExpressionAttributeNameMap
   expressionAttributeValues?: DynamoDB.ExpressionAttributeValueMap
-  [key: string]: any
 }
 
 /**

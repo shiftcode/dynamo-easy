@@ -4,12 +4,10 @@
 import { ComparatorOperator } from './comparator-operator.type'
 import { FunctionOperator } from './function-operator.type'
 
-/**
- *
+/*
  * http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.OperatorsAndFunctions.html#Expressions.OperatorsAndFunctions.Syntax
  *
- * condition-expression ::=
- *  operand comparator operand
+ * condition-expression ::= operand comparator operand
  *    | operand BETWEEN operand AND operand
  *    | operand IN ( operand (',' operand (, ...) ))
  *    | function
@@ -33,6 +31,9 @@ import { FunctionOperator } from './function-operator.type'
  *    | begins_with (path, substr)
  *    | contains (path, operand)
  *    | size (path)
+ */
+
+/**
  * @hidden
  */
 export type ConditionOperator = FunctionOperator | ComparatorOperator

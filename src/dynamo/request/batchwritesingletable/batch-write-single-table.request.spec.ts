@@ -1,4 +1,4 @@
-// tslint:disable:no-unnecessary-class
+/* eslint "@typescript-eslint/no-extraneous-class": 0 */
 
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { Organization } from '../../../../test/models'

@@ -1,6 +1,6 @@
+/* eslint-disable max-classes-per-file */
 import { CollectionProperty, DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 
-// tslint:disable-next-line:max-classes-per-file
 @Model()
 export class Address {
   street: string
@@ -8,7 +8,6 @@ export class Address {
   zip: number
 }
 
-// tslint:disable-next-line:max-classes-per-file
 @Model()
 export class Info {
   details: string
@@ -17,7 +16,6 @@ export class Info {
   createdAt: Date
 }
 
-// tslint:disable-next-line:max-classes-per-file
 @Model()
 export class UpdateModel {
   @PartitionKey()

@@ -8,8 +8,8 @@ import { WriteRequest } from './write.request'
 
 describe('write request', () => {
   class TestWriteRequest<T> extends WriteRequest<T, T, any, any, TestWriteRequest<T>> {
-    protected readonly logger: Logger
     readonly params: any = {}
+    protected readonly logger: Logger
 
     constructor(modelClazz: ModelConstructor<T>) {
       super(<any>null, modelClazz)

@@ -1,4 +1,4 @@
-// tslint:disable:no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { metadataForModel } from '../../../decorator/metadata/metadata-for-model.function'

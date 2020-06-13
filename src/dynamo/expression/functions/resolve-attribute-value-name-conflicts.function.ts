@@ -8,6 +8,7 @@ import { uniqueAttributeValueName } from './unique-attribute-value-name.function
 
 /**
  * resolves name conflict when expression uses an attributeValueName that is already used in given *Input
+ *
  * @param expression
  * @param params
  * @return safe-to-use Expression

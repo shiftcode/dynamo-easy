@@ -1,6 +1,3 @@
-// tslint:disable:no-empty
-// tslint:disable:no-unnecessary-callback-wrapper
-
 import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config/update-config.function'
@@ -113,7 +110,6 @@ describe('dynamo rx', () => {
   })
 
   describe('query', () => {
-    beforeEach(() => {})
     it('should throw when no KeyConditionExpression was given', () => {
       const dynamoDBWrapper = new DynamoDbWrapper()
       expect(() => dynamoDBWrapper.query({ TableName: 'tableName' })).toThrow()

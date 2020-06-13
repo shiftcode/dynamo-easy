@@ -57,11 +57,13 @@ export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
 
   /**
    * execute the request
+   *
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */
   exec(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT): Promise<void> {
     this.logger.debug('starting batchWriteItem')
+    /* eslint-disable-next-line arrow-body-style */
     return this.write(backoffTimer, throttleTimeSlot).then(() => {
       return
     })
@@ -69,6 +71,7 @@ export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
 
   /**
    * execute the request and return the full response
+   *
    * @param backoffTimer when unprocessed items are returned the next value of backoffTimer is used to determine how many time slots to wait before doing the next request
    * @param throttleTimeSlot the duration of a time slot in ms
    */

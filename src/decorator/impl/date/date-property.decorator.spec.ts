@@ -1,4 +1,4 @@
-// tslint:disable:no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { getMetaDataProperty } from '../../../../test/helper/get-meta-data-property.function'
 import { resetDynamoEasyConfig } from '../../../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'

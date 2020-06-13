@@ -15,12 +15,14 @@ export interface UpdateFunctions<T, R> {
    ---------------------------------------------------------------- */
   /**
    * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   *
    * @param value which maps to NumberAttribute
    */
   incrementBy: (value: T) => R
 
   /**
    * only works for numbers. So it either is a number or maps to a NumberAttribute (with custom mapper)
+   *
    * @param value which maps to NumberAttribute
    */
   decrementBy: (value: T) => R
@@ -66,8 +68,8 @@ export interface UpdateFunctions<T, R> {
    * --update-expression "ADD QuantityOnHand :q" \
    * --expression-attribute-values '{":q": {"N": "5"}}' \
    *
-   *  --update-expression "ADD Color :c" \
-   *  --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
+   * --update-expression "ADD Color :c" \
+   * --expression-attribute-values '{":c": {"SS":["Orange", "Purple"]}}' \
    */
   add: (values: T | Array<ExtractListType<T>> | Set<ExtractListType<T>>) => R
 
@@ -76,8 +78,8 @@ export interface UpdateFunctions<T, R> {
    ---------------------------------------------------------------- */
   /**
    * delete items from sets
+   *
    * @param values {multiple values as Array | Set}
-   * @returns {R}
    *
    * --update-expression "DELETE Color :p" \
    * --expression-attribute-values '{":p": {"SS": ["Yellow", "Purple"]}}'

@@ -1,4 +1,4 @@
-// tslint:disable:max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { DateProperty, GSIPartitionKey, Model, PartitionKey, SortKey } from '../../src/dynamo-easy'
 
 @Model()

@@ -32,6 +32,7 @@ export class UpdateRequest<T, T2 = void> extends WriteRequest<
 
   /**
    * create and add a single update operation
+   *
    * @example req.updateAttribute('path.to.attr').set('newVal')
    */
   updateAttribute<K extends keyof T>(attributePath: K): RequestUpdateFunction<this, T, K> {
@@ -40,6 +41,7 @@ export class UpdateRequest<T, T2 = void> extends WriteRequest<
 
   /**
    * add multiple update operations comma separated
+   *
    * @example req.operations(update('path.to.attr).set('newVal'), ... )
    */
   operations(...updateDefFns: UpdateExpressionDefinitionFunction[]): this {

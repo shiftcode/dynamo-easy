@@ -11,7 +11,7 @@ export const BRACED_INDEX_REGEX = /\[(\d+)]/g
 /**
  * Creates a unique attribute value placeholder name to use in the expression
  *
- * @returns {string} The unique attribute value placeholder name in respect to the given existing value names (no duplicates allowed)
+ * @returns The unique attribute value placeholder name in respect to the given existing value names (no duplicates allowed)
  * @hidden
  */
 export function uniqueAttributeValueName(key: string, existingValueNames?: string[]): string {

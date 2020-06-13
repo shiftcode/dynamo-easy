@@ -1,4 +1,4 @@
-// tslint:disable:max-classes-per-file
+/* eslint-disable max-classes-per-file */
 import { MapperForType, Model, NumberAttribute, PartitionKey, Property, SortKey } from '../../src/dynamo-easy'
 
 export class CustomId {
@@ -7,6 +7,11 @@ export class CustomId {
   date: Date
 
   id: number
+
+  constructor(date: Date, id: number) {
+    this.date = date
+    this.id = id
+  }
 
   static parse(value: string): CustomId {
     const id = parseInt(value.substr(0, value.length - CustomId.MULTIPLIER_E), 10)
@@ -24,11 +29,6 @@ export class CustomId {
     const mm = (<any>(customId.date.getMonth() + 1).toString()).padStart(2, '0')
     const dd = (<any>customId.date.getDate().toString()).padStart(2, '0')
     return `${yyyy}${mm}${dd}${(<any>customId.id.toString()).padStart(CustomId.MULTIPLIER_E, '0')}`
-  }
-
-  constructor(date: Date, id: number) {
-    this.date = date
-    this.id = id
   }
 }
 
