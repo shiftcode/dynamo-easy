@@ -1,2 +1,5 @@
-# run semantic-release on master branch
-branch: master
+branches:
+  - name: master
+  - name: next
+    channel: next
+    prerelease: next

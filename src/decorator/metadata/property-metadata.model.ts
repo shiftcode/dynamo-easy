@@ -13,7 +13,6 @@ export interface TypeInfo {
 
 export interface Key {
   type: DynamoDB.KeyType
-  uuid?: boolean
 }
 
 export interface PropertyMetadata<T, R extends Attribute = Attribute> {
@@ -49,6 +48,8 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
 
   // index?: IModelAttributeIndex
   transient?: boolean
+
+  defaultValueProvider?: () => any
 }
 
 /**
