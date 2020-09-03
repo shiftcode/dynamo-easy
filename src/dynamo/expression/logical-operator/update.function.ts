@@ -15,7 +15,7 @@ import {
  * @Model()
  * class Person {
  *
- *   @PartitionKeyUUID()
+ *   @PartitionKey()
  *   id: string
  *   age: number
  * }

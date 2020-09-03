@@ -14,7 +14,6 @@ export * from './index/lsi-sort-key.decorator'
 export * from './index/index-type.enum'
 // key
 export * from './key/partition-key.decorator'
-export * from './key/partition-key-uuid.decorator'
 export * from './key/sort-key.decorator'
 
 // model
