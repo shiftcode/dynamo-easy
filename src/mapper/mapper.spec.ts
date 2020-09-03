@@ -67,7 +67,7 @@ describe('Mapper', () => {
 
       it('string (empty)', () => {
         const attrValue = <StringAttribute>toDbOne('')!
-        expect(attrValue).toBeNull()
+        expect(attrValue.S).toStrictEqual('')
       })
 
       it('number', () => {
@@ -801,7 +801,7 @@ describe('Mapper', () => {
           // OK
           id: 'myId',
 
-          // x -> empty strings are not valid
+          // x -> empty strings are valid
           name: '',
 
           // x -> empty set is not valid
@@ -824,7 +824,8 @@ describe('Mapper', () => {
         expect(toDbValue.id).toBeDefined()
         expect(keyOf(toDbValue.id)).toBe('S')
 
-        expect(toDbValue.name).toBeUndefined()
+        expect(toDbValue.name).toBeDefined()
+        expect(keyOf(toDbValue.name)).toBe('S')
 
         expect(toDbValue.roles).toBeUndefined()
 

@@ -5,7 +5,7 @@ import { StringAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 function stringFromDb(attributeValue: StringAttribute): string {
-  if (attributeValue.S) {
+  if (attributeValue.S || attributeValue.S === '') {
     return attributeValue.S
   } else {
     throw new Error(`there is no S(tring) value defined on given attribute value: ${JSON.stringify(attributeValue)}`)
@@ -13,8 +13,8 @@ function stringFromDb(attributeValue: StringAttribute): string {
 }
 
 function stringToDb(modelValue: string): StringAttribute | null {
-  // an empty string is not a valid value for string attribute
-  if (modelValue === '' || modelValue === null || modelValue === undefined) {
+  // an empty string is valid for a string attribute
+  if (modelValue === null || modelValue === undefined) {
     return null
   } else {
     return { S: modelValue }

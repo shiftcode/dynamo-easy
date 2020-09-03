@@ -9,7 +9,7 @@ describe('string mapper', () => {
 
     it('should work (empty string)', () => {
       const attributeValue = StringMapper.toDb('')
-      expect(attributeValue).toBe(null)
+      expect(attributeValue).toStrictEqual({ S: '' })
     })
 
     it('should work (null)', () => {
@@ -27,6 +27,10 @@ describe('string mapper', () => {
     it('should work', () => {
       const stringValue = StringMapper.fromDb({ S: 'myStringValue' })
       expect(stringValue).toBe('myStringValue')
+    })
+    it('should allow empty string values', () => {
+      const stringValue = StringMapper.fromDb({ S: '' })
+      expect(stringValue).toBe('')
     })
     it('should throw if not a string attribute', () => {
       expect(() => StringMapper.fromDb(<any>{ N: '8' })).toThrow()
