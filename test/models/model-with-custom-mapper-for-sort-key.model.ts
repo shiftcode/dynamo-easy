@@ -20,9 +20,9 @@ export class CustomId {
   }
 
   static unparse(customId: CustomId): string {
-    const yyyy = customId.date.getFullYear()
-    const mm = (<any>(customId.date.getMonth() + 1).toString()).padStart(2, '0')
-    const dd = (<any>customId.date.getDate().toString()).padStart(2, '0')
+    const yyyy = customId.date.getUTCFullYear()
+    const mm = (<any>(customId.date.getUTCMonth() + 1).toString()).padStart(2, '0')
+    const dd = (<any>customId.date.getUTCDate().toString()).padStart(2, '0')
     return `${yyyy}${mm}${dd}${(<any>customId.id.toString()).padStart(CustomId.MULTIPLIER_E, '0')}`
   }
 

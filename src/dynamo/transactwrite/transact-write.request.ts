@@ -6,7 +6,7 @@ import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { TransactOperation } from './transact-operation.type'
 
 /**
- * Request class for the TransactWriteItems operation. Write up to 10 items to one or many tables in a transaction.
+ * Request class for the TransactWriteItems operation. Write up to 25 items to one or many tables in a transaction.
  */
 export class TransactWriteRequest {
   get dynamoDB(): DynamoDB {
@@ -40,7 +40,7 @@ export class TransactWriteRequest {
   }
 
   /**
-   * add up to 10 transaction operations
+   * add up to 25 transaction operations
    * create the operations with:
    * {@link TransactConditionCheck}, {@link TransactDelete}, {@link TransactPut}, {@link TransactUpdate}
    */
@@ -48,8 +48,8 @@ export class TransactWriteRequest {
     if (!writeOperations || writeOperations.length === 0) {
       throw new Error('at least one transaction operation must be added')
     }
-    if (this.params.TransactItems.length + writeOperations.length > 10) {
-      throw new Error(`Each transaction can include up to 10 unique items, including conditions.\
+    if (this.params.TransactItems.length + writeOperations.length > 25) {
+      throw new Error(`Each transaction can include up to 25 unique items, including conditions.\
        Given operations count: ${this.params.TransactItems.length + writeOperations.length}`)
     }
     this.params.TransactItems.push(...writeOperations.map((wo) => wo.transactItem))
