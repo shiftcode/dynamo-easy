@@ -1,5 +1,8 @@
 branches:
   - name: master
+  - name: next
+    channel: next
+    prerelease: next
   - name: "lab/#278-model-instance"
     channel: pr278
     prerelease: pr278

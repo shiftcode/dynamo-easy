@@ -1,7 +1,6 @@
 /**
  * @module mapper
  */
-import { v4 as uuidv4 } from 'uuid'
 import { hasSortKey, Metadata } from '../decorator/metadata/metadata'
 import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
 import { hasType, Key, PropertyMetadata } from '../decorator/metadata/property-metadata.model'
@@ -42,12 +41,14 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
     const metadata: Metadata<T> = metadataForModel(modelConstructor)
 
     /*
-     * initialize possible properties with auto generated uuid
+     * initialize possible properties with default value providers
      */
     if (metadata) {
-      metadata.getKeysWithUUID().forEach((propertyMetadata) => {
-        if (!Reflect.get(<any>item, propertyMetadata.name)) {
-          Reflect.set(<any>item, propertyMetadata.name, uuidv4())
+      metadata.getPropertiesWithDefaultValueProvider().forEach((propertyMetadata) => {
+        const currentVal = Reflect.get(<any>item, propertyMetadata.name)
+        if (currentVal === undefined || currentVal === null) {
+          // tslint:disable-next-line:no-non-null-assertion
+          Reflect.set(<any>item, propertyMetadata.name, propertyMetadata.defaultValueProvider!())
         }
       })
     }
