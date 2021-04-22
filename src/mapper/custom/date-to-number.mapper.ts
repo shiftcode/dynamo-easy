@@ -8,7 +8,7 @@ function dateFromDb(attributeValue: NumberAttribute): Date {
   if (attributeValue.N) {
     return new Date(parseInt(attributeValue.N, 10))
   } else {
-    throw new Error('there is no N(umber) value defiend on given attribute value')
+    throw new Error('there is no N(umber) value defined on given attribute value')
   }
 }
 

@@ -12,7 +12,7 @@ function dateFromDb(attributeValue: StringAttribute): Date {
     }
     return date
   } else {
-    throw new Error('there is no S(tring) value defiend on given attribute value')
+    throw new Error('there is no S(tring) value defined on given attribute value')
   }
 }
 
