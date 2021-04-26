@@ -83,6 +83,6 @@
   "peerDependencies": {
     "aws-sdk": "^2.401.0",
     "reflect-metadata": "^0.1.12",
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   }
 }
