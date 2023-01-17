@@ -1,6 +1,6 @@
-const { cd, exec, echo, touch } = require('shelljs')
-const { readFileSync } = require('fs')
-const url = require('url')
+import { cd, exec, echo, touch } from 'shelljs'
+import { readFileSync } from 'node:fs'
+import url from 'node:url'
 
 const info = {
   TRAVIS_BRANCH: process.env.TRAVIS_BRANCH,
