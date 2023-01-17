@@ -29,13 +29,13 @@
   },
   "license": "MIT",
   "author": "Michael Wittwer <michael.wittwer@shiftcode.ch>",
+  "main": "./dist/dynamo-easy.js",
+  "module": "./dist/_esm5/dynamo-easy.js",
+  "typings": "./dist/_types/dynamo-easy.d.ts",
   "files": [
     "dist",
     "!dist/docs"
   ],
-  "main": "./dist/dynamo-easy.js",
-  "module": "./dist/_esm5/dynamo-easy.js",
-  "typings": "./dist/_types/dynamo-easy.d.ts",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc --outDir ./dist/_esm2015/ && tsc --outDir ./dist/_esm5/ --target es5 && tsc --outDir ./dist/ --module commonjs",
@@ -71,7 +71,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "semantic-release": "^17.0.0",
-    "sort-package-json": "^1.22.1",
+    "sort-package-json": "^2.1.0",
     "ts-jest": "^25.0.0",
     "ts-node": "^8.3.0",
     "tslint": "^5.19.0",
