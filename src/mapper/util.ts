@@ -21,9 +21,9 @@ export function getPropertyPath<T>(
   propertyKey: keyof T,
 ): string {
   if (modelConstructorOrPropertyMetadata && modelConstructorOrPropertyMetadata.name) {
-    return `[${modelConstructorOrPropertyMetadata.name}::${propertyKey}]`
+    return `[${String(modelConstructorOrPropertyMetadata.name)}::${String(propertyKey)}]`
   } else {
-    return `[unknown::${propertyKey}]`
+    return `[unknown::${String(propertyKey)}]`
   }
 }
 

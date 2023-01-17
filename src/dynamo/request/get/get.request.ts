@@ -15,7 +15,12 @@ import { GetResponse } from './get.response'
 /**
  * Request class for the GetItem operation.
  */
-export class GetRequest<T, T2 = T> extends StandardRequest<T, T2, DynamoDB.GetItemInput, GetRequest<T, T2>> {
+export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
+  T,
+  T2,
+  DynamoDB.GetItemInput,
+  GetRequest<T, T2>
+> {
   private readonly logger: Logger
 
   constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {

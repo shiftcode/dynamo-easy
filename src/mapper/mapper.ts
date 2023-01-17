@@ -44,7 +44,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
      * initialize possible properties with default value providers
      */
     if (metadata) {
-      metadata.getPropertiesWithDefaultValueProvider().forEach(propertyMetadata => {
+      metadata.getPropertiesWithDefaultValueProvider().forEach((propertyMetadata) => {
         const currentVal = Reflect.get(<any>item, propertyMetadata.name)
         if (currentVal === undefined || currentVal === null) {
           // tslint:disable-next-line:no-non-null-assertion
@@ -184,7 +184,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
         throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
       }
       const propertyValue = getPropertyValue(item, propMeta.name)
-      key[propMeta.nameDb] = <Attribute>toDbOne(propertyValue, propMeta)
+      ;(key as any)[propMeta.nameDb] = <Attribute>toDbOne(propertyValue, propMeta)
       return key
     }, <Attributes<T>>{})
   }
@@ -220,7 +220,7 @@ export function createKeyAttributes<T>(
 
   if (hasSortKey(metadata)) {
     if (sortKey === null || sortKey === undefined) {
-      throw new Error(`please provide the sort key for attribute ${metadata.getSortKey()}`)
+      throw new Error(`please provide the sort key for attribute ${String(metadata.getSortKey())}`)
     }
     const sortKeyProp = metadata.getSortKey()
     const sortKeyMetadata = metadata.forProperty(sortKeyProp)
@@ -228,7 +228,7 @@ export function createKeyAttributes<T>(
       throw new Error('metadata for sort key must be defined')
     }
 
-    keyAttributeMap[sortKeyMetadata.nameDb] = <Attribute>toDbOne(sortKey, sortKeyMetadata)
+    ;(keyAttributeMap as any)[sortKeyMetadata.nameDb] = <Attribute>toDbOne(sortKey, sortKeyMetadata)
   }
 
   return keyAttributeMap

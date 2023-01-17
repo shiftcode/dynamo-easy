@@ -18,7 +18,7 @@ import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 /**
  * Request class for BatchGetItem operation which supports a single model class only.
  */
-export class BatchGetSingleTableRequest<T, T2 = T> extends BaseRequest<
+export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends BaseRequest<
   T,
   T2,
   DynamoDB.BatchGetItemInput,

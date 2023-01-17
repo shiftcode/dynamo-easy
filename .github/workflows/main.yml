@@ -21,7 +21,6 @@ jobs:
         node:
           - 16
           - 18
-          - 19
     name: Node.js v${{ matrix.node }}
     runs-on: ubuntu-latest
     steps:
