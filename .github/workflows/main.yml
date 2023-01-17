@@ -46,7 +46,7 @@ jobs:
       # Print current Git version
       - run: git --version
       # Install node_modules
-      - run: npm ci
+      - run: HUSKY=0 npm ci
       # Run tests
       - run: npm run test:ci
 
@@ -70,7 +70,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: install
-        run: npm ci
+        run: HUSKY=0 npm ci
       - name: lint, test, and build
         run: |
           npm run lint:ci
