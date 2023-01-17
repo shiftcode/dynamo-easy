@@ -26,8 +26,8 @@ export class MyProp {
 }
 
 const myPropMapper: MapperForType<MyProp, StringAttribute> = {
-  fromDb: a => MyProp.parse(a.S),
-  toDb: v => ({ S: MyProp.toString(v) }),
+  fromDb: (a) => MyProp.parse(a.S),
+  toDb: (v) => ({ S: MyProp.toString(v) }),
 }
 
 @Model()

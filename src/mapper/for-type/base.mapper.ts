@@ -40,7 +40,7 @@ export type ToDbFn<
     | MapAttribute
     | ListAttribute
     | NullAttribute
-    | BooleanAttribute
+    | BooleanAttribute,
 > = (propertyValue: T, propertyMetadata?: PropertyMetadata<T, R>) => R | null
 
 /**
@@ -58,7 +58,7 @@ export type FromDbFn<
     | MapAttribute
     | ListAttribute
     | NullAttribute
-    | BooleanAttribute
+    | BooleanAttribute,
 > = (attributeValue: R, propertyMetadata?: PropertyMetadata<T, R>) => T
 
 /**
@@ -77,7 +77,7 @@ export interface MapperForType<
     | MapAttribute
     | ListAttribute
     | NullAttribute
-    | BooleanAttribute
+    | BooleanAttribute,
 > {
   fromDb: FromDbFn<T, R>
   toDb: ToDbFn<T, R>

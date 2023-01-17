@@ -22,8 +22,9 @@ import { ConditionalParamsHost } from '../operation-params.type'
 export abstract class TransactBaseOperation<
   T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
-  R extends TransactBaseOperation<T, I, any>
-> implements ConditionalParamsHost {
+  R extends TransactBaseOperation<T, I, any>,
+> implements ConditionalParamsHost
+{
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>

@@ -27,7 +27,7 @@ export abstract class BaseRequest<
     | DynamoDB.BatchWriteItemInput
     | DynamoDB.TransactGetItemsInput
     | DynamoDB.TransactWriteItemsInput,
-  R extends BaseRequest<T, T2, I, any>
+  R extends BaseRequest<T, T2, I, any>,
 > {
   readonly dynamoDBWrapper: DynamoDbWrapper
 

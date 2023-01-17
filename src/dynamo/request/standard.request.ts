@@ -21,7 +21,7 @@ export abstract class StandardRequest<
     | DynamoDB.UpdateItemInput
     | DynamoDB.QueryInput
     | DynamoDB.ScanInput,
-  R extends StandardRequest<T, T2, I, any>
+  R extends StandardRequest<T, T2, I, any>,
 > extends BaseRequest<T, T2, I, R> {
   protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
     super(dynamoDBWrapper, modelClazz)

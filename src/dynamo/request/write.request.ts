@@ -32,7 +32,7 @@ export abstract class WriteRequest<
   T2,
   I extends DynamoDB.DeleteItemInput | DynamoDB.PutItemInput | DynamoDB.UpdateItemInput,
   O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput | DynamoDB.UpdateItemOutput,
-  R extends WriteRequest<T, T2, I, O, R>
+  R extends WriteRequest<T, T2, I, O, R>,
 > extends StandardRequest<T, T2, I, R> {
   protected abstract readonly logger: Logger
 
