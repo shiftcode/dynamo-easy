@@ -58,6 +58,6 @@ export class UpdateRequest<T, T2 extends T | Partial<T> | void = void> extends W
   }
 
   protected doRequest(params: DynamoDB.UpdateItemInput): Promise<DynamoDB.UpdateItemOutput> {
-    return this.dynamoDBWrapper.updateItem(this.params)
+    return this.dynamoDBWrapper.updateItem(params)
   }
 }
