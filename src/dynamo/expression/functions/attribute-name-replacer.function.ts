@@ -4,6 +4,6 @@
 /**
  * @hidden
  */
-export function attributeNameReplacer(substring: string, ...args: any[]): string {
+export function attributeNameReplacer(_substring: string, ...args: any[]): string {
   return `_at_${args[0]}`
 }

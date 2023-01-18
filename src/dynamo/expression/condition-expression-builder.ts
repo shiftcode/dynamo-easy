@@ -170,12 +170,12 @@ export function buildFilterExpression(
  * @hidden
  */
 function buildInConditionExpression(
-  attributePath: string,
+  _attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
   attributeNames: Record<string, string>,
   values: any[],
-  existingValueNames: string[] | undefined,
+  _existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
 ): Expression {
   const attributeValues: Attributes<any> = (<any[]>values[0])
@@ -188,7 +188,7 @@ function buildInConditionExpression(
       return result
     }, <Attributes<any>>{})
 
-  const inStatement = (<any[]>values[0]).map((value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
+  const inStatement = (<any[]>values[0]).map((_value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
   return {
     statement: `${namePlaceholder} IN (${inStatement})`,
@@ -236,12 +236,12 @@ function buildBetweenConditionExpression(
  */
 function buildDefaultConditionExpression(
   operator: ConditionOperator,
-  attributePath: string,
+  _attributePath: string,
   namePlaceholder: string,
   valuePlaceholder: string,
   attributeNames: Record<string, string>,
   values: any[],
-  existingValueNames: string[] | undefined,
+  _exisingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
 ): Expression {
   let statement: string

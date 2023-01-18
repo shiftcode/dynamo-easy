@@ -80,7 +80,7 @@ function buildDefaultExpression(
   valuePlaceholder: string,
   attributeNames: Record<string, string>,
   values: any[],
-  existingValueNames: string[] | undefined,
+  _existingValueNames: string[] | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
   operator: UpdateActionDef,
 ): UpdateExpression {

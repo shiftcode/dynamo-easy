@@ -40,4 +40,5 @@ export type RequestConditionFunctionTyped<R extends ConditionalParamsHost, T, K 
   T[K],
   R
 >
-export type RequestConditionFunction<R extends ConditionalParamsHost, T> = ConditionFunctions<any, R>
+// TODO typings check on unused generic
+export type RequestConditionFunction<R extends ConditionalParamsHost, _T> = ConditionFunctions<any, R>

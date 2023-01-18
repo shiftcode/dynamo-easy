@@ -53,6 +53,9 @@ rules:
   # introduced with v5.12.0
   unnecessary-constructor: true
   unnecessary-bind: true
+  variable-name:
+    - check-format
+    - allow-leading-underscore
 
   #
   # custom rules

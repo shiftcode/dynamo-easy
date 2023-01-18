@@ -19,7 +19,8 @@ import {
 import { ConditionExpressionDefinitionFunction } from '../expression/type/condition-expression-definition-function'
 import { StandardRequest } from './standard.request'
 
-type WriteResponse<O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput | DynamoDB.UpdateItemOutput, T> = Omit<
+// TODO typings check on unused generic
+type WriteResponse<O extends DynamoDB.DeleteItemOutput | DynamoDB.PutItemOutput | DynamoDB.UpdateItemOutput, _T> = Omit<
   O,
   'Attributes'
 >

@@ -32,7 +32,7 @@ import {
  * The downside of the strict typing is the model constructor parameter which is only required for typing reasons
  */
 export function attribute2<T, K extends keyof T>(
-  modelConstructor: ModelConstructor<T>,
+  _modelConstructor: ModelConstructor<T>,
   attributePath: K,
 ): ConditionExpressionDefinitionChainTyped<T, K> {
   return propertyDefinitionFunction<T, K>(attributePath)
