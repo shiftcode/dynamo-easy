@@ -16,7 +16,7 @@ describe('write request', () => {
       this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
     }
 
-    protected doRequest(params: any): Promise<any> {
+    protected doRequest(_params: any): Promise<any> {
       return Promise.resolve(null)
     }
   }

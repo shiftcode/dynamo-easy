@@ -3,7 +3,7 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]sx?$': [
+     '^.+\\.tsx?$': [
       'ts-jest',
       {
         tsconfig: './tsconfig.jest.json'

@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "declarationMap": false,
     "declaration": false,         /* Generates corresponding '.d.ts' file. */
     "types": [                    /* Type declaration files to be included in compilation. */
       "node",
@@ -8,9 +9,9 @@
       "jest"
     ]
   },
+  "exclude": [],
   "include": [
     "src/**/*.spec.ts",
     "test/**/*"
-  ],
-  "exclude": []
+  ]
 }

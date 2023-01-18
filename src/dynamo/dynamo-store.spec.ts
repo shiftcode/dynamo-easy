@@ -98,7 +98,7 @@ describe('dynamo store', () => {
   })
 
   describe('use provided dynamoDB instance', () => {
-    const dynamoDB = new DynamoDB()
+    const dynamoDB = new DynamoDB.default()
     const store = new DynamoStore(SimpleWithPartitionKeyModel, dynamoDB)
     expect(store.dynamoDB).toBe(dynamoDB)
 

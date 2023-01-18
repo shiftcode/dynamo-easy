@@ -12,7 +12,7 @@ import {
 } from './request-expression-builder'
 
 const DYNAMO_RX_MOCK: DynamoDbWrapper = <DynamoDbWrapper>{
-  query(params: DynamoDB.QueryInput): Promise<DynamoDB.QueryOutput> {
+  query(_params: DynamoDB.QueryInput): Promise<DynamoDB.QueryOutput> {
     return Promise.resolve({})
   },
 }

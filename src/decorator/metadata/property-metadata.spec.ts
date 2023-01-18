@@ -15,6 +15,7 @@ class NestedModel {
   createdAt: Date
 }
 
+// tslint:disable-next-line:max-classes-per-file
 @Model()
 class TestModel {
   @CollectionProperty()

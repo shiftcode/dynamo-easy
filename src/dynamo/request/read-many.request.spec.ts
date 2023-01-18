@@ -22,7 +22,7 @@ class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any, any> {
 
   protected readonly logger: Logger
 
-  protected doRequest(params: any): Promise<any> {
+  protected doRequest(_params: any): Promise<any> {
     return Promise.resolve({})
   }
 }

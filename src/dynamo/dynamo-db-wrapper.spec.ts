@@ -142,7 +142,7 @@ describe('dynamo rx', () => {
   })
 
   it('should use given dynamoDB client', () => {
-    const dynamoDB = new DynamoDB()
+    const dynamoDB = new DynamoDB.default()
     const dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     expect(dynamoDBWrapper.dynamoDB).toBe(dynamoDB)
 

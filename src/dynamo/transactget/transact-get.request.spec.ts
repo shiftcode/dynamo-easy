@@ -20,7 +20,7 @@ describe('TransactGetRequest', () => {
     })
 
     it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB()
+      const dynamoDB = new DynamoDB.default()
       const transactGetRequest = new TransactGetRequest(dynamoDB)
       expect(transactGetRequest.dynamoDB).toBe(dynamoDB)
 

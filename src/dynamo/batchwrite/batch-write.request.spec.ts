@@ -14,7 +14,7 @@ describe('batchWriteRequest', () => {
     })
 
     describe('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB()
+      const dynamoDB = new DynamoDB.default()
       const batchWriteRequest = new BatchWriteRequest(dynamoDB)
       expect(batchWriteRequest.dynamoDB).toBe(dynamoDB)
 

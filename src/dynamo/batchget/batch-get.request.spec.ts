@@ -12,7 +12,7 @@ describe('batch get', () => {
 
   describe('constructor', () => {
     it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB()
+      const dynamoDB = new DynamoDB.default()
       const batchGetRequest = new BatchGetRequest(dynamoDB)
       expect(batchGetRequest.dynamoDB).toBe(dynamoDB)
 
@@ -87,8 +87,10 @@ describe('batch get', () => {
     })
 
     it('should throw when more than 100 items are added', () => {
-      const items55: Array<Partial<SimpleWithPartitionKeyModel>> = [...new Array(55)].map((x, i) => ({ id: `id-${i}` }))
-      const items60: Array<Partial<Organization>> = [...new Array(60)].map((x, i) => ({
+      const items55: Array<Partial<SimpleWithPartitionKeyModel>> = [...new Array(55)].map((_x, i) => ({
+        id: `id-${i}`,
+      }))
+      const items60: Array<Partial<Organization>> = [...new Array(60)].map((_x, i) => ({
         id: `id-${i}`,
         createdAtDate: new Date(),
       }))

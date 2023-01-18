@@ -25,7 +25,7 @@ describe('TransactWriteRequest', () => {
     })
 
     it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB()
+      const dynamoDB = new DynamoDB.default()
       const transactWriteRequest = new TransactWriteRequest(dynamoDB)
       expect(transactWriteRequest.dynamoDB).toBe(dynamoDB)
 
