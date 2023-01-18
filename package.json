@@ -62,7 +62,7 @@
     "@types/node": "^18.11.18",
     "aws-sdk": "^2.401.0",
     "colors": "^1.4.0",
-    "coveralls": "^3.0.6",
+    "coveralls": "^3.1.1",
     "husky": "^8.0.0",
     "jest": "^25.2.7",
     "lint-staged": "^13.1.0",
@@ -75,7 +75,7 @@
     "ts-jest": "^25.0.0",
     "tslint": "^5.19.0",
     "tslint-config-prettier": "^1.18.0",
-    "tsutils": "^3.17.1",
+    "tsutils": "^3.21.0",
     "typedoc": "0.14.0",
     "typedoc-plugin-external-module-name": "^2.1.0",
     "typescript": "^4.9.4"
