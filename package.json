@@ -70,7 +70,7 @@
     "prettier": "^2.8.3",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
-    "semantic-release": "^17.0.0",
+    "semantic-release": "^20.0.2",
     "sort-package-json": "^2.1.0",
     "ts-jest": "^25.0.0",
     "tslint": "^5.19.0",
