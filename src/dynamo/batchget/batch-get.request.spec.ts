@@ -124,7 +124,7 @@ describe('batch get', () => {
       },
     }
 
-    let batchGetItemsSpy: jasmine.Spy
+    let batchGetItemsMock: jest.Mock
     let nextSpyFn: () => { value: number }
 
     const generatorMock = () => <any>{ next: nextSpyFn }
@@ -133,8 +133,11 @@ describe('batch get', () => {
       request = new BatchGetRequest()
       request.forModel(SimpleWithPartitionKeyModel, [jsItem1, jsItem2])
 
-      batchGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      const dynamoDBWrapper: DynamoDbWrapper = <any>{ batchGetItems: batchGetItemsSpy }
+      batchGetItemsMock = jest
+        .fn()
+        .mockReturnValueOnce(Promise.resolve(output1))
+        .mockReturnValueOnce(Promise.resolve(output2))
+      const dynamoDBWrapper: DynamoDbWrapper = <any>{ batchGetItems: batchGetItemsMock }
 
       Object.assign(request, { dynamoDBWrapper })
 
@@ -144,7 +147,7 @@ describe('batch get', () => {
     it('[execNoMap] should backoff and retry when UnprocessedItems are returned', async () => {
       const result = await request.execNoMap(generatorMock)
       expect(nextSpyFn).toHaveBeenCalledTimes(1)
-      expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
+      expect(batchGetItemsMock).toHaveBeenCalledTimes(2)
       expect(result).toBeDefined()
       expect(result.Responses).toBeDefined()
 
@@ -158,7 +161,7 @@ describe('batch get', () => {
     it('[execFullResponse] should backoff and retry when UnprocessedItems are returned', async () => {
       const result = await request.execFullResponse(generatorMock)
       expect(nextSpyFn).toHaveBeenCalledTimes(1)
-      expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
+      expect(batchGetItemsMock).toHaveBeenCalledTimes(2)
       expect(result).toBeDefined()
       expect(result.Responses).toBeDefined()
 
@@ -172,7 +175,7 @@ describe('batch get', () => {
     it('[exec] should backoff and retry when UnprocessedItems are returned', async () => {
       const result = await request.exec(generatorMock)
       expect(nextSpyFn).toHaveBeenCalledTimes(1)
-      expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
+      expect(batchGetItemsMock).toHaveBeenCalledTimes(2)
       expect(result).toBeDefined()
 
       const resultItems = result[getTableName(SimpleWithPartitionKeyModel)]
@@ -184,7 +187,7 @@ describe('batch get', () => {
   })
 
   describe('should map the result items', () => {
-    let batchGetItemsSpy: jasmine.Spy
+    let batchGetItemsMock: jest.Mock
     const jsItem: SimpleWithPartitionKeyModel = { id: 'idVal', age: 20 }
     const dbItem: Attributes<SimpleWithPartitionKeyModel> = {
       id: { S: 'idVal' },
@@ -198,8 +201,8 @@ describe('batch get', () => {
     }
 
     beforeEach(() => {
-      batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
-      const dynamoDBWrapper: DynamoDbWrapper = <any>{ batchGetItems: batchGetItemsSpy }
+      batchGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
+      const dynamoDBWrapper: DynamoDbWrapper = <any>{ batchGetItems: batchGetItemsMock }
       request = new BatchGetRequest()
       Object.assign(request, { dynamoDBWrapper })
       request.forModel(SimpleWithPartitionKeyModel, [{ id: 'idVal' }])
@@ -207,13 +210,13 @@ describe('batch get', () => {
 
     it('exec', async () => {
       const result = await request.exec()
-      expect(batchGetItemsSpy).toHaveBeenCalled()
+      expect(batchGetItemsMock).toHaveBeenCalled()
       expect(result).toEqual({ [getTableName(SimpleWithPartitionKeyModel)]: [jsItem] })
     })
 
     it('execFullResponse', async () => {
       const result = await request.execFullResponse()
-      expect(batchGetItemsSpy).toHaveBeenCalled()
+      expect(batchGetItemsMock).toHaveBeenCalled()
       expect(result).toEqual({
         Responses: { [getTableName(SimpleWithPartitionKeyModel)]: [jsItem] },
         UnprocessedKeys: {},

@@ -24,17 +24,17 @@ describe('write request', () => {
   let req: TestWriteRequest<SimpleWithPartitionKeyModel>
 
   describe('ReturnValues = NONE', () => {
-    let doRequestSpy: jasmine.Spy
+    let doRequestMock: jest.Mock
     const response = { myValue: true }
     beforeEach(() => {
       req = new TestWriteRequest(SimpleWithPartitionKeyModel)
-      doRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
-      Object.assign(req, { doRequest: doRequestSpy })
+      doRequestMock = jest.fn().mockReturnValueOnce(Promise.resolve(response))
+      Object.assign(req, { doRequest: doRequestMock })
     })
 
     it('exec should call execFullResponse', async () => {
       await req.exec()
-      expect(doRequestSpy).toHaveBeenCalled()
+      expect(doRequestMock).toHaveBeenCalled()
     })
 
     it('exec should return void', async () => {

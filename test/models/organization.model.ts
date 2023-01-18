@@ -109,7 +109,4 @@ export class Organization {
 
   @CollectionProperty()
   emptySet: Set<string> = new Set()
-
-  // tslint:disable-next-line:no-empty
-  constructor() {}
 }

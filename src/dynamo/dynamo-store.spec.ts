@@ -32,12 +32,12 @@ describe('dynamo store', () => {
   })
 
   describe('session validity ensurer', () => {
-    let validityEnsurerSpy: jasmine.Spy
+    let validityEnsurerMock: jest.Mock
 
     beforeEach(() => {
       // Promise.reject to not reach the actual call to the aws sdk
-      validityEnsurerSpy = jasmine.createSpy().and.returnValue(Promise.reject())
-      updateDynamoEasyConfig({ sessionValidityEnsurer: validityEnsurerSpy })
+      validityEnsurerMock = jest.fn().mockReturnValueOnce(Promise.reject())
+      updateDynamoEasyConfig({ sessionValidityEnsurer: validityEnsurerMock })
     })
 
     afterEach(resetDynamoEasyConfig)
@@ -49,19 +49,19 @@ describe('dynamo store', () => {
       } catch (error) {
         // ignore
       }
-      expect(validityEnsurerSpy).toHaveBeenCalled()
+      expect(validityEnsurerMock).toHaveBeenCalled()
     })
   })
 
   describe('logger', () => {
-    let logReceiverSpy: jasmine.Spy
+    let logReceiverMock: jest.Mock
     beforeEach(() => {
-      logReceiverSpy = jasmine.createSpy()
-      updateDynamoEasyConfig({ logReceiver: logReceiverSpy })
+      logReceiverMock = jest.fn()
+      updateDynamoEasyConfig({ logReceiver: logReceiverMock })
     })
     it('logs when instance was created', () => {
       new DynamoStore(DynamoStoreModel)
-      expect(logReceiverSpy).toHaveBeenCalled()
+      expect(logReceiverMock).toHaveBeenCalled()
     })
   })
 
@@ -85,7 +85,7 @@ describe('dynamo store', () => {
   })
 
   describe('should enable custom requests', () => {
-    const makeRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve())
+    const makeRequestSpy = jest.fn().mockReturnValue(Promise.resolve())
     const store = new DynamoStore(SimpleWithPartitionKeyModel)
     Object.assign(store, { dynamoDBWrapper: { makeRequest: makeRequestSpy } })
     store.makeRequest('updateTimeToLive', {})

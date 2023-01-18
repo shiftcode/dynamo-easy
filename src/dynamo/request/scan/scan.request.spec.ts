@@ -6,7 +6,7 @@ import { ScanRequest } from './scan.request'
 
 describe('scan request', () => {
   let request: MyScanRequest
-  let scanSpy: jasmine.Spy
+  let scanMock: jest.Mock
 
   class MyScanRequest extends ScanRequest<ComplexModel> {
     constructor(dynamoDBWrapper: DynamoDbWrapper) {
@@ -19,8 +19,8 @@ describe('scan request', () => {
   }
 
   beforeEach(() => {
-    scanSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ Count: 1 }))
-    request = new MyScanRequest(<any>{ scan: scanSpy })
+    scanMock = jest.fn().mockReturnValueOnce(Promise.resolve({ Count: 1 }))
+    request = new MyScanRequest(<any>{ scan: scanMock })
   })
 
   it('extends ReadManyRequest', () => {
@@ -33,9 +33,8 @@ describe('scan request', () => {
 
   it('execSingle', async () => {
     await request.execSingle()
-    expect(scanSpy).toHaveBeenCalled()
-    expect(scanSpy.calls.mostRecent().args[0]).toBeDefined()
-    expect(scanSpy.calls.mostRecent().args[0].Limit).toBe(1)
+    expect(scanMock).toHaveBeenCalled()
+    expect(scanMock).toHaveBeenLastCalledWith(expect.objectContaining({ Limit: 1 }))
   })
 
   it('constructor creates logger', () => {
@@ -44,6 +43,6 @@ describe('scan request', () => {
 
   it('doRequest uses dynamoDBWrapper.scan', async () => {
     await request.exec()
-    expect(scanSpy).toHaveBeenCalled()
+    expect(scanMock).toHaveBeenCalled()
   })
 })

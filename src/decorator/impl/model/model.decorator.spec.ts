@@ -14,8 +14,8 @@ describe('@model decorator', () => {
 
     it('throws when defining multiple partitionKeys for same gsi', () => {
       expect(() => {
-        // @ts-ignore
         @Model()
+        // @ts-ignore
         class FailModel {
           @GSIPartitionKey(IX_NAME)
           pk1: string
@@ -28,8 +28,8 @@ describe('@model decorator', () => {
     })
     it('throws when defining multiple sortKeys for same gsi', () => {
       expect(() => {
-        // @ts-ignore
         @Model()
+        // @ts-ignore
         class FailModel {
           @GSIPartitionKey(IX_NAME)
           pk1: string
@@ -44,8 +44,8 @@ describe('@model decorator', () => {
   describe('getLocalSecondaryIndexes', () => {
     it('throws when defining LSI sortKey but no PartitionKey', () => {
       expect(() => {
-        // @ts-ignore
         @Model()
+        // @ts-ignore
         class FailModel {
           @LSISortKey(IX_NAME)
           sk1: string
@@ -54,8 +54,8 @@ describe('@model decorator', () => {
     })
     it('throws when defining multiple sortKeys for same lsi', () => {
       expect(() => {
-        // @ts-ignore
         @Model()
+        // @ts-ignore
         class FailModel {
           @PartitionKey()
           pk1: string

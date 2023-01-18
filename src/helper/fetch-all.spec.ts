@@ -7,7 +7,7 @@ import { fetchAll } from './fetch-all.function'
 
 describe('fetch all', () => {
   let dynamoDBWrapper: DynamoDbWrapper
-  let methodSpy: jasmine.Spy
+  let methodMock: jest.Mock
   let result: SimpleWithPartitionKeyModel[]
 
   const output1: DynamoDB.ScanOutput | DynamoDB.QueryOutput = {
@@ -25,19 +25,22 @@ describe('fetch all', () => {
 
     beforeEach(async () => {
       dynamoDBWrapper = new DynamoDbWrapper()
-      spyOn(dynamoDBWrapper, 'scan').and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      methodSpy = <jasmine.Spy>dynamoDBWrapper.scan
+      jest
+        .spyOn(dynamoDBWrapper, 'scan')
+        .mockReturnValueOnce(Promise.resolve(output1))
+        .mockReturnValueOnce(Promise.resolve(output2))
+      methodMock = <jest.Mock>dynamoDBWrapper.scan
       req = new ScanRequest(dynamoDBWrapper, SimpleWithPartitionKeyModel)
       result = await fetchAll(req)
     })
 
     it('should scan until LastEvaluatedKey is undefined', async () => {
-      expect(methodSpy).toHaveBeenCalledTimes(2)
+      expect(methodMock).toHaveBeenCalledTimes(2)
     })
 
     it('should use LastEvaluatedKey for next request', async () => {
-      expect((<DynamoDB.ScanInput>methodSpy.calls.mostRecent().args[0]).ExclusiveStartKey).toEqual(
-        output1.LastEvaluatedKey,
+      expect(methodMock).toHaveBeenLastCalledWith(
+        expect.objectContaining(<DynamoDB.ScanInput>{ ExclusiveStartKey: output1.LastEvaluatedKey }),
       )
     })
 
@@ -58,20 +61,23 @@ describe('fetch all', () => {
 
     beforeEach(async () => {
       dynamoDBWrapper = new DynamoDbWrapper()
-      spyOn(dynamoDBWrapper, 'query').and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      methodSpy = <jasmine.Spy>dynamoDBWrapper.query
+      jest
+        .spyOn(dynamoDBWrapper, 'query')
+        .mockReturnValueOnce(Promise.resolve(output1))
+        .mockReturnValueOnce(Promise.resolve(output2))
+      methodMock = <jest.Mock>dynamoDBWrapper.query
       req = new QueryRequest(dynamoDBWrapper, SimpleWithPartitionKeyModel)
       req.wherePartitionKey('id-0')
       result = await fetchAll(req)
     })
 
     it('should query until LastEvaluatedKey is undefined', async () => {
-      expect(methodSpy).toHaveBeenCalledTimes(2)
+      expect(methodMock).toHaveBeenCalledTimes(2)
     })
 
     it('should use LastEvaluatedKey for next request', async () => {
-      expect((<DynamoDB.QueryInput>methodSpy.calls.mostRecent().args[0]).ExclusiveStartKey).toEqual(
-        output1.LastEvaluatedKey,
+      expect(methodMock).toHaveBeenLastCalledWith(
+        expect.objectContaining(<DynamoDB.QueryInput>{ ExclusiveStartKey: output1.LastEvaluatedKey }),
       )
     })
 

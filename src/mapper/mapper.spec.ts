@@ -14,13 +14,15 @@ import {
   Employee,
   Gift,
   Id,
-  ModelWithDefaultValue,
+  ModelWithCustomMapperAndDefaultValue,
   ModelWithCustomMapperModel,
   ModelWithDateAsHashKey,
   ModelWithDateAsIndexHashKey,
+  ModelWithDefaultValue,
   ModelWithNonDecoratedEnum,
   ModelWithoutCustomMapper,
   ModelWithoutCustomMapperOnIndex,
+  MyProp,
   Organization,
   OrganizationEvent,
   Product,
@@ -32,8 +34,6 @@ import {
   SimpleWithRenamedPartitionKeyModel,
   StringType,
   Type,
-  ModelWithCustomMapperAndDefaultValue,
-  MyProp,
 } from '../../test/models'
 import { IdMapper } from '../../test/models/model-with-custom-mapper.model'
 import { ModelWithEmptyValues } from '../../test/models/model-with-empty-values'
@@ -469,9 +469,9 @@ describe('Mapper', () => {
 
           organization.awards = new Set(['good, better, shiftcode', 'just kiddin'])
 
-          const events = new Set()
+          const events = new Set<OrganizationEvent>()
           events.add(new OrganizationEvent('shift the web', 1520))
-          organization.events = events
+          ;(organization as any).events = events
           organization.transient = 'the value which is marked as transient'
 
           organizationAttrMap = toDb(organization, Organization)
@@ -1045,20 +1045,20 @@ describe('Mapper', () => {
     })
 
     it('should throw when given partial has undefined key properties', () => {
-      expect(() => toKey({}, SimpleWithPartitionKeyModel)).toThrow()
-      expect(() => toKey({ id: 'myId' }, SimpleWithCompositePartitionKeyModel)).toThrow()
-      expect(() => toKey({ creationDate: new Date() }, SimpleWithCompositePartitionKeyModel)).toThrow()
+      expect(() => toKey(<any>{}, SimpleWithPartitionKeyModel)).toThrow()
+      expect(() => toKey(<any>{ id: 'myId' }, SimpleWithCompositePartitionKeyModel)).toThrow()
+      expect(() => toKey(<any>{ creationDate: new Date() }, SimpleWithCompositePartitionKeyModel)).toThrow()
     })
 
     it('should create key attributes of simple key', () => {
-      const key = toKey({ id: 'myId' }, SimpleWithPartitionKeyModel)
+      const key = toKey(<any>{ id: 'myId' }, SimpleWithPartitionKeyModel)
       expect(key).toEqual({
         id: { S: 'myId' },
       })
     })
 
     it('should create key attributes of simple key (custom db name)', () => {
-      const key = toKey({ id: 'myId' }, SimpleWithRenamedPartitionKeyModel)
+      const key = toKey(<any>{ id: 'myId' }, SimpleWithRenamedPartitionKeyModel)
       expect(key).toEqual({
         custom_id: { S: 'myId' },
       })

@@ -78,8 +78,8 @@ describe('batchWriteRequest', () => {
 
     it('should set params', () => {
       req = new BatchWriteRequest()
-        .put(SimpleWithPartitionKeyModel, [{ id: 'myId1' }])
-        .put(ComplexModel, [{ id: 'myId2', creationDate: now }])
+        .put(SimpleWithPartitionKeyModel, [<any>{ id: 'myId1' }])
+        .put(ComplexModel, [<any>{ id: 'myId2', creationDate: now }])
 
       const simpleReqItems = req.params.RequestItems[getTableName(SimpleWithPartitionKeyModel)]
       expect(simpleReqItems).toBeDefined()
@@ -136,14 +136,14 @@ describe('batchWriteRequest', () => {
   })
 
   describe('exec functions', () => {
-    let batchWriteItemSpy: jasmine.Spy
+    let batchWriteItemMock: jest.Mock
 
     beforeEach(() => {
       const output = {
         myResponse: true,
       }
-      batchWriteItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(output))
-      const dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemSpy }
+      batchWriteItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(output))
+      const dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemMock }
       req = new BatchWriteRequest()
       Object.assign(req, { dynamoDBWrapper })
     })

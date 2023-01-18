@@ -82,7 +82,7 @@ describe('batch get', () => {
   })
 
   describe('should return appropriate value', () => {
-    let batchGetItemsSpy: jasmine.Spy
+    let batchGetItemsMock: jest.Mock
     let req: BatchGetSingleTableRequest<SimpleWithPartitionKeyModel>
 
     const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 20 }
@@ -93,8 +93,8 @@ describe('batch get', () => {
     }
 
     beforeEach(() => {
-      batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
-      req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsSpy }, SimpleWithPartitionKeyModel, [
+      batchGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
+      req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsMock }, SimpleWithPartitionKeyModel, [
         jsItem,
       ])
     })
@@ -117,41 +117,41 @@ describe('batch get', () => {
   })
 
   describe('logger', () => {
-    let logReceiverSpy: jasmine.Spy
-    let batchGetItemsSpy: jasmine.Spy
+    let logReceiverMock: jest.Mock
+    let batchGetItemsMock: jest.Mock
     let req: BatchGetSingleTableRequest<SimpleWithPartitionKeyModel>
 
     const sampleResponse = { Responses: null }
 
     beforeEach(() => {
-      logReceiverSpy = jasmine.createSpy()
-      batchGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
-      updateDynamoEasyConfig({ logReceiver: logReceiverSpy })
-      req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsSpy }, SimpleWithPartitionKeyModel, [])
+      logReceiverMock = jest.fn()
+      batchGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver: logReceiverMock })
+      req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsMock }, SimpleWithPartitionKeyModel, [])
     })
 
     afterEach(resetDynamoEasyConfig)
 
     it('execNoMap should log params and response', async () => {
       await req.execNoMap()
-      expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
 
     it('execFullResponse should log params and response', async () => {
       await req.execFullResponse()
-      expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
 
     it('exec should log params and response', async () => {
       await req.exec()
-      expect(logReceiverSpy).toHaveBeenCalled()
-      const logInfoData = logReceiverSpy.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })

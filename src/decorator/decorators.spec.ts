@@ -566,7 +566,7 @@ describe('Decorators should add correct metadata', () => {
       @Model()
       class B extends A {
         @Property({ name: 'bProp' })
-        aProp: string
+        declare aProp: string
       }
 
       const aMeta = metadataForModel(A)
@@ -632,11 +632,11 @@ describe('Decorators should add correct metadata', () => {
   })
 
   describe('decorate property multiple times identically', () => {
-    let logReceiver: jest.Mock
+    let logReceiverMock: jest.Mock
 
     beforeEach(() => {
-      logReceiver = jest.fn()
-      updateDynamoEasyConfig({ logReceiver })
+      logReceiverMock = jest.fn()
+      updateDynamoEasyConfig({ logReceiver: logReceiverMock })
     })
 
     it('should not throw but warn, if the PartitionKey is two times annotated', () => {
@@ -650,8 +650,8 @@ describe('Decorators should add correct metadata', () => {
       const propertyMetaData = metadataForModel(NotCoolButOkModel).forProperty('doppeltGemoppelt')
       expect(propertyMetaData).toBeDefined()
       expect(propertyMetaData!.key).toEqual({ type: 'HASH' })
-      expect(logReceiver).toBeCalledTimes(1)
-      expect(logReceiver.mock.calls[0][0].level).toBe(LogLevel.WARNING)
+      expect(logReceiverMock).toBeCalledTimes(1)
+      expect(logReceiverMock.mock.calls[0][0].level).toBe(LogLevel.WARNING)
     })
   })
 })

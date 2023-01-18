@@ -1,6 +1,7 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:max-classes-per-file
 
+import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 import {
   ComplexModel,
   CustomId,
@@ -18,10 +19,9 @@ import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { attribute } from '../../expression/logical-operator/attribute.function'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
 
 describe('query request', () => {
-  let querySpy: jasmine.Spy
+  let queryMock: jest.Mock
 
   describe('constructor', () => {
     class MyQueryRequest extends QueryRequest<ComplexModel> {
@@ -37,8 +37,8 @@ describe('query request', () => {
     let request: MyQueryRequest
 
     beforeEach(() => {
-      querySpy = jasmine.createSpy().and.returnValue(Promise.resolve({ Count: 1 }))
-      request = new MyQueryRequest(<any>{ query: querySpy })
+      queryMock = jest.fn().mockReturnValueOnce(Promise.resolve({ Count: 1 }))
+      request = new MyQueryRequest(<any>{ query: queryMock })
     })
 
     it('extends ReadManyRequest', () => {
@@ -49,7 +49,7 @@ describe('query request', () => {
     })
     it('doRequest uses dynamoDBWrapper.query', async () => {
       await request.exec()
-      expect(querySpy).toHaveBeenCalled()
+      expect(queryMock).toHaveBeenCalled()
     })
   })
 

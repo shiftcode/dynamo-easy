@@ -1,36 +1,17 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/test/"
-  ],
-  coverageThreshold: {
-    global: {
-      branches: 10,
-      functions: 10,
-      lines: 10,
-      statements: 10
-    }
-  },
-  globals: {
-    "ts-jest": {
-      diagnostics: {
-        ignoreCodes: [151001]
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.[tj]sx?$': [
+      'ts-jest',
+      {
+        tsconfig: './tsconfig.jest.json'
       },
-      tsConfig: "./tsconfig.jest.json"
-    }
+    ],
   },
-  moduleFileExtensions: [
-    "ts",
-    "tsx",
-    "js"
-  ],
   setupFiles: [
     "reflect-metadata",
     './test/jest-setup.ts'
-  ],
-  testEnvironment: "node",
-  testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-  transform: {
-    ".(ts|tsx|js)": "ts-jest"
-  }
-}
+  ]
+};

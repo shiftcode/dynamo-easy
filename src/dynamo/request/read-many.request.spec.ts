@@ -29,7 +29,7 @@ class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any, any> {
 
 describe('ReadManyRequest', () => {
   let request: TestRequest<any>
-  let doRequestSpy: jasmine.Spy
+  let doRequestMock: jest.Mock
 
   describe('constructor', () => {
     beforeEach(() => {
@@ -176,8 +176,8 @@ describe('ReadManyRequest', () => {
     }
     beforeEach(() => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
-      doRequestSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output), Promise.resolve({}))
-      Object.assign(request, { doRequest: doRequestSpy })
+      doRequestMock = jest.fn().mockReturnValueOnce(Promise.resolve(output)).mockReturnValueOnce(Promise.resolve({}))
+      Object.assign(request, { doRequest: doRequestMock })
     })
 
     it('execFullResponse', async () => {
@@ -197,9 +197,9 @@ describe('ReadManyRequest', () => {
 
     it('execSingle', async () => {
       const res = await request.execSingle()
-      expect(doRequestSpy).toHaveBeenCalled()
-      expect(doRequestSpy.calls.mostRecent().args[0]).toBeDefined()
-      expect(doRequestSpy.calls.mostRecent().args[0].Limit).toBe(1)
+      expect(doRequestMock).toHaveBeenCalled()
+      expect(doRequestMock.mock.calls.slice(-1)[0]).toBeDefined()
+      expect(doRequestMock).toHaveBeenLastCalledWith(expect.objectContaining({ Limit: 1 }))
       expect(res).toEqual(jsItem)
     })
 
@@ -218,9 +218,9 @@ describe('ReadManyRequest', () => {
 
     it('execCount', async () => {
       const res = await request.execCount()
-      expect(doRequestSpy).toHaveBeenCalled()
-      expect(doRequestSpy.calls.mostRecent().args[0]).toBeDefined()
-      expect(doRequestSpy.calls.mostRecent().args[0].Select).toBe('COUNT')
+      expect(doRequestMock).toHaveBeenCalled()
+      expect(doRequestMock.mock.calls.slice(-1)).toBeDefined()
+      expect(doRequestMock).toHaveBeenLastCalledWith(expect.objectContaining({ Select: 'COUNT' }))
       expect(res).toBe(output.Count)
     })
 
@@ -245,29 +245,29 @@ describe('ReadManyRequest', () => {
 
   describe('logger', () => {
     const output: DynamoDB.ScanOutput = { Items: [] }
-    let logReceiver: jasmine.Spy
+    let logReceiverMock: jest.Mock
 
     beforeEach(() => {
-      logReceiver = jasmine.createSpy()
-      updateDynamoEasyConfig({ logReceiver })
+      logReceiverMock = jest.fn()
+      updateDynamoEasyConfig({ logReceiver: logReceiverMock })
       request = new TestRequest(SimpleWithPartitionKeyModel)
 
-      doRequestSpy = jasmine.createSpy().and.returnValue(Promise.resolve(output))
-      Object.assign(request, { doRequest: doRequestSpy })
+      doRequestMock = jest.fn().mockReturnValueOnce(Promise.resolve(output))
+      Object.assign(request, { doRequest: doRequestMock })
     })
 
     it('exec should log params and response', async () => {
       await request.exec()
-      expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(request.params)).toBeTruthy()
       expect(logInfoData.includes(output)).toBeTruthy()
     })
 
     it('execFullResponse should log params and response', async () => {
       await request.execFullResponse()
-      expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(request.params)).toBeTruthy()
       expect(logInfoData.includes(output)).toBeTruthy()
     })

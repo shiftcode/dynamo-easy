@@ -84,7 +84,7 @@ describe('TransactGetRequest', () => {
   })
 
   describe('execNoMap, execFullResponse, exec', () => {
-    let transactGetItemsSpy: jasmine.Spy
+    let transactGetItemsMock: jest.Mock
     let req2: TransactGetRequest2<SimpleWithPartitionKeyModel, SimpleWithCompositePartitionKeyModel>
     let creationDate: Date
 
@@ -103,11 +103,11 @@ describe('TransactGetRequest', () => {
         ConsumedCapacity: [],
         Responses: [{ Item: dbItem }, { Item: dbItem2 }],
       }
-      transactGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output))
+      transactGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(output))
       req2 = new TransactGetRequest()
         .forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
         .forModel(SimpleWithCompositePartitionKeyModel, { id: 'myId', creationDate })
-      Object.assign(req2, { dynamoDBWrapper: { transactGetItems: transactGetItemsSpy } })
+      Object.assign(req2, { dynamoDBWrapper: { transactGetItems: transactGetItemsMock } })
     })
 
     it('exec should return the mapped item', async () => {

@@ -50,9 +50,9 @@ describe('batch-get utils', () => {
   })
 
   describe('batchGetItemsFetchAll', () => {
-    let batchGetItemsSpy: jasmine.Spy
+    let batchGetItemsMock: jest.Mock
     let dynamoDBWrapper: DynamoDbWrapper
-    let backoffTimerMock: { next: jasmine.Spy }
+    let backoffTimerMock: { next: jest.Mock }
 
     const output1: DynamoDB.BatchGetItemOutput = {
       Responses: {
@@ -71,18 +71,21 @@ describe('batch-get utils', () => {
     }
 
     beforeEach(async () => {
-      batchGetItemsSpy = jasmine.createSpy().and.returnValues(Promise.resolve(output1), Promise.resolve(output2))
-      dynamoDBWrapper = <any>{ batchGetItems: batchGetItemsSpy }
-      backoffTimerMock = { next: jasmine.createSpy().and.returnValue({ value: 0 }) }
+      batchGetItemsMock = jest
+        .fn()
+        .mockReturnValueOnce(Promise.resolve(output1))
+        .mockReturnValueOnce(Promise.resolve(output2))
+      dynamoDBWrapper = <any>{ batchGetItems: batchGetItemsMock }
+      backoffTimerMock = { next: jest.fn().mockReturnValueOnce({ value: 0 }) }
 
       await batchGetItemsFetchAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
     })
 
     it('should use UnprocessedKeys for next request', () => {
-      expect(batchGetItemsSpy).toHaveBeenCalledTimes(2)
-      expect(batchGetItemsSpy.calls.mostRecent().args[0]).toBeDefined()
-      expect(batchGetItemsSpy.calls.mostRecent().args[0].RequestItems).toBeDefined()
-      expect(batchGetItemsSpy.calls.mostRecent().args[0].RequestItems).toEqual(output1.UnprocessedKeys)
+      expect(batchGetItemsMock).toHaveBeenCalledTimes(2)
+      expect(batchGetItemsMock).toHaveBeenLastCalledWith(
+        expect.objectContaining({ RequestItems: output1.UnprocessedKeys }),
+      )
     })
 
     it('should backoff when UnprocessedItems', () => {

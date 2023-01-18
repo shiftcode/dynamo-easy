@@ -50,8 +50,8 @@ describe('put request', () => {
 
   describe('logger', () => {
     const sampleResponse: DynamoDB.PutItemOutput = { Attributes: undefined }
-    let logReceiver: jasmine.Spy
-    let putItemSpy: jasmine.Spy
+    let logReceiverMock: jest.Mock
+    let putItemMock: jest.Mock
     let req: PutRequest<SimpleWithPartitionKeyModel>
 
     const jsItem: SimpleWithPartitionKeyModel = {
@@ -60,24 +60,24 @@ describe('put request', () => {
     }
 
     beforeEach(() => {
-      logReceiver = jasmine.createSpy()
-      putItemSpy = jasmine.createSpy().and.returnValue(Promise.resolve(sampleResponse))
-      updateDynamoEasyConfig({ logReceiver })
-      req = new PutRequest(<any>{ putItem: putItemSpy }, SimpleWithPartitionKeyModel, jsItem)
+      logReceiverMock = jest.fn()
+      putItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
+      updateDynamoEasyConfig({ logReceiver: logReceiverMock })
+      req = new PutRequest(<any>{ putItem: putItemMock }, SimpleWithPartitionKeyModel, jsItem)
     })
 
     it('exec should log params and response', async () => {
       await req.exec()
-      expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })
 
     it('execFullResponse should log params and response', async () => {
       await req.execFullResponse()
-      expect(logReceiver).toHaveBeenCalled()
-      const logInfoData = logReceiver.calls.allArgs().map((i) => i[0].data)
+      expect(logReceiverMock).toHaveBeenCalled()
+      const logInfoData = logReceiverMock.mock.calls.map((i) => i[0].data)
       expect(logInfoData.includes(req.params)).toBeTruthy()
       expect(logInfoData.includes(sampleResponse)).toBeTruthy()
     })

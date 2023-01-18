@@ -33,7 +33,7 @@ describe('TransactGetSingleTableRequest', () => {
       ],
       ConsumedCapacity: [],
     }
-    const transactGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
+    const transactGetItemsSpy = jest.fn().mockReturnValue(Promise.resolve(response))
 
     beforeEach(() => {
       const dynamoDBWrapperMock: DynamoDbWrapper = <any>{ transactGetItems: transactGetItemsSpy }
@@ -69,17 +69,21 @@ describe('TransactGetSingleTableRequest', () => {
 
   describe('with empty response', () => {
     const response: DynamoDB.TransactGetItemsOutput = {}
-    const transactGetItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve(response))
+    const transactGetItemsSpy = jest.fn().mockReturnValue(Promise.resolve(response))
+
     beforeEach(() => {
       const dynamoDBWrapperMock: DynamoDbWrapper = <any>{ transactGetItems: transactGetItemsSpy }
       req = new TransactGetSingleTableRequest(dynamoDBWrapperMock, SimpleWithPartitionKeyModel, [])
     })
+
     it('exec returns empty array', async () => {
       expect(await req.exec()).toEqual([])
     })
+
     it('execNoMap returns original response (empty object)', async () => {
       expect(await req.execNoMap()).toEqual({})
     })
+
     it('execFullResponse returns the response with empty items array', async () => {
       expect(await req.execFullResponse()).toEqual({
         ConsumedCapacity: undefined,

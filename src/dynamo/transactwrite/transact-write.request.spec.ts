@@ -134,28 +134,28 @@ describe('TransactWriteRequest', () => {
 
   describe('execFullResponse / exec', () => {
     let req: TransactWriteRequest
-    let transactWriteItemsSpy: jasmine.Spy
+    let transactWriteItemsMock: jest.Mock
 
     beforeEach(() => {
       req = new TransactWriteRequest()
 
-      transactWriteItemsSpy = jasmine.createSpy().and.returnValue(Promise.resolve({ myResponse: true }))
-      Object.assign(req, { dynamoDBWrapper: { transactWriteItems: transactWriteItemsSpy } })
+      transactWriteItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve({ myResponse: true }))
+      Object.assign(req, { dynamoDBWrapper: { transactWriteItems: transactWriteItemsMock } })
 
       req.transact(new TransactDelete(SimpleWithPartitionKeyModel, 'myId'))
     })
 
     it('execFullResponse should call dynamoDBWrapper.transactWriteItems with the params and return the response', async () => {
       const response = await req.execFullResponse()
-      expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
-      expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
+      expect(transactWriteItemsMock).toHaveBeenCalledTimes(1)
+      expect(transactWriteItemsMock).toHaveBeenLastCalledWith(req.params)
       expect(response).toEqual({ myResponse: true })
     })
 
     it('exec should call dynamoDBWrapper.transactWriteItems with the params and return void', async () => {
       const response = await req.exec()
-      expect(transactWriteItemsSpy).toHaveBeenCalledTimes(1)
-      expect(transactWriteItemsSpy.calls.mostRecent().args[0]).toEqual(req.params)
+      expect(transactWriteItemsMock).toHaveBeenCalledTimes(1)
+      expect(transactWriteItemsMock).toHaveBeenLastCalledWith(req.params)
       expect(response).toBeUndefined()
     })
   })
