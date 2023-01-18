@@ -58,7 +58,7 @@
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
     "@commitlint/prompt-cli": "^17.4.2",
-    "@types/jest": "^25.2.1",
+    "@types/jest": "^29.2.5",
     "@types/node": "^18.11.18",
     "aws-sdk": "^2.401.0",
     "colors": "^1.4.0",
