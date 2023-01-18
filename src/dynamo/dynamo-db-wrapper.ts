@@ -14,6 +14,7 @@ export class DynamoDbWrapper {
 
   constructor(dynamoDB?: DynamoDB) {
     // create the actual dynamoDB client
+    // @ts-ignore
     this.dynamoDB = dynamoDB || new DynamoDB()
   }
 

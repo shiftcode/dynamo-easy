@@ -12,6 +12,6 @@ export const modelErrors = {
     `there is already a sort key defined for global secondary index ${indexName} (property name: ${propDbName})`,
   lsiMultipleSk: (indexName: string, propDbName: string) =>
     `only one sort key can be defined for the same local secondary index, ${propDbName} is already defined as sort key for index ${indexName}`,
-  lsiRequiresPk: (indexName: string, propDbName: string) =>
+  lsiRequiresPk: (indexName: string, _propDbName: string) =>
     `the  local secondary index ${indexName} requires the partition key to be defined`,
 }
