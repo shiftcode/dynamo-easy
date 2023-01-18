@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "declarationMap": false,
     "declaration": false,         /* Generates corresponding '.d.ts' file. */

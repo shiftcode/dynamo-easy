@@ -1,19 +1,7 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": "./",
-    "target": "es2015",
-    "module": "es2015",
-    "lib": [
-      "es2015",
-      "es2016.array.include",
-      "es2017.object"
-    ],
-    "strict": true,
-    "strictPropertyInitialization": false,
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
+    "noUnusedLocals": false,
     "types": [
       "node",
       "reflect-metadata"
