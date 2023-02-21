@@ -22,12 +22,14 @@ export class BatchGetRequest {
     return this.dynamoDBWrapper.dynamoDB
   }
 
-  readonly params: DynamoDB.BatchGetItemInput
+  readonly params: DynamoDB.BatchGetItemInput & {
+    RequestItems: NonNullable<DynamoDB.BatchGetItemInput['RequestItems']>
+  }
   private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
   private itemCounter = 0
 
-  constructor(dynamoDB?: DynamoDB.DynamoDB) {
+  constructor(dynamoDB: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       RequestItems: {},

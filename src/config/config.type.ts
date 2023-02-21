@@ -24,6 +24,7 @@ export interface Config {
   tableNameResolver: TableNameResolver
   /**
    * function called before calling dynamoDB api
+   * @deprecated v3: should be replaced by using the default middleware stack provided by aws-sdk v3
    */
   sessionValidityEnsurer: SessionValidityEnsurer
 }

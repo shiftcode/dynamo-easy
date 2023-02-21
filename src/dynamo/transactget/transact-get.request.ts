@@ -23,11 +23,13 @@ export class TransactGetRequest {
     return this.dynamoDBWrapper.dynamoDB
   }
 
-  readonly params: DynamoDB.TransactGetItemsInput
+  readonly params: DynamoDB.TransactGetItemsInput & {
+    TransactItems: NonNullable<DynamoDB.TransactGetItemsInput['TransactItems']>
+  }
   private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Array<ModelConstructor<any>> = []
 
-  constructor(dynamoDB?: DynamoDB.DynamoDB) {
+  constructor(dynamoDB: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       TransactItems: [],

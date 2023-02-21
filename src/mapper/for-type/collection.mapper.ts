@@ -6,6 +6,7 @@ import { notNull } from '../../helper/not-null.function'
 import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'
 import { AttributeCollectionType } from '../type/attribute-type.type'
 import {
+  Attribute,
   BinarySetAttribute,
   ListAttribute,
   MapAttribute,
@@ -32,22 +33,24 @@ function collectionFromDb(
   let arr: any[]
 
   // if [L]ist
-  if ('L' in attributeValue) {
+  if ('L' in attributeValue && attributeValue.L) {
     if (hasGenericType(propertyMetadata)) {
-      arr = attributeValue.L.map((item) => fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType))
+      arr = attributeValue.L.map((item: Attribute) =>
+        fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType),
+      )
     } else {
       // tslint:disable-next-line:no-unnecessary-callback-wrapper
-      arr = attributeValue.L.map((v) => fromDbOne(v))
+      arr = attributeValue.L.map((v: Attribute) => fromDbOne(v))
     }
     return explicitType && explicitType === Set ? new Set(arr) : arr
   }
 
   // if [(N|S|B)S]et
-  else if ('SS' in attributeValue) {
+  else if ('SS' in attributeValue && attributeValue.SS) {
     arr = attributeValue.SS
-  } else if ('NS' in attributeValue) {
+  } else if ('NS' in attributeValue && attributeValue.NS) {
     arr = attributeValue.NS.map(parseFloat)
-  } else if ('BS' in attributeValue) {
+  } else if ('BS' in attributeValue && attributeValue.BS) {
     arr = attributeValue.BS
   } else {
     throw new Error(

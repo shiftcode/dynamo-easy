@@ -21,6 +21,7 @@ export function prepareAndAddUpdateExpressions(
   if (updateDefFns && updateDefFns.length) {
     const sortedByActionKeyWord: Map<UpdateActionKeyword, UpdateExpression[]> = updateDefFns
       .map((updateDefFn) => {
+        // TODO v3: investigate on how to remove any
         return updateDefFn(params.ExpressionAttributeNames, metadata)
       })
       .reduce((result, expr) => {

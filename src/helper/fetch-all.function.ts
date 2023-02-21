@@ -1,7 +1,7 @@
 /**
  * @module helper
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDBv2 from '../aws-sdk-v2.types'
 import { QueryRequest } from '../dynamo/request/query/query.request'
 import { ReadManyRequest } from '../dynamo/request/read-many.request'
 import { ScanRequest } from '../dynamo/request/scan/scan.request'
@@ -11,7 +11,7 @@ import { ScanRequest } from '../dynamo/request/scan/scan.request'
  * available. This can be used with scan and query requests.
  */
 
-export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?: DynamoDB.Key): Promise<T[]> {
+export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?: DynamoDBv2.Key): Promise<T[]> {
   request.limit(ReadManyRequest.INFINITE_LIMIT)
   if (startKey) {
     request.exclusiveStartKey(startKey)

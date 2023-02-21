@@ -17,7 +17,7 @@ import { BaseRequest } from '../base.request'
 export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
   T,
   T2,
-  DynamoDB.BatchWriteItemInput,
+  DynamoDB.BatchWriteItemInput & { RequestItems: NonNullable<DynamoDB.BatchWriteItemInput['RequestItems']> },
   BatchWriteSingleTableRequest<T, T2>
 > {
   private readonly logger: Logger

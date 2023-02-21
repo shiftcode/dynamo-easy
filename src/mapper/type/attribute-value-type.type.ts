@@ -16,3 +16,4 @@ export type AttributeValueType =
   | NullType
   | UndefinedType
   | object
+  | unknown

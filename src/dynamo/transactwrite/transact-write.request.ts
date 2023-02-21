@@ -16,7 +16,7 @@ export class TransactWriteRequest {
   readonly params: DynamoDB.TransactWriteItemsInput & { TransactItems: DynamoDB.TransactWriteItem[] }
   private readonly dynamoDBWrapper: DynamoDbWrapper
 
-  constructor(dynamoDB?: DynamoDB.DynamoDB) {
+  constructor(dynamoDB: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       TransactItems: [],

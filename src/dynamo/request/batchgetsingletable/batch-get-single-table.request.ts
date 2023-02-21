@@ -21,7 +21,7 @@ import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
 export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends BaseRequest<
   T,
   T2,
-  DynamoDB.BatchGetItemInput,
+  DynamoDB.BatchGetItemInput & { RequestItems: NonNullable<DynamoDB.BatchGetItemInput['RequestItems']> },
   BatchGetSingleTableRequest<T, T2>
 > {
   private readonly logger: Logger

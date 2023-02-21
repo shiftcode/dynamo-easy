@@ -5,5 +5,5 @@ import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 export interface TransactGetFullResponse<X> {
   Items: X
-  ConsumedCapacity?: DynamoDB.ConsumedCapacityMultiple
+  ConsumedCapacity?: DynamoDB.ConsumedCapacity[]
 }

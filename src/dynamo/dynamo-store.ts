@@ -28,7 +28,7 @@ export class DynamoStore<T> {
   private readonly logger: Logger
   private readonly dynamoDBWrapper: DynamoDbWrapper
 
-  constructor(private modelClazz: ModelConstructor<T>, dynamoDB?: DynamoDB.DynamoDB) {
+  constructor(private modelClazz: ModelConstructor<T>, dynamoDB: DynamoDB.DynamoDB) {
     this.logger = createLogger('dynamo.DynamoStore', modelClazz)
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.tableName = getTableName(modelClazz)

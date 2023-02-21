@@ -10,13 +10,7 @@ import { dynamoEasyConfig } from '../config/dynamo-easy-config'
  * @hidden
  */
 export class DynamoDbWrapper {
-  readonly dynamoDB: DynamoDB.DynamoDB
-
-  constructor(dynamoDB?: DynamoDB.DynamoDB) {
-    // create the actual dynamoDB client
-    // TODO v3: check if any default configuration should be provided, possibly from dynamoEasyConfig
-    this.dynamoDB = dynamoDB || new DynamoDB.DynamoDB({})
-  }
+  constructor(readonly dynamoDB: DynamoDB.DynamoDB) {}
 
   /*
    * make all the dynamo requests return an promise

@@ -52,6 +52,7 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
       .getItem(this.params)
       .then(promiseTap((response) => this.logger.debug('response', response)))
       .then((getItemResponse) => {
+        // TODO v3: investigate on how to remove any
         const response: GetResponse<T2> = { ...getItemResponse }
 
         if (getItemResponse.Item) {

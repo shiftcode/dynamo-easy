@@ -18,11 +18,11 @@ export class BatchWriteRequest {
     return this.dynamoDBWrapper.dynamoDB
   }
 
-  readonly params: DynamoDB.BatchWriteItemInput
+  readonly params: DynamoDB.BatchWriteItemInput & { RequestItems: Record<string, DynamoDB.WriteRequest[]> }
   private readonly dynamoDBWrapper: DynamoDbWrapper
   private itemCount = 0
 
-  constructor(dynamoDB?: DynamoDB.DynamoDB) {
+  constructor(dynamoDB: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       RequestItems: {},
@@ -88,7 +88,7 @@ export class BatchWriteRequest {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 
-  private requestItems(modelClazz: ModelConstructor<any>, items: DynamoDB.WriteRequests) {
+  private requestItems(modelClazz: ModelConstructor<any>, items: DynamoDB.WriteRequest[]) {
     if (this.itemCount + items.length > BATCH_WRITE_MAX_REQUEST_ITEM_COUNT) {
       throw new Error(`batch write takes at max ${BATCH_WRITE_MAX_REQUEST_ITEM_COUNT} items`)
     }
