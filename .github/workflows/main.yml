@@ -17,8 +17,9 @@ jobs:
   test:
     strategy:
       matrix:
-        # Test with Node.js v18 (LTS) and v19 current
+        # Test with Node.js v16 (maintenance), v18 (LTS) and v19 current
         node:
+          - 16
           - 18
           - 19
     name: Node.js v${{ matrix.node }}
@@ -50,6 +51,7 @@ jobs:
       # Run tests
       - run: npm run test:ci
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
