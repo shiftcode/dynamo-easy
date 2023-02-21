@@ -1,10 +1,11 @@
 import { attribute, DynamoStore, or, update } from '@shiftcoders/dynamo-easy'
 import { AnotherModel } from '../models'
+import { DynamoDB } from '@aws-sdk/client-dynamodb'
 
 const index = 3
 const oneHourAgo = new Date(Date.now() - 1000 * 60 * 60)
 
-new DynamoStore(AnotherModel)
+new DynamoStore(AnotherModel, new DynamoDB({}))
   .update('myPartitionKey', 'mySortKey')
   .operations(
     update(`myNestedList[${index}].propertyX`).set('value'),

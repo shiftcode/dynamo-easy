@@ -1,8 +1,9 @@
 import { TransactGetRequest } from '@shiftcoders/dynamo-easy'
 import { AnotherModel, Person } from '../models'
+import { DynamoDB, ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 
-new TransactGetRequest()
-  .returnConsumedCapacity('TOTAL')
+new TransactGetRequest(new DynamoDB({}))
+  .returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
   .forModel(Person, { id: 'vogelsw' })
   .forModel(AnotherModel, { propA: 'Foo', propB: 'Bar' })
   .exec()

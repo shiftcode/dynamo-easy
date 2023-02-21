@@ -1,11 +1,9 @@
+import {DynamoDB} from '@aws-sdk/client-dynamodb'
 import { DynamoStore } from '@shiftcoders/dynamo-easy'
-import * as AWS from 'aws-sdk/global'
 import { Person } from './models'
 
 // update the aws config with your credentials to enable successful connection
-AWS.config.update({ region: 'yourAwsRegion' })
-
-const personStore = new DynamoStore(Person)
+const personStore = new DynamoStore(Person, new DynamoDB({ region: 'yourAwsRegion' }))
 
 // add a new item
 personStore.put({ id: 'wernerv', name: 'Werner Hans Peter Vogels', yearOfBirth: 1958 })
