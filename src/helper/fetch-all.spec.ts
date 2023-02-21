@@ -24,7 +24,7 @@ describe('fetch all', () => {
     let req: ScanRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(async () => {
-      dynamoDBWrapper = new DynamoDbWrapper()
+      dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
       jest
         .spyOn(dynamoDBWrapper, 'scan')
         .mockReturnValueOnce(Promise.resolve(output1))
@@ -60,7 +60,7 @@ describe('fetch all', () => {
     let req: QueryRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(async () => {
-      dynamoDBWrapper = new DynamoDbWrapper()
+      dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
       jest
         .spyOn(dynamoDBWrapper, 'query')
         .mockReturnValueOnce(Promise.resolve(output1))

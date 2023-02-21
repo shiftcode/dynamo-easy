@@ -1,6 +1,5 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-string-literal
-import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import {
   organization1CreatedAt,
   organization1Employee1CreatedAt,
@@ -42,6 +41,7 @@ import {
   NestedModelWithCustomMapper,
 } from '../../test/models/model-with-nested-model-with-custom-mapper.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
+import * as DynamoDBv2 from '../aws-sdk-v2.types'
 import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
 import { PropertyMetadata } from '../decorator/metadata/property-metadata.model'
 import { createKeyAttributes, createToKeyFn, fromDb, fromDbOne, toDb, toDbOne, toKey } from './mapper'
@@ -552,16 +552,16 @@ describe('Mapper', () => {
             expect((<StringAttribute>employee1.createdAt).S).toBe(createdAtDateEmployee1.toISOString())
 
             // test employee2
-            const employee2: DynamoDb.MapAttributeValue = (<MapAttribute>employeesL[1]).M
+            const employee2: Attributes<any> = (<MapAttribute>employeesL[1]).M
             expect(employee2['name']).toBeDefined()
-            expect(employee2['name'].S).toBeDefined()
-            expect(employee2['name'].S).toBe('anna')
+            expect((employee2['name'] as StringAttribute).S).toBeDefined()
+            expect((employee2['name'] as StringAttribute).S).toBe('anna')
             expect(employee2['age']).toBeDefined()
-            expect(employee2['age'].N).toBeDefined()
-            expect(employee2['age'].N).toBe('27')
+            expect((employee2['age'] as NumberAttribute).N).toBeDefined()
+            expect((employee2['age'] as NumberAttribute).N).toBe('27')
             expect(employee2['createdAt']).toBeDefined()
-            expect(employee2['createdAt'].S).toBeDefined()
-            expect(employee2['createdAt'].S).toBe(createdAtDateEmployee2.toISOString())
+            expect((employee2['createdAt'] as StringAttribute).S).toBeDefined()
+            expect((employee2['createdAt'] as StringAttribute).S).toBe(createdAtDateEmployee2.toISOString())
           })
 
           it('cities', () => {
@@ -713,13 +713,13 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDbVal: DynamoDb.AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          const toDbVal: DynamoDBv2.AttributeMap = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
           expect(toDbVal.startDate.S).toBeDefined()
           expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })
         it('should accept date as HASH or RANGE key on GSI', () => {
           const now = new Date()
-          const toDbVal: DynamoDb.AttributeMap = toDb(
+          const toDbVal: DynamoDBv2.AttributeMap = toDb(
             new ModelWithDateAsIndexHashKey(0, now),
             ModelWithDateAsIndexHashKey,
           )

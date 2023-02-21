@@ -22,9 +22,9 @@ describe('update request', () => {
       expect(request.params).toBeDefined()
       const key = request.params.Key
       expect(key).toBeDefined()
-      expect(Object.keys(key).length).toBe(1)
-      expect(key.id).toBeDefined()
-      expect(key.id).toEqual({ S: 'myId' })
+      expect(Object.keys(key ?? {}).length).toBe(1)
+      expect(key?.id).toBeDefined()
+      expect(key?.id).toEqual({ S: 'myId' })
     })
 
     it('composite key', () => {
@@ -34,13 +34,13 @@ describe('update request', () => {
       expect(request.params).toBeDefined()
       const key = request.params.Key
       expect(key).toBeDefined()
-      expect(Object.keys(key).length).toBe(2)
+      expect(Object.keys(key ?? {}).length).toBe(2)
 
-      expect(key.id).toBeDefined()
-      expect(key.id).toEqual({ S: 'myId' })
+      expect(key?.id).toBeDefined()
+      expect(key?.id).toEqual({ S: 'myId' })
 
-      expect(key.creationDate).toBeDefined()
-      expect(key.creationDate).toEqual({ S: now.toISOString() })
+      expect(key?.creationDate).toBeDefined()
+      expect(key?.creationDate).toEqual({ S: now.toISOString() })
     })
 
     it('should throw when no sortKey was given but necessary', () => {

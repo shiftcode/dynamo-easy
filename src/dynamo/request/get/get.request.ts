@@ -53,7 +53,7 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
       .then(promiseTap((response) => this.logger.debug('response', response)))
       .then((getItemResponse) => {
         // TODO v3: investigate on how to remove any
-        const response: GetResponse<T2> = { ...getItemResponse }
+        const response: GetResponse<T2> = { ...(getItemResponse) }
 
         if (getItemResponse.Item) {
           response.Item = fromDb(<Attributes<T2>>getItemResponse.Item, <any>this.modelClazz)

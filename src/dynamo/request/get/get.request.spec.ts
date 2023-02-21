@@ -1,5 +1,6 @@
 // tslint:disable:no-unused-expression
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { Attributes } from '../../../mapper/type/attribute.type'
@@ -47,7 +48,7 @@ describe('GetRequest', () => {
     })
 
     it('should set param for ReturnConsumedCapacity', () => {
-      request.returnConsumedCapacity('TOTAL')
+      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
   })

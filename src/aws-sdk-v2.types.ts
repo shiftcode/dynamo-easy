@@ -10,4 +10,6 @@ export type BatchWriteItemRequestMap = { [key: string]: WriteRequest[] }
 export type ExpressionAttributeNameMap = { [key: string]: string /* was: AttributeName */ }
 export type ExpressionAttributeValueMap = { [key: string]: AttributeValue /* was: AttributeValue */ }
 
+export type AttributeMap = { [key: string]: AttributeValue }
+
 export type Key = { [key: string]: AttributeValue }

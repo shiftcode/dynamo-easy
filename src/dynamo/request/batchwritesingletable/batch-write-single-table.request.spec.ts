@@ -1,6 +1,7 @@
 // tslint:disable:no-unnecessary-class
 
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { Organization } from '../../../../test/models'
 import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
@@ -42,12 +43,12 @@ describe('batch write single table request', () => {
     })
 
     it('returnConsumedCapacity', () => {
-      request.returnConsumedCapacity('TOTAL')
+      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
 
     it('returnItemCollectionMetrics', () => {
-      request.returnItemCollectionMetrics('SIZE')
+      request.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
       expect(request.params.ReturnItemCollectionMetrics).toBe('SIZE')
     })
 
@@ -161,8 +162,8 @@ describe('batch write single table request', () => {
 
     it('should keep other params in additional calls', async () => {
       request.put([item])
-      request.returnConsumedCapacity('TOTAL')
-      request.returnItemCollectionMetrics('SIZE')
+      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      request.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
       await request.exec(<any>generatorMock)
 
       expect(batchWriteItemMock).toHaveBeenCalledTimes(3)

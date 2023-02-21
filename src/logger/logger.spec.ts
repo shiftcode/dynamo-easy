@@ -5,6 +5,7 @@ import { LogInfo } from './log-info.type'
 import { LogLevel } from './log-level.type'
 import { LogReceiver } from './log-receiver.type'
 import { createLogger, createOptModelLogger, Logger, OptModelLogger } from './logger'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 describe('log receiver', () => {
   let logs: LogInfo[] = []
@@ -15,7 +16,7 @@ describe('log receiver', () => {
 
   it('receives logs', () => {
     const ts = Date.now()
-    const store = new DynamoStore(Employee)
+    const store = new DynamoStore(Employee, new DynamoDB.DynamoDB({}))
 
     expect(store).toBeDefined()
     expect(logs.length).toBe(1)

@@ -24,9 +24,15 @@ class DynamoStoreModel {}
 class DynamoStoreModel2 {}
 
 describe('dynamo store', () => {
+  let dynamoDB: DynamoDB.DynamoDB
+
+  beforeEach(() => {
+    dynamoDB = new DynamoDB.DynamoDB({})
+  })
+
   describe('table name', () => {
     it('correct table name', () => {
-      const store = new DynamoStore(DynamoStoreModel2)
+      const store = new DynamoStore(DynamoStoreModel2, dynamoDB)
       expect(store.tableName).toBe('myTableName')
     })
   })
@@ -43,7 +49,7 @@ describe('dynamo store', () => {
     afterEach(resetDynamoEasyConfig)
 
     it('custom session validity ensurer is used', async () => {
-      const store = new DynamoStore(DynamoStoreModel)
+      const store = new DynamoStore(DynamoStoreModel, dynamoDB)
       try {
         await store.scan().exec()
       } catch (error) {
@@ -60,7 +66,7 @@ describe('dynamo store', () => {
       updateDynamoEasyConfig({ logReceiver: logReceiverMock })
     })
     it('logs when instance was created', () => {
-      new DynamoStore(DynamoStoreModel)
+      new DynamoStore(DynamoStoreModel, dynamoDB)
       expect(logReceiverMock).toHaveBeenCalled()
     })
   })
@@ -69,7 +75,7 @@ describe('dynamo store', () => {
     let store: DynamoStore<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
-      store = new DynamoStore(SimpleWithPartitionKeyModel)
+      store = new DynamoStore(SimpleWithPartitionKeyModel, dynamoDB)
     })
 
     it('put', () => expect(store.put({ id: 'id', age: 0 }) instanceof PutRequest).toBeTruthy())
@@ -84,25 +90,17 @@ describe('dynamo store', () => {
       expect(store.transactGet([{ id: 'myId' }]) instanceof TransactGetSingleTableRequest).toBeTruthy())
   })
 
-  describe('should enable custom requests', () => {
-    const makeRequestSpy = jest.fn().mockReturnValue(Promise.resolve())
-    const store = new DynamoStore(SimpleWithPartitionKeyModel)
-    Object.assign(store, { dynamoDBWrapper: { makeRequest: makeRequestSpy } })
-    store.makeRequest('updateTimeToLive', {})
-    expect(makeRequestSpy).toBeCalled()
-  })
+  // TODO v3: possibly remove when we decided on how to proceed with DynamoDbWrapper.makeRequest
+  // xdescribe('should enable custom requests', () => {
+  //   const makeRequestSpy = jest.fn().mockReturnValue(Promise.resolve())
+  //   const store = new DynamoStore(SimpleWithPartitionKeyModel, dynamoDB)
+  //   Object.assign(store, { dynamoDBWrapper: { makeRequest: makeRequestSpy } })
+  //   store.makeRequest('updateTimeToLive', {})
+  //   expect(makeRequestSpy).toBeCalled()
+  // })
 
   describe('allow to get dynamoDB instance', () => {
-    const store = new DynamoStore(SimpleWithPartitionKeyModel)
+    const store = new DynamoStore(SimpleWithPartitionKeyModel, new DynamoDB.DynamoDB({}))
     expect(store.dynamoDB).toBeDefined()
-  })
-
-  describe('use provided dynamoDB instance', () => {
-    const dynamoDB = new DynamoDB.default()
-    const store = new DynamoStore(SimpleWithPartitionKeyModel, dynamoDB)
-    expect(store.dynamoDB).toBe(dynamoDB)
-
-    const store2 = new DynamoStore(SimpleWithPartitionKeyModel)
-    expect(store2.dynamoDB).not.toBe(dynamoDB)
   })
 })

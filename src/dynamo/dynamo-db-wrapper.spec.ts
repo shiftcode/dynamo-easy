@@ -17,7 +17,7 @@ describe('dynamo rx', () => {
       pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
       sessionValidityEnsurerMock = jest.fn().mockReturnValueOnce(Promise.resolve())
       updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerMock })
-      dynamoDBWrapper = new DynamoDbWrapper()
+      dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
     })
 
     afterEach(() => {
@@ -98,55 +98,48 @@ describe('dynamo rx', () => {
     })
   })
 
-  describe('makeRequest', () => {
-    let dynamoDBWrapper: DynamoDbWrapper
-    let sessionValidityEnsurerMock: jest.Mock
-    let dynamoDBMock: jest.SpyInstance
-    let pseudoParams: any
-
-    beforeEach(() => {
-      pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
-      sessionValidityEnsurerMock = jest.fn().mockReturnValueOnce(Promise.resolve(true))
-      updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerMock })
-      dynamoDBWrapper = new DynamoDbWrapper()
-    })
-
-    it('should call the validity ensurer before each call and call the correct dynamoDB method', async () => {
-      dynamoDBMock = jest
-        .spyOn(dynamoDBWrapper.dynamoDB, 'makeRequest')
-        .mockReturnValueOnce(<any>{ promise: () => Promise.resolve() })
-      await dynamoDBWrapper.makeRequest('pseudoOperation', pseudoParams)
-      expect(sessionValidityEnsurerMock).toHaveBeenCalled()
-      expect(dynamoDBMock).toHaveBeenCalledTimes(1)
-      expect(dynamoDBMock).toHaveBeenCalledWith('pseudoOperation', pseudoParams)
-    })
-  })
+  // TODO v3: remove when decision is made if DynamoDbWrapper.makeRequest comes back or not
+  // describe('makeRequest', () => {
+  //   let dynamoDBWrapper: DynamoDbWrapper
+  //   let sessionValidityEnsurerMock: jest.Mock
+  //   let dynamoDBMock: jest.SpyInstance
+  //   let pseudoParams: any
+  //
+  //   beforeEach(() => {
+  //     pseudoParams = { TableName: 'tableName', KeyConditionExpression: 'blub' }
+  //     sessionValidityEnsurerMock = jest.fn().mockReturnValueOnce(Promise.resolve(true))
+  //     updateDynamoEasyConfig({ sessionValidityEnsurer: sessionValidityEnsurerMock })
+  //     dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
+  //   })
+  //
+  //   it('should call the validity ensurer before each call and call the correct dynamoDB method', async () => {
+  //     dynamoDBMock = jest
+  //       .spyOn(dynamoDBWrapper.dynamoDB, 'makeRequest')
+  //       .mockReturnValueOnce(<any>{ promise: () => Promise.resolve() })
+  //     await dynamoDBWrapper.makeRequest('pseudoOperation', pseudoParams)
+  //     expect(sessionValidityEnsurerMock).toHaveBeenCalled()
+  //     expect(dynamoDBMock).toHaveBeenCalledTimes(1)
+  //     expect(dynamoDBMock).toHaveBeenCalledWith('pseudoOperation', pseudoParams)
+  //   })
+  // })
 
   describe('query', () => {
     beforeEach(() => {})
     it('should throw when no KeyConditionExpression was given', () => {
-      const dynamoDBWrapper = new DynamoDbWrapper()
+      const dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
       updateDynamoEasyConfig({ sessionValidityEnsurer: jest.fn().mockReturnValue(Promise.resolve()) })
       expect(() => dynamoDBWrapper.query({ TableName: 'tableName' })).toThrow()
     })
   })
 
-  it('should call makeRequest with the given params', async () => {
-    const dynamoDBWrapper = new DynamoDbWrapper()
-    const makeRequestMock = jest.fn().mockReturnValue({ promise: (args: any) => Promise.resolve(args) })
-    Object.assign(dynamoDBWrapper, { dynamoDB: { makeRequest: makeRequestMock } })
-
-    await dynamoDBWrapper.makeRequest(<any>{ ok: true })
-    expect(makeRequestMock).toHaveBeenCalled()
-    expect(makeRequestMock.mock.calls.slice(-1)[0][0]).toEqual({ ok: true })
-  })
-
-  it('should use given dynamoDB client', () => {
-    const dynamoDB = new DynamoDB.default()
-    const dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
-    expect(dynamoDBWrapper.dynamoDB).toBe(dynamoDB)
-
-    const dynamoDBWrapper2 = new DynamoDbWrapper()
-    expect(dynamoDBWrapper2.dynamoDB).not.toBe(dynamoDB)
-  })
+  // TODO v3: remove when decision is made if DynamoDbWrapper.makeRequest comes back or not
+  // it('should call makeRequest with the given params', async () => {
+  //   const dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
+  //   const makeRequestMock = jest.fn().mockReturnValue({ promise: (args: any) => Promise.resolve(args) })
+  //   Object.assign(dynamoDBWrapper, { dynamoDB: { makeRequest: makeRequestMock } })
+  //
+  //   await dynamoDBWrapper.makeRequest(<any>{ ok: true })
+  //   expect(makeRequestMock).toHaveBeenCalled()
+  //   expect(makeRequestMock.mock.calls.slice(-1)[0][0]).toEqual({ ok: true })
+  // })
 })

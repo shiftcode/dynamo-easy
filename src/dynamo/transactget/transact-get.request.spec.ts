@@ -1,6 +1,7 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-unnecessary-class
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { getTableName } from '../get-table-name.function'
@@ -11,36 +12,27 @@ describe('TransactGetRequest', () => {
   let req: TransactGetRequest
 
   describe('constructor', () => {
-    beforeEach(() => (req = new TransactGetRequest()))
+    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDB({}))))
 
     it('shoud init params', () => {
       expect(req.params).toBeDefined()
       expect(req.params.TransactItems).toBeDefined()
       expect(req.params.TransactItems.length).toBe(0)
     })
-
-    it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB.default()
-      const transactGetRequest = new TransactGetRequest(dynamoDB)
-      expect(transactGetRequest.dynamoDB).toBe(dynamoDB)
-
-      const transactGetRequest2 = new TransactGetRequest()
-      expect(transactGetRequest2.dynamoDB).not.toBe(dynamoDB)
-    })
   })
 
   describe('returnConsumedCapacity', () => {
-    beforeEach(() => (req = new TransactGetRequest()))
+    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDB({}))))
 
     it('should set the param', () => {
-      req.returnConsumedCapacity('INDEXES')
+      req.returnConsumedCapacity(ReturnConsumedCapacity.INDEXES)
 
       expect(req.params.ReturnConsumedCapacity).toBe('INDEXES')
     })
   })
 
   describe('forModel', () => {
-    beforeEach(() => (req = new TransactGetRequest()))
+    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDB({}))))
 
     it('should add a single item to params', () => {
       req.forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
@@ -60,10 +52,10 @@ describe('TransactGetRequest', () => {
       req.forModel(SimpleWithCompositePartitionKeyModel, { id: 'myId', creationDate })
 
       expect(req.params.TransactItems.length).toBe(2)
-      expect(req.params.TransactItems[0].Get.TableName).toBe(getTableName(SimpleWithPartitionKeyModel))
+      expect(req.params.TransactItems[0]?.Get?.TableName).toBe(getTableName(SimpleWithPartitionKeyModel))
 
-      expect(req.params.TransactItems[1].Get.TableName).toBe(getTableName(SimpleWithCompositePartitionKeyModel))
-      expect(req.params.TransactItems[1].Get.Key).toEqual({
+      expect(req.params.TransactItems[1]?.Get?.TableName).toBe(getTableName(SimpleWithCompositePartitionKeyModel))
+      expect(req.params.TransactItems[1]?.Get?.Key).toEqual({
         id: { S: 'myId' },
         creationDate: { S: creationDate.toISOString() },
       })
@@ -104,7 +96,7 @@ describe('TransactGetRequest', () => {
         Responses: [{ Item: dbItem }, { Item: dbItem2 }],
       }
       transactGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(output))
-      req2 = new TransactGetRequest()
+      req2 = new TransactGetRequest(new DynamoDB.DynamoDB({}))
         .forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
         .forModel(SimpleWithCompositePartitionKeyModel, { id: 'myId', creationDate })
       Object.assign(req2, { dynamoDBWrapper: { transactGetItems: transactGetItemsMock } })

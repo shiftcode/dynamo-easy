@@ -1,4 +1,5 @@
 // tslint:disable:max-classes-per-file
+import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model/model-constructor'
 import { BaseRequest } from './base.request'
@@ -57,11 +58,11 @@ describe('base request', () => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
     })
     it('should set param', () => {
-      request.returnConsumedCapacity('TOTAL')
+      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
     it('should return request instance', () => {
-      expect(request.returnConsumedCapacity('TOTAL')).toBe(request)
+      expect(request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)).toBe(request)
     })
   })
 })

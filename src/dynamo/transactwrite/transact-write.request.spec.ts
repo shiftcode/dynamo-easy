@@ -1,5 +1,6 @@
 // tslint:disable:no-non-null-assertion
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { update } from '../expression/logical-operator/update.function'
@@ -15,7 +16,7 @@ describe('TransactWriteRequest', () => {
   describe('constructor', () => {
     let req: TransactWriteRequest
     beforeEach(() => {
-      req = new TransactWriteRequest()
+      req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
     })
 
     it('should add transactItems array to params', () => {
@@ -25,11 +26,11 @@ describe('TransactWriteRequest', () => {
     })
 
     it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB.default()
+      const dynamoDB = new DynamoDB.DynamoDB({})
       const transactWriteRequest = new TransactWriteRequest(dynamoDB)
       expect(transactWriteRequest.dynamoDB).toBe(dynamoDB)
 
-      const transactWriteRequest2 = new TransactWriteRequest()
+      const transactWriteRequest2 = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
       expect(transactWriteRequest2.dynamoDB).not.toBe(dynamoDB)
     })
   })
@@ -37,7 +38,7 @@ describe('TransactWriteRequest', () => {
   describe('transact', () => {
     let req: TransactWriteRequest
     beforeEach(() => {
-      req = new TransactWriteRequest()
+      req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
     })
 
     it('should throw when no operations are provided', () => {
@@ -53,15 +54,15 @@ describe('TransactWriteRequest', () => {
   describe('correct params', () => {
     let req: TransactWriteRequest
 
-    beforeEach(() => (req = new TransactWriteRequest()))
+    beforeEach(() => (req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))))
 
     it('returnConsumedCapacity', () => {
-      req.returnConsumedCapacity('TOTAL')
+      req.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
       expect(req.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
 
     it('returnItemCollectionMetrics', () => {
-      req.returnItemCollectionMetrics('SIZE')
+      req.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
       expect(req.params.ReturnItemCollectionMetrics).toBe('SIZE')
     })
 
@@ -137,7 +138,7 @@ describe('TransactWriteRequest', () => {
     let transactWriteItemsMock: jest.Mock
 
     beforeEach(() => {
-      req = new TransactWriteRequest()
+      req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
 
       transactWriteItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve({ myResponse: true }))
       Object.assign(req, { dynamoDBWrapper: { transactWriteItems: transactWriteItemsMock } })

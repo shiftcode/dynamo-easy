@@ -17,10 +17,10 @@ describe('TransactGetSingleTableRequest', () => {
       req = new TransactGetSingleTableRequest(<any>null, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
 
       expect(req.params.TransactItems).toBeDefined()
-      expect(req.params.TransactItems.length).toBe(1)
-      expect(req.params.TransactItems[0].Get).toBeDefined()
-      expect(req.params.TransactItems[0].Get.TableName).toEqual(getTableName(SimpleWithPartitionKeyModel))
-      expect(req.params.TransactItems[0].Get.Key).toEqual(createKeyAttributes(simpleWithPartitionKeyMeta, 'myId'))
+      expect(req.params.TransactItems?.length).toBe(1)
+      expect(req.params.TransactItems?.[0]?.Get).toBeDefined()
+      expect(req.params.TransactItems?.[0].Get?.TableName).toEqual(getTableName(SimpleWithPartitionKeyModel))
+      expect(req.params.TransactItems?.[0].Get?.Key).toEqual(createKeyAttributes(simpleWithPartitionKeyMeta, 'myId'))
     })
   })
 
