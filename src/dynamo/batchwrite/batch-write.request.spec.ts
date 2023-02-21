@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { getTableName } from '../get-table-name.function'
 import { BatchWriteRequest } from './batch-write.request'

@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-unnecessary-class
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { getTableName } from '../get-table-name.function'

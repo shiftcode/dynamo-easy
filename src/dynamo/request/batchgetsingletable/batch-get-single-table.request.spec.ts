@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 // tslint:disable:no-unnecessary-class
 // tslint:disable:no-unused-expression
 // tslint:disable:no-non-null-assertion

@@ -1,7 +1,7 @@
 /**
  * @module decorators
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { KEY_PROPERTY } from '../property/key-property.const'

@@ -1,7 +1,7 @@
 /**
  * @module expression
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { Metadata } from '../../decorator/metadata/metadata'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { addUpdateExpression } from './param-util'
@@ -21,7 +21,7 @@ export function prepareAndAddUpdateExpressions(
   if (updateDefFns && updateDefFns.length) {
     const sortedByActionKeyWord: Map<UpdateActionKeyword, UpdateExpression[]> = updateDefFns
       .map((updateDefFn) => {
-        return updateDefFn(<any>params.ExpressionAttributeNames, metadata)
+        return updateDefFn(params.ExpressionAttributeNames, metadata)
       })
       .reduce((result, expr) => {
         const actionKeyword = expr.type

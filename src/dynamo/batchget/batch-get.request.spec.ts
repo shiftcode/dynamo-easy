@@ -1,5 +1,5 @@
 // tslint:disable:no-non-null-assertion
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { Organization, SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { toDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'

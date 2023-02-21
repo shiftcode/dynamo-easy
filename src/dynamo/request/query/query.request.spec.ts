@@ -1,7 +1,7 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:max-classes-per-file
 
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import {
   ComplexModel,
   CustomId,

@@ -1,6 +1,6 @@
 // tslint:disable:no-non-null-assertion
 // tslint:disable:no-string-literal
-import * as DynamoDb from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import {
   organization1CreatedAt,
   organization1Employee1CreatedAt,

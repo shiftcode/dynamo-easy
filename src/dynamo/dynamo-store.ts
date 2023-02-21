@@ -1,8 +1,7 @@
 /**
  * @module dynamo-easy
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
-import { promiseTap } from '../helper/promise-tap.function'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { createLogger, Logger } from '../logger/logger'
 import { ModelConstructor } from '../model/model-constructor'
 import { DynamoApiOperations } from './dynamo-api-operations.type'

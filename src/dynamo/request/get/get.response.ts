@@ -1,7 +1,7 @@
 /**
  * @module store-requests
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 /**
  * copied from aws-sdk/clients/dynamoDb GetItemOutput but added generics, because we process the items and map them

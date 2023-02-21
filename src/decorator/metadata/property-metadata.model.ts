@@ -1,7 +1,7 @@
 /**
  * @module metadata
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { MapperForType } from '../../mapper/for-type/base.mapper'
 import { Attribute } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'

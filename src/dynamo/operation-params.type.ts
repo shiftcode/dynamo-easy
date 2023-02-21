@@ -1,7 +1,7 @@
 /**
  * @module dynamo-easy
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 /**
  * @hidden

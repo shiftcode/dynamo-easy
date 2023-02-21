@@ -1,7 +1,7 @@
 /**
  * @module multi-model-requests/transact-write
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { createKeyAttributes } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
 import { prepareAndAddUpdateExpressions } from '../expression/prepare-and-add-update-expressions.function'

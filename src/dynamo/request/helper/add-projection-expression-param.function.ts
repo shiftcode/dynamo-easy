@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { Metadata } from '../../../decorator/metadata/metadata'
 import { resolveAttributeNames } from '../../expression/functions/attribute-names.function'
 

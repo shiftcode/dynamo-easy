@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { BrutalistModel } from '../../../test/models/brutalist.model'
 import { Address, ComplexModel, UpdateModel } from '../../../test/models/index'
 import { FormId, FormType, Order, OrderId } from '../../../test/models/real-world/index'

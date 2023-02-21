@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
 import { DynamoDbWrapper } from '../dynamo/dynamo-db-wrapper'
 import { QueryRequest } from '../dynamo/request/query/query.request'

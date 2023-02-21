@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { batchWriteItemsWriteAll, hasUnprocessedItems } from './batch-write-utils'
 

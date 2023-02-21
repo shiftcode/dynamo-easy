@@ -1,7 +1,7 @@
 /**
  * @module store-requests
  */
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { promiseTap } from '../../../helper/promise-tap.function'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes, fromDb } from '../../../mapper/mapper'
@@ -52,7 +52,7 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
       .getItem(this.params)
       .then(promiseTap((response) => this.logger.debug('response', response)))
       .then((getItemResponse) => {
-        const response: GetResponse<T2> = <any>{ ...getItemResponse }
+        const response: GetResponse<T2> = { ...getItemResponse }
 
         if (getItemResponse.Item) {
           response.Item = fromDb(<Attributes<T2>>getItemResponse.Item, <any>this.modelClazz)

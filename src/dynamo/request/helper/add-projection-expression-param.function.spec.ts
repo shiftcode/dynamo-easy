@@ -1,4 +1,4 @@
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { metadataForModel } from '../../../decorator/metadata/metadata-for-model.function'
 import { addProjectionExpressionParam } from './add-projection-expression-param.function'

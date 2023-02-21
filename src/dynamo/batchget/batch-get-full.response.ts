@@ -3,7 +3,7 @@
  */
 
 // tslint:disable-next-line:interface-over-type-literal
-import * as DynamoDB from 'aws-sdk/clients/dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { BatchGetResponse } from './batch-get.response'
 
 /**
