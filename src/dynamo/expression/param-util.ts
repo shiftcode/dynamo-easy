@@ -1,6 +1,7 @@
 /**
  * @module expression
  */
+import DynamoDB from '@aws-sdk/client-dynamodb'
 import { isEmpty } from '../../helper/is-empty.function'
 import { isString } from '../../helper/is-string.function'
 import { ConditionalParams } from '../operation-params.type'

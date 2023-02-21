@@ -14,7 +14,7 @@ import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } fro
  * Request class for the BatchWriteItem operation. Put or delete multiple items in one or more table.
  */
 export class BatchWriteRequest {
-  get dynamoDB(): DynamoDB {
+  get dynamoDB(): DynamoDB.DynamoDB {
     return this.dynamoDBWrapper.dynamoDB
   }
 
@@ -22,7 +22,7 @@ export class BatchWriteRequest {
   private readonly dynamoDBWrapper: DynamoDbWrapper
   private itemCount = 0
 
-  constructor(dynamoDB?: DynamoDB) {
+  constructor(dynamoDB?: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       RequestItems: {},

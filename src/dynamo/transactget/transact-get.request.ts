@@ -19,7 +19,7 @@ const MAX_REQUEST_ITEM_COUNT = 10
  * Request class for the TransactGetItems operation. Read up to 10 items from one or more tables in a transaction.
  */
 export class TransactGetRequest {
-  get dynamoDB(): DynamoDB {
+  get dynamoDB(): DynamoDB.DynamoDB {
     return this.dynamoDBWrapper.dynamoDB
   }
 
@@ -27,7 +27,7 @@ export class TransactGetRequest {
   private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Array<ModelConstructor<any>> = []
 
-  constructor(dynamoDB?: DynamoDB) {
+  constructor(dynamoDB?: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       TransactItems: [],

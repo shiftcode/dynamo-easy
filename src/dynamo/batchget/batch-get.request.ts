@@ -18,7 +18,7 @@ import { BatchGetResponse } from './batch-get.response'
  * Request class for the BatchGetItem operation. Read multiple items from one or more tables.
  */
 export class BatchGetRequest {
-  get dynamoDB(): DynamoDB {
+  get dynamoDB(): DynamoDB.DynamoDB {
     return this.dynamoDBWrapper.dynamoDB
   }
 
@@ -27,7 +27,7 @@ export class BatchGetRequest {
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
   private itemCounter = 0
 
-  constructor(dynamoDB?: DynamoDB) {
+  constructor(dynamoDB?: DynamoDB.DynamoDB) {
     this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
     this.params = {
       RequestItems: {},
