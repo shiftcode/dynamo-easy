@@ -184,7 +184,7 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
         throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
       }
       const propertyValue = getPropertyValue(item, propMeta.name)
-      ;(key as any)[propMeta.nameDb] = <Attribute>toDbOne(propertyValue, propMeta)
+      ;(key as any)[propMeta.nameDb] = toDbOne(propertyValue, propMeta)
       return key
     }, <Attributes<T>>{})
   }
@@ -228,7 +228,7 @@ export function createKeyAttributes<T>(
       throw new Error('metadata for sort key must be defined')
     }
 
-    ;(keyAttributeMap as any)[sortKeyMetadata.nameDb] = <Attribute>toDbOne(sortKey, sortKeyMetadata)
+    ;(keyAttributeMap as any)[sortKeyMetadata.nameDb] = toDbOne(sortKey, sortKeyMetadata)
   }
 
   return keyAttributeMap
