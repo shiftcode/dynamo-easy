@@ -1,7 +1,7 @@
 /**
  * @module decorators
  */
-import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { KeyType } from '../../../aws-sdk-v2.types'
 import { kebabCase } from '../../../helper/kebab-case.function'
 import { ModelMetadata } from '../../metadata/model-metadata.model'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
@@ -63,7 +63,7 @@ export function Model(opts: ModelData = {}): ClassDecorator {
  */
 function testForGSI<T>(
   property: PropertyMetadata<T>,
-): property is PropertyMetadata<T> & { keyForGSI: Record<string, DynamoDB.KeyType> } {
+): property is PropertyMetadata<T> & { keyForGSI: Record<string, KeyType> } {
   return !!(property.keyForGSI && Object.keys(property.keyForGSI).length)
 }
 

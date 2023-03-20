@@ -1,7 +1,7 @@
 /**
  * @module decorators
  */
-import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { KeyType } from '../../../aws-sdk-v2.types'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'
 import { KEY_PROPERTY } from '../property/key-property.const'
@@ -12,7 +12,7 @@ import { IndexType } from './index-type.enum'
  */
 export interface IndexData {
   name: string
-  keyType: DynamoDB.KeyType
+  keyType: KeyType
 }
 
 /**
@@ -47,10 +47,7 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
 /**
  * @hidden
  */
-function initOrUpdateGSI(
-  indexes: Record<string, DynamoDB.KeyType>,
-  indexData: IndexData,
-): Partial<PropertyMetadata<any>> {
+function initOrUpdateGSI(indexes: Record<string, KeyType>, indexData: IndexData): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
     // TODO INVESTIGATE when we throw an error we have a problem where multiple different classes extend one base class, this will be executed multiple times
     // throw new Error(

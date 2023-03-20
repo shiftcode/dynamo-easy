@@ -2,4 +2,4 @@ import * as moment from 'moment'
 import * as DynamoDB from 'aws-sdk'
 import { Config } from 'aws-sdk'
 import { Key } from 'aws-sdk/clients/dynamodb'
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [only wildcard import (import * as DynamoDB from 'aws-sdk/clients/dynamodb') is allowed for this module]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ [only wildcard import (import * as DynamoDB from '@aws-sdk/client-dynamodb') is allowed for this module]

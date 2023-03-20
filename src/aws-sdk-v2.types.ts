@@ -13,3 +13,9 @@ export type ExpressionAttributeValueMap = { [key: string]: AttributeValue /* was
 export type AttributeMap = { [key: string]: AttributeValue }
 
 export type Key = { [key: string]: AttributeValue }
+
+// FIXME somehow the import of KeyType from @aws-sdk/client-dynamodb does not work at runtime
+export enum KeyType {
+  HASH = 'HASH',
+  RANGE = 'RANGE',
+}

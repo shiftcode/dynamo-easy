@@ -1,7 +1,7 @@
 /**
  * @module metadata
  */
-import * as DynamoDB from '@aws-sdk/client-dynamodb'
+import { KeyType } from '../../aws-sdk-v2.types'
 import { MapperForType } from '../../mapper/for-type/base.mapper'
 import { Attribute } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
@@ -12,7 +12,7 @@ export interface TypeInfo {
 }
 
 export interface Key {
-  type: DynamoDB.KeyType
+  type: KeyType
 }
 
 export interface PropertyMetadata<T, R extends Attribute = Attribute> {
@@ -41,7 +41,7 @@ export interface PropertyMetadata<T, R extends Attribute = Attribute> {
   mapperForSingleItem?: () => MapperForType<any, any>
 
   // maps the index name to the key type to describe for which GSI this property describes a key attribute
-  keyForGSI?: Record<string, DynamoDB.KeyType>
+  keyForGSI?: Record<string, KeyType>
 
   // holds all the the index names for which this property describes the sort key attribute
   sortKeyForLSI?: string[]

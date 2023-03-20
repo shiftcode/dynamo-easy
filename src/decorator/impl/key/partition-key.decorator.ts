@@ -1,7 +1,7 @@
 /**
  * @module decorators
  */
-import { KeyType } from '@aws-sdk/client-dynamodb'
+import { KeyType } from '../../../aws-sdk-v2.types'
 import { createOptModelLogger } from '../../../logger/logger'
 import { PropertyMetadata } from '../../metadata/property-metadata.model'
 import { initOrUpdateProperty } from '../property/init-or-update-property.function'

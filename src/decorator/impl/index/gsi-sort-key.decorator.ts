@@ -1,7 +1,7 @@
 /**
  * @module decorators
  */
-import { KeyType } from '@aws-sdk/client-dynamodb'
+import { KeyType } from '../../../aws-sdk-v2.types'
 import { IndexType } from './index-type.enum'
 import { initOrUpdateIndex } from './util'
 
