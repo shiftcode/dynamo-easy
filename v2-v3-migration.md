@@ -1,7 +1,7 @@
 # Migrate dynamo-easy to sdk v3
 
 ## To complete before releasing
-- [ ] Update demo
+- [ ] Update [demo](https://github.com/shiftcode/dynamo-easy-demo/tree/aws-sdk-v3)
 - [ ] Update doc with new snippets
 
 ## Useful Links
@@ -13,7 +13,7 @@
 Search for `TODO v3:` to see open issues / notes, here are some more general ones:
 - [x] Make sure the snippets compile
 - [ ] Check on new attribute type [$UnknownAttribute](./src/mapper/type/attribute.type.ts) and implement tests
-- [ ] Add new [demo](https://github.com/shiftcode/dynamo-easy-demo) with aws-cdk
+- [ ] Add new with aws-cdk WIP can be found [here](https://github.com/shiftcode/dynamo-easy-demo/tree/aws-sdk-v3)
 - [x] Make tests compile and run successfully
 - [ ] Remove [sessionValidityEnsurer](./src/config/dynamo-easy-config.ts) and add demo with using [middleware stack](https://github.com/aws/aws-sdk-js-v3#middleware-stack) 
 to implement the same
