@@ -53,6 +53,9 @@
     "tslint:custom-rule:build": "tsc ./tools/tslint/noDynamoNamedImportRule.ts",
     "tslint:custom-rule:test": "tslint --test ./tools/tslint/test"
   },
+  "dependencies": {
+    "tslib": "^1.10.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^8.1.0",
@@ -82,7 +85,6 @@
   },
   "peerDependencies": {
     "aws-sdk": "^2.401.0",
-    "reflect-metadata": "^0.1.12",
-    "tslib": "^1.10.0"
+    "reflect-metadata": "^0.1.12"
   }
 }
