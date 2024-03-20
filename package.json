@@ -54,7 +54,7 @@
     "tslint:custom-rule:test": "tslint --test ./tools/tslint/test"
   },
   "dependencies": {
-    "tslib": "^1.10.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.1.0",
