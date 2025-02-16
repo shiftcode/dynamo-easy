@@ -179,7 +179,7 @@ describe('Mapper', () => {
         const employee1 = <MapAttribute<Employee>>attrValue.L[0]
         expect(employee1).toBeDefined()
         expect(keyOf(employee1)).toBe('M')
-        expect(Object.keys(employee1.M).length).toBe(2)
+        expect(Object.keys(employee1.M).length).toBe(3)
         expect(employee1.M.name).toBeDefined()
         expect(keyOf(employee1.M.name)).toBe('S')
         expect((<StringAttribute>employee1.M.name).S).toBe('max')
@@ -187,6 +187,10 @@ describe('Mapper', () => {
         expect(employee1.M.age).toBeDefined()
         expect(keyOf(employee1.M.age)).toBe('N')
         expect((<NumberAttribute>employee1.M.age).N).toBe('25')
+
+        expect(employee1.M.age).toBeDefined()
+        expect(keyOf(employee1.M.sortedSet)).toBe('NULL')
+        expect((<NullAttribute>employee1.M.sortedSet).NULL).toBe(true)
       })
 
       it('heterogenous Set without decorator should throw', () => {
@@ -713,7 +717,10 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDbVal: Record<string, DynamoDB.AttributeValue> = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          const toDbVal: Record<string, DynamoDB.AttributeValue> = toDb(
+            new ModelWithDateAsHashKey(now),
+            ModelWithDateAsHashKey,
+          )
           expect(toDbVal.startDate.S).toBeDefined()
           expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })

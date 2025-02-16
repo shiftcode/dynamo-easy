@@ -41,12 +41,20 @@ describe('expressions', () => {
       [undefined, undefined, {}],
       {},
       [],
-      { blub: undefined, other: undefined },
+      { blub: undefined, other: undefined, empty_arr: [] },
       new Set(arr),
     ]
 
     const filteredObj = deepFilter(obj, (item) => item !== undefined)
-    expect(filteredObj).toEqual([{ street: 'street', zip: 1524 }, [{ age: 25 }], new Set([arr[0], arr[1]])])
+    expect(filteredObj).toEqual([
+      { street: 'street', zip: 1524 },
+      [{ age: 25 }],
+      [{}],
+      {},
+      [],
+      { empty_arr: [] },
+      new Set([arr[0], arr[1]]),
+    ])
   })
 
   it('use property metadata', () => {

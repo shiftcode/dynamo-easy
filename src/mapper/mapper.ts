@@ -63,7 +63,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
     let attributeValue: Attribute | undefined | null
 
-    if (propertyValue === undefined || propertyValue === null) {
+    if (propertyValue === undefined) {
       // noop ignore because we can't map it
     } else {
       /*
@@ -274,7 +274,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
       modelValue = fromDbOne(attributeValue)
     }
 
-    if (modelValue !== null && modelValue !== undefined) {
+    if (modelValue !== undefined) {
       Reflect.set(<any>model, propertyMetadata ? propertyMetadata.name : attributeName, modelValue)
     }
   })

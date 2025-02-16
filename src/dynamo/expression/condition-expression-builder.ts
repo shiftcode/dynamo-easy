@@ -51,22 +51,22 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
     const returnArr: any[] = []
     obj.forEach((i) => {
       const item = deepFilter(i, filterFn)
-      if (item !== null) {
+      if (item !== undefined) {
         returnArr.push(item)
       }
     })
 
-    return returnArr.length ? returnArr : null
+    return returnArr
   } else if (obj instanceof Set) {
     const returnArr: any[] = []
     Array.from(obj).forEach((i) => {
       const item = deepFilter(i, filterFn)
-      if (item !== null) {
+      if (item !== undefined) {
         returnArr.push(item)
       }
     })
 
-    return returnArr.length ? new Set(returnArr) : null
+    return new Set(returnArr)
   } else if (isPlainObject(obj)) {
     const returnObj: Record<string, any> = {}
 
@@ -74,18 +74,18 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
       if (obj.hasOwnProperty(key)) {
         const value = obj[key]
         const item = deepFilter(value, filterFn)
-        if (item !== null) {
+        if (item !== undefined) {
           returnObj[key] = item
         }
       }
     }
 
-    return Object.keys(returnObj).length ? returnObj : null
+    return returnObj
   } else {
     if (filterFn(obj)) {
       return obj
     } else {
-      return null
+      return undefined
     }
   }
 }

@@ -11,7 +11,10 @@ import { ScanRequest } from '../dynamo/request/scan/scan.request'
  * available. This can be used with scan and query requests.
  */
 
-export function fetchAll<T>(request: ScanRequest<T> | QueryRequest<T>, startKey?: Record<string, DynamoDB.AttributeValue>): Promise<T[]> {
+export function fetchAll<T>(
+  request: ScanRequest<T> | QueryRequest<T>,
+  startKey?: Record<string, DynamoDB.AttributeValue>,
+): Promise<T[]> {
   request.limit(ReadManyRequest.INFINITE_LIMIT)
   if (startKey) {
     request.exclusiveStartKey(startKey)

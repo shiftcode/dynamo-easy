@@ -47,7 +47,10 @@ export function initOrUpdateIndex(indexType: IndexType, indexData: IndexData, ta
 /**
  * @hidden
  */
-function initOrUpdateGSI(indexes: Record<string, DynamoDB.KeyType>, indexData: IndexData): Partial<PropertyMetadata<any>> {
+function initOrUpdateGSI(
+  indexes: Record<string, DynamoDB.KeyType>,
+  indexData: IndexData,
+): Partial<PropertyMetadata<any>> {
   if (indexes[indexData.name]) {
     // TODO INVESTIGATE when we throw an error we have a problem where multiple different classes extend one base class, this will be executed multiple times
     // throw new Error(
