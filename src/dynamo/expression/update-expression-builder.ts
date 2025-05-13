@@ -36,7 +36,7 @@ export function buildUpdateExpression(
   existingValueNames: string[] | undefined,
   metadata: Metadata<any> | undefined,
 ): UpdateExpression {
-  // metadata get rid of undefined values
+  // get rid of undefined values
   values = deepFilter(values, (value) => value !== undefined) || []
 
   // load property metadata if model metadata was provided

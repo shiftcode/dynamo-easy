@@ -40,7 +40,7 @@ type BuildFilterFn = (
  */
 
 /**
- * Will walk the object tree recursively and removes all items which do not satisfy the filterFn
+ * Will walk the object tree recursively and removes all items that do not satisfy the filterFn
  * @param obj
  * @param {(value: any) => boolean} filterFn
  * @returns {any}
@@ -56,7 +56,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
       }
     })
 
-    return returnArr.length ? returnArr : null
+    return returnArr
   } else if (obj instanceof Set) {
     const returnArr: any[] = []
     Array.from(obj).forEach((i) => {
@@ -80,7 +80,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
       }
     }
 
-    return Object.keys(returnObj).length ? returnObj : null
+    return returnObj
   } else {
     if (filterFn(obj)) {
       return obj
