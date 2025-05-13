@@ -91,16 +91,6 @@ describe('buildUpdateExpression', () => {
           type: 'SET',
         })
       })
-
-      it('set', () => {
-        const exp = buildUpdateExpression('topics', op, [new Set([])], [], metaDataU)
-        expect(exp).toEqual({
-          attributeNames: { '#topics': 'topics' },
-          attributeValues: { ':topics': { L: [] } },
-          statement: '#topics = :topics',
-          type: 'SET',
-        })
-      })
     })
 
     it('should build set expression for number at document path', () => {

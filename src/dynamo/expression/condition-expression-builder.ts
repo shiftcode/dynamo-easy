@@ -40,7 +40,7 @@ type BuildFilterFn = (
  */
 
 /**
- * Will walk the object tree recursively and removes all items which do not satisfy the filterFn
+ * Will walk the object tree recursively and removes all items that do not satisfy the filterFn
  * @param obj
  * @param {(value: any) => boolean} filterFn
  * @returns {any}
@@ -66,7 +66,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
       }
     })
 
-    return new Set(returnArr)
+    return returnArr.length ? new Set(returnArr) : null
   } else if (isPlainObject(obj)) {
     const returnObj: Record<string, any> = {}
 
