@@ -21,7 +21,7 @@ export function prepareAndAddUpdateExpressions(
   if (updateDefFns && updateDefFns.length) {
     const sortedByActionKeyWord: Map<UpdateActionKeyword, UpdateExpression[]> = updateDefFns
       .map((updateDefFn) => {
-        // TODO v3: investigate on how to remove any
+        // TODO post-v3:: investigate on how to remove any
         // tslint:disable-next-line:no-unnecessary-type-assertion
         return updateDefFn(params.ExpressionAttributeNames as any, metadata)
       })
