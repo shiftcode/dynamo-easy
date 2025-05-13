@@ -81,6 +81,28 @@ describe('buildUpdateExpression', () => {
       })
     })
 
+    describe('should build set expression for empty collection', () => {
+      it('array', () => {
+        const exp = buildUpdateExpression('addresses', op, [[]], [], metaDataU)
+        expect(exp).toEqual({
+          attributeNames: { '#addresses': 'addresses' },
+          attributeValues: { ':addresses': { L: [] } },
+          statement: '#addresses = :addresses',
+          type: 'SET',
+        })
+      })
+
+      it('set', () => {
+        const exp = buildUpdateExpression('topics', op, [new Set([])], [], metaDataU)
+        expect(exp).toEqual({
+          attributeNames: { '#topics': 'topics' },
+          attributeValues: { ':topics': { L: [] } },
+          statement: '#topics = :topics',
+          type: 'SET',
+        })
+      })
+    })
+
     it('should build set expression for number at document path', () => {
       const exp = buildUpdateExpression('numberValues[0]', op, [23], [], metaDataU)
       expect(exp).toEqual({
@@ -144,7 +166,7 @@ describe('buildUpdateExpression', () => {
     const op = new UpdateActionDef('DELETE', 'removeFromSet')
 
     it('should build the expression', () => {
-      const exp = buildUpdateExpression('topics', op, [['val1', 'val2']], [], metaDataU)
+      const exp = buildUpdateExpression('topics', op, [new Set(['val1', 'val2'])], [], metaDataU)
       expect(exp).toEqual({
         attributeNames: { '#topics': 'topics' },
         attributeValues: { ':topics': { SS: ['val1', 'val2'] } },
