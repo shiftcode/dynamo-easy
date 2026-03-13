@@ -12,7 +12,7 @@ import { Attribute, Attributes } from '../../mapper/type/attribute.type'
 import { getPropertyPath, isSet } from '../../mapper/util'
 import { deepFilter } from './condition-expression-builder'
 import { resolveAttributeNames } from './functions/attribute-names.function'
-import { uniqueAttributeValueName } from './functions/unique-attribute-value-name.function'
+import { uniqueAttributeValueNameRecord } from './functions/unique-attribute-value-name.function'
 import { UpdateActionDef } from './type/update-action-def'
 import { UpdateAction } from './type/update-action.type'
 import { UpdateExpression } from './type/update-expression.type'
@@ -24,7 +24,7 @@ import { UpdateExpression } from './type/update-expression.type'
  * @param {string} attributePath
  * @param {ConditionOperator} operation
  * @param {any[]} values Depending on the operation the amount of values differs
- * @param {string[]} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
+ * @param {Record<string, string>} existingValueNames If provided the existing names are used to make sure we have a unique name for the current attributePath
  * @param {Metadata<any>} metadata If provided we use the metadata to define the attribute name and use it to map the given value(s) to attributeValue(s)
  * @returns {Expression}
  * @hidden
@@ -33,7 +33,7 @@ export function buildUpdateExpression(
   attributePath: string,
   operation: UpdateActionDef,
   values: any[],
-  existingValueNames: string[] | undefined,
+  existingValueNames: Record<string, string> | undefined,
   metadata: Metadata<any> | undefined,
 ): UpdateExpression {
   // get rid of undefined values
@@ -54,7 +54,7 @@ export function buildUpdateExpression(
    * person.age
    */
   const resolvedAttributeNames = resolveAttributeNames(attributePath, metadata)
-  const valuePlaceholder = uniqueAttributeValueName(attributePath, existingValueNames)
+  const valuePlaceholder = uniqueAttributeValueNameRecord(attributePath, existingValueNames)
 
   /*
    * build the statement
@@ -80,7 +80,7 @@ function buildDefaultExpression(
   valuePlaceholder: string,
   attributeNames: Record<string, string>,
   values: any[],
-  _existingValueNames: string[] | undefined,
+  _existingValueNames: Record<string, string> | undefined,
   propertyMetadata: PropertyMetadata<any> | undefined,
   operator: UpdateActionDef,
 ): UpdateExpression {

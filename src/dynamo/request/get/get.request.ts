@@ -52,14 +52,10 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
       .getItem(this.params)
       .then(promiseTap((response) => this.logger.debug('response', response)))
       .then((getItemResponse) => {
-        // TODO post-v3: investigate on how to remove any
-        // tslint:disable-next-line:no-unnecessary-type-assertion
-        const response: GetResponse<T2> = { ...(getItemResponse as any) }
+        const response: GetResponse<T2> = { ...getItemResponse, ...{ Item: undefined } }
 
         if (getItemResponse.Item) {
           response.Item = fromDb(<Attributes<T2>>getItemResponse.Item, <any>this.modelClazz)
-        } else {
-          response.Item = null
         }
 
         return response

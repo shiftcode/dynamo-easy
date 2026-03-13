@@ -28,3 +28,20 @@ export function uniqueAttributeValueName(key: string, existingValueNames?: strin
 
   return potentialName
 }
+
+export function uniqueAttributeValueNameRecord(key: string, existingValueNames?: Record<string, string>): string {
+  key = key.replace(/\./g, '__').replace(BRACED_INDEX_REGEX, attributeNameReplacer)
+  let potentialName = `:${key}`
+  let idx = 1
+
+  if (existingValueNames && existingValueNames.length) {
+    const recordKeys = Object.keys(existingValueNames)
+    const recordValues = Object.values(existingValueNames)
+    while (recordKeys.includes(potentialName) || recordValues.includes(potentialName)) {
+      idx++
+      potentialName = `:${key}_${idx}`
+    }
+  }
+
+  return potentialName
+}
