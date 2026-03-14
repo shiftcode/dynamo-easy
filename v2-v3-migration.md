@@ -3,7 +3,7 @@
 ## 📋 To complete before releasing
 - [x] Make sure the snippets compile
 - [x] Make tests compile and run successfully
-- [ ] Search for `TODO v3:` in the code to see open issues / notes, and create followup issues to decide if we have more to fix prior to a major release or keep it for later follow-up
+- [x] Search for `TODO v3:` in the code to see open issues / notes, and create followup issues to decide if we have more to fix prior to a major release or keep it for later follow-up
 - [ ] Check on new attribute type [$UnknownAttribute](./src/mapper/type/attribute.type.ts) and implement tests
 - [ ] Remove [sessionValidityEnsurer](./src/config/dynamo-easy-config.ts) and add demo with using [middleware stack](https://github.com/aws/aws-sdk-js-v3#middleware-stack)
   to implement the same
