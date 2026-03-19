@@ -50,6 +50,9 @@ jobs:
         run: HUSKY=0 npm ci
       - name: Lint
         run: npm run lint:ci
+      # run tests again to have coverage information available for report coverage step
+      - name: Test
+        run: npm run test:ci
       - name: Build
         run: npm run build
         env:
