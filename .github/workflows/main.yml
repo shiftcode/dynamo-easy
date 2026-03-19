@@ -24,58 +24,34 @@ jobs:
     name: Node.js v${{ matrix.node }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+      - name: Setup Node and NPM Cache
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
+          cache: 'npm'
           node-version: ${{ matrix.node }}
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        shell: bash
-        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-      - uses: actions/cache@v4
-        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      # Print current Node.js version
-      - run: node --version
-      # Print current Yarn version
-      - run: npm --version
-      # Print current Git version
-      - run: git --version
-      # Install node_modules
-      - run: HUSKY=0 npm ci
-      # Run tests
-      - run: npm run test:ci
+      - name: Install
+        run: HUSKY=0 npm ci
+      - name: Test
+        run: npm run test:ci
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Node v18
-        uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+      - name: Setup Node and NPM Cache
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
-          node-version: 18
-      - name: Get npm cache directory
-        id: npm-cache-dir
-        shell: bash
-        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
-      - uses: actions/cache@v4
-        id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
-        with:
-          path: ${{ steps.npm-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: install
+          node-version-file: .nvmrc
+          cache: 'npm'
+      - name: Install
         run: HUSKY=0 npm ci
-      - name: lint, test, and build
-        run: |
-          npm run lint:ci
-          npm run test:ci
-          npm run build
+      - name: Lint
+        run: npm run lint:ci
+      - name: Build
+        run: npm run build
         env:
           CI: true
       # report coverage only for non PR
