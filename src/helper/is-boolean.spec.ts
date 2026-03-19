@@ -4,7 +4,6 @@ describe('is boolean', () => {
   it('should be a boolean', () => {
     expect(isBoolean(true)).toBeTruthy()
     expect(isBoolean(false)).toBeTruthy()
-    // tslint:disable:no-construct
     expect(isBoolean(new Boolean(1))).toBeTruthy()
     expect(isBoolean(new Boolean(0))).toBeTruthy()
   })

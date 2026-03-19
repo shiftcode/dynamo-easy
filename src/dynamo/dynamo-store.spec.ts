@@ -1,6 +1,3 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-unnecessary-class
-// tslint:disable:no-unused-expression
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
@@ -42,6 +39,7 @@ describe('dynamo store', () => {
 
     beforeEach(() => {
       // Promise.reject to not reach the actual call to the aws sdk
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
       validityEnsurerMock = jest.fn().mockReturnValueOnce(Promise.reject())
       updateDynamoEasyConfig({ sessionValidityEnsurer: validityEnsurerMock })
     })

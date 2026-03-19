@@ -57,10 +57,10 @@ export function CollectionProperty<R, T extends StringAttribute | NumberAttribut
 
         const wrappedMapper: MapperForType<any, any> =
           type === Array
-            ? !!opts.sorted
+            ? opts.sorted
               ? wrapMapperForDynamoListJsArray(itemMapper)
               : wrapMapperForDynamoSetJsArray(itemMapper)
-            : !!opts.sorted
+            : opts.sorted
             ? wrapMapperForDynamoListJsSet(itemMapper)
             : wrapMapperForDynamoSetJsSet(itemMapper)
 

@@ -1,3 +1,5 @@
+// TODO eslint: fix
+/* eslint-disable */
 import { cd, exec, echo, touch } from 'shelljs'
 import { readFileSync } from 'node:fs'
 import url from 'node:url'

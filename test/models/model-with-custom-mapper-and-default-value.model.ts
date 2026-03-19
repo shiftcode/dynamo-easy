@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Property } from '../../src/decorator/impl/property/property.decorator'
 import { MapperForType } from '../../src/mapper/for-type/base.mapper'

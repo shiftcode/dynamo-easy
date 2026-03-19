@@ -1,5 +1,3 @@
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-string-literal
 import {
   organization1CreatedAt,
   organization1Employee1CreatedAt,
@@ -713,7 +711,10 @@ describe('Mapper', () => {
       describe('model with non string/number/binary keys', () => {
         it('should accept date as HASH or RANGE key', () => {
           const now = new Date()
-          const toDbVal: Record<string, DynamoDB.AttributeValue> = toDb(new ModelWithDateAsHashKey(now), ModelWithDateAsHashKey)
+          const toDbVal: Record<string, DynamoDB.AttributeValue> = toDb(
+            new ModelWithDateAsHashKey(now),
+            ModelWithDateAsHashKey,
+          )
           expect(toDbVal.startDate.S).toBeDefined()
           expect(toDbVal.startDate.S).toEqual(now.toISOString())
         })

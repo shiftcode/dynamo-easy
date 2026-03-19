@@ -94,13 +94,11 @@ describe('Util', () => {
     it('detects string', () => {
       expect(detectType('aString')).toBe('S')
       expect(detectType(String('aString'))).toBe('S')
-      // tslint:disable-next-line:no-construct
       expect(detectType(new String('aString'))).toBe('S')
     })
     it('detects number', () => {
       expect(detectType(3)).toBe('N')
       expect(detectType(Number(-5))).toBe('N')
-      // tslint:disable-next-line:no-construct
       expect(detectType(new Number(83))).toBe('N')
     })
     it('detects binary', () => {
@@ -118,7 +116,6 @@ describe('Util', () => {
     it('detects bool', () => {
       expect(detectType(true)).toBe('BOOL')
       expect(detectType(false)).toBe('BOOL')
-      // tslint:disable-next-line:no-construct
       expect(detectType(new Boolean(1))).toBe('BOOL')
     })
     it('detects collection', () => {
@@ -223,7 +220,6 @@ describe('Util', () => {
     })
 
     it('undefined', () => {
-      // tslint:disable-next-line:prefer-const
       let undfn: undefined
       expect(typeOf(undfn)).toBe(UndefinedType)
     })

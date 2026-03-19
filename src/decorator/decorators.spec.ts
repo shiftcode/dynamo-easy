@@ -1,7 +1,3 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-unnecessary-class
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-unused-variable
 import { getMetaDataProperty } from '../../test/helper/get-meta-data-property.function'
 import {
   ComplexModel,
@@ -101,7 +97,7 @@ describe('Decorators should add correct metadata', () => {
 
     it('with correct properties', () => {
       expect(modelOptions.properties).toBeDefined()
-      expect(modelOptions.properties!.length).toBe(10)
+      expect(modelOptions.properties.length).toBe(10)
     })
 
     it('with correct transient properties', () => {
@@ -234,10 +230,10 @@ describe('Decorators should add correct metadata', () => {
 
       it('should add indexes on model', () => {
         expect(metadata.modelOptions.indexes).toBeDefined()
-        expect(metadata.modelOptions.indexes!.size).toBe(1)
-        expect(metadata.modelOptions.indexes!.get(INDEX_ACTIVE)).toBeDefined()
-        expect(metadata.modelOptions.indexes!.get(INDEX_ACTIVE)!.partitionKey).toBe('active')
-        expect(metadata.modelOptions.indexes!.get(INDEX_ACTIVE)!.sortKey).toBeUndefined()
+        expect(metadata.modelOptions.indexes.size).toBe(1)
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)).toBeDefined()
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)!.partitionKey).toBe('active')
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)!.sortKey).toBeUndefined()
       })
 
       it('should define the index on property metadata', () => {
@@ -259,10 +255,10 @@ describe('Decorators should add correct metadata', () => {
 
       it('should add indexes on model', () => {
         expect(metadata.modelOptions.indexes).toBeDefined()
-        expect(metadata.modelOptions.indexes!.size).toBe(1)
-        expect(metadata.modelOptions.indexes!.get(INDEX_ACTIVE)).toBeDefined()
-        expect(metadata.modelOptions.indexes!.get(INDEX_ACTIVE)!.partitionKey).toBe('active')
-        expect(metadata.modelOptions.indexes!.get(INDEX_ACTIVE)!.sortKey).toBe('createdAt')
+        expect(metadata.modelOptions.indexes.size).toBe(1)
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)).toBeDefined()
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)!.partitionKey).toBe('active')
+        expect(metadata.modelOptions.indexes.get(INDEX_ACTIVE)!.sortKey).toBe('createdAt')
       })
 
       it('should define the index on property metadata', () => {
@@ -302,7 +298,7 @@ describe('Decorators should add correct metadata', () => {
         // metadata.getLocalIndex(INDEX_ACTIVE_CREATED_AT)
 
         expect(metadata.modelOptions.indexes).toBeDefined()
-        expect(metadata.modelOptions.indexes!.size).toBe(2)
+        expect(metadata.modelOptions.indexes.size).toBe(2)
 
         const gsiActive = metadata.getIndex(INDEX_ACTIVE_CREATED_AT)
         expect(gsiActive).toBeDefined()
@@ -448,7 +444,7 @@ describe('Decorators should add correct metadata', () => {
       const metaData = metadataForModel(B).modelOptions
 
       expect(metaData.properties).toBeDefined()
-      expect(metaData.properties!.length).toBe(3)
+      expect(metaData.properties.length).toBe(3)
 
       const bMetadata = metadataForModel(B)
       expect(bMetadata.forProperty('myPartitionKey')).toBeDefined()
@@ -481,7 +477,7 @@ describe('Decorators should add correct metadata', () => {
       const metaData = metadataForModel(B).modelOptions
 
       expect(metaData.properties).toBeDefined()
-      expect(metaData.properties!.length).toBe(5)
+      expect(metaData.properties.length).toBe(5)
 
       const bMetadata = metadataForModel(B)
       expect(bMetadata.forProperty('myPartitionKey')).toBeDefined()
@@ -491,9 +487,9 @@ describe('Decorators should add correct metadata', () => {
       expect(bMetadata.forProperty('myOtherGsiPartitionKey')).toBeDefined()
 
       expect(metaData.indexes).toBeDefined()
-      expect(metaData.indexes!.get('my-gsi')).toBeDefined()
-      expect(metaData.indexes!.get('my-lsi')).toBeDefined()
-      expect(metaData.indexes!.get('my-other-gsi')).toBeDefined()
+      expect(metaData.indexes.get('my-gsi')).toBeDefined()
+      expect(metaData.indexes.get('my-lsi')).toBeDefined()
+      expect(metaData.indexes.get('my-other-gsi')).toBeDefined()
     })
 
     it("should contain the super-class' and own transient properties", () => {
@@ -543,15 +539,15 @@ describe('Decorators should add correct metadata', () => {
       const cModelMetadata = cMetaData.modelOptions
 
       expect(aModelMetadata.properties).toBeDefined()
-      expect(aModelMetadata.properties!.length).toBe(1)
+      expect(aModelMetadata.properties.length).toBe(1)
 
       expect(bModelMetadata.properties).toBeDefined()
-      expect(bModelMetadata.properties!.length).toBe(2)
+      expect(bModelMetadata.properties.length).toBe(2)
       expect(bMetaData.forProperty('bProp')).toBeDefined()
       expect(bMetaData.forProperty('cProp')).toBeFalsy()
 
       expect(cModelMetadata.properties).toBeDefined()
-      expect(cModelMetadata.properties!.length).toBe(2)
+      expect(cModelMetadata.properties.length).toBe(2)
       expect(cMetaData.forProperty('cProp')).toBeDefined()
       expect(cMetaData.forProperty('bProp')).toBeFalsy()
     })
@@ -572,22 +568,22 @@ describe('Decorators should add correct metadata', () => {
       const aMeta = metadataForModel(A)
       const aModelMetadata = aMeta.modelOptions
       expect(aModelMetadata.properties).toBeDefined()
-      expect(aModelMetadata.properties!.length).toBe(1)
+      expect(aModelMetadata.properties.length).toBe(1)
 
-      const aPropMeta = aModelMetadata.properties![0]
+      const aPropMeta = aModelMetadata.properties[0]
       expect(aPropMeta).toBeDefined()
-      expect(aPropMeta!.name).toBe('aProp')
-      expect(aPropMeta!.nameDb).toBe('aProp')
+      expect(aPropMeta.name).toBe('aProp')
+      expect(aPropMeta.nameDb).toBe('aProp')
 
       const bMeta = metadataForModel(B)
       const bModelMetadata = bMeta.modelOptions
       expect(bModelMetadata.properties).toBeDefined()
-      expect(bModelMetadata.properties!.length).toBe(1)
+      expect(bModelMetadata.properties.length).toBe(1)
 
-      const bPropMeta = bModelMetadata.properties![0]
+      const bPropMeta = bModelMetadata.properties[0]
       expect(bPropMeta).toBeDefined()
-      expect(bPropMeta!.name).toBe('aProp')
-      expect(bPropMeta!.nameDb).toBe('bProp')
+      expect(bPropMeta.name).toBe('aProp')
+      expect(bPropMeta.nameDb).toBe('bProp')
     })
 
     it('should have all parents props even if empty', () => {
@@ -603,12 +599,12 @@ describe('Decorators should add correct metadata', () => {
       const bMeta = metadataForModel(B)
 
       expect(bMeta.modelOptions.properties).toBeDefined()
-      expect(bMeta.modelOptions.properties!.length).toBe(1)
+      expect(bMeta.modelOptions.properties.length).toBe(1)
     })
 
     it('should work for real world scenario 1', () => {
       const metadata = metadataForModel(Form)
-      expect(metadata.modelOptions.properties!.length).toBe(4)
+      expect(metadata.modelOptions.properties.length).toBe(4)
       const meta = metadata.forProperty('id')
       expect(meta).toBeDefined()
     })

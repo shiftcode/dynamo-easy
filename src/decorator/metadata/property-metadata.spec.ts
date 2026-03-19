@@ -1,5 +1,4 @@
 import { dateToStringMapper } from '../../mapper/custom/date-to-string.mapper'
-// tslint:disable:no-non-null-assertion
 import { CollectionProperty } from '../impl/collection/collection-property.decorator'
 import { DateProperty } from '../impl/date/date-property.decorator'
 import { Model } from '../impl/model/model.decorator'
@@ -15,7 +14,6 @@ class NestedModel {
   createdAt: Date
 }
 
-// tslint:disable-next-line:max-classes-per-file
 @Model()
 class TestModel {
   @CollectionProperty()

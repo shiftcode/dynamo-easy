@@ -1,4 +1,3 @@
-// tslint:disable:no-non-null-assertion
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'

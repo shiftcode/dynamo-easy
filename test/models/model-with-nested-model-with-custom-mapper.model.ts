@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { Model, Property } from '../../src/dynamo-easy'
 import { Id, IdMapper } from './model-with-custom-mapper.model'
 

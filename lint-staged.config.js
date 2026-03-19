@@ -4,7 +4,7 @@
  */
 const config = {
   "package.json": ["npx sort-package-json"],
-  "*": [/* "eslint --fix --cache", */ "npx prettier --write --ignore-unknown"],
+  "*": ["eslint --fix --cache", "npx prettier --write --ignore-unknown"],
 };
 
 export default config;

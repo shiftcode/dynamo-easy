@@ -140,16 +140,19 @@ export function curry<T1, T2, T3, T4, T5, T6, T7, T8, R>(
 ): CurriedFunction8<T1, T2, T3, T4, T5, T6, T7, T8, R>
 export function curry(fn: (...args: any[]) => any, arity?: number) {
   return function curried() {
+    // eslint-disable-next-line eqeqeq
     if (arity == null) {
       arity = fn.length
     }
+    // eslint-disable-next-line prefer-rest-params
     const args = [].slice.call(arguments)
     if (args.length >= arity) {
-      // @ts-ignore
+      // @ts-expect-error - outstanding documentation
       return fn.apply(this, args)
     } else {
       return function () {
-        // @ts-ignore
+        // @ts-expect-error - outstanding documentation
+        // eslint-disable-next-line prefer-rest-params
         return curried.apply(this, args.concat([].slice.call(arguments)))
       }
     }

@@ -31,7 +31,7 @@ export function getPropertyPath<T>(
  * @hidden
  */
 export function messageWithPath(propertyPath: string | null | undefined, message: string): string {
-  if (!!propertyPath) {
+  if (propertyPath) {
     return `${propertyPath} ${message}`
   } else {
     return `${message}`
@@ -139,6 +139,7 @@ export function isCollection(value: any): boolean {
  */
 export function isSet(value: any): value is Set<any> {
   return (
+    // eslint-disable-next-line no-prototype-builtins
     (value !== null && value !== undefined && value.hasOwnProperty('name') && value.name === 'Set') ||
     value instanceof Set
   )
@@ -268,7 +269,7 @@ export function isType(obj: any, type: any): boolean {
 /**
  * @hidden
  */
-// tslint:disable-next-line:function-constructor
+// eslint-disable-next-line @typescript-eslint/no-implied-eval
 const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
 
 /**

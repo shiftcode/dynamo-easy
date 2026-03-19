@@ -1,6 +1,3 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-non-null-assertion
-
 import { MapperForType, Model, PartitionKey, Property, StringAttribute } from '../../src/dynamo-easy'
 
 export class Id {

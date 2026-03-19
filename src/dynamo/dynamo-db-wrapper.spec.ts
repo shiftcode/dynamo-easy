@@ -1,6 +1,3 @@
-// tslint:disable:no-empty
-// tslint:disable:no-unnecessary-callback-wrapper
-
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { resetDynamoEasyConfig } from '../../test/helper/resetDynamoEasyConfig.function'
 import { updateDynamoEasyConfig } from '../config/update-config.function'

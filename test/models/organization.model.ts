@@ -9,7 +9,6 @@ import {
 } from '../../src/dynamo-easy'
 import { Employee } from './employee.model'
 
-// tslint:disable:max-classes-per-file
 @Model()
 export class Gift {
   description: string

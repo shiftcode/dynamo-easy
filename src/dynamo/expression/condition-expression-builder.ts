@@ -71,6 +71,7 @@ export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
     const returnObj: Record<string, any> = {}
 
     for (const key in obj) {
+      // eslint-disable-next-line no-prototype-builtins
       if (obj.hasOwnProperty(key)) {
         const value = obj[key]
         const item = deepFilter(value, filterFn)
@@ -317,7 +318,6 @@ function validateForOperator(operator: ConditionOperator, values?: any[]) {
   }
 }
 
-// tslint:disable:no-invalid-template-strings
 /*
  * error messages for arity issues
  */
@@ -333,7 +333,6 @@ export const ERR_ARITY_IN =
 export const ERR_ARITY_DEFAULT =
   'expected ${parameterArity} value(s) for operator ${operator}, this is not the right amount of method parameters for this operator'
 
-// tslint:enable:no-invalid-template-strings
 /**
  * @hidden
  */
@@ -362,7 +361,6 @@ function validateArity(operator: ConditionOperator, values?: any[]) {
 /*
  * error message for wrong operator values
  */
-// tslint:disable:no-invalid-template-strings
 /**
  * @hidden
  */
@@ -372,8 +370,6 @@ export const ERR_VALUES_BETWEEN_TYPE =
  * @hidden
  */
 export const ERR_VALUES_IN = 'the provided value for IN operator must be an array'
-
-// tslint:enable:no-invalid-template-strings
 
 /**
  * Every operator has some constraints about the values it supports, this method makes sure everything is fine for given
