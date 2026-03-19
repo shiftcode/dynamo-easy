@@ -39,7 +39,6 @@ function collectionFromDb(
         fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType),
       )
     } else {
-      // tslint:disable-next-line:no-unnecessary-callback-wrapper
       arr = attributeValue.L.map((v: Attribute) => fromDbOne(v))
     }
     return explicitType && explicitType === Set ? new Set(arr) : arr
@@ -106,10 +105,7 @@ function collectionToDb(
         }
       } else {
         return {
-          L: propertyValue
-            // tslint:disable-next-line:no-unnecessary-callback-wrapper
-            .map((v) => toDbOne(v))
-            .filter(notNull),
+          L: propertyValue.map((v) => toDbOne(v)).filter(notNull),
         }
       }
     // no 'default' necessary, all possible cases caught

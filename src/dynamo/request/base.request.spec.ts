@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model/model-constructor'

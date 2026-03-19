@@ -47,7 +47,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
       metadata.getPropertiesWithDefaultValueProvider().forEach((propertyMetadata) => {
         const currentVal = Reflect.get(<any>item, propertyMetadata.name)
         if (currentVal === undefined || currentVal === null) {
-          // tslint:disable-next-line:no-non-null-assertion
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           Reflect.set(<any>item, propertyMetadata.name, propertyMetadata.defaultValueProvider!())
         }
       })

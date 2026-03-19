@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "declarationMap": false,
+    "declaration": false,
+    "types": ["node", "jest"],
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "snippets/**/*",
+  ]
+}

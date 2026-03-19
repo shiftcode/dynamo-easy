@@ -49,7 +49,6 @@ export class Metadata<T> {
       let currentMeta: ModelMetadata<T> = this.modelOptions
       let lastPropMeta: PropertyMetadata<any> | undefined
       let lastPathPart = ''
-      // tslint:disable-next-line:no-conditional-assignment
       while ((re = regex.exec(propertyKey)) !== null) {
         lastPathPart = re[1]
         lastPropMeta = Metadata.findMetaDataForProperty(currentMeta, <any>lastPathPart)

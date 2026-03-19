@@ -21,6 +21,7 @@ export type Attribute =
  * names @Property({name: 'myOtherName'}) and the value is one of Attribute
  * (we can't narrow the type of Attribute)
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type Attributes<T = {}> = Record<keyof T | string, Attribute>
 
 export type StringAttribute = DynamoDB.AttributeValue.SMember
@@ -33,6 +34,7 @@ export type NullAttribute = DynamoDB.AttributeValue.NULLMember
 export type BooleanAttribute = DynamoDB.AttributeValue.BOOLMember
 export type $UnknownAttribute = DynamoDB.AttributeValue.$UnknownMember
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MapAttribute<T = {}> {
   M: Attributes<T>
 }

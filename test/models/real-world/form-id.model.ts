@@ -1,5 +1,3 @@
-// tslint:disable:no-non-null-assertion
-
 import { MapperForType, StringAttribute } from '../../../src/dynamo-easy'
 import { FormType } from './form-type.enum'
 

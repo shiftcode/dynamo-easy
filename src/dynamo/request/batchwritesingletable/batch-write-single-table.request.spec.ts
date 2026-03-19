@@ -1,5 +1,3 @@
-// tslint:disable:no-unnecessary-class
-
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { Organization } from '../../../../test/models'

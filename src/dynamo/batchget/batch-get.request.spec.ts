@@ -1,4 +1,3 @@
-// tslint:disable:no-non-null-assertion
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { Organization, SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
@@ -168,7 +167,7 @@ describe('batch get', () => {
       expect(result).toBeDefined()
       expect(result.Responses).toBeDefined()
 
-      const resultItems = result.Responses![getTableName(SimpleWithPartitionKeyModel)]
+      const resultItems = result.Responses[getTableName(SimpleWithPartitionKeyModel)]
       expect(resultItems).toBeDefined()
       expect(resultItems.length).toBe(2)
       expect(resultItems[0]).toEqual(jsItem1)

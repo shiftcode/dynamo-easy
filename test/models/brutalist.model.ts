@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { CollectionProperty, DateProperty, Model, PartitionKey, Property } from '../../src/dynamo-easy'
 import { FormId, formIdMapper } from './real-world'
 

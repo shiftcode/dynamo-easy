@@ -1,5 +1,3 @@
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-unnecessary-class
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'

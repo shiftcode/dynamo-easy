@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { GSIPartitionKey } from '../index/gsi-partition-key.decorator'
 import { GSISortKey } from '../index/gsi-sort-key.decorator'
 import { LSISortKey } from '../index/lsi-sort-key.decorator'
