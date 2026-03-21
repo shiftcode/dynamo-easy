@@ -57,7 +57,7 @@ describe('updateDefinitionFunction', () => {
   })
 
   it('set property', () => {
-    const expr = updateDefinitionFunction('nestedObj').set({ id: 'ok' })([], metadata)
+    const expr = updateDefinitionFunction('nestedObj').set({ id: 'ok' })({}, metadata)
 
     expect(expr.statement).toBe('#nestedObj = :nestedObj')
     expect(expr.attributeNames).toEqual({ '#nestedObj': 'my_nested_object' })
@@ -66,7 +66,7 @@ describe('updateDefinitionFunction', () => {
   })
 
   it('set nested property', () => {
-    const expr = updateDefinitionFunction('nestedObj.id').set('ok')([], metadata)
+    const expr = updateDefinitionFunction('nestedObj.id').set('ok')({}, metadata)
 
     expect(expr.statement).toBe('#nestedObj.#id = :nestedObj__id')
     expect(expr.attributeNames).toEqual({ '#nestedObj': 'my_nested_object', '#id': 'id' })
@@ -75,7 +75,7 @@ describe('updateDefinitionFunction', () => {
   })
 
   it('set list item at position', () => {
-    const expr = updateDefinitionFunction('sortedComplexSet[0]').set({ id: 'ok' })([], metadata)
+    const expr = updateDefinitionFunction('sortedComplexSet[0]').set({ id: 'ok' })({}, metadata)
 
     expect(expr.statement).toBe('#sortedComplexSet[0] = :sortedComplexSet_at_0')
     expect(expr.attributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet' })
@@ -84,7 +84,7 @@ describe('updateDefinitionFunction', () => {
   })
 
   it('set nested property of list item at position', () => {
-    const expr = updateDefinitionFunction('sortedComplexSet[1].id').set('ok')([], metadata)
+    const expr = updateDefinitionFunction('sortedComplexSet[1].id').set('ok')({}, metadata)
 
     expect(expr.statement).toBe('#sortedComplexSet[1].#id = :sortedComplexSet_at_1__id')
     expect(expr.attributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet', '#id': 'id' })
@@ -93,7 +93,7 @@ describe('updateDefinitionFunction', () => {
   })
 
   it('set nested property of list item with decorators', () => {
-    const expr = updateDefinitionFunction('sortedComplexSet[1].date').set(aDate)([], metadata)
+    const expr = updateDefinitionFunction('sortedComplexSet[1].date').set(aDate)({}, metadata)
 
     expect(expr.statement).toBe('#sortedComplexSet[1].#date = :sortedComplexSet_at_1__date')
     expect(expr.attributeNames).toEqual({ '#sortedComplexSet': 'sortedComplexSet', '#date': 'my_date' })

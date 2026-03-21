@@ -53,7 +53,7 @@ export function addUpdate<R extends UpdateParamsHost, T, K extends keyof T>(
         string,
         UpdateActionDef,
         any[],
-        string[] | undefined,
+        Record<string, string> | undefined,
         Metadata<any> | undefined,
         UpdateExpression
       >(buildUpdateExpression)
@@ -193,7 +193,7 @@ export function updateDefinitionFunction<T>(attributePath: keyof T): UpdateExpre
         string,
         UpdateActionDef,
         any[],
-        string[] | undefined,
+        Record<string, string> | undefined,
         Metadata<any> | undefined,
         UpdateExpression
       >(buildUpdateExpression)

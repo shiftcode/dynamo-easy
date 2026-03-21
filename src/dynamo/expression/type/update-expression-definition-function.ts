@@ -8,6 +8,6 @@ import { UpdateExpression } from './update-expression.type'
  * @hidden
  */
 export type UpdateExpressionDefinitionFunction = (
-  expressionAttributeValues: string[] | undefined,
+  expressionAttributeValues: Record<string, string> | undefined,
   metadata: Metadata<any> | undefined,
 ) => UpdateExpression

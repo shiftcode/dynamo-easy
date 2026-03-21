@@ -10,14 +10,14 @@ describe('buildUpdateExpression', () => {
 
   it('should throw when operation.action is unknown', () => {
     const unknownOp = new UpdateActionDef('SET', <any>'subtract')
-    expect(() => buildUpdateExpression('age', unknownOp, [3], [], metaDataS)).toThrow()
+    expect(() => buildUpdateExpression('age', unknownOp, [3], {}, metaDataS)).toThrow()
   })
 
   describe('incrementBy', () => {
     const op = new UpdateActionDef('SET', 'incrementBy')
 
     it('should build expression', () => {
-      const exp = buildUpdateExpression('age', op, [23], [], metaDataS)
+      const exp = buildUpdateExpression('age', op, [23], {}, metaDataS)
       expect(exp).toEqual({
         attributeNames: { '#age': 'age' },
         attributeValues: { ':age': { N: '23' } },
@@ -27,7 +27,7 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should build expression for number at document path ', () => {
-      const exp = buildUpdateExpression('numberValues[0]', op, [23], [], metaDataU)
+      const exp = buildUpdateExpression('numberValues[0]', op, [23], {}, metaDataU)
       expect(exp).toEqual({
         attributeNames: { '#numberValues': 'numberValues' },
         attributeValues: { ':numberValues_at_0': { N: '23' } },
@@ -37,14 +37,14 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should throw when not number', () => {
-      expect(() => buildUpdateExpression('age', op, ['notANumber'], [], metaDataS)).toThrow()
+      expect(() => buildUpdateExpression('age', op, ['notANumber'], {}, metaDataS)).toThrow()
     })
   })
 
   describe('decrementBy', () => {
     const op = new UpdateActionDef('SET', 'decrementBy')
     it('should build expression', () => {
-      const exp = buildUpdateExpression('age', op, [23], [], metaDataS)
+      const exp = buildUpdateExpression('age', op, [23], {}, metaDataS)
       expect(exp).toEqual({
         attributeNames: { '#age': 'age' },
         attributeValues: { ':age': { N: '23' } },
@@ -54,7 +54,7 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should build expression for number at document path ', () => {
-      const exp = buildUpdateExpression('numberValues[0]', op, [23], [], metaDataU)
+      const exp = buildUpdateExpression('numberValues[0]', op, [23], {}, metaDataU)
       expect(exp).toEqual({
         attributeNames: { '#numberValues': 'numberValues' },
         attributeValues: { ':numberValues_at_0': { N: '23' } },
@@ -64,15 +64,15 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should throw when not number', () => {
-      expect(() => buildUpdateExpression('age', op, ['notANumber'], [], metaDataS)).toThrow()
+      expect(() => buildUpdateExpression('age', op, ['notANumber'], {}, metaDataS)).toThrow()
     })
   })
 
   describe('set', () => {
     const op = new UpdateActionDef('SET', 'set')
 
-    it('should build set expression for number[]', () => {
-      const exp = buildUpdateExpression('numberValues', op, [[23]], [], metaDataU)
+    it('should build set expression for number{}', () => {
+      const exp = buildUpdateExpression('numberValues', op, [[23]], {}, metaDataU)
       expect(exp).toEqual({
         attributeNames: { '#numberValues': 'numberValues' },
         attributeValues: { ':numberValues': { L: [{ N: '23' }] } },
@@ -83,7 +83,7 @@ describe('buildUpdateExpression', () => {
 
     describe('should build set expression for empty collection', () => {
       it('array', () => {
-        const exp = buildUpdateExpression('addresses', op, [[]], [], metaDataU)
+        const exp = buildUpdateExpression('addresses', op, [[]], {}, metaDataU)
         expect(exp).toEqual({
           attributeNames: { '#addresses': 'addresses' },
           attributeValues: { ':addresses': { L: [] } },
@@ -94,7 +94,7 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should build set expression for number at document path', () => {
-      const exp = buildUpdateExpression('numberValues[0]', op, [23], [], metaDataU)
+      const exp = buildUpdateExpression('numberValues[0]', op, [23], {}, metaDataU)
       expect(exp).toEqual({
         attributeNames: { '#numberValues': 'numberValues' },
         attributeValues: { ':numberValues_at_0': { N: '23' } },
@@ -123,7 +123,7 @@ describe('buildUpdateExpression', () => {
     const op = new UpdateActionDef('ADD', 'add')
 
     it('should build add expression for numbers', () => {
-      const exp = buildUpdateExpression('age', op, [23], [], metaDataS)
+      const exp = buildUpdateExpression('age', op, [23], {}, metaDataS)
       expect(exp).toEqual({
         attributeNames: { '#age': 'age' },
         attributeValues: { ':age': { N: '23' } },
@@ -134,7 +134,7 @@ describe('buildUpdateExpression', () => {
 
     it('should work with customMapper (1)', () => {
       const metaDataC = metadataForModel(SpecialCasesModel)
-      const exp = buildUpdateExpression('myChars', op, ['abc'], [], metaDataC)
+      const exp = buildUpdateExpression('myChars', op, ['abc'], {}, metaDataC)
       expect(exp).toEqual({
         attributeNames: { '#myChars': 'myChars' },
         attributeValues: { ':myChars': { SS: ['a', 'b', 'c'] } },
@@ -144,11 +144,11 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should throw when not number or a set value', () => {
-      expect(() => buildUpdateExpression('age', op, ['notANumber'], [], metaDataS)).toThrow()
+      expect(() => buildUpdateExpression('age', op, ['notANumber'], {}, metaDataS)).toThrow()
     })
 
     it('should throw when no value for attributeValue was given', () => {
-      expect(() => buildUpdateExpression('age', op, [], [], metaDataS)).toThrow()
+      expect(() => buildUpdateExpression('age', op, [], {}, metaDataS)).toThrow()
     })
   })
 
@@ -156,7 +156,7 @@ describe('buildUpdateExpression', () => {
     const op = new UpdateActionDef('DELETE', 'removeFromSet')
 
     it('should build the expression', () => {
-      const exp = buildUpdateExpression('topics', op, [new Set(['val1', 'val2'])], [], metaDataU)
+      const exp = buildUpdateExpression('topics', op, [new Set(['val1', 'val2'])], {}, metaDataU)
       expect(exp).toEqual({
         attributeNames: { '#topics': 'topics' },
         attributeValues: { ':topics': { SS: ['val1', 'val2'] } },
@@ -166,11 +166,11 @@ describe('buildUpdateExpression', () => {
     })
 
     it('should throw when not a set value', () => {
-      expect(() => buildUpdateExpression('topics', op, ['notASet'], [], metaDataU)).toThrow()
+      expect(() => buildUpdateExpression('topics', op, ['notASet'], {}, metaDataU)).toThrow()
     })
 
     it('should throw when no value was given', () => {
-      expect(() => buildUpdateExpression('topics', op, [], [], metaDataU)).toThrow()
+      expect(() => buildUpdateExpression('topics', op, [], {}, metaDataU)).toThrow()
     })
   })
 })
