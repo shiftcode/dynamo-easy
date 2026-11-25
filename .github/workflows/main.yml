@@ -4,15 +4,15 @@ on:
   # push only for branches (ignore tags)
   push:
     branches:
-      - '**'
+      - "**"
     tags-ignore:
-      - '**'
+      - "**"
     # pull request only for branches (ignore tags)
   pull_request:
     branches:
-      - '**'
+      - "**"
     tags-ignore:
-      - '**'
+      - "**"
 
 permissions:
   contents: read
@@ -22,10 +22,9 @@ jobs:
     strategy:
       matrix:
         node:
-          - 20
           - 22
           - 24
-          - 25
+          - 26
     name: Node.js v${{ matrix.node }}
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +33,7 @@ jobs:
       - name: Setup Node and NPM Cache
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
-          cache: 'npm'
+          cache: "npm"
           node-version: ${{ matrix.node }}
       - name: Install
         run: HUSKY=0 npm ci
@@ -55,7 +54,7 @@ jobs:
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
         with:
           node-version-file: .nvmrc
-          cache: 'npm'
+          cache: "npm"
       - name: Install
         run: HUSKY=0 npm ci
       - name: Lint
