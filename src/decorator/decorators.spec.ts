@@ -1,7 +1,3 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-unnecessary-class
-// tslint:disable:no-non-null-assertion
-// tslint:disable:no-unused-variable
 import { getMetaDataProperty } from '../../test/helper/get-meta-data-property.function'
 import {
   ComplexModel,

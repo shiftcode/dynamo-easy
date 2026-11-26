@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { CollectionProperty, MapAttribute, MapperForType, Model, StringAttribute } from '../../src/dynamo-easy'
 
 const strangeMapper: MapperForType<FailModelNestedFail, MapAttribute> = {

@@ -95,13 +95,16 @@ function splitUpdateExpressionToActionKeyword(updateExpression: string): UpdateE
       // the regex ensures a whitespace at the beginning of the ActionWord
       // -> to not have problems with properties named exactly as an ActionKeyword
       .split(/\s(SET|REMOVE|ADD|DELETE)\s/g)
-      .reduce((u, e, i, arr) => {
-        if (isUpdateActionKeyword(e)) {
-          u[e] = arr[i + 1]
-        }
+      .reduce(
+        (u, e, i, arr) => {
+          if (isUpdateActionKeyword(e)) {
+            u[e] = arr[i + 1]
+          }
 
-        return u
-      }, <UpdateExpressionsByKeyword>{})
+          return u
+        },
+        <UpdateExpressionsByKeyword>{},
+      )
   )
 }
 

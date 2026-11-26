@@ -1,9 +1,9 @@
 /**
  * @module dynamo-easy
  */
-import { TableNameResolver } from "../dynamo/table-name-resolver.type";
-import { LogReceiver } from "../logger/log-receiver.type";
-import { MapperForType } from "../mapper/for-type/base.mapper";
+import { TableNameResolver } from '../dynamo/table-name-resolver.type'
+import { LogReceiver } from '../logger/log-receiver.type'
+import { MapperForType } from '../mapper/for-type/base.mapper'
 
 /**
  * the global config object
@@ -12,13 +12,13 @@ export interface Config {
   /**
    * function receiving all the log statements
    */
-  logReceiver: LogReceiver;
+  logReceiver: LogReceiver
   /**
    * mapper used for {@link DateProperty} decorated properties
    */
-  dateMapper: MapperForType<any, any>;
+  dateMapper: MapperForType<any, any>
   /**
    * function used to create the table names
    */
-  tableNameResolver: TableNameResolver;
+  tableNameResolver: TableNameResolver
 }

@@ -24,8 +24,7 @@ export abstract class TransactBaseOperation<
   T,
   I extends DynamoDB.ConditionCheck | DynamoDB.Put | DynamoDB.Update | DynamoDB.Delete,
   _R extends TransactBaseOperation<T, I, any>,
-> implements ConditionalParamsHost
-{
+> implements ConditionalParamsHost {
   readonly params: I
   readonly metadata: Metadata<T>
   readonly modelClazz: ModelConstructor<T>

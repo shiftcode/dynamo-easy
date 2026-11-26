@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { CollectionProperty, Model, Property } from '../../src/dynamo-easy'
 import { NestedComplexModel } from './nested-complex.model'
 

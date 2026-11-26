@@ -15,6 +15,6 @@ new BatchWriteRequest(new DynamoDB({}))
   .delete(AnotherModel, otherKeysToDelete)
   .put(AnotherModel, objectsToPut)
   .execFullResponse()
-  .then(resp => {
+  .then((resp) => {
     console.log(resp.ConsumedCapacity)
   })

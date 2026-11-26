@@ -1,10 +1,10 @@
 /**
  * @module dynamo-easy
  */
-import { DEFAULT_TABLE_NAME_RESOLVER } from "../dynamo/default-table-name-resolver.const";
-import { DEFAULT_LOG_RECEIVER } from "../logger/default-log-receiver.const";
-import { dateToStringMapper } from "../mapper/custom/date-to-string.mapper";
-import { Config } from "./config.type";
+import { DEFAULT_TABLE_NAME_RESOLVER } from '../dynamo/default-table-name-resolver.const'
+import { DEFAULT_LOG_RECEIVER } from '../logger/default-log-receiver.const'
+import { dateToStringMapper } from '../mapper/custom/date-to-string.mapper'
+import { Config } from './config.type'
 
 /**
  * to update the config you must do it before importing any model, basically before anything else.
@@ -14,4 +14,4 @@ export const dynamoEasyConfig: Config = {
   dateMapper: dateToStringMapper,
   logReceiver: DEFAULT_LOG_RECEIVER,
   tableNameResolver: DEFAULT_TABLE_NAME_RESOLVER,
-};
+}

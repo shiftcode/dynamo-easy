@@ -3,7 +3,6 @@ import { isString } from './is-string.function'
 describe('is string', () => {
   it('should be a string', () => {
     expect(isString('myValue')).toBeTruthy()
-    // tslint:disable:no-construct
     expect(isString(new String('2'))).toBeTruthy()
     expect(isString(new String('someValue'))).toBeTruthy()
   })

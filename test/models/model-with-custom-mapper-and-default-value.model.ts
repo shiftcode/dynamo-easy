@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { Model } from '../../src/decorator/impl/model/model.decorator'
 import { Property } from '../../src/decorator/impl/property/property.decorator'
 import { MapperForType } from '../../src/mapper/for-type/base.mapper'
@@ -18,7 +17,10 @@ export class MyProp {
     return `${v.type}-${v.name}`
   }
 
-  constructor(public type: string, public name: string) {}
+  constructor(
+    public type: string,
+    public name: string,
+  ) {}
 
   toString() {
     return MyProp.toString(this)

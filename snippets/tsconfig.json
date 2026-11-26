@@ -2,17 +2,10 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "noUnusedLocals": false,
-    "types": [
-      "node",
-      "reflect-metadata"
-    ],
+    "types": ["node", "reflect-metadata"],
     "paths": {
-      "@shiftcoders/*": [
-        "../src/*"
-      ]
+      "@shiftcoders/*": ["../src/*"]
     }
   },
-  "include": [
-    "./**/*.ts"
-  ]
+  "include": ["./**/*.ts"]
 }

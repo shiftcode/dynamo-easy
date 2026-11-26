@@ -268,7 +268,7 @@ export function isType(obj: any, type: any): boolean {
 /**
  * @hidden
  */
-// tslint:disable-next-line:function-constructor
+
 const isGlobalScopeWindow = new Function('try {return this===window;}catch(e){ return false;}')()
 
 /**
