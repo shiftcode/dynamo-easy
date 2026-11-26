@@ -12,4 +12,6 @@ new DynamoStore(Person, new DynamoDB({}))
   .put(objectToPut)
   .ifNotExists()
   .exec()
-  .then(() => console.log('done'))
+  .then(() => {
+    console.log('done')
+  })

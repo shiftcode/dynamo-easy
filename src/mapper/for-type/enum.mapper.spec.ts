@@ -34,7 +34,7 @@ describe('enum mapper', () => {
 
     it('should throw (string cannot be mapped)', () => {
       expect(() => {
-        EnumMapper.toDb(<any>'enum')
+        EnumMapper.toDb('enum')
       }).toThrowError()
     })
   })

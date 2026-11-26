@@ -41,7 +41,7 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
    * @param attributesToGet List of model attributes to be returned
    */
-  projectionExpression(...attributesToGet: Array<keyof T | string>): GetRequest<T, Partial<T>> {
+  projectionExpression(...attributesToGet: Array<keyof T | string>): this {
     addProjectionExpressionParam(attributesToGet, this.params, this.metadata)
     return this
   }
@@ -50,7 +50,11 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper
       .getItem(this.params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then((getItemResponse) => {
         // TODO post-v3: investigate on how to remove any
         // tslint:disable-next-line:no-unnecessary-type-assertion
@@ -64,7 +68,11 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
 
         return response
       })
-      .then(promiseTap((response) => this.logger.debug('mapped item', response.Item)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('mapped item', response.Item)
+        }),
+      )
   }
 
   /**
@@ -74,7 +82,11 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
     this.logger.debug('request', this.params)
     return this.dynamoDBWrapper
       .getItem(this.params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then((response) => {
         if (response.Item) {
           return fromDb(<Attributes<T2>>response.Item, <any>this.modelClazz)
@@ -82,6 +94,10 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
           return null
         }
       })
-      .then(promiseTap((item) => this.logger.debug('mapped item', item)))
+      .then(
+        promiseTap((item) => {
+          this.logger.debug('mapped item', item)
+        }),
+      )
   }
 }

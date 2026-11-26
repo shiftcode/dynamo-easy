@@ -89,7 +89,7 @@ describe('delete request', () => {
             },
           }),
       }
-      req = new DeleteRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+      req = new DeleteRequest(dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
     })
 
     it('exec, ALL_OLD', async () => {

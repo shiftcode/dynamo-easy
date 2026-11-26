@@ -61,7 +61,7 @@ describe('query request', () => {
     })
 
     it('defaults should be defined', () => {
-      expect(request.params).toEqual(<DynamoDB.QueryInput>{ TableName: 'complex_model' })
+      expect(request.params).toEqual({ TableName: 'complex_model' })
     })
 
     it('Limit', () => {

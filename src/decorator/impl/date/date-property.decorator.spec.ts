@@ -15,7 +15,9 @@ class ModelWithDate {
 }
 
 describe('Date decorators should allow to use a different date mapper', () => {
-  beforeEach(() => updateDynamoEasyConfig({ dateMapper: dateToNumberMapper }))
+  beforeEach(() => {
+    updateDynamoEasyConfig({ dateMapper: dateToNumberMapper })
+  })
   afterEach(resetDynamoEasyConfig)
 
   it('should define the dateToNumberMapper in metadata', () => {

@@ -191,32 +191,23 @@ describe('wrap mapper for collection', () => {
       })
 
       it('array to (L)ist (itemMapper, sorted)', () => {
-        expect(
-          toDb(<Partial<ModelWithCollections>>{ arrayOfFormIdToListWithStrings: [aFormId] }, ModelWithCollections),
-        ).toEqual({
+        expect(toDb({ arrayOfFormIdToListWithStrings: [aFormId] }, ModelWithCollections)).toEqual({
           arrayOfFormIdToListWithStrings: { L: [formIdMapper.toDb(aFormId)] },
         })
       })
       it('set to (L)ist (itemMapper, sorted)', () => {
-        expect(
-          toDb(
-            <Partial<ModelWithCollections>>{ setOfFormIdToListWithStrings: new Set([aFormId]) },
-            ModelWithCollections,
-          ),
-        ).toEqual({
+        expect(toDb({ setOfFormIdToListWithStrings: new Set([aFormId]) }, ModelWithCollections)).toEqual({
           setOfFormIdToListWithStrings: { L: [formIdMapper.toDb(aFormId)] },
         })
       })
 
       it('array to (S)et (itemMapper)', () => {
-        expect(toDb(<Partial<ModelWithCollections>>{ arrayOfFormIdToSet: [aFormId] }, ModelWithCollections)).toEqual({
+        expect(toDb({ arrayOfFormIdToSet: [aFormId] }, ModelWithCollections)).toEqual({
           arrayOfFormIdToSet: { SS: [FormId.unparse(aFormId)] },
         })
       })
       it('set to (S)et (itemMapper)', () => {
-        expect(
-          toDb(<Partial<ModelWithCollections>>{ setOfFormIdToSet: new Set([aFormId]) }, ModelWithCollections),
-        ).toEqual({
+        expect(toDb({ setOfFormIdToSet: new Set([aFormId]) }, ModelWithCollections)).toEqual({
           setOfFormIdToSet: { SS: [FormId.unparse(aFormId)] },
         })
       })

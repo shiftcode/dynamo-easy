@@ -26,7 +26,7 @@ describe('Util', () => {
     })
 
     it('array (using constructor)', () => {
-      const arr: string[] = new Array()
+      const arr: string[] = []
       arr.push('foo', 'bar')
       expect(isSet(arr)).toBeFalsy()
     })
@@ -44,7 +44,7 @@ describe('Util', () => {
     })
 
     it('array (using constructor) is collection', () => {
-      const arr: string[] = new Array()
+      const arr: string[] = []
       arr.push('foo', 'bar')
       expect(isCollection(arr)).toBeTruthy()
     })
@@ -230,7 +230,7 @@ describe('Util', () => {
 
     // object with type casting to custom
     it('object', () => {
-      expect(typeOf(<Employee>{ name: 'foo', age: 45 })).toBe(Object)
+      expect(typeOf({ name: 'foo', age: 45 })).toBe(Object)
     })
 
     it('custom class (Employee)', () => {

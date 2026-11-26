@@ -6,7 +6,7 @@ import { NumberAttribute } from '../type/attribute.type'
 import { MapperForType } from './base.mapper'
 
 function enumToDb(value: string | number, propertyMetadata?: PropertyMetadata<any, NumberAttribute>): NumberAttribute {
-  if (Number.isInteger(<any>value)) {
+  if (Number.isInteger(value)) {
     if (hasGenericType(propertyMetadata) && (<any>propertyMetadata.typeInfo.genericType)[value] === undefined) {
       throw new Error(`${JSON.stringify(value)} is not a valid value for enum ${propertyMetadata.typeInfo.genericType}`)
     }

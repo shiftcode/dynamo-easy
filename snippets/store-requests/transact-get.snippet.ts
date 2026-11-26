@@ -5,4 +5,6 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb'
 new DynamoStore(Person, new DynamoDB({}))
   .transactGet([{ id: 'a' }, { id: 'b' }])
   .exec()
-  .then(() => console.log('transactionally read a and b'))
+  .then(() => {
+    console.log('transactionally read a and b')
+  })

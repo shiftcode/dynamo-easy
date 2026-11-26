@@ -28,7 +28,7 @@ export class Id {
 
 export const IdMapper: MapperForType<Id, StringAttribute> = {
   fromDb: (attributeValue: StringAttribute) => Id.parse(attributeValue.S),
-  toDb: (propertyValue: Id) => ({ S: `${Id.unparse(propertyValue)}` }),
+  toDb: (propertyValue: Id) => ({ S: Id.unparse(propertyValue) }),
 }
 
 @Model()

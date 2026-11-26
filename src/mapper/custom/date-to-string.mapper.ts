@@ -19,7 +19,7 @@ function dateFromDb(attributeValue: StringAttribute): Date {
 function dateToDb(modelValue: Date): StringAttribute {
   // noinspection SuspiciousInstanceOfGuard
   if (modelValue && modelValue instanceof Date) {
-    return { S: `${modelValue.toISOString()}` }
+    return { S: modelValue.toISOString() }
   } else {
     throw new Error('the given model value must be an instance of Date')
   }

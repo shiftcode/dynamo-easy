@@ -70,7 +70,7 @@ export class TransactGetRequest {
   /**
    * return ConsumedCapacity of the corresponding tables in the response
    */
-  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): TransactGetRequest {
+  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): this {
     this.params.ReturnConsumedCapacity = level
     return this
   }

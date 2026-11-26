@@ -53,7 +53,7 @@ export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends Ba
    * Specifies the list of model attributes to be returned from the table instead of returning the entire document
    * @param attributesToGet List of model attributes to be returned
    */
-  projectionExpression(...attributesToGet: Array<keyof T | string>): BatchGetSingleTableRequest<T, Partial<T>> {
+  projectionExpression(...attributesToGet: Array<keyof T | string>): this {
     addProjectionExpressionParam(attributesToGet, this.params.RequestItems[this.tableName], this.metadata)
     return this
   }
@@ -81,7 +81,11 @@ export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends Ba
   ): Promise<BatchGetSingleTableResponse<T2>> {
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
-      .then(promiseTap((response) => this.logger.debug('mapped items', response.Items)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('mapped items', response.Items)
+        }),
+      )
   }
 
   /**
@@ -93,7 +97,11 @@ export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends Ba
     return this.fetch(backoffTimer, throttleTimeSlot)
       .then(this.mapResponse)
       .then((r) => r.Items)
-      .then(promiseTap((items) => this.logger.debug('mapped items', items)))
+      .then(
+        promiseTap((items) => {
+          this.logger.debug('mapped items', items)
+        }),
+      )
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput) => {
@@ -114,7 +122,9 @@ export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends Ba
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
     return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot).then(
-      promiseTap((response) => this.logger.debug('response', response)),
+      promiseTap((response) => {
+        this.logger.debug('response', response)
+      }),
     )
   }
 }

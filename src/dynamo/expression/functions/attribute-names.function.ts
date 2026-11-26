@@ -10,7 +10,7 @@ import { NESTED_ATTR_PATH_CAPTURED_REGEX, NESTED_ATTR_PATH_REGEX } from './attri
  */
 export function resolveAttributeNames(
   attributePath: string,
-  metadata?: Metadata<any> | undefined,
+  metadata?: Metadata<any>,
 ): { placeholder: string; attributeNames: Record<string, string> } {
   let placeholder: string
   // tslint:disable-next-line:no-shadowed-variable

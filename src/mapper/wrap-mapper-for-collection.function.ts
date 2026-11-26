@@ -20,8 +20,8 @@ import { isSet } from './util'
 export type SetAttributeOf<A extends StringAttribute | NumberAttribute | BinaryAttribute> = A extends StringAttribute
   ? StringSetAttribute
   : A extends NumberAttribute
-  ? NumberSetAttribute
-  : BinarySetAttribute
+    ? NumberSetAttribute
+    : BinarySetAttribute
 
 /**
  * @hidden
@@ -31,7 +31,7 @@ export function arrayToListAttribute<T, A extends StringAttribute | NumberAttrib
 ) {
   return (values: T[]): ListAttribute<A> | null => {
     const mapped = values.map((v) => customMapper.toDb(v)).filter(notNull)
-    return <ListAttribute<A>>{ L: mapped }
+    return { L: mapped }
   }
 }
 

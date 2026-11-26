@@ -128,7 +128,7 @@ function buildDefaultExpression(
       statement = `${namePlaceholder} = ${namePlaceholder} - ${valuePlaceholder}`
       break
     case 'set':
-      if (values.length > 1 && !!values[values.length - 1] === true) {
+      if (values.length > 1 && !!values[values.length - 1]) {
         statement = `${namePlaceholder} = if_not_exists(${namePlaceholder}, ${valuePlaceholder})`
       } else {
         statement = `${namePlaceholder} = ${valuePlaceholder}`
@@ -142,7 +142,7 @@ function buildDefaultExpression(
       }
       break
     case 'remove':
-      statement = `${namePlaceholder}`
+      statement = namePlaceholder
       break
     case 'removeFromListAt':
       statement = values.map((pos) => `${namePlaceholder}[${pos}]`).join(', ')

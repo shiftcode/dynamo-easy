@@ -180,13 +180,13 @@ function buildInConditionExpression(
 ): Expression {
   const attributeValues: Attributes<any> = (<any[]>values[0])
     .map((value) => toDbOne(value, propertyMetadata))
-    .reduce((result, mappedValue: Attribute | null, index: number) => {
+    .reduce<Attributes<any>>((result, mappedValue: Attribute | null, index: number) => {
       if (mappedValue !== null) {
         validateAttributeType('IN condition', mappedValue, 'S', 'N', 'B')
         result[`${valuePlaceholder}_${index}`] = mappedValue
       }
       return result
-    }, <Attributes<any>>{})
+    }, {})
 
   const inStatement = (<any[]>values[0]).map((_value: any, index: number) => `${valuePlaceholder}_${index}`).join(', ')
 
@@ -216,7 +216,9 @@ function buildBetweenConditionExpression(
   if (mappedValue1 === null || mappedValue2 === null) {
     throw new Error('make sure to provide an actual value for te BETWEEN operator')
   }
-  ;[mappedValue1, mappedValue2].forEach((mv) => validateAttributeType('between', mv, 'S', 'N', 'B'))
+  ;[mappedValue1, mappedValue2].forEach((mv) => {
+    validateAttributeType('between', mv, 'S', 'N', 'B')
+  })
 
   const value2Placeholder = uniqueAttributeValueName(attributePath, [valuePlaceholder].concat(existingValueNames || []))
 
