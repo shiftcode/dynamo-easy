@@ -62,12 +62,16 @@ export function hasGenericType(
 }
 
 /**
+ * returns true if the property metadata has a usable explicit type.
+ * `Object` is not considered usable: it is what typescript emits as design type when the actual type can't be expressed
+ * at runtime (e.g. `any`, interfaces or union types like `string | null` / `MyModel | null`).
+ * In that case the type is derived from the value.
  * @hidden
  */
 export function hasType(
   propertyMetadata?: PropertyMetadata<any, any>,
 ): propertyMetadata is PropertyMetadata<any, any> & { typeInfo: { type: ModelConstructor<any> } } {
-  return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.type)
+  return !!(propertyMetadata && propertyMetadata.typeInfo && propertyMetadata.typeInfo.type !== Object)
 }
 
 /**

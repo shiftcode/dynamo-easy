@@ -14,7 +14,7 @@ import { NumberMapper } from './for-type/number.mapper'
 import { ObjectMapper } from './for-type/object.mapper'
 import { StringMapper } from './for-type/string.mapper'
 import { AttributeValueType } from './type/attribute-value-type.type'
-import { Attribute, Attributes } from './type/attribute.type'
+import { Attribute, Attributes, NullAttribute } from './type/attribute.type'
 import { Binary } from './type/binary.type'
 import { NullType } from './type/null.type'
 import { UndefinedType } from './type/undefined.type'
@@ -62,7 +62,7 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
 
     let attributeValue: Attribute | undefined | null
 
-    if (propertyValue === undefined || propertyValue === null) {
+    if (propertyValue === undefined) {
       // noop ignore because we can't map it
     } else {
       /*
@@ -86,10 +86,14 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
         attributeValue = toDbOne(propertyValue, getPropertyPath<T>(modelConstructor, propertyKey))
       }
 
+      if (attributeValue && propertyMetadata && isIndexKey(propertyMetadata)) {
+        validateKeyAttribute(attributeValue, propertyMetadata, propertyValue)
+      }
+
       if (attributeValue === undefined) {
         // no-op transient field, just ignore it
       } else if (attributeValue === null) {
-        // empty values will be ignored too
+        // empty values (e.g. empty sets) are ignored too. (js `null` values are mapped to { NULL: true } by toDbOne)
       } else {
         ;(<any>mapped)[propertyMetadata ? propertyMetadata.nameDb : propertyKey] = attributeValue
       }
@@ -130,6 +134,18 @@ export function toDbOne(
   propertyMetadata =
     propertyPathOrMetadata && typeof propertyPathOrMetadata !== 'string' ? propertyPathOrMetadata : propertyMetadata
 
+  if (propertyValue === null) {
+    if (propertyMetadata && propertyMetadata.key) {
+      throw new Error(`${propertyMetadata.name.toString()} is null but is a ${propertyMetadata.key.type} key`)
+    }
+    if (isIndexKey(propertyMetadata)) {
+      // index key attributes must not be NULL -> omit the attribute (item won't be part of the sparse index)
+      return null
+    }
+    // null is mapped to the NULL attribute (regardless of explicit type or custom mapper)
+    return NullMapper.toDb(null)
+  }
+
   const explicitType: AttributeValueType | null = hasType(propertyMetadata) ? propertyMetadata.typeInfo.type : null
   const type: AttributeValueType = explicitType || typeOf(propertyValue, propertyPath)
 
@@ -144,16 +160,34 @@ export function toDbOne(
     if (attrValue === null) {
       throw new Error(`${propertyMetadata.name.toString()} is null but is a ${propertyMetadata.key.type} key`)
     }
-    if (!('S' in attrValue) && !('N' in attrValue) && !('B' in attrValue)) {
-      throw new Error(
-        `\
-DynamoDb only allows string, number or binary type for RANGE and HASH key. \
-Make sure to define a custom mapper for '${propertyMetadata.name.toString()}' which returns a string, number or binary value for partition key, \
-type ${type} cannot be used as partition key, value = ${JSON.stringify(propertyValue)}`,
-      )
-    }
+    validateKeyAttribute(attrValue, propertyMetadata, propertyValue)
   }
   return attrValue
+}
+
+/**
+ * @hidden
+ */
+function validateKeyAttribute(attrValue: Attribute, propertyMetadata: PropertyMetadata<any>, propertyValue: unknown) {
+  if (!('S' in attrValue) && !('N' in attrValue) && !('B' in attrValue)) {
+    throw new Error(
+      `\
+DynamoDb only allows string, number or binary type for RANGE and HASH key (also for index keys). \
+Make sure to define a custom mapper for '${propertyMetadata.name.toString()}' which returns a string, number or binary value for the key, \
+type ${Object.keys(attrValue)[0]} cannot be used as key, value = ${JSON.stringify(propertyValue)}`,
+    )
+  }
+}
+
+/**
+ * @hidden
+ */
+function isIndexKey(propertyMetadata?: PropertyMetadata<any>): boolean {
+  return (
+    !!propertyMetadata &&
+    ((!!propertyMetadata.keyForGSI && Object.keys(propertyMetadata.keyForGSI).length > 0) ||
+      (!!propertyMetadata.sortKeyForLSI && propertyMetadata.sortKeyForLSI.length > 0))
+  )
 }
 
 /**
@@ -247,7 +281,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
     /*
      * 1) get the value of the property
      */
-    const attributeValue = (<any>attributeMap)[attributeName]
+    const attributeValue: Attribute = (<any>attributeMap)[attributeName]
 
     /*
      * 2) decide how to map the property depending on type or value
@@ -265,7 +299,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
         /*
          * 3a) property metadata is defined
          */
-        if (propertyMetadata && propertyMetadata.mapper) {
+        if (propertyMetadata.mapper && !isNullAttribute(attributeValue)) {
           // custom mapper
           modelValue = propertyMetadata.mapper().fromDb(attributeValue, propertyMetadata)
         } else {
@@ -276,7 +310,7 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
       modelValue = fromDbOne(attributeValue)
     }
 
-    if (modelValue !== null && modelValue !== undefined) {
+    if (modelValue !== undefined) {
       Reflect.set(<any>model, propertyMetadata ? propertyMetadata.name : attributeName, modelValue)
     }
   })
@@ -289,6 +323,10 @@ export function fromDb<T>(attributeMap: Attributes<T>, modelConstructor?: ModelC
  */
 export function fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: PropertyMetadata<any, any>): T {
   logger.verbose('parse fromDbOne', null, { attributeValue, propertyMetadata })
+  if (isNullAttribute(attributeValue)) {
+    // NULL is always mapped to null (regardless of explicit type)
+    return <T>NullMapper.fromDb(attributeValue)
+  }
   const explicitType: AttributeValueType | null = hasType(propertyMetadata) ? propertyMetadata.typeInfo.type : null
   const type: AttributeValueType = explicitType || typeOfFromDb(attributeValue)
 
@@ -297,6 +335,13 @@ export function fromDbOne<T>(attributeValue: Attribute, propertyMetadata?: Prope
   } else {
     return forType(type).fromDb(attributeValue)
   }
+}
+
+/**
+ * @hidden
+ */
+export function isNullAttribute(attributeValue: Attribute | null | undefined): attributeValue is NullAttribute {
+  return !!attributeValue && 'NULL' in attributeValue
 }
 
 /**

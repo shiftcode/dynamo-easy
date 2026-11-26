@@ -3,7 +3,7 @@
  */
 import { hasGenericType, PropertyMetadata } from '../../decorator/metadata/property-metadata.model'
 import { notNull } from '../../helper/not-null.function'
-import { fromDb, fromDbOne, toDb, toDbOne } from '../mapper'
+import { fromDb, fromDbOne, isNullAttribute, toDb, toDbOne } from '../mapper'
 import { AttributeCollectionType } from '../type/attribute-type.type'
 import {
   Attribute,
@@ -32,7 +32,7 @@ function collectionFromDb(
   if ('L' in attributeValue && attributeValue.L) {
     if (hasGenericType(propertyMetadata)) {
       arr = attributeValue.L.map((item: Attribute) =>
-        fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType),
+        isNullAttribute(item) ? null : fromDb((<MapAttribute>item).M, propertyMetadata.typeInfo.genericType),
       )
     } else {
       arr = attributeValue.L.map((v: Attribute) => fromDbOne(v))
@@ -84,6 +84,11 @@ function collectionToDb(
     return null
   }
 
+  // null values are not allowed for S(et) types only for L(ist)
+  if (collectionType !== 'L' && propertyValue.includes(null)) {
+    throw new Error(`null values are not allowed in a ${collectionType} set, value = ${JSON.stringify(propertyValue)}`)
+  }
+
   // do the mapping depending on type
   switch (collectionType) {
     case 'SS':
@@ -95,9 +100,9 @@ function collectionToDb(
     case 'L':
       if (hasGenericType(propertyMetadata)) {
         return {
-          L: propertyValue.map((value) => ({
-            M: toDb(value, propertyMetadata.typeInfo.genericType),
-          })),
+          L: propertyValue.map((value) =>
+            value === null ? { NULL: true } : { M: toDb(value, propertyMetadata.typeInfo.genericType) },
+          ),
         }
       } else {
         return {

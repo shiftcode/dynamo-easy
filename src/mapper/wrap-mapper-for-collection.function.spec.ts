@@ -3,7 +3,7 @@ import { ModelWithCollections } from '../../test/models/model-with-collections.m
 import { FormId, formIdMapper, FormType } from '../../test/models/real-world'
 import { MapperForType } from './for-type/base.mapper'
 import { fromDb, toDb } from './mapper'
-import { Attributes, NumberAttribute, StringAttribute } from './type/attribute.type'
+import { Attributes, ListAttribute, NumberAttribute, StringAttribute } from './type/attribute.type'
 import {
   arrayToListAttribute,
   arrayToSetAttribute,
@@ -39,6 +39,11 @@ describe('wrap mapper for collection', () => {
     it('should map array to list with given mapper', () => {
       expect(arrayToListAttribute(myNumberToStringAttrMapper)([{ value: 7 }])).toEqual({ L: [{ S: '7' }] })
     })
+    it('should map null items to NULL without calling the mapper', () => {
+      expect(arrayToListAttribute(myNumberToStringAttrMapper)([{ value: 7 }, <any>null])).toEqual({
+        L: [{ S: '7' }, { NULL: true }],
+      })
+    })
   })
 
   describe('listAttributeToArray', () => {
@@ -47,6 +52,13 @@ describe('wrap mapper for collection', () => {
     })
     it('should parse list to array with given mapper', () => {
       expect(listAttributeToArray(myNumberToStringAttrMapper)({ L: [{ S: '7' }] })).toEqual([{ value: 7 }])
+    })
+    it('should parse NULL items to null without calling the mapper', () => {
+      expect(
+        listAttributeToArray(myNumberToStringAttrMapper)(<ListAttribute<StringAttribute>>{
+          L: [{ S: '7' }, { NULL: true }],
+        }),
+      ).toEqual([{ value: 7 }, null])
     })
   })
 
@@ -57,6 +69,11 @@ describe('wrap mapper for collection', () => {
     it('should map array to (S)et', () => {
       expect(arrayToSetAttribute(myNumberToStringAttrMapper)([{ value: 7 }])).toEqual({ SS: ['7'] })
       expect(arrayToSetAttribute(myCharToNumberAttrMapper)([{ value: 'A' }])).toEqual({ NS: ['65'] })
+    })
+    it('should throw for null values', () => {
+      expect(() => arrayToSetAttribute(myNumberToStringAttrMapper)([{ value: 7 }, <any>null])).toThrow(
+        'null values are not allowed',
+      )
     })
   })
 

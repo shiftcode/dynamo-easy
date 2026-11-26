@@ -30,7 +30,7 @@ export function arrayToListAttribute<T, A extends StringAttribute | NumberAttrib
   customMapper: MapperForType<T, A>,
 ) {
   return (values: T[]): ListAttribute<A> | null => {
-    const mapped = values.map((v) => customMapper.toDb(v)).filter(notNull)
+    const mapped = values.map((v) => (v === null ? <A>(<unknown>{ NULL: true }) : customMapper.toDb(v))).filter(notNull)
     return { L: mapped }
   }
 }
@@ -41,7 +41,8 @@ export function arrayToListAttribute<T, A extends StringAttribute | NumberAttrib
 export function listAttributeToArray<T, A extends StringAttribute | NumberAttribute | BinaryAttribute>(
   customMapper: MapperForType<T, A>,
 ) {
-  return (attributeValues: ListAttribute<A>): T[] => attributeValues.L.map((i) => customMapper.fromDb(i))
+  return (attributeValues: ListAttribute<A>): T[] =>
+    attributeValues.L.map((i) => ('NULL' in i ? <T>(<unknown>null) : customMapper.fromDb(i)))
 }
 
 /**
@@ -71,6 +72,9 @@ export function arrayToSetAttribute<T, A extends StringAttribute | NumberAttribu
   customMapper: MapperForType<T, A>,
 ) {
   return (values: T[]): SetAttributeOf<A> | null => {
+    if (values.includes(<T>(<unknown>null))) {
+      throw new Error(`null values are not allowed in a set, value = ${JSON.stringify(values)}`)
+    }
     const mapped = values.map((v) => customMapper.toDb(v)).filter(notNull)
     if (mapped.length === 0) {
       return null

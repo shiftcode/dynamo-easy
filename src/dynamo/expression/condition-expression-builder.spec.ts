@@ -1,3 +1,4 @@
+import { ModelWithNullValues } from '../../../test/models/model-with-null-values.model'
 import { ComplexModel } from '../../../test/models'
 import { Form, FormId, formIdMapper, FormType } from '../../../test/models/real-world'
 import { CollectionProperty } from '../../decorator/impl/collection/collection-property.decorator'
@@ -31,31 +32,49 @@ class MyModel {
 }
 
 describe('expressions', () => {
-  it('deep filter', () => {
-    const arr = [5, 'bla', undefined]
-    const obj = [
-      { street: 'street', zip: 1524 },
-      undefined,
-      [undefined, { name: undefined, age: 25 }],
-      [undefined, undefined, {}],
-      {},
-      [],
-      { blub: undefined, other: undefined },
-      { emptyArr: [] },
-      new Set(arr),
-    ]
+  describe('deep filter', () => {
+    it('should remove items not satisfying the filterFn', () => {
+      const arr = [5, 'bla', undefined]
+      const obj = [
+        { street: 'street', zip: 1524 },
+        undefined,
+        [undefined, { name: undefined, age: 25 }],
+        [undefined, undefined, {}],
+        {},
+        [],
+        { blub: undefined, other: undefined },
+        { emptyArr: [] },
+        new Set(arr),
+      ]
 
-    const filteredObj = deepFilter(obj, (item) => item !== undefined)
-    expect(filteredObj).toEqual([
-      { street: 'street', zip: 1524 },
-      [{ age: 25 }],
-      [{}],
-      {},
-      [],
-      {},
-      { emptyArr: [] },
-      new Set([arr[0], arr[1]]),
-    ])
+      expect(deepFilter(obj, (item) => item !== undefined)).toEqual([
+        { street: 'street', zip: 1524 },
+        [{ age: 25 }],
+        [{}],
+        {},
+        [],
+        {},
+        { emptyArr: [] },
+        new Set([arr[0], arr[1]]),
+      ])
+    })
+
+    it('should keep null values', () => {
+      const obj = [null, { a: null, b: undefined }, [null, undefined], new Set([undefined])]
+      expect(deepFilter(obj, (item) => item !== undefined)).toEqual([null, { a: null }, [null], new Set()])
+    })
+  })
+
+  it('equals null', () => {
+    const condition = buildFilterExpression('name', '=', [null], undefined, metadataForModel(ModelWithNullValues))
+    expect(condition.statement).toBe('#name = :name')
+    expect(condition.attributeValues).toEqual({ ':name': { NULL: true } })
+  })
+
+  it('not equals null', () => {
+    const condition = buildFilterExpression('name', '<>', [null], undefined, undefined)
+    expect(condition.statement).toBe('#name <> :name')
+    expect(condition.attributeValues).toEqual({ ':name': { NULL: true } })
   })
 
   it('use property metadata', () => {
