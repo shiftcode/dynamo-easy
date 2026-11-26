@@ -47,7 +47,6 @@ export function toDb<T>(item: T, modelConstructor?: ModelConstructor<T>): Attrib
       metadata.getPropertiesWithDefaultValueProvider().forEach((propertyMetadata) => {
         const currentVal = Reflect.get(<any>item, propertyMetadata.name)
         if (currentVal === undefined || currentVal === null) {
-          // tslint:disable-next-line:no-non-null-assertion
           Reflect.set(<any>item, propertyMetadata.name, propertyMetadata.defaultValueProvider!())
         }
       })
@@ -179,14 +178,17 @@ export function createToKeyFn<T>(modelConstructor: ModelConstructor<T>): (item: 
 
   return (item: Partial<T>) => {
     logger.verbose('create key', null, { item, propertyMeta: keyProperties })
-    return keyProperties.reduce((key, propMeta) => {
-      if (item[propMeta.name] === null || item[propMeta.name] === undefined) {
-        throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
-      }
-      const propertyValue = getPropertyValue(item, propMeta.name)
-      ;(key as any)[propMeta.nameDb] = toDbOne(propertyValue, propMeta)
-      return key
-    }, <Attributes<T>>{})
+    return keyProperties.reduce(
+      (key, propMeta) => {
+        if (item[propMeta.name] === null || item[propMeta.name] === undefined) {
+          throw new Error(`there is no value for property ${propMeta.name.toString()} but is ${propMeta.key.type} key`)
+        }
+        const propertyValue = getPropertyValue(item, propMeta.name)
+        ;(key as any)[propMeta.nameDb] = toDbOne(propertyValue, propMeta)
+        return key
+      },
+      <Attributes<T>>{},
+    )
   }
 }
 

@@ -4,12 +4,6 @@
     "outDir": "./dist",
     "declarationDir": "./dist/_types"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "test/**/*",
-    "snippets/**/*",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["test/**/*", "snippets/**/*", "**/*.spec.ts"]
 }

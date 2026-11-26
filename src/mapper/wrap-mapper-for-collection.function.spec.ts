@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { FailModel } from '../../test/models/fail-model.model'
 import { ModelWithCollections } from '../../test/models/model-with-collections.model'
 import { FormId, formIdMapper, FormType } from '../../test/models/real-world'

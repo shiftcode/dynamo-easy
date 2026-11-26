@@ -13,7 +13,7 @@ export function resolveAttributeNames(
   metadata?: Metadata<any>,
 ): { placeholder: string; attributeNames: Record<string, string> } {
   let placeholder: string
-  // tslint:disable-next-line:no-shadowed-variable
+
   const attributeNames: Record<string, string> = {}
   if (new RegExp(NESTED_ATTR_PATH_REGEX).test(attributePath)) {
     const regex = new RegExp(NESTED_ATTR_PATH_CAPTURED_REGEX)
@@ -21,7 +21,7 @@ export function resolveAttributeNames(
     const currentPath = []
     let regExpResult: RegExpExecArray | null
     const namePlaceholders: string[] = []
-    // tslint:disable-next-line:no-conditional-assignment
+
     while ((regExpResult = regex.exec(attributePath)) !== null) {
       // path part is pos 1 - full match would be 0
       const pathPart = regExpResult[1]

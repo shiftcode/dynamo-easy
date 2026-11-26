@@ -1,5 +1,3 @@
-// tslint:disable:max-classes-per-file
-// tslint:disable:no-unnecessary-class
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ReturnValuesOnConditionCheckFailure } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'

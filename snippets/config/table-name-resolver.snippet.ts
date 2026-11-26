@@ -5,5 +5,5 @@ const myTableNameResolver: TableNameResolver = (tableName: string) => {
 }
 
 updateDynamoEasyConfig({
-  tableNameResolver: myTableNameResolver
+  tableNameResolver: myTableNameResolver,
 })

@@ -26,7 +26,6 @@ describe('getTableName', () => {
   })
 
   it('throw error because table name is invalid', () => {
-    // tslint:disable-next-line:no-unused-expression
     updateDynamoEasyConfig({ tableNameResolver: (tableName) => `${tableName}$` })
     expect(() => getTableName(metadataForModel(SimpleModel))).toThrowError()
     expect(() => getTableName(Organization)).toThrowError()

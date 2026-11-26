@@ -1,17 +1,18 @@
 # Dynamo-Easy
+
 [![Travis](https://img.shields.io/travis/com/shiftcode/dynamo-easy.svg)](https://travis-ci.com/shiftcode/dynamo-easy)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![latest-release](https://img.shields.io/npm/v/@shiftcoders/dynamo-easy/latest.svg)]()
+[![latest-release](https://img.shields.io/npm/v/@shiftcoders/dynamo-easy/latest.svg)](<>)
 [![Coverage Status](https://coveralls.io/repos/github/shiftcode/dynamo-easy/badge.svg?branch=master)](https://coveralls.io/github/shiftcode/dynamo-easy?branch=master)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors)
-
 
 A DynamoDB client which provides an easy to use fluent api to execute requests. It supports TypeScript decorators to define the necessary metadata for your models. You don't need to care about the mapping of JavaScript types to their DynamoDB types any more. We've got you covered.
 
 Built with :heart: by [shiftcode](https://www.shiftcode.ch).
 
 ## Show me some code
+
 ```typescript
 import { Model, PartitionKey, DynamoStore } from '@shiftcoders/dynamo-easy'
 
@@ -27,24 +28,27 @@ const personStore = new DynamoStore(Person)
 
 personStore
   .scan()
-  .whereAttribute('yearOfBirth').equals(1958)
+  .whereAttribute('yearOfBirth')
+  .equals(1958)
   .exec()
-  .then(res => console.log('ALL items with yearOfBirth == 1958', res))
-
+  .then((res) => console.log('ALL items with yearOfBirth == 1958', res))
 ```
 
 ## Resources
+
 - 🤓 Learn more visiting the [docs](https://shiftcode.gitbook.io/dynamo-easy)
 - 📖 Checkout the technical API documentation [api docs](https://shiftcode.github.io/dynamo-easy/)
 - 🚀 Check the running sample on [StackBlitz](https://stackblitz.com/edit/dynamo-easy-node-sample)
   - [demo git repository](https://github.com/shiftcode/dynamo-easy-demo)
 
 ## Credits
+
 - [typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter) - Starter project which helps creating a TypeScript library project
 - [vogels](https://github.com/ryanfitz/vogels) - To get an idea on how to build the fluent api
 - [typestore](http://densebrain.github.io/typestore/) - Inspiration on how to implement the model decorators
 
 ## Contributors
+
 Made with :heart: by [@michaelwittwer](https://github.com/michaelwittwer) and all these wonderful contributors ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->

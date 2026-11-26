@@ -1,4 +1,3 @@
-// tslint:disable:max-classes-per-file
 import { MapperForType, Model, NumberAttribute, PartitionKey, Property, SortKey } from '../../src/dynamo-easy'
 
 export class CustomId {

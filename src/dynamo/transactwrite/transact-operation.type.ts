@@ -9,7 +9,4 @@ import { TransactUpdate } from './transact-update'
  * @hidden
  */
 export type TransactOperation =
-  | TransactConditionCheck<any>
-  | TransactDelete<any>
-  | TransactPut<any>
-  | TransactUpdate<any>
+  TransactConditionCheck<any> | TransactDelete<any> | TransactPut<any> | TransactUpdate<any>

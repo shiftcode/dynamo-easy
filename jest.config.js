@@ -3,15 +3,12 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
-     '^.+\\.tsx?$': [
+    '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: './tsconfig.jest.json'
+        tsconfig: './tsconfig.jest.json',
       },
     ],
   },
-  setupFiles: [
-    "reflect-metadata",
-    './test/jest-setup.ts'
-  ]
-};
+  setupFiles: ['reflect-metadata', './test/jest-setup.ts'],
+}

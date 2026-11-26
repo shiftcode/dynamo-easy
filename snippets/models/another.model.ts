@@ -8,7 +8,6 @@ export class AnotherModel {
   @SortKey()
   propB: string
 
-
   propC?: string
 
   @CollectionProperty()
