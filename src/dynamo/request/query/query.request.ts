@@ -80,4 +80,12 @@ export class QueryRequest<T, T2 = T> extends ReadManyRequest<
 
     return this.client.send(new DynamoDB.QueryCommand(params))
   }
+
+  protected doPaginate(params: DynamoDB.QueryInput): AsyncIterable<DynamoDB.QueryCommandOutput> {
+    if (!params.KeyConditionExpression) {
+      throw new Error('key condition expression must be defined')
+    }
+
+    return DynamoDB.paginateQuery({ client: this.client }, params)
+  }
 }

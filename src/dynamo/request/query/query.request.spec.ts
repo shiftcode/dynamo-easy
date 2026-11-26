@@ -179,4 +179,63 @@ describe('query request', () => {
       expect(req.params.ScanIndexForward).toBeFalsy()
     })
   })
+
+  describe('execFetchAll', () => {
+    let client: DynamoDB.DynamoDBClient
+    let sendMock: jest.Mock
+    let req: QueryRequest<SimpleWithPartitionKeyModel>
+
+    const output1: DynamoDB.QueryCommandOutput = {
+      $metadata: {},
+      Items: [{ id: { S: 'id-1' }, age: { N: '21' } }],
+      Count: 1,
+      LastEvaluatedKey: { id: { S: 'id-1' } },
+    }
+    const output2: DynamoDB.QueryCommandOutput = {
+      $metadata: {},
+      Items: [{ id: { S: 'id-2' }, age: { N: '22' } }],
+      Count: 1,
+    }
+
+    beforeEach(() => {
+      // the SDK paginator requires an actual DynamoDBClient instance
+      client = new DynamoDB.DynamoDBClient({})
+      sendMock = <jest.Mock>(<unknown>jest.spyOn(client, 'send'))
+      sendMock.mockReturnValueOnce(Promise.resolve(output1)).mockReturnValueOnce(Promise.resolve(output2))
+      req = new QueryRequest(client, SimpleWithPartitionKeyModel)
+    })
+
+    describe('with key condition', () => {
+      let result: SimpleWithPartitionKeyModel[]
+
+      beforeEach(async () => {
+        req.wherePartitionKey('id-0')
+        result = await req.execFetchAll()
+      })
+
+      it('should send QueryCommands until LastEvaluatedKey is undefined', () => {
+        expect(sendMock).toHaveBeenCalledTimes(2)
+        expect(sendMock.mock.calls[0][0]).toBeInstanceOf(DynamoDB.QueryCommand)
+        expect(sendMock.mock.calls[1][0]).toBeInstanceOf(DynamoDB.QueryCommand)
+      })
+
+      it('should use LastEvaluatedKey for next request', () => {
+        expect(sendMock.mock.calls[1][0].input).toEqual(
+          expect.objectContaining(<DynamoDB.QueryInput>{ ExclusiveStartKey: output1.LastEvaluatedKey }),
+        )
+      })
+
+      it('should concatenate the result items', () => {
+        expect(result).toEqual([
+          { id: 'id-1', age: 21 },
+          { id: 'id-2', age: 22 },
+        ])
+      })
+    })
+
+    it('should reject when no key condition expression is defined', async () => {
+      await expect(req.execFetchAll()).rejects.toThrow('key condition expression must be defined')
+      expect(sendMock).not.toHaveBeenCalled()
+    })
+  })
 })

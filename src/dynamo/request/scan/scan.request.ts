@@ -29,4 +29,8 @@ export class ScanRequest<T, T2 = T> extends ReadManyRequest<
   protected doRequest(params: DynamoDB.ScanInput): Promise<DynamoDB.ScanCommandOutput> {
     return this.client.send(new DynamoDB.ScanCommand(params))
   }
+
+  protected doPaginate(params: DynamoDB.ScanInput): AsyncIterable<DynamoDB.ScanCommandOutput> {
+    return DynamoDB.paginateScan({ client: this.client }, params)
+  }
 }

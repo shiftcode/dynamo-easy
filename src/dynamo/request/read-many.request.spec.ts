@@ -25,6 +25,10 @@ class TestRequest<T> extends ReadManyRequest<T, T, any, any, any, any, any> {
   protected doRequest(_params: any): Promise<any> {
     return Promise.resolve({})
   }
+
+  protected async *doPaginate(params: any): AsyncIterable<any> {
+    yield await this.doRequest(params)
+  }
 }
 
 describe('ReadManyRequest', () => {
@@ -237,10 +241,51 @@ describe('ReadManyRequest', () => {
       const res = await request.execCount()
       expect(res).toBe(0)
     })
+  })
 
-    it('execFetchAll', async () => {
-      const res = await request.execFetchAll()
-      expect(res).toEqual([jsItem, jsItem])
+  describe('execFetchAll', () => {
+    const jsItem1: SimpleWithPartitionKeyModel = { id: 'id-1', age: 21 }
+    const jsItem2: SimpleWithPartitionKeyModel = { id: 'id-2', age: 22 }
+    const page1: DynamoDB.ScanCommandOutput = {
+      $metadata: {},
+      Items: [{ id: { S: 'id-1' }, age: { N: '21' } }],
+      LastEvaluatedKey: { id: { S: 'id-1' } },
+    }
+    const page2: DynamoDB.ScanCommandOutput = {
+      $metadata: {},
+      Items: [{ id: { S: 'id-2' }, age: { N: '22' } }],
+    }
+    const emptyPage: DynamoDB.ScanCommandOutput = { $metadata: {} }
+    let req: TestRequest<SimpleWithPartitionKeyModel>
+    let doPaginateMock: jest.Mock
+    let res: SimpleWithPartitionKeyModel[]
+
+    beforeEach(async () => {
+      req = new TestRequest(SimpleWithPartitionKeyModel)
+      req.limit(5)
+      // for await also iterates sync iterables, so a plain generator is enough
+      doPaginateMock = jest.fn(function* () {
+        yield page1
+        yield page2
+        yield emptyPage
+      })
+      Object.assign(req, { doPaginate: doPaginateMock })
+      res = await req.execFetchAll()
+    })
+
+    it('should map and concatenate the items of all pages', () => {
+      expect(res).toEqual([jsItem1, jsItem2])
+    })
+
+    it('should paginate without limit per page', () => {
+      expect(doPaginateMock).toHaveBeenCalledTimes(1)
+      expect(doPaginateMock.mock.calls[0][0].Limit).toBeUndefined()
+    })
+
+    it('should not alter request params', () => {
+      expect(doPaginateMock.mock.calls[0][0]).not.toBe(req.params)
+      expect(req.params.Limit).toBe(5)
+      expect(req.params.ExclusiveStartKey).toBeUndefined()
     })
   })
 

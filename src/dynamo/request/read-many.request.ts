@@ -3,7 +3,6 @@
  */
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SecondaryIndex } from '../../decorator/impl/index/secondary-index'
-import { fetchAll } from '../../helper/fetch-all.function'
 import { promiseTap } from '../../helper/promise-tap.function'
 import { Logger } from '../../logger/logger'
 import { fromDb } from '../../mapper/mapper'
@@ -47,6 +46,12 @@ export abstract class ReadManyRequest<
    * method that executes the actual call on client with the given params.
    */
   protected abstract doRequest(params: I): Promise<O>
+
+  /**
+   * method that returns the SDK paginator (iterating over all pages) for the given params.
+   * the paginator mutates the given params (ExclusiveStartKey), therefore always provide a copy.
+   */
+  protected abstract doPaginate(params: I): AsyncIterable<O>
 
   protected constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>) {
     super(client, modelClazz)
@@ -247,8 +252,20 @@ export abstract class ReadManyRequest<
   /**
    * fetches all pages. may uses all provisionedOutput, therefore for client side use cases rather use pagedDatasource (exec)
    */
-  execFetchAll(): Promise<T2[]> {
-    return fetchAll(<any>this)
+  async execFetchAll(): Promise<T2[]> {
+    // do not alter the params on the instance (the paginator sets ExclusiveStartKey on its input)
+    // and fetch without Limit per page
+    const params: I = { ...this.params }
+    delete params.Limit
+
+    this.logger.debug('fetch all request', params)
+    const items: T2[] = []
+    for await (const page of this.doPaginate(params)) {
+      this.logger.debug('response', page)
+      items.push(...this.mapFromDb(page).Items)
+    }
+    this.logger.debug('mapped items', items)
+    return items
   }
 
   protected mapFromDb = (output: O) => {

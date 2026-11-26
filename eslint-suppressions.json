@@ -496,7 +496,7 @@
       "count": 3
     },
     "@typescript-eslint/no-unsafe-argument": {
-      "count": 4
+      "count": 3
     },
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 3
@@ -588,11 +588,6 @@
     },
     "prefer-rest-params": {
       "count": 2
-    }
-  },
-  "src/helper/fetch-all.spec.ts": {
-    "@typescript-eslint/require-await": {
-      "count": 6
     }
   },
   "src/helper/is-boolean.function.ts": {
