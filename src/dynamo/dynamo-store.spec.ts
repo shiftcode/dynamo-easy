@@ -20,10 +20,10 @@ class DynamoStoreModel {}
 class DynamoStoreModel2 {}
 
 describe('dynamo store', () => {
-  let dynamoDB: DynamoDB.DynamoDB
+  let dynamoDB: DynamoDB.DynamoDBClient
 
   beforeEach(() => {
-    dynamoDB = new DynamoDB.DynamoDB({})
+    dynamoDB = new DynamoDB.DynamoDBClient({})
   })
 
   describe('table name', () => {
@@ -81,8 +81,9 @@ describe('dynamo store', () => {
     })
   })
 
-  describe('allow to get dynamoDB instance', () => {
-    const store = new DynamoStore(SimpleWithPartitionKeyModel, new DynamoDB.DynamoDB({}))
-    expect(store.dynamoDB).toBeDefined()
+  it('allow to get DynamoDBClient instance', () => {
+    const client = new DynamoDB.DynamoDBClient({})
+    const store = new DynamoStore(SimpleWithPartitionKeyModel, client)
+    expect(store.client).toBe(client)
   })
 })

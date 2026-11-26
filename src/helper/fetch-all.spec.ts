@@ -1,21 +1,22 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../test/models'
-import { DynamoDbWrapper } from '../dynamo/dynamo-db-wrapper'
 import { QueryRequest } from '../dynamo/request/query/query.request'
 import { ScanRequest } from '../dynamo/request/scan/scan.request'
 import { fetchAll } from './fetch-all.function'
 
 describe('fetch all', () => {
-  let dynamoDBWrapper: DynamoDbWrapper
+  let client: DynamoDB.DynamoDBClient
   let methodMock: jest.Mock
   let result: SimpleWithPartitionKeyModel[]
 
-  const output1: DynamoDB.ScanOutput | DynamoDB.QueryOutput = {
+  const output1: DynamoDB.ScanCommandOutput | DynamoDB.QueryCommandOutput = {
+    $metadata: {},
     Items: [{ id: { S: 'id-1' }, age: { N: '21' } }],
     Count: 1,
     LastEvaluatedKey: { id: { S: 'id-1' } },
   }
-  const output2: DynamoDB.ScanOutput | DynamoDB.QueryOutput = {
+  const output2: DynamoDB.ScanCommandOutput | DynamoDB.QueryCommandOutput = {
+    $metadata: {},
     Items: [{ id: { S: 'id-2' }, age: { N: '22' } }],
     Count: 1,
   }
@@ -24,13 +25,10 @@ describe('fetch all', () => {
     let req: ScanRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(async () => {
-      dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
-      jest
-        .spyOn(dynamoDBWrapper, 'scan')
-        .mockReturnValueOnce(Promise.resolve(output1))
-        .mockReturnValueOnce(Promise.resolve(output2))
-      methodMock = <jest.Mock>dynamoDBWrapper.scan
-      req = new ScanRequest(dynamoDBWrapper, SimpleWithPartitionKeyModel)
+      client = new DynamoDB.DynamoDBClient({})
+      methodMock = <jest.Mock>(<unknown>jest.spyOn(client, 'send'))
+      methodMock.mockReturnValueOnce(Promise.resolve(output1)).mockReturnValueOnce(Promise.resolve(output2))
+      req = new ScanRequest(client, SimpleWithPartitionKeyModel)
       result = await fetchAll(req)
     })
 
@@ -39,7 +37,7 @@ describe('fetch all', () => {
     })
 
     it('should use LastEvaluatedKey for next request', async () => {
-      expect(methodMock).toHaveBeenLastCalledWith(
+      expect(methodMock.mock.calls[1][0].input).toEqual(
         expect.objectContaining(<DynamoDB.ScanInput>{ ExclusiveStartKey: output1.LastEvaluatedKey }),
       )
     })
@@ -60,13 +58,10 @@ describe('fetch all', () => {
     let req: QueryRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(async () => {
-      dynamoDBWrapper = new DynamoDbWrapper(new DynamoDB.DynamoDB({}))
-      jest
-        .spyOn(dynamoDBWrapper, 'query')
-        .mockReturnValueOnce(Promise.resolve(output1))
-        .mockReturnValueOnce(Promise.resolve(output2))
-      methodMock = <jest.Mock>dynamoDBWrapper.query
-      req = new QueryRequest(dynamoDBWrapper, SimpleWithPartitionKeyModel)
+      client = new DynamoDB.DynamoDBClient({})
+      methodMock = <jest.Mock>(<unknown>jest.spyOn(client, 'send'))
+      methodMock.mockReturnValueOnce(Promise.resolve(output1)).mockReturnValueOnce(Promise.resolve(output2))
+      req = new QueryRequest(client, SimpleWithPartitionKeyModel)
       req.wherePartitionKey('id-0')
       result = await fetchAll(req)
     })
@@ -76,7 +71,7 @@ describe('fetch all', () => {
     })
 
     it('should use LastEvaluatedKey for next request', async () => {
-      expect(methodMock).toHaveBeenLastCalledWith(
+      expect(methodMock.mock.calls[1][0].input).toEqual(
         expect.objectContaining(<DynamoDB.QueryInput>{ ExclusiveStartKey: output1.LastEvaluatedKey }),
       )
     })

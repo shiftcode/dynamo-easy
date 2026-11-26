@@ -2,22 +2,15 @@
  * @module multi-model-requests/transact-write
  */
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { TransactOperation } from './transact-operation.type'
 
 /**
  * Request class for the TransactWriteItems operation. Write up to 25 items to one or many tables in a transaction.
  */
 export class TransactWriteRequest {
-  get dynamoDB(): DynamoDB.DynamoDB {
-    return this.dynamoDBWrapper.dynamoDB
-  }
-
   readonly params: DynamoDB.TransactWriteItemsInput & { TransactItems: DynamoDB.TransactWriteItem[] }
-  private readonly dynamoDBWrapper: DynamoDbWrapper
 
-  constructor(dynamoDB: DynamoDB.DynamoDB) {
-    this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
+  constructor(readonly client: DynamoDB.DynamoDBClient) {
     this.params = {
       TransactItems: [],
     }
@@ -59,15 +52,15 @@ export class TransactWriteRequest {
   /**
    * execute the request and return the full reponse.
    */
-  execFullResponse(): Promise<DynamoDB.TransactWriteItemsOutput> {
-    return this.dynamoDBWrapper.transactWriteItems(this.params)
+  execFullResponse(): Promise<DynamoDB.TransactWriteItemsCommandOutput> {
+    return this.client.send(new DynamoDB.TransactWriteItemsCommand(this.params))
   }
 
   /**
    * execute the request.
    */
   exec(): Promise<void> {
-    return this.dynamoDBWrapper.transactWriteItems(this.params).then(() => {
+    return this.client.send(new DynamoDB.TransactWriteItemsCommand(this.params)).then(() => {
       return
     })
   }

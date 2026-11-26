@@ -1,14 +1,14 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { batchWriteItemsWriteAll, hasUnprocessedItems } from './batch-write-utils'
 
 describe('batch-write-utils', () => {
   describe('batchWriteItemsWriteAll', () => {
-    let batchWriteItemMock: jest.Mock
-    let dynamoDBWrapper: DynamoDbWrapper
+    let sendMock: jest.Mock
+    let client: DynamoDB.DynamoDBClient
     let backoffTimerMock: { next: jest.Mock }
 
-    const output1: DynamoDB.BatchWriteItemOutput = {
+    const output1: DynamoDB.BatchWriteItemCommandOutput = {
+      $metadata: {},
       UnprocessedItems: {
         tableA: [
           {
@@ -17,22 +17,20 @@ describe('batch-write-utils', () => {
         ],
       },
     }
-    const output2: DynamoDB.BatchWriteItemOutput = {}
+    const output2: DynamoDB.BatchWriteItemCommandOutput = { $metadata: {} }
 
     beforeEach(async () => {
-      batchWriteItemMock = jest
-        .fn()
-        .mockReturnValueOnce(Promise.resolve(output1))
-        .mockReturnValueOnce(Promise.resolve(output2))
-      dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemMock }
+      sendMock = jest.fn().mockReturnValueOnce(Promise.resolve(output1)).mockReturnValueOnce(Promise.resolve(output2))
+      client = <any>{ send: sendMock }
       backoffTimerMock = { next: jest.fn().mockReturnValueOnce({ value: 0 }) }
 
-      await batchWriteItemsWriteAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
+      await batchWriteItemsWriteAll(client, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
     })
 
     it('should use UnprocessedKeys for next request', () => {
-      expect(batchWriteItemMock).toHaveBeenCalledTimes(2)
-      expect(batchWriteItemMock).toHaveBeenLastCalledWith(
+      expect(sendMock).toHaveBeenCalledTimes(2)
+      expect(sendMock.mock.calls[1][0]).toBeInstanceOf(DynamoDB.BatchWriteItemCommand)
+      expect(sendMock.mock.calls[1][0].input).toEqual(
         expect.objectContaining({ RequestItems: output1.UnprocessedItems }),
       )
     })

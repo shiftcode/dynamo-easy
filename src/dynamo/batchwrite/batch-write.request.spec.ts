@@ -1,5 +1,4 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { getTableName } from '../get-table-name.function'
 import { BatchWriteRequest } from './batch-write.request'
@@ -9,32 +8,34 @@ describe('batchWriteRequest', () => {
 
   describe('constructor', () => {
     it('should initialize params', () => {
-      req = new BatchWriteRequest(new DynamoDB.DynamoDB({}))
+      req = new BatchWriteRequest(new DynamoDB.DynamoDBClient({}))
       expect(req.params.RequestItems).toBeDefined()
       expect(req.params.RequestItems).toEqual({})
     })
 
-    describe('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB.DynamoDB({})
-      const batchWriteRequest = new BatchWriteRequest(dynamoDB)
-      expect(batchWriteRequest.dynamoDB).toBe(dynamoDB)
+    it('use provided DynamoDBClient instance', () => {
+      const client = new DynamoDB.DynamoDBClient({})
+      const batchWriteRequest = new BatchWriteRequest(client)
+      expect(batchWriteRequest.client).toBe(client)
 
-      const batchWriteRequest2 = new BatchWriteRequest(new DynamoDB.DynamoDB({}))
-      expect(batchWriteRequest2.dynamoDB).not.toBe(dynamoDB)
+      const batchWriteRequest2 = new BatchWriteRequest(new DynamoDB.DynamoDBClient({}))
+      expect(batchWriteRequest2.client).not.toBe(client)
     })
   })
 
   describe('returnConsumedCapacity', () => {
     it('should set params', () => {
-      req = new BatchWriteRequest(new DynamoDB.DynamoDB({})).returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      req = new BatchWriteRequest(new DynamoDB.DynamoDBClient({})).returnConsumedCapacity(
+        DynamoDB.ReturnConsumedCapacity.TOTAL,
+      )
       expect(req.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
   })
 
   describe('returnItemCollectionMetrics', () => {
     it('should set params', () => {
-      req = new BatchWriteRequest(new DynamoDB.DynamoDB({})).returnItemCollectionMetrics(
-        ReturnItemCollectionMetrics.SIZE,
+      req = new BatchWriteRequest(new DynamoDB.DynamoDBClient({})).returnItemCollectionMetrics(
+        DynamoDB.ReturnItemCollectionMetrics.SIZE,
       )
       expect(req.params.ReturnItemCollectionMetrics).toBe('SIZE')
     })
@@ -44,7 +45,7 @@ describe('batchWriteRequest', () => {
     const now = new Date()
 
     it('should set params', () => {
-      req = new BatchWriteRequest(new DynamoDB.DynamoDB({}))
+      req = new BatchWriteRequest(new DynamoDB.DynamoDBClient({}))
         .delete(SimpleWithPartitionKeyModel, [{ id: 'myId1' }])
         .delete(ComplexModel, [{ id: 'myId2', creationDate: now }])
 
@@ -73,7 +74,7 @@ describe('batchWriteRequest', () => {
         id: `mydId-${ix}`,
       }))
       expect(() =>
-        new BatchWriteRequest(new DynamoDB.DynamoDB({})).delete(SimpleWithPartitionKeyModel, items),
+        new BatchWriteRequest(new DynamoDB.DynamoDBClient({})).delete(SimpleWithPartitionKeyModel, items),
       ).toThrow()
     })
   })
@@ -82,7 +83,7 @@ describe('batchWriteRequest', () => {
     const now = new Date()
 
     it('should set params', () => {
-      req = new BatchWriteRequest(new DynamoDB.DynamoDB({}))
+      req = new BatchWriteRequest(new DynamoDB.DynamoDBClient({}))
         .put(SimpleWithPartitionKeyModel, [<any>{ id: 'myId1' }])
         .put(ComplexModel, [<any>{ id: 'myId2', creationDate: now }])
 
@@ -103,7 +104,9 @@ describe('batchWriteRequest', () => {
 
     it('should throw when too many items', () => {
       const items: SimpleWithPartitionKeyModel[] = [...new Array(30)].map((_, ix) => ({ id: `mydId-${ix}`, age: ix }))
-      expect(() => new BatchWriteRequest(new DynamoDB.DynamoDB({})).put(SimpleWithPartitionKeyModel, items)).toThrow()
+      expect(() =>
+        new BatchWriteRequest(new DynamoDB.DynamoDBClient({})).put(SimpleWithPartitionKeyModel, items),
+      ).toThrow()
     })
   })
 
@@ -121,7 +124,7 @@ describe('batchWriteRequest', () => {
       (_, ix) => <ComplexModel>{ id: `myId-${ix}`, creationDate: now },
     )
 
-    beforeEach(() => (req = new BatchWriteRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (req = new BatchWriteRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('should add correct request items', () => {
       req.put(ComplexModel, complexItems).delete(SimpleWithPartitionKeyModel, [simpleItem])
@@ -148,9 +151,7 @@ describe('batchWriteRequest', () => {
         myResponse: true,
       }
       batchWriteItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(output))
-      const dynamoDBWrapper = <any>{ batchWriteItem: batchWriteItemMock }
-      req = new BatchWriteRequest(new DynamoDB.DynamoDB({}))
-      Object.assign(req, { dynamoDBWrapper })
+      req = new BatchWriteRequest(<any>{ send: batchWriteItemMock })
     })
 
     it('exec should return void', async () => {

@@ -8,7 +8,6 @@ import { createToKeyFn, toDb } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { batchWriteItemsWriteAll } from '../../batchwrite/batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from '../../batchwrite/batch-write.const'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 
 /**
@@ -23,8 +22,8 @@ export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
   private readonly logger: Logger
   private toKey = createToKeyFn(this.modelClazz)
 
-  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
-    super(dynamoDBWrapper, modelClazz)
+  constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>) {
+    super(client, modelClazz)
     this.logger = createLogger('dynamo.request.BatchWriteSingleTableRequest', modelClazz)
     this.params.RequestItems = {
       [this.tableName]: [],
@@ -75,12 +74,12 @@ export class BatchWriteSingleTableRequest<T, T2 = T> extends BaseRequest<
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Promise<DynamoDB.BatchWriteItemOutput> {
+  ): Promise<DynamoDB.BatchWriteItemCommandOutput> {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 
   private write(backoffTimer: () => IterableIterator<number>, throttleTimeSlot: number) {
-    return batchWriteItemsWriteAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
+    return batchWriteItemsWriteAll(this.client, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
   private createDeleteRequest = (item: Partial<T>): DynamoDB.WriteRequest => ({

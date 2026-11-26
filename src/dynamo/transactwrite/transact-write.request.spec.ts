@@ -1,5 +1,4 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { update } from '../expression/logical-operator/update.function'
@@ -15,7 +14,7 @@ describe('TransactWriteRequest', () => {
   describe('constructor', () => {
     let req: TransactWriteRequest
     beforeEach(() => {
-      req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
+      req = new TransactWriteRequest(new DynamoDB.DynamoDBClient({}))
     })
 
     it('should add transactItems array to params', () => {
@@ -24,20 +23,20 @@ describe('TransactWriteRequest', () => {
       })
     })
 
-    it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB.DynamoDB({})
-      const transactWriteRequest = new TransactWriteRequest(dynamoDB)
-      expect(transactWriteRequest.dynamoDB).toBe(dynamoDB)
+    it('use provided DynamoDBClient instance', () => {
+      const client = new DynamoDB.DynamoDBClient({})
+      const transactWriteRequest = new TransactWriteRequest(client)
+      expect(transactWriteRequest.client).toBe(client)
 
-      const transactWriteRequest2 = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
-      expect(transactWriteRequest2.dynamoDB).not.toBe(dynamoDB)
+      const transactWriteRequest2 = new TransactWriteRequest(new DynamoDB.DynamoDBClient({}))
+      expect(transactWriteRequest2.client).not.toBe(client)
     })
   })
 
   describe('transact', () => {
     let req: TransactWriteRequest
     beforeEach(() => {
-      req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
+      req = new TransactWriteRequest(new DynamoDB.DynamoDBClient({}))
     })
 
     it('should throw when no operations are provided', () => {
@@ -53,15 +52,15 @@ describe('TransactWriteRequest', () => {
   describe('correct params', () => {
     let req: TransactWriteRequest
 
-    beforeEach(() => (req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (req = new TransactWriteRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('returnConsumedCapacity', () => {
-      req.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      req.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)
       expect(req.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
 
     it('returnItemCollectionMetrics', () => {
-      req.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
+      req.returnItemCollectionMetrics(DynamoDB.ReturnItemCollectionMetrics.SIZE)
       expect(req.params.ReturnItemCollectionMetrics).toBe('SIZE')
     })
 
@@ -137,25 +136,25 @@ describe('TransactWriteRequest', () => {
     let transactWriteItemsMock: jest.Mock
 
     beforeEach(() => {
-      req = new TransactWriteRequest(new DynamoDB.DynamoDB({}))
-
       transactWriteItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve({ myResponse: true }))
-      Object.assign(req, { dynamoDBWrapper: { transactWriteItems: transactWriteItemsMock } })
+      req = new TransactWriteRequest(<any>{ send: transactWriteItemsMock })
 
       req.transact(new TransactDelete(SimpleWithPartitionKeyModel, 'myId'))
     })
 
-    it('execFullResponse should call dynamoDBWrapper.transactWriteItems with the params and return the response', async () => {
+    it('execFullResponse should send a TransactWriteItemsCommand with the params and return the response', async () => {
       const response = await req.execFullResponse()
       expect(transactWriteItemsMock).toHaveBeenCalledTimes(1)
-      expect(transactWriteItemsMock).toHaveBeenLastCalledWith(req.params)
+      expect(transactWriteItemsMock.mock.calls[0][0]).toBeInstanceOf(DynamoDB.TransactWriteItemsCommand)
+      expect(transactWriteItemsMock.mock.calls[0][0].input).toEqual(req.params)
       expect(response).toEqual({ myResponse: true })
     })
 
-    it('exec should call dynamoDBWrapper.transactWriteItems with the params and return void', async () => {
+    it('exec should send a TransactWriteItemsCommand with the params and return void', async () => {
       const response = await req.exec()
       expect(transactWriteItemsMock).toHaveBeenCalledTimes(1)
-      expect(transactWriteItemsMock).toHaveBeenLastCalledWith(req.params)
+      expect(transactWriteItemsMock.mock.calls[0][0]).toBeInstanceOf(DynamoDB.TransactWriteItemsCommand)
+      expect(transactWriteItemsMock.mock.calls[0][0].input).toEqual(req.params)
       expect(response).toBeUndefined()
     })
   })

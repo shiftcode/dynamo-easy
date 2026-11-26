@@ -1,5 +1,4 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnValuesOnConditionCheckFailure } from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model/model-constructor'
 import { attribute } from '../expression/logical-operator/attribute.function'
@@ -34,7 +33,7 @@ describe('TransactBaseOperation', () => {
     })
 
     it('returnValuesOnConditionCheckFailure', () => {
-      op.returnValuesOnConditionCheckFailure(ReturnValuesOnConditionCheckFailure.ALL_OLD)
+      op.returnValuesOnConditionCheckFailure(DynamoDB.ReturnValuesOnConditionCheckFailure.ALL_OLD)
       expect(op.params.ReturnValuesOnConditionCheckFailure).toBe('ALL_OLD')
     })
 

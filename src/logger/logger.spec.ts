@@ -16,7 +16,7 @@ describe('log receiver', () => {
 
   it('receives logs', () => {
     const ts = Date.now()
-    const store = new DynamoStore(Employee, new DynamoDB.DynamoDB({}))
+    const store = new DynamoStore(Employee, new DynamoDB.DynamoDBClient({}))
 
     expect(store).toBeDefined()
     expect(logs.length).toBe(1)

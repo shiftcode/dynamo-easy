@@ -7,7 +7,6 @@ import { randomExponentialBackoffTimer } from '../../helper/random-exponential-b
 import { createToKeyFn, fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetFullResponse } from './batch-get-full.response'
 import { batchGetItemsFetchAll } from './batch-get-utils'
@@ -18,19 +17,13 @@ import { BatchGetResponse } from './batch-get.response'
  * Request class for the BatchGetItem operation. Read multiple items from one or more tables.
  */
 export class BatchGetRequest {
-  get dynamoDB(): DynamoDB.DynamoDB {
-    return this.dynamoDBWrapper.dynamoDB
-  }
-
   readonly params: DynamoDB.BatchGetItemInput & {
     RequestItems: NonNullable<DynamoDB.BatchGetItemInput['RequestItems']>
   }
-  private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Map<string, ModelConstructor<any>> = new Map()
   private itemCounter = 0
 
-  constructor(dynamoDB: DynamoDB.DynamoDB) {
-    this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
+  constructor(readonly client: DynamoDB.DynamoDBClient) {
     this.params = {
       RequestItems: {},
     }
@@ -118,7 +111,7 @@ export class BatchGetRequest {
   }
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
-    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
+    return batchGetItemsFetchAll(this.client, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
   private mapResponse = (response: DynamoDB.BatchGetItemOutput): BatchGetFullResponse => {

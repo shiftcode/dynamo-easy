@@ -7,11 +7,11 @@ import {
   TransactWriteRequest,
 } from '@shiftcoders/dynamo-easy'
 import { AnotherModel, Person } from '../models'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 const objectToPut: AnotherModel = { propA: 'Foo', propB: 'Bar', updated: new Date() }
 
-new TransactWriteRequest(new DynamoDB({}))
+new TransactWriteRequest(new DynamoDB.DynamoDBClient({}))
   .transact(
     new TransactConditionCheck(Person, 'vogelsw').onlyIf(attribute('yearOfBirth').gte(1958)),
     new TransactDelete(AnotherModel, 'Foo', 'Bar'),

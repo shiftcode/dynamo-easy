@@ -6,7 +6,6 @@ import { metadataForModel } from '../../decorator/metadata/metadata-for-model.fu
 import { createToKeyFn, fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { TransactGetFullResponse } from './transact-get-full.response'
 import { TransactGetRequest1 } from './transact-get.request.type'
@@ -19,18 +18,12 @@ const MAX_REQUEST_ITEM_COUNT = 10
  * Request class for the TransactGetItems operation. Read up to 10 items from one or more tables in a transaction.
  */
 export class TransactGetRequest {
-  get dynamoDB(): DynamoDB.DynamoDB {
-    return this.dynamoDBWrapper.dynamoDB
-  }
-
   readonly params: DynamoDB.TransactGetItemsInput & {
     TransactItems: NonNullable<DynamoDB.TransactGetItemsInput['TransactItems']>
   }
-  private readonly dynamoDBWrapper: DynamoDbWrapper
   private readonly tables: Array<ModelConstructor<any>> = []
 
-  constructor(dynamoDB: DynamoDB.DynamoDB) {
-    this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
+  constructor(readonly client: DynamoDB.DynamoDBClient) {
     this.params = {
       TransactItems: [],
     }
@@ -78,8 +71,8 @@ export class TransactGetRequest {
   /**
    * execute request and return the raw response (without parsing the attributes to js objects)
    */
-  execNoMap(): Promise<DynamoDB.TransactGetItemsOutput> {
-    return this.dynamoDBWrapper.transactGetItems(this.params)
+  execNoMap(): Promise<DynamoDB.TransactGetItemsCommandOutput> {
+    return this.client.send(new DynamoDB.TransactGetItemsCommand(this.params))
   }
 
   /**
@@ -88,15 +81,15 @@ export class TransactGetRequest {
   execFullResponse(): Promise<
     TransactGetFullResponse<any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */>
   > {
-    return this.dynamoDBWrapper.transactGetItems(this.params).then(this.mapResponse)
+    return this.client.send(new DynamoDB.TransactGetItemsCommand(this.params)).then(this.mapResponse)
   }
 
   /**
    * execute request and return the parsed items.
    */
   exec(): Promise<any[] /* real type defined in transact-get.request.type.ts: TransactGetRequest1 - 10 */> {
-    return this.dynamoDBWrapper
-      .transactGetItems(this.params)
+    return this.client
+      .send(new DynamoDB.TransactGetItemsCommand(this.params))
       .then(this.mapResponse)
       .then((r) => r.Items)
   }

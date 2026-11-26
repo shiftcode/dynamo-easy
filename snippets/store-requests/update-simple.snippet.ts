@@ -1,10 +1,10 @@
 import { DynamoStore } from '@shiftcoders/dynamo-easy'
 import { AnotherModel } from '../models'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 const oneHourAgo = new Date(Date.now() - 1000 * 60 * 60)
 
-new DynamoStore(AnotherModel, new DynamoDB({}))
+new DynamoStore(AnotherModel, new DynamoDB.DynamoDBClient({}))
   .update('myPartitionKey', 'mySortKey')
   .updateAttribute('propC')
   .set('newValue')

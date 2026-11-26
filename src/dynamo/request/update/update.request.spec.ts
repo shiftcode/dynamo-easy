@@ -1,7 +1,6 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import {
   ComplexModel,
-  Info,
   SimpleWithCompositePartitionKeyModel,
   SimpleWithPartitionKeyModel,
   UpdateModel,
@@ -10,7 +9,6 @@ import { Duration } from '../../../../test/models/duration.model'
 import { SpecialCasesModel } from '../../../../test/models/special-cases-model.model'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { dateToStringMapper } from '../../../mapper/custom/date-to-string.mapper'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { update, update2 } from '../../expression/logical-operator/update.function'
 import { UpdateRequest } from './update.request'
 
@@ -202,7 +200,7 @@ describe('update request', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: DynamoDB.UpdateItemOutput = { Attributes: undefined }
+    const sampleResponse: DynamoDB.UpdateItemCommandOutput = { $metadata: {}, Attributes: undefined }
     let logReceiverMock: jest.Mock
     let updateItemMock: jest.Mock
     let req: UpdateRequest<SimpleWithPartitionKeyModel>
@@ -211,7 +209,7 @@ describe('update request', () => {
       logReceiverMock = jest.fn()
       updateItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverMock })
-      req = new UpdateRequest(<any>{ updateItem: updateItemMock }, SimpleWithPartitionKeyModel, 'id')
+      req = new UpdateRequest(<any>{ send: updateItemMock }, SimpleWithPartitionKeyModel, 'id')
       req.operations(update2(SimpleWithPartitionKeyModel, 'age').set(10))
     })
 
@@ -235,19 +233,20 @@ describe('update request', () => {
   describe('typings', () => {
     // tests basically only exists to be not valid when typings would be wrong
     let req: UpdateRequest<SimpleWithPartitionKeyModel>
-    let dynamoDbWrapperMock: DynamoDbWrapper
+    let clientMock: DynamoDB.DynamoDBClient
 
     beforeEach(() => {
-      dynamoDbWrapperMock = <any>{
-        updateItem: () =>
+      clientMock = <any>{
+        send: () =>
           Promise.resolve({
+            $metadata: {},
             Attributes: {
               id: { S: 'myId' },
               age: { N: '20' },
             },
           }),
       }
-      req = new UpdateRequest(dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+      req = new UpdateRequest(clientMock, SimpleWithPartitionKeyModel, 'myKey')
     })
 
     it('exec, ALL_OLD', async () => {

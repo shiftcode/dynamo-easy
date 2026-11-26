@@ -1,7 +1,6 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { PutRequest } from './put.request'
 
 describe('put request', () => {
@@ -49,7 +48,7 @@ describe('put request', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: DynamoDB.PutItemOutput = { Attributes: undefined }
+    const sampleResponse: DynamoDB.PutItemCommandOutput = { $metadata: {}, Attributes: undefined }
     let logReceiverMock: jest.Mock
     let putItemMock: jest.Mock
     let req: PutRequest<SimpleWithPartitionKeyModel>
@@ -63,7 +62,7 @@ describe('put request', () => {
       logReceiverMock = jest.fn()
       putItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverMock })
-      req = new PutRequest(<any>{ putItem: putItemMock }, SimpleWithPartitionKeyModel, jsItem)
+      req = new PutRequest(<any>{ send: putItemMock }, SimpleWithPartitionKeyModel, jsItem)
     })
 
     it('exec should log params and response', async () => {
@@ -86,19 +85,20 @@ describe('put request', () => {
   describe('typings', () => {
     // tests basically only exists to be not valid when typings would be wrong
     let req: PutRequest<SimpleWithPartitionKeyModel>
-    let dynamoDbWrapperMock: DynamoDbWrapper
+    let clientMock: DynamoDB.DynamoDBClient
 
     beforeEach(() => {
-      dynamoDbWrapperMock = <any>{
-        putItem: () =>
+      clientMock = <any>{
+        send: () =>
           Promise.resolve({
+            $metadata: {},
             Attributes: {
               id: { S: 'myId' },
               age: { N: '20' },
             },
           }),
       }
-      req = new PutRequest(dynamoDbWrapperMock, SimpleWithPartitionKeyModel, { id: 'myKey', age: 20 })
+      req = new PutRequest(clientMock, SimpleWithPartitionKeyModel, { id: 'myKey', age: 20 })
     })
 
     it('exec, ALL_OLD', async () => {

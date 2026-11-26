@@ -1,6 +1,6 @@
 import { DynamoStore } from '@shiftcoders/dynamo-easy'
 import { Person } from '../models'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 const objectToPut: Person = {
   id: 'vogelsw',
@@ -8,7 +8,7 @@ const objectToPut: Person = {
   yearOfBirth: 1958,
 } // object literal or new Person(...)
 
-new DynamoStore(Person, new DynamoDB({}))
+new DynamoStore(Person, new DynamoDB.DynamoDBClient({}))
   .put(objectToPut)
   .ifNotExists()
   .exec()

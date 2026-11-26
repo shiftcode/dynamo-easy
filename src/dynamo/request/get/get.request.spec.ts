@@ -1,5 +1,4 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
 import { Attributes } from '../../../mapper/type/attribute.type'
@@ -47,7 +46,7 @@ describe('GetRequest', () => {
     })
 
     it('should set param for ReturnConsumedCapacity', () => {
-      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      request.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
   })
@@ -55,14 +54,14 @@ describe('GetRequest', () => {
   describe('maps response item', () => {
     const jsItem: SimpleWithPartitionKeyModel = { age: 20, id: 'my-id' }
     const dbItem: Attributes<SimpleWithPartitionKeyModel> = { age: { N: '20' }, id: { S: 'my-id' } }
-    const sampleResponse: DynamoDB.GetItemOutput = { Item: dbItem }
+    const sampleResponse: DynamoDB.GetItemCommandOutput = { $metadata: {}, Item: dbItem }
 
     let getItemMock: jest.Mock
     let req: GetRequest<SimpleWithPartitionKeyModel>
 
     beforeEach(() => {
       getItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
-      req = new GetRequest(<any>{ getItem: getItemMock }, SimpleWithPartitionKeyModel, 'my-id')
+      req = new GetRequest(<any>{ send: getItemMock }, SimpleWithPartitionKeyModel, 'my-id')
     })
 
     it('exec', async () => {
@@ -70,12 +69,12 @@ describe('GetRequest', () => {
     })
 
     it('execFullResponse', async () => {
-      expect(await req.execFullResponse()).toEqual({ Item: jsItem })
+      expect(await req.execFullResponse()).toEqual({ $metadata: {}, Item: jsItem })
     })
   })
 
   describe('logger', () => {
-    const sampleResponse: DynamoDB.GetItemOutput = { Item: undefined }
+    const sampleResponse: DynamoDB.GetItemCommandOutput = { $metadata: {}, Item: undefined }
     let logReceiverMock: jest.Mock
     let getItemMock: jest.Mock
     let req: GetRequest<SimpleWithPartitionKeyModel>
@@ -84,7 +83,7 @@ describe('GetRequest', () => {
       logReceiverMock = jest.fn()
       getItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverMock })
-      req = new GetRequest(<any>{ getItem: getItemMock }, SimpleWithPartitionKeyModel, 'partitionKeyValue')
+      req = new GetRequest(<any>{ send: getItemMock }, SimpleWithPartitionKeyModel, 'partitionKeyValue')
     })
 
     it('exec should log params and response', async () => {

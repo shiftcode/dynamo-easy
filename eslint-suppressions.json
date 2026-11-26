@@ -187,9 +187,6 @@
     },
     "@typescript-eslint/no-unsafe-member-access": {
       "count": 2
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/decorator/metadata/metadata.ts": {
@@ -229,7 +226,7 @@
   },
   "src/dynamo/batchget/batch-get.request.spec.ts": {
     "@typescript-eslint/no-unsafe-assignment": {
-      "count": 4
+      "count": 2
     },
     "@typescript-eslint/no-unsafe-return": {
       "count": 1
@@ -264,7 +261,7 @@
       "count": 1
     },
     "@typescript-eslint/no-unsafe-assignment": {
-      "count": 6
+      "count": 4
     }
   },
   "src/dynamo/batchwrite/batch-write.request.ts": {
@@ -466,9 +463,6 @@
   "src/dynamo/request/get/get.request.ts": {
     "@typescript-eslint/no-unsafe-argument": {
       "count": 2
-    },
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
     }
   },
   "src/dynamo/request/put/put.request.spec.ts": {
@@ -481,11 +475,6 @@
   },
   "src/dynamo/request/put/put.request.ts": {
     "@typescript-eslint/no-unsafe-return": {
-      "count": 1
-    }
-  },
-  "src/dynamo/request/query/query.request.spec.ts": {
-    "@typescript-eslint/no-unused-vars": {
       "count": 1
     }
   },
@@ -516,16 +505,6 @@
       "count": 1
     }
   },
-  "src/dynamo/request/scan/scan.request.spec.ts": {
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
-    }
-  },
-  "src/dynamo/request/transactgetsingletable/transact-get-single-table.request.spec.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 2
-    }
-  },
   "src/dynamo/request/transactgetsingletable/transact-get-single-table.request.ts": {
     "@typescript-eslint/no-unsafe-argument": {
       "count": 1
@@ -537,9 +516,6 @@
     },
     "@typescript-eslint/no-unsafe-return": {
       "count": 2
-    },
-    "@typescript-eslint/no-unused-vars": {
-      "count": 1
     }
   },
   "src/dynamo/request/update/update.request.ts": {
@@ -617,9 +593,6 @@
   "src/helper/fetch-all.spec.ts": {
     "@typescript-eslint/require-await": {
       "count": 6
-    },
-    "@typescript-eslint/unbound-method": {
-      "count": 2
     }
   },
   "src/helper/is-boolean.function.ts": {
@@ -700,7 +673,7 @@
       "count": 1
     },
     "@typescript-eslint/no-unnecessary-condition": {
-      "count": 2
+      "count": 1
     }
   },
   "src/mapper/for-type/collection.mapper.spec.ts": {

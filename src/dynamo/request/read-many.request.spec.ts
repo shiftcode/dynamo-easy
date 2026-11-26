@@ -169,7 +169,8 @@ describe('ReadManyRequest', () => {
       id: { S: jsItem.id },
       age: { N: `${jsItem.age}` },
     }
-    const output: DynamoDB.ScanOutput = {
+    const output: DynamoDB.ScanCommandOutput = {
+      $metadata: {},
       Items: [dbItem, dbItem],
       Count: 2,
       ConsumedCapacity: { TableName: getTableName(SimpleWithPartitionKeyModel) },
@@ -244,7 +245,7 @@ describe('ReadManyRequest', () => {
   })
 
   describe('logger', () => {
-    const output: DynamoDB.ScanOutput = { Items: [] }
+    const output: DynamoDB.ScanCommandOutput = { $metadata: {}, Items: [] }
     let logReceiverMock: jest.Mock
 
     beforeEach(() => {
