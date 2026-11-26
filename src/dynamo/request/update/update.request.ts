@@ -49,10 +49,8 @@ export class UpdateRequest<T, T2 extends T | Partial<T> | void = void> extends W
 
   returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW'): UpdateRequest<T, T>
   returnValues(returnValues: 'UPDATED_OLD' | 'UPDATED_NEW'): UpdateRequest<T, Partial<T>>
-  returnValues(returnValues: 'NONE'): UpdateRequest<T, void>
-  returnValues(
-    returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE',
-  ): UpdateRequest<T, T | Partial<T> | void> {
+  returnValues(returnValues: 'NONE'): UpdateRequest<T>
+  returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE'): this {
     this.params.ReturnValues = returnValues
     return this
   }

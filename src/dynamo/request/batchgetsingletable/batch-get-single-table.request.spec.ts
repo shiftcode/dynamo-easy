@@ -53,7 +53,7 @@ describe('batch get', () => {
           Keys: [
             {
               id: { S: key.id },
-              creationDate: { S: `${key.creationDate!.toISOString()}` },
+              creationDate: { S: key.creationDate!.toISOString() },
             },
           ],
         },
@@ -88,7 +88,7 @@ describe('batch get', () => {
     const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 20 }
     const sampleResponse: DynamoDB.BatchGetItemOutput = {
       Responses: {
-        [getTableName(SimpleWithPartitionKeyModel)]: [{ id: { S: `${jsItem.id}` }, age: { N: `${jsItem.age}` } }],
+        [getTableName(SimpleWithPartitionKeyModel)]: [{ id: { S: jsItem.id }, age: { N: `${jsItem.age}` } }],
       },
     }
 

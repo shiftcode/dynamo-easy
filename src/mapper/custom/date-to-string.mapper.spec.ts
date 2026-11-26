@@ -8,7 +8,7 @@ describe('dateToStringMapper', () => {
       const toDb = dateToStringMapper.toDb(now)
       expect(toDb).toBeDefined()
       expect(toDb!.S).toBeDefined()
-      expect(toDb!.S).toEqual(`${now.toISOString()}`)
+      expect(toDb!.S).toEqual(now.toISOString())
     })
 
     it('throws', () => {
@@ -19,7 +19,7 @@ describe('dateToStringMapper', () => {
   describe('from db', () => {
     it('simple', () => {
       const now = new Date()
-      const fromDb = dateToStringMapper.fromDb({ S: `${now.toISOString()}` })
+      const fromDb = dateToStringMapper.fromDb({ S: now.toISOString() })
 
       expect(fromDb).toEqual(now)
     })

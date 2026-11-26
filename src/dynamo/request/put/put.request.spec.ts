@@ -98,7 +98,7 @@ describe('put request', () => {
             },
           }),
       }
-      req = new PutRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, { id: 'myKey', age: 20 })
+      req = new PutRequest(dynamoDbWrapperMock, SimpleWithPartitionKeyModel, { id: 'myKey', age: 20 })
     })
 
     it('exec, ALL_OLD', async () => {

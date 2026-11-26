@@ -11,7 +11,7 @@ import { KEY_PROPERTY } from './key-property.const'
  * @hidden
  */
 export function initOrUpdateProperty(
-  propertyMetadata: Partial<PropertyMetadata<any, Attribute>> = {},
+  propertyMetadata: Partial<PropertyMetadata<any>> = {},
   target: any,
   propertyKey: string,
 ): void {
@@ -38,7 +38,7 @@ export function initOrUpdateProperty(
  * @hidden
  */
 function createNewProperty(
-  propertyOptions: Partial<PropertyMetadata<any, Attribute>> = {},
+  propertyOptions: Partial<PropertyMetadata<any>> = {},
   target: any,
   propertyKey: string,
 ): PropertyMetadata<any> {

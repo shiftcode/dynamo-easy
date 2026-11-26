@@ -40,7 +40,7 @@ export class PutRequest<T, T2 = void> extends WriteRequest<
   }
 
   returnValues(returnValues: 'ALL_OLD'): PutRequest<T, T>
-  returnValues(returnValues: 'NONE'): PutRequest<T, void>
+  returnValues(returnValues: 'NONE'): PutRequest<T>
   returnValues(returnValues: 'ALL_OLD' | 'NONE'): PutRequest<T, T | void> {
     this.params.ReturnValues = returnValues
     return <any>this

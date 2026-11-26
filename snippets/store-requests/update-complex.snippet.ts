@@ -7,10 +7,7 @@ const oneHourAgo = new Date(Date.now() - 1000 * 60 * 60)
 
 new DynamoStore(AnotherModel, new DynamoDB({}))
   .update('myPartitionKey', 'mySortKey')
-  .operations(
-    update(`myNestedList[${index}].propertyX`).set('value'),
-    update('updated').set(new Date()),
-  )
+  .operations(update(`myNestedList[${index}].propertyX`).set('value'), update('updated').set(new Date()))
   .onlyIf(
     or(
       attribute('id').attributeNotExists(), // item not existing
@@ -19,4 +16,6 @@ new DynamoStore(AnotherModel, new DynamoDB({}))
   )
   .returnValues('ALL_OLD')
   .exec()
-  .then(oldVal => console.log('old value was:', oldVal))
+  .then((oldVal) => {
+    console.log('old value was:', oldVal)
+  })

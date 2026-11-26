@@ -39,7 +39,7 @@ export class BatchGetRequest {
   /**
    * return ConsumedCapacity of the corresponding tables in the response
    */
-  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): BatchGetRequest {
+  returnConsumedCapacity(level: DynamoDB.ReturnConsumedCapacity): this {
     this.params.ReturnConsumedCapacity = level
     return this
   }
@@ -50,7 +50,7 @@ export class BatchGetRequest {
    * @param keys an array of partials of T that contains PartitionKey and SortKey (if necessary). Throws if missing.
    * @param consistentRead set to true so the operation uses strongly consistent reads, default false
    */
-  forModel<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>, consistentRead = false): BatchGetRequest {
+  forModel<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>, consistentRead = false): this {
     // check if modelClazz is really an @Model() decorated class
     const metadata = metadataForModel(modelClazz)
     if (!metadata.modelOptions) {

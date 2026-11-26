@@ -8,7 +8,9 @@
 export function promiseDelay<T>(duration: number): (arg: T) => Promise<T> {
   return (arg: T) => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(arg), duration)
+      setTimeout(() => {
+        resolve(arg)
+      }, duration)
     })
   }
 }

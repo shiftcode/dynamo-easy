@@ -146,7 +146,11 @@ export abstract class ReadManyRequest<
    */
   execNoMap() {
     this.logger.debug('request (noMap)', this.params)
-    return this.doRequest(this.params).then(promiseTap((response) => this.logger.debug('response', response)))
+    return this.doRequest(this.params).then(
+      promiseTap((response) => {
+        this.logger.debug('response', response)
+      }),
+    )
   }
 
   /**
@@ -162,10 +166,18 @@ export abstract class ReadManyRequest<
 
     this.logger.debug('single request', params)
     return this.doRequest(params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then(this.mapFromDb)
       .then((r) => (r.Items && r.Items.length ? r.Items[0] : null))
-      .then(promiseTap((item) => this.logger.debug('mapped item', item)))
+      .then(
+        promiseTap((item) => {
+          this.logger.debug('mapped item', item)
+        }),
+      )
   }
 
   /**
@@ -181,9 +193,17 @@ export abstract class ReadManyRequest<
 
     this.logger.debug('count request', params)
     return this.doRequest(params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then((response) => response.Count || 0)
-      .then(promiseTap((count) => this.logger.debug('count', count)))
+      .then(
+        promiseTap((count) => {
+          this.logger.debug('count', count)
+        }),
+      )
   }
 
   /**
@@ -192,10 +212,18 @@ export abstract class ReadManyRequest<
   exec(): Promise<T2[]> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then(this.mapFromDb)
       .then((r) => r.Items)
-      .then(promiseTap((items) => this.logger.debug('mapped items', items)))
+      .then(
+        promiseTap((items) => {
+          this.logger.debug('mapped items', items)
+        }),
+      )
   }
 
   /**
@@ -204,9 +232,17 @@ export abstract class ReadManyRequest<
   execFullResponse(): Promise<Z> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then(this.mapFromDb)
-      .then(promiseTap((response) => this.logger.debug('mapped items', response.Items)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('mapped items', response.Items)
+        }),
+      )
   }
 
   /**

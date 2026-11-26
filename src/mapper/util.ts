@@ -31,10 +31,10 @@ export function getPropertyPath<T>(
  * @hidden
  */
 export function messageWithPath(propertyPath: string | null | undefined, message: string): string {
-  if (!!propertyPath) {
+  if (propertyPath) {
     return `${propertyPath} ${message}`
   } else {
-    return `${message}`
+    return message
   }
 }
 

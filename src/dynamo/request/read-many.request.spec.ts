@@ -166,7 +166,7 @@ describe('ReadManyRequest', () => {
   describe('exec functions', () => {
     const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 15 }
     const dbItem: Attributes<SimpleWithPartitionKeyModel> = {
-      id: { S: `${jsItem.id}` },
+      id: { S: jsItem.id },
       age: { N: `${jsItem.age}` },
     }
     const output: DynamoDB.ScanOutput = {

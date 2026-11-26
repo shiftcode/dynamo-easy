@@ -28,7 +28,7 @@ describe('scan request', () => {
   })
 
   it('default params', () => {
-    expect(request.params).toEqual(<DynamoDB.ScanInput>{ TableName: 'complex_model' })
+    expect(request.params).toEqual({ TableName: 'complex_model' })
   })
 
   it('execSingle', async () => {

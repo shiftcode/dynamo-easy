@@ -19,4 +19,6 @@ new TransactWriteRequest(new DynamoDB({}))
     new TransactUpdate(Person, 'vogelsw').updateAttribute('yearOfBirth').set(1984),
   )
   .exec()
-  .then(() => console.log('done'))
+  .then(() => {
+    console.log('done')
+  })

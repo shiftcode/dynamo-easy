@@ -58,7 +58,7 @@ export abstract class WriteRequest<
   onlyIfAttribute<K extends keyof T>(attributePath: K): RequestConditionFunctionTyped<this, T, K>
   onlyIfAttribute(attributePath: string): RequestConditionFunction<this, T>
   onlyIfAttribute<K extends keyof T>(attributePath: K | string): RequestConditionFunctionTyped<this, T, K> {
-    return addCondition<this, T, any>('ConditionExpression', attributePath, <any>this, this.metadata)
+    return addCondition<this, T, any>('ConditionExpression', attributePath, this, this.metadata)
   }
 
   /**
@@ -88,7 +88,11 @@ export abstract class WriteRequest<
   execFullResponse(): Promise<WriteResponse<O, T2>> {
     this.logger.debug('request', this.params)
     return this.doRequest(this.params)
-      .then(promiseTap((response) => this.logger.debug('response', response)))
+      .then(
+        promiseTap((response) => {
+          this.logger.debug('response', response)
+        }),
+      )
       .then((resp) => {
         const attrs = resp.Attributes
         delete resp.Attributes // delete Attributes on response so it will not be on returned value
@@ -102,7 +106,11 @@ export abstract class WriteRequest<
         }
         return r
       })
-      .then(promiseTap((resp) => this.logger.debug('mapped response', resp)))
+      .then(
+        promiseTap((resp) => {
+          this.logger.debug('mapped response', resp)
+        }),
+      )
   }
 
   /**
@@ -110,6 +118,10 @@ export abstract class WriteRequest<
    */
   execNoMap(): Promise<O> {
     this.logger.debug('request', this.params)
-    return this.doRequest(this.params).then(promiseTap((response) => this.logger.debug('response', response)))
+    return this.doRequest(this.params).then(
+      promiseTap((response) => {
+        this.logger.debug('response', response)
+      }),
+    )
   }
 }

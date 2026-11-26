@@ -5,6 +5,9 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb'
 new DynamoStore(AnotherModel, new DynamoDB({}))
   .query()
   .wherePartitionKey('2018-01')
-  .whereSortKey().beginsWith('a')
+  .whereSortKey()
+  .beginsWith('a')
   .execSingle()
-  .then(r => console.log('first found item:', r))
+  .then((r) => {
+    console.log('first found item:', r)
+  })

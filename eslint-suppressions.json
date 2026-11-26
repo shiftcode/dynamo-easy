@@ -1,0 +1,941 @@
+{
+  "snippets/app.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-class-instance-assignment": {
+      "count": 1
+    }
+  },
+  "snippets/config/log-receiver.snippet.ts": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 2
+    }
+  },
+  "snippets/looks-easy-right.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/models/date-to-number.mapper.ts": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "snippets/models/my-model.snippet.ts": {
+    "@typescript-eslint/no-extraneous-class": {
+      "count": 1
+    }
+  },
+  "snippets/multi-model-requests/batch-get.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/multi-model-requests/batch-write.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-class-instance-assignment": {
+      "count": 2
+    }
+  },
+  "snippets/multi-model-requests/transact-get.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/multi-model-requests/transact-write.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-class-instance-assignment": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/batch-get.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/batch-write.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-class-instance-assignment": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/delete.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/get.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/put.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-class-instance-assignment": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/query.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/scan.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/transact-get.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/update-complex.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "snippets/store-requests/update-simple.snippet.ts": {
+    "@typescript-eslint/no-floating-promises": {
+      "count": 1
+    }
+  },
+  "src/config/update-config.function.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 6
+    }
+  },
+  "src/decorator/impl/collection/collection-property.decorator.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/decorator/impl/index/util.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/decorator/impl/key/partition-key.decorator.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 2
+    }
+  },
+  "src/decorator/impl/model/model.decorator.spec.ts": {
+    "@typescript-eslint/no-unused-vars": {
+      "count": 4
+    }
+  },
+  "src/decorator/impl/model/model.decorator.ts": {
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 6
+    },
+    "@typescript-eslint/no-unsafe-function-type": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    }
+  },
+  "src/decorator/impl/property/init-or-update-property.function.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unused-vars": {
+      "count": 1
+    }
+  },
+  "src/decorator/metadata/metadata.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 2
+    }
+  },
+  "src/decorator/util.ts": {
+    "@typescript-eslint/no-unnecessary-type-parameters": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchget/batch-get-utils.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchget/batch-get-utils.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchget/batch-get.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 4
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchget/batch-get.request.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchwrite/batch-write-utils.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchwrite/batch-write-utils.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/dynamo/batchwrite/batch-write.request.spec.ts": {
+    "@typescript-eslint/no-confusing-void-expression": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 6
+    }
+  },
+  "src/dynamo/batchwrite/batch-write.request.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/condition-expression-builder.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/condition-expression-builder.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 5
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 6
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 2
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 2
+    },
+    "no-prototype-builtins": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/functions/attribute-name-replacer.function.ts": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/functions/attribute-names.function.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/functions/resolve-attribute-value-name-conflicts.function.ts": {
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/functions/unique-attribute-value-name.function.ts": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/logical-operator/attribute.function.ts": {
+    "@typescript-eslint/no-unnecessary-type-parameters": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/logical-operator/update.function.ts": {
+    "@typescript-eslint/no-unnecessary-type-parameters": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/param-util.ts": {
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 3
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/prepare-and-add-update-expressions.function.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/request-expression-builder.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-type-parameters": {
+      "count": 4
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 4
+    }
+  },
+  "src/dynamo/expression/update-expression-builder.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/util.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/dynamo/expression/util.ts": {
+    "@typescript-eslint/no-implied-eval": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/base.request.ts": {
+    "@typescript-eslint/no-invalid-void-type": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 3
+    }
+  },
+  "src/dynamo/request/batchgetsingletable/batch-get-single-table.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 3
+    }
+  },
+  "src/dynamo/request/batchgetsingletable/batch-get-single-table.request.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/batchwritesingletable/batch-write-single-table.request.spec.ts": {
+    "@typescript-eslint/no-confusing-void-expression": {
+      "count": 1
+    },
+    "@typescript-eslint/require-await": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/batchwritesingletable/batch-write-single-table.request.ts": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/delete/delete.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/delete/delete.request.ts": {
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/get/get.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/get/get.request.ts": {
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/put/put.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/put/put.request.ts": {
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/query/query.request.spec.ts": {
+    "@typescript-eslint/no-unused-vars": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/query/query.request.ts": {
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/read-many.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 5
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/read-many.request.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 4
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/scan/scan.request.spec.ts": {
+    "@typescript-eslint/no-unused-vars": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/transactgetsingletable/transact-get-single-table.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 2
+    }
+  },
+  "src/dynamo/request/transactgetsingletable/transact-get-single-table.request.ts": {
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/update/update.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unused-vars": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/update/update.request.ts": {
+    "@typescript-eslint/no-invalid-void-type": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/write.request.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/dynamo/request/write.request.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "src/dynamo/transactget/transact-get.request.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 3
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/dynamo/transactwrite/transact-base-operation.spec.ts": {
+    "@typescript-eslint/no-useless-constructor": {
+      "count": 1
+    }
+  },
+  "src/dynamo/transactwrite/transact-base-operation.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/dynamo/transactwrite/transact-write.request.spec.ts": {
+    "@typescript-eslint/no-confusing-void-expression": {
+      "count": 1
+    }
+  },
+  "src/dynamo/transactwrite/transact-write.request.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/helper/curry.function.ts": {
+    "@typescript-eslint/ban-ts-comment": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 2
+    },
+    "prefer-rest-params": {
+      "count": 2
+    }
+  },
+  "src/helper/fetch-all.spec.ts": {
+    "@typescript-eslint/require-await": {
+      "count": 6
+    },
+    "@typescript-eslint/unbound-method": {
+      "count": 2
+    }
+  },
+  "src/helper/is-boolean.function.ts": {
+    "@typescript-eslint/no-unsafe-enum-comparison": {
+      "count": 1
+    }
+  },
+  "src/helper/is-number.function.ts": {
+    "@typescript-eslint/no-unsafe-enum-comparison": {
+      "count": 1
+    }
+  },
+  "src/helper/is-plain-object.function.ts": {
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-enum-comparison": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 3
+    },
+    "no-prototype-builtins": {
+      "count": 1
+    }
+  },
+  "src/helper/is-string.function.ts": {
+    "@typescript-eslint/no-unsafe-enum-comparison": {
+      "count": 1
+    }
+  },
+  "src/helper/kebab-case.function.ts": {
+    "no-useless-escape": {
+      "count": 2
+    }
+  },
+  "src/helper/promise-tap.function.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/helper/random-exponential-backoff-timer.generator.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/logger/log-receiver.type.ts": {
+    "@typescript-eslint/no-invalid-void-type": {
+      "count": 1
+    },
+    "@typescript-eslint/no-redundant-type-constituents": {
+      "count": 1
+    }
+  },
+  "src/logger/logger.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 2
+    }
+  },
+  "src/mapper/custom/date-to-number.mapper.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/mapper/custom/date-to-string.mapper.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/boolean.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/mapper/for-type/collection.mapper.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/collection.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 3
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/enum.mapper.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 2
+    }
+  },
+  "src/mapper/for-type/enum.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 2
+    }
+  },
+  "src/mapper/for-type/null.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/number.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/object.mapper.spec.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/object.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    }
+  },
+  "src/mapper/for-type/string.mapper.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/mapper/mapper.spec.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 3
+    }
+  },
+  "src/mapper/mapper.ts": {
+    "@typescript-eslint/no-non-null-assertion": {
+      "count": 1
+    },
+    "@typescript-eslint/no-redundant-type-constituents": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unnecessary-type-parameters": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 6
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 4
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 3
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 1
+    }
+  },
+  "src/mapper/type/attribute-value-type.type.ts": {
+    "@typescript-eslint/no-redundant-type-constituents": {
+      "count": 1
+    }
+  },
+  "src/mapper/type/attribute.type.ts": {
+    "@typescript-eslint/no-empty-object-type": {
+      "count": 2
+    }
+  },
+  "src/mapper/type/binary.type.ts": {
+    "@typescript-eslint/no-extraneous-class": {
+      "count": 1
+    }
+  },
+  "src/mapper/type/null.type.ts": {
+    "@typescript-eslint/no-extraneous-class": {
+      "count": 1
+    }
+  },
+  "src/mapper/type/undefined.type.ts": {
+    "@typescript-eslint/no-extraneous-class": {
+      "count": 1
+    }
+  },
+  "src/mapper/util.spec.ts": {
+    "@typescript-eslint/no-unnecessary-type-conversion": {
+      "count": 2
+    }
+  },
+  "src/mapper/util.ts": {
+    "@typescript-eslint/no-implied-eval": {
+      "count": 1
+    },
+    "@typescript-eslint/no-redundant-type-constituents": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-argument": {
+      "count": 2
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-call": {
+      "count": 4
+    },
+    "@typescript-eslint/no-unsafe-member-access": {
+      "count": 8
+    },
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 5
+    },
+    "@typescript-eslint/restrict-template-expressions": {
+      "count": 5
+    },
+    "no-prototype-builtins": {
+      "count": 1
+    }
+  },
+  "test/helper/get-meta-data-property.function.ts": {
+    "@typescript-eslint/no-unsafe-return": {
+      "count": 1
+    }
+  },
+  "test/models/employee.model.ts": {
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "test/models/fail-model.model.ts": {
+    "@typescript-eslint/no-base-to-string": {
+      "count": 1
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 1
+    }
+  },
+  "test/models/model-with-custom-mapper-for-sort-key.model.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/no-deprecated": {
+      "count": 5
+    },
+    "@typescript-eslint/no-unnecessary-type-conversion": {
+      "count": 3
+    },
+    "@typescript-eslint/no-unsafe-assignment": {
+      "count": 2
+    }
+  },
+  "test/models/model-with-custom-mapper.model.ts": {
+    "@typescript-eslint/naming-convention": {
+      "count": 1
+    },
+    "@typescript-eslint/restrict-plus-operands": {
+      "count": 1
+    }
+  },
+  "test/models/real-world/form-id.model.ts": {
+    "@typescript-eslint/restrict-plus-operands": {
+      "count": 3
+    }
+  },
+  "test/models/real-world/order-id.model.ts": {
+    "@typescript-eslint/restrict-plus-operands": {
+      "count": 3
+    }
+  },
+  "tools/gh-pages-publish.mjs": {
+    "no-prototype-builtins": {
+      "count": 1
+    }
+  }
+}

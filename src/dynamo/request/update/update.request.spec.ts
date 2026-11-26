@@ -140,7 +140,7 @@ describe('update request', () => {
     it('should map with metadata of itemType (Info)', () => {
       const now = new Date()
       const request = new UpdateRequest(<any>null, UpdateModel, 'myId').operations(
-        update('informations[0]').set(<Info>{ details: 'my details', createdAt: now }),
+        update('informations[0]').set({ details: 'my details', createdAt: now }),
       )
 
       expect(request).toBeDefined()
@@ -247,7 +247,7 @@ describe('update request', () => {
             },
           }),
       }
-      req = new UpdateRequest(<any>dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+      req = new UpdateRequest(dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
     })
 
     it('exec, ALL_OLD', async () => {

@@ -27,7 +27,7 @@ export class DeleteRequest<T, T2 = void> extends WriteRequest<
   }
 
   returnValues(returnValues: 'ALL_OLD'): DeleteRequest<T, T>
-  returnValues(returnValues: 'NONE'): DeleteRequest<T, void>
+  returnValues(returnValues: 'NONE'): DeleteRequest<T>
   returnValues(returnValues: 'ALL_OLD' | 'NONE'): DeleteRequest<T, T | void> {
     this.params.ReturnValues = returnValues
     return <any>this

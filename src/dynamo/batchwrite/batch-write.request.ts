@@ -32,7 +32,7 @@ export class BatchWriteRequest {
   /**
    * return ConsumedCapacity of the corresponding tables in the response
    */
-  returnConsumedCapacity(value: DynamoDB.ReturnConsumedCapacity): BatchWriteRequest {
+  returnConsumedCapacity(value: DynamoDB.ReturnConsumedCapacity): this {
     this.params.ReturnConsumedCapacity = value
     return this
   }
@@ -40,7 +40,7 @@ export class BatchWriteRequest {
   /**
    * return item collection metrics.
    */
-  returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics): BatchWriteRequest {
+  returnItemCollectionMetrics(value: DynamoDB.ReturnItemCollectionMetrics): this {
     this.params.ReturnItemCollectionMetrics = value
     return this
   }
@@ -50,7 +50,7 @@ export class BatchWriteRequest {
    * @param modelClazz the corresponding ModelConstructor
    * @param keys an array of partials of T that contains PartitionKey and SortKey (if necessary). Throws if missing.
    */
-  delete<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>): BatchWriteRequest {
+  delete<T>(modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>): this {
     this.requestItems(modelClazz, keys.map(this.createDeleteRequest(modelClazz)))
     return this
   }
@@ -60,7 +60,7 @@ export class BatchWriteRequest {
    * @param modelClazz the corresponding ModelConstructor
    * @param items the items to put
    */
-  put<T>(modelClazz: ModelConstructor<T>, items: T[]): BatchWriteRequest {
+  put<T>(modelClazz: ModelConstructor<T>, items: T[]): this {
     this.requestItems(modelClazz, items.map(this.createPutRequest(modelClazz)))
     return this
   }
