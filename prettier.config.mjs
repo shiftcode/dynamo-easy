@@ -6,7 +6,8 @@ const config = {
   printWidth: 120,
   singleQuote: true,
   semi: false,
-  trailingComma: "all",
-};
+  trailingComma: 'all',
+  arrowParens: 'always',
+}
 
-export default config;
+export default config
