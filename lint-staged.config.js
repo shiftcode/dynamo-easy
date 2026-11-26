@@ -3,8 +3,8 @@
  * @type  { import('lint-staged').Configuration }
  */
 const config = {
-  "package.json": ["npx sort-package-json"],
-  "*": [/* "eslint --fix --cache", */ "npx prettier --write --ignore-unknown"],
-};
+  'package.json': ['npx sort-package-json'],
+  '*': ['npx eslint --cache --fix', 'npx prettier --write --ignore-unknown'],
+}
 
-export default config;
+export default config
