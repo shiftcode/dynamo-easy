@@ -4,7 +4,6 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { createLogger, Logger } from '../../../logger/logger'
 import { ModelConstructor } from '../../../model/model-constructor'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { addSortKeyCondition } from '../../expression/request-expression-builder'
 import { SortKeyConditionFunction } from '../../expression/type/sort-key-condition-function'
 import { ReadManyRequest } from '../read-many.request'
@@ -17,15 +16,15 @@ export class QueryRequest<T, T2 = T> extends ReadManyRequest<
   T,
   T2,
   DynamoDB.QueryInput,
-  DynamoDB.QueryOutput,
+  DynamoDB.QueryCommandOutput,
   QueryResponse<T2>,
   QueryRequest<T, T2>,
   QueryRequest<T, Partial<T>>
 > {
   protected readonly logger: Logger
 
-  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
-    super(dynamoDBWrapper, modelClazz)
+  constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>) {
+    super(client, modelClazz)
     this.logger = createLogger('dynamo.request.QueryRequest', modelClazz)
   }
 
@@ -74,7 +73,11 @@ export class QueryRequest<T, T2 = T> extends ReadManyRequest<
     return this
   }
 
-  protected doRequest(params: DynamoDB.QueryInput): Promise<DynamoDB.QueryOutput> {
-    return this.dynamoDBWrapper.query(params)
+  protected doRequest(params: DynamoDB.QueryInput): Promise<DynamoDB.QueryCommandOutput> {
+    if (!params.KeyConditionExpression) {
+      throw new Error('key condition expression must be defined')
+    }
+
+    return this.client.send(new DynamoDB.QueryCommand(params))
   }
 }

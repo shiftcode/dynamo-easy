@@ -1,4 +1,4 @@
-import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../test/models'
 import { ModelConstructor } from '../../model/model-constructor'
 import { BaseRequest } from './base.request'
@@ -57,11 +57,11 @@ describe('base request', () => {
       request = new TestRequest(SimpleWithPartitionKeyModel)
     })
     it('should set param', () => {
-      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      request.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
     it('should return request instance', () => {
-      expect(request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)).toBe(request)
+      expect(request.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)).toBe(request)
     })
   })
 })

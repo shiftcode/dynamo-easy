@@ -5,7 +5,6 @@ import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { createLogger, Logger } from '../../../logger/logger'
 import { toDb } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { createIfNotExistsCondition } from '../../expression/create-if-not-exists-condition.function'
 import { WriteRequest } from '../write.request'
 
@@ -16,13 +15,13 @@ export class PutRequest<T, T2 = void> extends WriteRequest<
   T,
   T2,
   DynamoDB.PutItemInput,
-  DynamoDB.PutItemOutput,
+  DynamoDB.PutItemCommandOutput,
   PutRequest<T, T2>
 > {
   protected readonly logger: Logger
 
-  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, item: T) {
-    super(dynamoDBWrapper, modelClazz)
+  constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>, item: T) {
+    super(client, modelClazz)
     this.logger = createLogger('dynamo.request.PutRequest', modelClazz)
     this.params.Item = toDb(item, this.modelClazz)
   }
@@ -46,7 +45,7 @@ export class PutRequest<T, T2 = void> extends WriteRequest<
     return <any>this
   }
 
-  protected doRequest(params: DynamoDB.PutItemInput): Promise<DynamoDB.PutItemOutput> {
-    return this.dynamoDBWrapper.putItem(params)
+  protected doRequest(params: DynamoDB.PutItemInput): Promise<DynamoDB.PutItemCommandOutput> {
+    return this.client.send(new DynamoDB.PutItemCommand(params))
   }
 }

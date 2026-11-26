@@ -1,7 +1,5 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnConsumedCapacity, ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
 import { Organization } from '../../../../test/models'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
 import { BatchWriteSingleTableRequest } from './batch-write-single-table.request'
 
@@ -13,7 +11,7 @@ describe('batch write single table request', () => {
     name: 'myOrg',
   }
 
-  let dynamoDBWrapper: DynamoDbWrapper
+  let client: DynamoDB.DynamoDBClient
   let request: BatchWriteSingleTableRequest<Organization>
 
   describe('constructor', () => {
@@ -37,16 +35,16 @@ describe('batch write single table request', () => {
 
   describe('correct params', () => {
     beforeEach(() => {
-      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
+      request = new BatchWriteSingleTableRequest(client, Organization)
     })
 
     it('returnConsumedCapacity', () => {
-      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      request.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
 
     it('returnItemCollectionMetrics', () => {
-      request.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
+      request.returnItemCollectionMetrics(DynamoDB.ReturnItemCollectionMetrics.SIZE)
       expect(request.params.ReturnItemCollectionMetrics).toBe('SIZE')
     })
 
@@ -113,7 +111,8 @@ describe('batch write single table request', () => {
   })
 
   describe('Unprocessed items', () => {
-    const output: DynamoDB.BatchWriteItemOutput = {
+    const output: DynamoDB.BatchWriteItemCommandOutput = {
+      $metadata: {},
       UnprocessedItems: {
         [tableName]: [
           {
@@ -140,10 +139,10 @@ describe('batch write single table request', () => {
         .mockReturnValueOnce(Promise.resolve(output))
         .mockReturnValueOnce(Promise.resolve({ MyResult: true }))
       nextFnMock = jest.fn().mockReturnValue({ value: 0 })
-      dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: batchWriteItemMock })
+      client = <DynamoDB.DynamoDBClient>(<unknown>{ send: batchWriteItemMock })
       generatorMock = jest.fn().mockReturnValueOnce({ next: nextFnMock })
 
-      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
+      request = new BatchWriteSingleTableRequest(client, Organization)
     })
 
     it('should retry when unprocessed items are returned', async () => {
@@ -160,12 +159,12 @@ describe('batch write single table request', () => {
 
     it('should keep other params in additional calls', async () => {
       request.put([item])
-      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
-      request.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
+      request.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)
+      request.returnItemCollectionMetrics(DynamoDB.ReturnItemCollectionMetrics.SIZE)
       await request.exec(<any>generatorMock)
 
       expect(batchWriteItemMock).toHaveBeenCalledTimes(3)
-      const paramsThirdCall = <DynamoDB.BatchWriteItemInput>batchWriteItemMock.mock.calls[2][0]
+      const paramsThirdCall = <DynamoDB.BatchWriteItemInput>batchWriteItemMock.mock.calls[2][0].input
 
       expect(paramsThirdCall).toMatchObject(
         expect.objectContaining({ ReturnConsumedCapacity: 'TOTAL', ReturnItemCollectionMetrics: 'SIZE' }),
@@ -177,8 +176,8 @@ describe('batch write single table request', () => {
 
   describe('exec / execFullResponse', () => {
     beforeEach(() => {
-      dynamoDBWrapper = <DynamoDbWrapper>(<any>{ batchWriteItem: () => Promise.resolve({ myResponse: true }) })
-      request = new BatchWriteSingleTableRequest(dynamoDBWrapper, Organization)
+      client = <DynamoDB.DynamoDBClient>(<unknown>{ send: () => Promise.resolve({ myResponse: true }) })
+      request = new BatchWriteSingleTableRequest(client, Organization)
       request.delete([item])
     })
 

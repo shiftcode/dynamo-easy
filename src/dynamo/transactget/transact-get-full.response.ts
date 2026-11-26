@@ -3,7 +3,15 @@
  */
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
-export interface TransactGetFullResponse<X> {
+/**
+ * The response of a TransactGetItems operation with the Items mapped to their model classes.
+ */
+export interface TransactGetFullResponse<X extends ReadonlyArray<unknown>> extends Omit<
+  DynamoDB.TransactGetItemsOutput,
+  'Responses'
+> {
+  /**
+   * The read items, in the same order as requested.
+   */
   Items: X
-  ConsumedCapacity?: DynamoDB.ConsumedCapacity[]
 }

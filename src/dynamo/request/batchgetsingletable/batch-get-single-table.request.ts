@@ -10,7 +10,6 @@ import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
 import { batchGetItemsFetchAll } from '../../batchget/batch-get-utils'
 import { BATCH_GET_DEFAULT_TIME_SLOT, BATCH_GET_MAX_REQUEST_ITEM_COUNT } from '../../batchget/batch-get.const'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { BaseRequest } from '../base.request'
 import { addProjectionExpressionParam } from '../helper/add-projection-expression-param.function'
 import { BatchGetSingleTableResponse } from './batch-get-single-table.response'
@@ -26,8 +25,8 @@ export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends Ba
 > {
   private readonly logger: Logger
 
-  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
-    super(dynamoDBWrapper, modelClazz)
+  constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>, keys: Array<Partial<T>>) {
+    super(client, modelClazz)
     this.logger = createLogger('dynamo.request.BatchGetSingleTableRequest', modelClazz)
 
     if (keys.length > BATCH_GET_MAX_REQUEST_ITEM_COUNT) {
@@ -121,7 +120,7 @@ export class BatchGetSingleTableRequest<T, T2 extends Partial<T> = T> extends Ba
 
   private fetch(backoffTimer = randomExponentialBackoffTimer, throttleTimeSlot = BATCH_GET_DEFAULT_TIME_SLOT) {
     this.logger.debug('request', this.params)
-    return batchGetItemsFetchAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot).then(
+    return batchGetItemsFetchAll(this.client, { ...this.params }, backoffTimer(), throttleTimeSlot).then(
       promiseTap((response) => {
         this.logger.debug('response', response)
       }),

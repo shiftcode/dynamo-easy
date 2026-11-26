@@ -1,8 +1,8 @@
 import { and, attribute, DynamoStore, not, or } from '@shiftcoders/dynamo-easy'
 import { Person } from '../models'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
-const personStore = new DynamoStore(Person, new DynamoDB({}))
+const personStore = new DynamoStore(Person, new DynamoDB.DynamoDBClient({}))
 personStore
   .delete('vogelsw')
   .onlyIf(

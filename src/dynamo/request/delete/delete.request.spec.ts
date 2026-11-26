@@ -1,7 +1,6 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { ComplexModel, SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { updateDynamoEasyConfig } from '../../../config/update-config.function'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { DeleteRequest } from './delete.request'
 
 describe('delete request', () => {
@@ -45,7 +44,7 @@ describe('delete request', () => {
   })
 
   describe('logger', () => {
-    const sampleResponse: DynamoDB.DeleteItemOutput = { Attributes: undefined }
+    const sampleResponse: DynamoDB.DeleteItemCommandOutput = { $metadata: {}, Attributes: undefined }
     let logReceiverMock: jest.Mock
     let deleteItemMock: jest.Mock
     let req: DeleteRequest<SimpleWithPartitionKeyModel>
@@ -54,7 +53,7 @@ describe('delete request', () => {
       logReceiverMock = jest.fn()
       deleteItemMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverMock })
-      req = new DeleteRequest(<any>{ deleteItem: deleteItemMock }, SimpleWithPartitionKeyModel, 'id')
+      req = new DeleteRequest(<any>{ send: deleteItemMock }, SimpleWithPartitionKeyModel, 'id')
     })
 
     it('exec should log params and response', async () => {
@@ -77,19 +76,20 @@ describe('delete request', () => {
   describe('typings', () => {
     // tests basically only exists to be not valid when typings would be wrong
     let req: DeleteRequest<SimpleWithPartitionKeyModel>
-    let dynamoDbWrapperMock: DynamoDbWrapper
+    let clientMock: DynamoDB.DynamoDBClient
 
     beforeEach(() => {
-      dynamoDbWrapperMock = <any>{
-        deleteItem: () =>
+      clientMock = <any>{
+        send: () =>
           Promise.resolve({
+            $metadata: {},
             Attributes: {
               id: { S: 'myId' },
               age: { N: '20' },
             },
           }),
       }
-      req = new DeleteRequest(dynamoDbWrapperMock, SimpleWithPartitionKeyModel, 'myKey')
+      req = new DeleteRequest(clientMock, SimpleWithPartitionKeyModel, 'myKey')
     })
 
     it('exec, ALL_OLD', async () => {

@@ -1,11 +1,11 @@
 import { BatchGetRequest, BatchGetResponse } from '@shiftcoders/dynamo-easy'
 import { AnotherModel, Person } from '../models'
-import { DynamoDB } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 const keysToFetch: Array<Partial<Person>> = [{ id: 'vogelsw' }]
 const otherKeysToFetch: Array<Partial<AnotherModel>> = [{ propA: 'Foo', propB: 'Bar' }]
 
-new BatchGetRequest(new DynamoDB({}))
+new BatchGetRequest(new DynamoDB.DynamoDBClient({}))
   .forModel(Person, keysToFetch)
   .forModel(AnotherModel, otherKeysToFetch)
   .exec()

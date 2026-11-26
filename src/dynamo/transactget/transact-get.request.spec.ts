@@ -1,5 +1,4 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { getTableName } from '../get-table-name.function'
@@ -10,7 +9,7 @@ describe('TransactGetRequest', () => {
   let req: TransactGetRequest
 
   describe('constructor', () => {
-    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('shoud init params', () => {
       expect(req.params).toBeDefined()
@@ -20,17 +19,17 @@ describe('TransactGetRequest', () => {
   })
 
   describe('returnConsumedCapacity', () => {
-    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('should set the param', () => {
-      req.returnConsumedCapacity(ReturnConsumedCapacity.INDEXES)
+      req.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.INDEXES)
 
       expect(req.params.ReturnConsumedCapacity).toBe('INDEXES')
     })
   })
 
   describe('forModel', () => {
-    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (req = new TransactGetRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('should add a single item to params', () => {
       req.forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
@@ -89,15 +88,15 @@ describe('TransactGetRequest', () => {
         creationDate: { S: creationDate.toISOString() },
         age: { N: '22' },
       }
-      const output: DynamoDB.TransactGetItemsOutput = {
+      const output: DynamoDB.TransactGetItemsCommandOutput = {
+        $metadata: {},
         ConsumedCapacity: [],
         Responses: [{ Item: dbItem }, { Item: dbItem2 }],
       }
       transactGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(output))
-      req2 = new TransactGetRequest(new DynamoDB.DynamoDB({}))
+      req2 = new TransactGetRequest(<any>{ send: transactGetItemsMock })
         .forModel(SimpleWithPartitionKeyModel, { id: 'myId' })
         .forModel(SimpleWithCompositePartitionKeyModel, { id: 'myId', creationDate })
-      Object.assign(req2, { dynamoDBWrapper: { transactGetItems: transactGetItemsMock } })
     })
 
     it('exec should return the mapped item', async () => {

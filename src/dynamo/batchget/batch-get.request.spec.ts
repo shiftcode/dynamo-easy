@@ -1,9 +1,7 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { ReturnConsumedCapacity } from '@aws-sdk/client-dynamodb'
 import { Organization, SimpleWithCompositePartitionKeyModel, SimpleWithPartitionKeyModel } from '../../../test/models'
 import { toDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { BatchGetRequest } from './batch-get.request'
 
@@ -11,18 +9,18 @@ describe('batch get', () => {
   let request: BatchGetRequest
 
   describe('constructor', () => {
-    it('use provided DynamoDB instance', () => {
-      const dynamoDB = new DynamoDB.DynamoDB({})
-      const batchGetRequest = new BatchGetRequest(dynamoDB)
-      expect(batchGetRequest.dynamoDB).toBe(dynamoDB)
+    it('use provided DynamoDBClient instance', () => {
+      const client = new DynamoDB.DynamoDBClient({})
+      const batchGetRequest = new BatchGetRequest(client)
+      expect(batchGetRequest.client).toBe(client)
 
-      const batchGetRequest2 = new BatchGetRequest(new DynamoDB.DynamoDB({}))
-      expect(batchGetRequest2.dynamoDB).not.toBe(dynamoDB)
+      const batchGetRequest2 = new BatchGetRequest(new DynamoDB.DynamoDBClient({}))
+      expect(batchGetRequest2.client).not.toBe(client)
     })
   })
 
   describe('params', () => {
-    beforeEach(() => (request = new BatchGetRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (request = new BatchGetRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('base params', () => {
       const params = request.params
@@ -48,13 +46,13 @@ describe('batch get', () => {
     })
 
     it('returnConsumedCapacity', () => {
-      request.returnConsumedCapacity(ReturnConsumedCapacity.TOTAL)
+      request.returnConsumedCapacity(DynamoDB.ReturnConsumedCapacity.TOTAL)
       expect(request.params.ReturnConsumedCapacity).toBe('TOTAL')
     })
   })
 
   describe('forModel', () => {
-    beforeEach(() => (request = new BatchGetRequest(new DynamoDB.DynamoDB({}))))
+    beforeEach(() => (request = new BatchGetRequest(new DynamoDB.DynamoDBClient({}))))
 
     it('should throw when same table is used 2 times', () => {
       request.forModel(SimpleWithPartitionKeyModel, [{ id: 'idVal' }])
@@ -110,7 +108,8 @@ describe('batch get', () => {
     const jsItem1: SimpleWithPartitionKeyModel = { id: 'id-1', age: 21 }
     const jsItem2: SimpleWithPartitionKeyModel = { id: 'id-2', age: 22 }
 
-    const output1: DynamoDB.BatchGetItemOutput = {
+    const output1: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
       Responses: {
         [getTableName(SimpleWithPartitionKeyModel)]: [toDb(jsItem1, SimpleWithPartitionKeyModel)],
       },
@@ -120,7 +119,8 @@ describe('batch get', () => {
         },
       },
     }
-    const output2: DynamoDB.BatchGetItemOutput = {
+    const output2: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
       Responses: {
         [getTableName(SimpleWithPartitionKeyModel)]: [toDb(jsItem2, SimpleWithPartitionKeyModel)],
       },
@@ -132,16 +132,13 @@ describe('batch get', () => {
     const generatorMock = () => <any>{ next: nextSpyFn }
 
     beforeEach(() => {
-      request = new BatchGetRequest(new DynamoDB.DynamoDB({}))
-      request.forModel(SimpleWithPartitionKeyModel, [jsItem1, jsItem2])
-
       batchGetItemsMock = jest
         .fn()
         .mockReturnValueOnce(Promise.resolve(output1))
         .mockReturnValueOnce(Promise.resolve(output2))
-      const dynamoDBWrapper: DynamoDbWrapper = <any>{ batchGetItems: batchGetItemsMock }
 
-      Object.assign(request, { dynamoDBWrapper })
+      request = new BatchGetRequest(<any>{ send: batchGetItemsMock })
+      request.forModel(SimpleWithPartitionKeyModel, [jsItem1, jsItem2])
 
       nextSpyFn = jest.fn().mockImplementation(() => ({ value: 0 }))
     })
@@ -195,7 +192,8 @@ describe('batch get', () => {
       id: { S: 'idVal' },
       age: { N: '20' },
     }
-    const sampleResponse: DynamoDB.BatchGetItemOutput = {
+    const sampleResponse: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
       Responses: {
         [getTableName(SimpleWithPartitionKeyModel)]: [dbItem],
       },
@@ -204,9 +202,7 @@ describe('batch get', () => {
 
     beforeEach(() => {
       batchGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
-      const dynamoDBWrapper: DynamoDbWrapper = <any>{ batchGetItems: batchGetItemsMock }
-      request = new BatchGetRequest(new DynamoDB.DynamoDB({}))
-      Object.assign(request, { dynamoDBWrapper })
+      request = new BatchGetRequest(<any>{ send: batchGetItemsMock })
       request.forModel(SimpleWithPartitionKeyModel, [{ id: 'idVal' }])
     })
 

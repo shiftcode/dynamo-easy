@@ -2,7 +2,6 @@ import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { SimpleWithPartitionKeyModel } from '../../../../test/models'
 import { metadataForModel } from '../../../decorator/metadata/metadata-for-model.function'
 import { createKeyAttributes } from '../../../mapper/mapper'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { getTableName } from '../../get-table-name.function'
 import { TransactGetSingleTableRequest } from './transact-get-single-table.request'
 
@@ -24,7 +23,8 @@ describe('TransactGetSingleTableRequest', () => {
   })
 
   describe('exec, execFullResponse', () => {
-    const response: DynamoDB.TransactGetItemsOutput = {
+    const response: DynamoDB.TransactGetItemsCommandOutput = {
+      $metadata: {},
       Responses: [
         {
           Item: { id: { S: 'myId' }, age: { N: '20' } },
@@ -35,8 +35,9 @@ describe('TransactGetSingleTableRequest', () => {
     const transactGetItemsSpy = jest.fn().mockReturnValue(Promise.resolve(response))
 
     beforeEach(() => {
-      const dynamoDBWrapperMock: DynamoDbWrapper = <any>{ transactGetItems: transactGetItemsSpy }
-      req = new TransactGetSingleTableRequest(dynamoDBWrapperMock, SimpleWithPartitionKeyModel, [{ id: 'myId' }])
+      req = new TransactGetSingleTableRequest(<any>{ send: transactGetItemsSpy }, SimpleWithPartitionKeyModel, [
+        { id: 'myId' },
+      ])
     })
 
     it('exec should map items', async () => {
@@ -67,24 +68,24 @@ describe('TransactGetSingleTableRequest', () => {
   })
 
   describe('with empty response', () => {
-    const response: DynamoDB.TransactGetItemsOutput = {}
+    const response: DynamoDB.TransactGetItemsCommandOutput = { $metadata: {} }
     const transactGetItemsSpy = jest.fn().mockReturnValue(Promise.resolve(response))
 
     beforeEach(() => {
-      const dynamoDBWrapperMock: DynamoDbWrapper = <any>{ transactGetItems: transactGetItemsSpy }
-      req = new TransactGetSingleTableRequest(dynamoDBWrapperMock, SimpleWithPartitionKeyModel, [])
+      req = new TransactGetSingleTableRequest(<any>{ send: transactGetItemsSpy }, SimpleWithPartitionKeyModel, [])
     })
 
     it('exec returns empty array', async () => {
       expect(await req.exec()).toEqual([])
     })
 
-    it('execNoMap returns original response (empty object)', async () => {
-      expect(await req.execNoMap()).toEqual({})
+    it('execNoMap returns original response (only $metadata)', async () => {
+      expect(await req.execNoMap()).toEqual({ $metadata: {} })
     })
 
     it('execFullResponse returns the response with empty items array', async () => {
       expect(await req.execFullResponse()).toEqual({
+        $metadata: {},
         ConsumedCapacity: undefined,
         Items: [],
       })

@@ -7,7 +7,6 @@ import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes, fromDb } from '../../../mapper/mapper'
 import { Attributes } from '../../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../../model/model-constructor'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { addProjectionExpressionParam } from '../helper/add-projection-expression-param.function'
 import { StandardRequest } from '../standard.request'
 import { GetResponse } from './get.response'
@@ -23,8 +22,8 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
 > {
   private readonly logger: Logger
 
-  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
-    super(dynamoDBWrapper, modelClazz)
+  constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(client, modelClazz)
     this.logger = createLogger('dynamo.request.GetRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
@@ -48,26 +47,17 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
 
   execFullResponse(): Promise<GetResponse<T2>> {
     this.logger.debug('request', this.params)
-    return this.dynamoDBWrapper
-      .getItem(this.params)
+    return this.client
+      .send(new DynamoDB.GetItemCommand(this.params))
       .then(
         promiseTap((response) => {
           this.logger.debug('response', response)
         }),
       )
-      .then((getItemResponse) => {
-        // TODO post-v3: investigate on how to remove any
-
-        const response: GetResponse<T2> = { ...(getItemResponse as any) }
-
-        if (getItemResponse.Item) {
-          response.Item = fromDb(<Attributes<T2>>getItemResponse.Item, <any>this.modelClazz)
-        } else {
-          response.Item = null
-        }
-
-        return response
-      })
+      .then(({ Item, ...rest }): GetResponse<T2> => ({
+        ...rest,
+        Item: Item ? fromDb(<Attributes<T2>>Item, <any>this.modelClazz) : null,
+      }))
       .then(
         promiseTap((response) => {
           this.logger.debug('mapped item', response.Item)
@@ -80,8 +70,8 @@ export class GetRequest<T, T2 extends Partial<T> = T> extends StandardRequest<
    */
   exec(): Promise<T2 | null> {
     this.logger.debug('request', this.params)
-    return this.dynamoDBWrapper
-      .getItem(this.params)
+    return this.client
+      .send(new DynamoDB.GetItemCommand(this.params))
       .then(
         promiseTap((response) => {
           this.logger.debug('response', response)

@@ -12,7 +12,7 @@ function booleanFromDb(attributeValue: BooleanAttribute): boolean {
 }
 
 function booleanToDb(modelValue: boolean): BooleanAttribute {
-  if (!(modelValue || !modelValue)) {
+  if (typeof modelValue !== 'boolean') {
     throw new Error(`only boolean values are mapped to a BOOl attribute, given: ${JSON.stringify(modelValue)}`)
   }
   return { BOOL: modelValue }

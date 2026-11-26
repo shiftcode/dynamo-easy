@@ -12,7 +12,6 @@ import { INDEX_ACTIVE } from '../../../../test/models/model-with-indexes.model'
 import { GSISortKey } from '../../../decorator/impl/index/gsi-sort-key.decorator'
 import { PartitionKey } from '../../../decorator/impl/key/partition-key.decorator'
 import { Model } from '../../../decorator/impl/model/model.decorator'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { attribute } from '../../expression/logical-operator/attribute.function'
 import { ReadManyRequest } from '../read-many.request'
 import { QueryRequest } from './query.request'
@@ -22,8 +21,8 @@ describe('query request', () => {
 
   describe('constructor', () => {
     class MyQueryRequest extends QueryRequest<ComplexModel> {
-      constructor(dynamoDBWrapper: DynamoDbWrapper) {
-        super(dynamoDBWrapper, ComplexModel)
+      constructor(client: DynamoDB.DynamoDBClient) {
+        super(client, ComplexModel)
       }
 
       get theLogger() {
@@ -35,7 +34,7 @@ describe('query request', () => {
 
     beforeEach(() => {
       queryMock = jest.fn().mockReturnValueOnce(Promise.resolve({ Count: 1 }))
-      request = new MyQueryRequest(<any>{ query: queryMock })
+      request = new MyQueryRequest(<any>{ send: queryMock })
     })
 
     it('extends ReadManyRequest', () => {
@@ -44,9 +43,16 @@ describe('query request', () => {
     it('creates logger', () => {
       expect(request.theLogger).toBeDefined()
     })
-    it('doRequest uses dynamoDBWrapper.query', async () => {
+    it('doRequest sends a QueryCommand', async () => {
+      request.wherePartitionKey('myId')
       await request.exec()
       expect(queryMock).toHaveBeenCalled()
+      expect(queryMock.mock.calls[0][0]).toBeInstanceOf(DynamoDB.QueryCommand)
+      expect(queryMock.mock.calls[0][0].input).toEqual(request.params)
+    })
+    it('doRequest throws when no key condition expression is defined', () => {
+      expect(() => request.exec()).toThrow('key condition expression must be defined')
+      expect(queryMock).not.toHaveBeenCalled()
     })
   })
 

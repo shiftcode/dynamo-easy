@@ -5,7 +5,6 @@ import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { createLogger, Logger } from '../../../logger/logger'
 import { createKeyAttributes } from '../../../mapper/mapper'
 import { ModelConstructor } from '../../../model/model-constructor'
-import { DynamoDbWrapper } from '../../dynamo-db-wrapper'
 import { prepareAndAddUpdateExpressions } from '../../expression/prepare-and-add-update-expressions.function'
 import { addUpdate } from '../../expression/request-expression-builder'
 import { RequestUpdateFunction } from '../../expression/type/update-expression-definition-chain'
@@ -19,13 +18,13 @@ export class UpdateRequest<T, T2 extends T | Partial<T> | void = void> extends W
   T,
   T2,
   DynamoDB.UpdateItemInput,
-  DynamoDB.UpdateItemOutput,
+  DynamoDB.UpdateItemCommandOutput,
   UpdateRequest<T, T2>
 > {
   protected readonly logger: Logger
 
-  constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
-    super(dynamoDBWrapper, modelClazz)
+  constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>, partitionKey: any, sortKey?: any) {
+    super(client, modelClazz)
     this.logger = createLogger('dynamo.request.UpdateRequest', modelClazz)
     this.params.Key = createKeyAttributes(this.metadata, partitionKey, sortKey)
   }
@@ -50,12 +49,12 @@ export class UpdateRequest<T, T2 extends T | Partial<T> | void = void> extends W
   returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW'): UpdateRequest<T, T>
   returnValues(returnValues: 'UPDATED_OLD' | 'UPDATED_NEW'): UpdateRequest<T, Partial<T>>
   returnValues(returnValues: 'NONE'): UpdateRequest<T>
-  returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE'): this {
+  returnValues(returnValues: 'ALL_OLD' | 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'NONE'): any {
     this.params.ReturnValues = returnValues
     return this
   }
 
-  protected doRequest(params: DynamoDB.UpdateItemInput): Promise<DynamoDB.UpdateItemOutput> {
-    return this.dynamoDBWrapper.updateItem(params)
+  protected doRequest(params: DynamoDB.UpdateItemInput): Promise<DynamoDB.UpdateItemCommandOutput> {
+    return this.client.send(new DynamoDB.UpdateItemCommand(params))
   }
 }

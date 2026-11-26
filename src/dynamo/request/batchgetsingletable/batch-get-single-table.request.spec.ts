@@ -84,7 +84,8 @@ describe('batch get', () => {
     let req: BatchGetSingleTableRequest<SimpleWithPartitionKeyModel>
 
     const jsItem: SimpleWithPartitionKeyModel = { id: 'myId', age: 20 }
-    const sampleResponse: DynamoDB.BatchGetItemOutput = {
+    const sampleResponse: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
       Responses: {
         [getTableName(SimpleWithPartitionKeyModel)]: [{ id: { S: jsItem.id }, age: { N: `${jsItem.age}` } }],
       },
@@ -92,9 +93,7 @@ describe('batch get', () => {
 
     beforeEach(() => {
       batchGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
-      req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsMock }, SimpleWithPartitionKeyModel, [
-        jsItem,
-      ])
+      req = new BatchGetSingleTableRequest(<any>{ send: batchGetItemsMock }, SimpleWithPartitionKeyModel, [jsItem])
     })
 
     it('execNoMap', async () => {
@@ -119,13 +118,13 @@ describe('batch get', () => {
     let batchGetItemsMock: jest.Mock
     let req: BatchGetSingleTableRequest<SimpleWithPartitionKeyModel>
 
-    const sampleResponse = { Responses: null }
+    const sampleResponse = { $metadata: {}, Responses: null }
 
     beforeEach(() => {
       logReceiverMock = jest.fn()
       batchGetItemsMock = jest.fn().mockReturnValueOnce(Promise.resolve(sampleResponse))
       updateDynamoEasyConfig({ logReceiver: logReceiverMock })
-      req = new BatchGetSingleTableRequest(<any>{ batchGetItems: batchGetItemsMock }, SimpleWithPartitionKeyModel, [])
+      req = new BatchGetSingleTableRequest(<any>{ send: batchGetItemsMock }, SimpleWithPartitionKeyModel, [])
     })
 
     afterEach(resetDynamoEasyConfig)

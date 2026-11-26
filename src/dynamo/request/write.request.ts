@@ -8,7 +8,6 @@ import { fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
 import { Omit } from '../../model/omit.type'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/public.api'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -37,8 +36,8 @@ export abstract class WriteRequest<
 > extends StandardRequest<T, T2, I, R> {
   protected abstract readonly logger: Logger
 
-  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
-    super(dynamoDBWrapper, modelClazz)
+  protected constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>) {
+    super(client, modelClazz)
   }
 
   protected abstract doRequest(params: I): Promise<O>

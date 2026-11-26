@@ -1,5 +1,4 @@
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { batchGetItemsFetchAll, combineBatchGetResponses, hasUnprocessedKeys } from './batch-get-utils'
 
 describe('batch-get utils', () => {
@@ -50,11 +49,12 @@ describe('batch-get utils', () => {
   })
 
   describe('batchGetItemsFetchAll', () => {
-    let batchGetItemsMock: jest.Mock
-    let dynamoDBWrapper: DynamoDbWrapper
+    let sendMock: jest.Mock
+    let client: DynamoDB.DynamoDBClient
     let backoffTimerMock: { next: jest.Mock }
 
-    const output1: DynamoDB.BatchGetItemOutput = {
+    const output1: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
       Responses: {
         tableA: [{ id: { S: 'id-A' } }],
       },
@@ -64,26 +64,25 @@ describe('batch-get utils', () => {
         },
       },
     }
-    const output2: DynamoDB.BatchGetItemOutput = {
+    const output2: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
       Responses: {
         tableA: [{ id: { S: 'id-A' } }],
       },
     }
 
     beforeEach(async () => {
-      batchGetItemsMock = jest
-        .fn()
-        .mockReturnValueOnce(Promise.resolve(output1))
-        .mockReturnValueOnce(Promise.resolve(output2))
-      dynamoDBWrapper = <any>{ batchGetItems: batchGetItemsMock }
+      sendMock = jest.fn().mockReturnValueOnce(Promise.resolve(output1)).mockReturnValueOnce(Promise.resolve(output2))
+      client = <any>{ send: sendMock }
       backoffTimerMock = { next: jest.fn().mockReturnValueOnce({ value: 0 }) }
 
-      await batchGetItemsFetchAll(dynamoDBWrapper, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
+      await batchGetItemsFetchAll(client, <any>{}, <IterableIterator<number>>(<any>backoffTimerMock), 0)
     })
 
     it('should use UnprocessedKeys for next request', () => {
-      expect(batchGetItemsMock).toHaveBeenCalledTimes(2)
-      expect(batchGetItemsMock).toHaveBeenLastCalledWith(
+      expect(sendMock).toHaveBeenCalledTimes(2)
+      expect(sendMock.mock.calls[1][0]).toBeInstanceOf(DynamoDB.BatchGetItemCommand)
+      expect(sendMock.mock.calls[1][0].input).toEqual(
         expect.objectContaining({ RequestItems: output1.UnprocessedKeys }),
       )
     })

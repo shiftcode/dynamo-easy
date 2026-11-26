@@ -5,7 +5,6 @@ import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { randomExponentialBackoffTimer } from '../../helper/random-exponential-backoff-timer.generator'
 import { createToKeyFn, toDb } from '../../mapper/mapper'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { getTableName } from '../get-table-name.function'
 import { batchWriteItemsWriteAll } from './batch-write-utils'
 import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } from './batch-write.const'
@@ -14,16 +13,10 @@ import { BATCH_WRITE_DEFAULT_TIME_SLOT, BATCH_WRITE_MAX_REQUEST_ITEM_COUNT } fro
  * Request class for the BatchWriteItem operation. Put or delete multiple items in one or more table.
  */
 export class BatchWriteRequest {
-  get dynamoDB(): DynamoDB.DynamoDB {
-    return this.dynamoDBWrapper.dynamoDB
-  }
-
   readonly params: DynamoDB.BatchWriteItemInput & { RequestItems: Record<string, DynamoDB.WriteRequest[]> }
-  private readonly dynamoDBWrapper: DynamoDbWrapper
   private itemCount = 0
 
-  constructor(dynamoDB: DynamoDB.DynamoDB) {
-    this.dynamoDBWrapper = new DynamoDbWrapper(dynamoDB)
+  constructor(readonly client: DynamoDB.DynamoDBClient) {
     this.params = {
       RequestItems: {},
     }
@@ -84,7 +77,7 @@ export class BatchWriteRequest {
   execFullResponse(
     backoffTimer = randomExponentialBackoffTimer,
     throttleTimeSlot = BATCH_WRITE_DEFAULT_TIME_SLOT,
-  ): Promise<DynamoDB.BatchWriteItemOutput> {
+  ): Promise<DynamoDB.BatchWriteItemCommandOutput> {
     return this.write(backoffTimer, throttleTimeSlot)
   }
 
@@ -99,7 +92,7 @@ export class BatchWriteRequest {
   }
 
   private write(backoffTimer: () => IterableIterator<number>, throttleTimeSlot: number) {
-    return batchWriteItemsWriteAll(this.dynamoDBWrapper, { ...this.params }, backoffTimer(), throttleTimeSlot)
+    return batchWriteItemsWriteAll(this.client, { ...this.params }, backoffTimer(), throttleTimeSlot)
   }
 
   private createDeleteRequest = <T>(modelClazz: ModelConstructor<T>) => {

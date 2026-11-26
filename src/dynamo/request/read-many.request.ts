@@ -9,7 +9,6 @@ import { Logger } from '../../logger/logger'
 import { fromDb } from '../../mapper/mapper'
 import { Attributes } from '../../mapper/type/attribute.type'
 import { ModelConstructor } from '../../model/model-constructor'
-import { DynamoDbWrapper } from '../dynamo-db-wrapper'
 import { and } from '../expression/logical-operator/and.function'
 import { addExpression } from '../expression/param-util'
 import { addCondition } from '../expression/request-expression-builder'
@@ -45,12 +44,12 @@ export abstract class ReadManyRequest<
   protected abstract readonly logger: Logger
 
   /**
-   * method that executes the actual call on dynamoDBWrapper with the given params.
+   * method that executes the actual call on client with the given params.
    */
   protected abstract doRequest(params: I): Promise<O>
 
-  protected constructor(dynamoDBWrapper: DynamoDbWrapper, modelClazz: ModelConstructor<T>) {
-    super(dynamoDBWrapper, modelClazz)
+  protected constructor(client: DynamoDB.DynamoDBClient, modelClazz: ModelConstructor<T>) {
+    super(client, modelClazz)
   }
 
   /**

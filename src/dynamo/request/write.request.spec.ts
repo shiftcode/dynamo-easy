@@ -5,7 +5,7 @@ import { ModelConstructor } from '../../model/model-constructor'
 import { attribute } from '../expression/logical-operator/attribute.function'
 import { or } from '../expression/logical-operator/public.api'
 import { WriteRequest } from './write.request'
-import { ReturnItemCollectionMetrics } from '@aws-sdk/client-dynamodb'
+import * as DynamoDB from '@aws-sdk/client-dynamodb'
 
 describe('write request', () => {
   class TestWriteRequest<T> extends WriteRequest<T, T, any, any, TestWriteRequest<T>> {
@@ -69,7 +69,7 @@ describe('write request', () => {
     })
 
     it('should set returnItemCollectionMetrics', () => {
-      req.returnItemCollectionMetrics(ReturnItemCollectionMetrics.SIZE)
+      req.returnItemCollectionMetrics(DynamoDB.ReturnItemCollectionMetrics.SIZE)
       expect(req.params.ReturnItemCollectionMetrics).toBe('SIZE')
     })
 
