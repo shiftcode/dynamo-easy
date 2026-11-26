@@ -14,9 +14,6 @@ on:
     tags-ignore:
       - '**'
 
-permissions:
-  contents: read
-
 jobs:
   test:
     strategy:
@@ -27,6 +24,8 @@ jobs:
           - 26
     name: Node.js v${{ matrix.node }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
@@ -43,6 +42,48 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd #v6.0.2
+      - name: Setup Node and NPM Cache
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f #v6.3.0
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+      - name: Install
+        run: HUSKY=0 npm ci
+      - name: Check Linting
+        run: npm run lint:ci
+      - name: Check Formatting
+        run: npm run format:ci
+      # run tests again to have coverage information available for report coverage step
+      - name: Test
+        run: npm run test:ci
+      - name: Build
+        run: npm run build
+        env:
+          CI: true
+      # report coverage only for non PR
+      - name: coveralls
+        if: ${{ startsWith(github.ref, 'refs/pull/') == false }}
+        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload build output
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 #v7.0.2
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    needs: build
+    # only for non-PR branches
+    if: ${{ startsWith(github.ref, 'refs/pull/') == false }}
+    runs-on: ubuntu-latest
+    permissions:
       contents: write # to be able to publish a GitHub release
       issues: write # to be able to comment on released issues
       pull-requests: write # to be able to comment on released pull requests
@@ -57,25 +98,15 @@ jobs:
           cache: 'npm'
       - name: Install
         run: HUSKY=0 npm ci
-      - name: Lint
-        run: npm run lint:ci
-      # run tests again to have coverage information available for report coverage step
-      - name: Test
-        run: npm run test:ci
-      - name: Build
-        run: npm run build
-        env:
-          CI: true
-      # report coverage only for non PR
-      - name: coveralls
-        if: ${{ startsWith(github.ref, 'refs/pull/') == false }}
-        uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.7
+      - name: Download build output
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 #v8.0.2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          name: dist
+          path: dist
 
       # publish to latest if on master branch
       - name: release master
-        if: ${{ github.ref == 'master' }}
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: |
           npm run docs:build
           npx semantic-release
@@ -83,9 +114,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # publish pre-release if non master branch and allowed by .releaserc.yml configuration (only for non-PR branches)
+      # publish pre-release if non master branch and allowed by .releaserc.yml configuration
       - name: release non-master version
-        if: ${{ github.ref != 'master' && startsWith(github.ref, 'refs/pull/') == false }}
+        if: ${{ github.ref != 'refs/heads/master' }}
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
