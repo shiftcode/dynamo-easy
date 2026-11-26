@@ -48,6 +48,31 @@ describe('batch-get utils', () => {
     })
   })
 
+  describe('batchGetItemsFetchAll limits', () => {
+    const unprocessed: DynamoDB.BatchGetItemCommandOutput = {
+      $metadata: {},
+      UnprocessedKeys: { tableA: { Keys: [{ id: { S: 'id-A' } }] } },
+    }
+    const timer = () => <IterableIterator<number>>(<any>{ next: () => ({ value: 1000 }) })
+
+    it('should reject after maxRetries follow-up requests', async () => {
+      const sendMock = jest.fn().mockResolvedValue(unprocessed)
+      await expect(batchGetItemsFetchAll(<any>{ send: sendMock }, <any>{}, timer(), 0, 0, 2)).rejects.toThrow(
+        'max retries',
+      )
+      expect(sendMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('should cap the delay at maxDelay', async () => {
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+      const sendMock = jest.fn().mockResolvedValueOnce(unprocessed).mockResolvedValueOnce({ $metadata: {} })
+      await batchGetItemsFetchAll(<any>{ send: sendMock }, <any>{}, timer(), 1000, 5)
+      expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 5)
+      expect(sendMock).toHaveBeenCalledTimes(2)
+      setTimeoutSpy.mockRestore()
+    })
+  })
+
   describe('batchGetItemsFetchAll', () => {
     let sendMock: jest.Mock
     let client: DynamoDB.DynamoDBClient
