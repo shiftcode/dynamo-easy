@@ -94,6 +94,21 @@ describe('collection mapper', () => {
         expect(attributeValue.SS).toEqual(['value1', 'value2', 'value3'])
       })
 
+      it.each([
+        { value: new Set(['value1', null]), genericType: String, type: Set },
+        { value: new Set([1, null]), genericType: Number, type: Set },
+        { value: ['value1', null], genericType: String, type: Array },
+        { value: [1, null], genericType: Number, type: Array },
+      ])('should throw for null in $type.name<$genericType.name> (set attribute)', ({ value, genericType, type }) => {
+        expect(() => CollectionMapper.toDb(value, <any>{ typeInfo: { type, genericType } })).toThrow(
+          'null values are not allowed',
+        )
+      })
+
+      it('should map null in (L)ist to NULL', () => {
+        expect(CollectionMapper.toDb(['value1', null], <any>metadata)).toEqual({ L: [{ S: 'value1' }, { NULL: true }] })
+      })
+
       it('sorted arr (homogeneous string)', () => {
         const attributeValue = <ListAttribute>CollectionMapper.toDb(['value1', 'value2', 'value3'], <any>metadata)
         expect(Object.keys(attributeValue)[0]).toBe('L')

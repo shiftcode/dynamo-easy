@@ -272,11 +272,6 @@
       "count": 1
     }
   },
-  "src/dynamo/expression/condition-expression-builder.spec.ts": {
-    "@typescript-eslint/no-unsafe-assignment": {
-      "count": 1
-    }
-  },
   "src/dynamo/expression/condition-expression-builder.ts": {
     "@typescript-eslint/no-unnecessary-condition": {
       "count": 2
@@ -285,19 +280,10 @@
       "count": 5
     },
     "@typescript-eslint/no-unsafe-assignment": {
-      "count": 6
-    },
-    "@typescript-eslint/no-unsafe-call": {
       "count": 1
-    },
-    "@typescript-eslint/no-unsafe-member-access": {
-      "count": 2
     },
     "@typescript-eslint/restrict-template-expressions": {
       "count": 2
-    },
-    "no-prototype-builtins": {
-      "count": 1
     }
   },
   "src/dynamo/expression/functions/attribute-name-replacer.function.ts": {
@@ -771,13 +757,13 @@
       "count": 2
     },
     "@typescript-eslint/no-unnecessary-condition": {
-      "count": 3
+      "count": 2
     },
     "@typescript-eslint/no-unnecessary-type-parameters": {
       "count": 1
     },
     "@typescript-eslint/no-unsafe-argument": {
-      "count": 2
+      "count": 1
     },
     "@typescript-eslint/no-unsafe-assignment": {
       "count": 6
@@ -787,9 +773,6 @@
     },
     "@typescript-eslint/no-unsafe-return": {
       "count": 3
-    },
-    "@typescript-eslint/restrict-template-expressions": {
-      "count": 1
     }
   },
   "src/mapper/type/attribute-value-type.type.ts": {

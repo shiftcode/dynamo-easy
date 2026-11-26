@@ -38,6 +38,7 @@ import {
   ModelWithNestedModelWithCustomMapper,
   NestedModelWithCustomMapper,
 } from '../../test/models/model-with-nested-model-with-custom-mapper.model'
+import { ModelWithNullValues } from '../../test/models/model-with-null-values.model'
 import { NestedComplexModel } from '../../test/models/nested-complex.model'
 import * as DynamoDB from '@aws-sdk/client-dynamodb'
 import { metadataForModel } from '../decorator/metadata/metadata-for-model.function'
@@ -110,13 +111,9 @@ describe('Mapper', () => {
         expect(attrValue.S).toBe('first')
       })
 
-      it('enum (propertyMetadata -> no enum decorator)', () => {
-        const attrValue: Attribute = <MapAttribute>toDbOne(Type.FirstType, <any>{
-          typeInfo: { type: Object },
-        })!
-        expect(attrValue).toBeDefined()
-        expect(keyOf(attrValue)).toBe('M')
-        expect(attrValue.M).toEqual({})
+      it('enum (propertyMetadata with design type Object -> type derived from value)', () => {
+        const attrValue = toDbOne(Type.FirstType, <any>{ typeInfo: { type: Object } })
+        expect(attrValue).toEqual({ N: `${Type.FirstType}` })
       })
 
       it('array -> L(ist) (no explicit type)', () => {
@@ -177,7 +174,7 @@ describe('Mapper', () => {
         const employee1 = <MapAttribute<Employee>>attrValue.L[0]
         expect(employee1).toBeDefined()
         expect(keyOf(employee1)).toBe('M')
-        expect(Object.keys(employee1.M).length).toBe(2)
+        expect(Object.keys(employee1.M).length).toBe(3)
         expect(employee1.M.name).toBeDefined()
         expect(keyOf(employee1.M.name)).toBe('S')
         expect((<StringAttribute>employee1.M.name).S).toBe('max')
@@ -185,6 +182,8 @@ describe('Mapper', () => {
         expect(employee1.M.age).toBeDefined()
         expect(keyOf(employee1.M.age)).toBe('N')
         expect((<NumberAttribute>employee1.M.age).N).toBe('25')
+
+        expect(employee1.M.sortedSet).toEqual({ NULL: true })
       })
 
       it('heterogenous Set without decorator should throw', () => {
@@ -1089,6 +1088,57 @@ describe('Mapper', () => {
       expect(key).toEqual({
         id: { S: Id.unparse(partial.id) },
       })
+    })
+  })
+  describe('null values', () => {
+    const item: ModelWithNullValues = {
+      id: 'id',
+      name: null,
+      age: null,
+      nested: { name: null },
+      nestedList: [{ name: null }, null],
+      customId: null,
+      untyped: { a: null, b: [null] },
+    }
+    const attributes: Attributes<ModelWithNullValues> = {
+      id: { S: 'id' },
+      name: { NULL: true },
+      renamed_age: { NULL: true },
+      nested: { M: { name: { NULL: true } } },
+      nestedList: { L: [{ M: { name: { NULL: true } } }, { NULL: true }] },
+      customId: { NULL: true },
+      untyped: { M: { a: { NULL: true }, b: { L: [{ NULL: true }] } } },
+    }
+
+    it('toDb maps null to NULL (also for explicitly typed, nested, list items and custom mapper properties)', () => {
+      expect(toDb(item, ModelWithNullValues)).toEqual(attributes)
+    })
+
+    it('toDb maps null to NULL without model', () => {
+      expect(toDb({ a: null, b: { c: null } })).toEqual({ a: { NULL: true }, b: { M: { c: { NULL: true } } } })
+    })
+
+    it('toDb still ignores undefined values', () => {
+      expect(toDb(<any>{ id: 'id', name: undefined }, ModelWithNullValues)).toEqual({ id: { S: 'id' } })
+    })
+
+    it('fromDb maps NULL to null', () => {
+      expect(fromDb(attributes, ModelWithNullValues)).toEqual(item)
+    })
+
+    it('fromDbOne maps NULL to null regardless of explicit type', () => {
+      const meta = metadataForModel(ModelWithNullValues).forProperty('name')
+      expect(fromDbOne({ NULL: true }, meta)).toBeNull()
+    })
+
+    it('null index key value is omitted (index key attributes must not be NULL)', () => {
+      expect(toDb(<any>{ id: 'id', gsiPk: null }, ModelWithNullValues)).toEqual({ id: { S: 'id' } })
+    })
+
+    it('null key value throws', () => {
+      const meta = metadataForModel(ModelWithNullValues).forProperty('id')
+      expect(() => toDbOne(null, meta)).toThrow()
+      expect(() => toDb(<any>{ id: null }, ModelWithNullValues)).toThrow()
     })
   })
 })

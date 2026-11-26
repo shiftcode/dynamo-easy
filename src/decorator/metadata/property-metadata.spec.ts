@@ -5,7 +5,7 @@ import { DateProperty } from '../impl/date/date-property.decorator'
 import { Model } from '../impl/model/model.decorator'
 import { Property } from '../impl/property/property.decorator'
 import { metadataForModel } from './metadata-for-model.function'
-import { alterCollectionPropertyMetadataForSingleItem } from './property-metadata.model'
+import { alterCollectionPropertyMetadataForSingleItem, hasType } from './property-metadata.model'
 
 @Model()
 class NestedModel {
@@ -28,6 +28,25 @@ class TestModel {
 
   @Property()
   myString: string
+
+  @Property()
+  myNested: NestedModel
+
+  // typescript emits `Object` as design type for the following properties
+  @Property()
+  myNullableString: string | null
+
+  @Property()
+  myNullableNested: NestedModel | null
+
+  @Property()
+  myAny: any
+
+  @Property()
+  myInterface: { foo: string }
+
+  // no decorator -> no property metadata
+  myUndecorated: string
 }
 
 describe('alterCollectionPropertyMetadataForSingleItem', () => {
@@ -82,4 +101,44 @@ describe('alterCollectionPropertyMetadataForSingleItem', () => {
     expect(alterCollectionPropertyMetadataForSingleItem()).toBe(undefined)
     expect(alterCollectionPropertyMetadataForSingleItem(null)).toBe(undefined)
   })
+})
+
+describe('hasType', () => {
+  const metadata = metadataForModel(TestModel)
+
+  it('should return false when no property metadata was provided', () => {
+    expect(hasType()).toBe(false)
+    expect(hasType(metadata.forProperty('myUndecorated'))).toBe(false)
+  })
+
+  it('should return false when property metadata has no typeInfo', () => {
+    expect(hasType({ name: 'foo', nameDb: 'foo' })).toBe(false)
+  })
+
+  it('should return false when type is Object', () => {
+    expect(hasType({ name: 'foo', nameDb: 'foo', typeInfo: { type: Object } })).toBe(false)
+  })
+
+  it.each([String, Number, Boolean, Date, Array, Set, NestedModel].map((type) => ({ type })))(
+    'should return true for explicit type $type.name',
+    ({ type }) => {
+      expect(hasType({ name: 'foo', nameDb: 'foo', typeInfo: { type } })).toBe(true)
+    },
+  )
+
+  it.each(['myString', 'myNested', 'myStringArray', 'myCustomArray', 'myDateSet'] satisfies Array<keyof TestModel>)(
+    'should return true for decorated property %s with a concrete design type',
+    (prop) => {
+      expect(hasType(metadata.forProperty(prop))).toBe(true)
+    },
+  )
+
+  it.each(['myNullableString', 'myNullableNested', 'myAny', 'myInterface'] satisfies Array<keyof TestModel>)(
+    'should return false for decorated property %s with design type Object (nullable unions, any, interfaces)',
+    (prop) => {
+      const propMeta = metadata.forProperty(prop)
+      expect(propMeta?.typeInfo?.type).toBe(Object)
+      expect(hasType(propMeta)).toBe(false)
+    },
+  )
 })

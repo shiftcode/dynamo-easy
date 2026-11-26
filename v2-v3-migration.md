@@ -11,10 +11,10 @@
   - [x] The old behavior (sessionValidityEnsurer) was executed before every request, with the new implementation we
         only react to failing requests, so we should probably provide a way to automatically retry failed requests after
         successfully refreshing any invalid session.
-- [ ] Switch to new implementation of pagination, see [official doc](https://github.com/aws/aws-sdk-js-v3#paginators).
+- [x] Switch to new implementation of pagination, see [official doc](https://github.com/aws/aws-sdk-js-v3#paginators).
 - [ ] ~~Use middleware stack to implement verbose logging of request / response data~~
 - [x] Update [dynamo-easy-demo](https://github.com/shiftcode/dynamo-easy-demo) see [this](https://github.com/shiftcode/dynamo-easy-demo/issues/1) issue
-- [ ] Check if we still need to implement our custom retry backoff behaviour, since it seems that v3 has some reasonable default behaviour. (see [https://github.com/aws/aws-sdk-js-v3?tab=readme-ov-file#example-pagination-usage](https://github.com/smithy-lang/smithy-typescript/blob/main/packages/util-retry/README.md#default))
+- [x] Check if we still need to implement our custom retry backoff behaviour, since it seems that v3 has some reasonable default behaviour. (see [https://github.com/aws/aws-sdk-js-v3?tab=readme-ov-file#example-pagination-usage](https://github.com/smithy-lang/smithy-typescript/blob/main/packages/util-retry/README.md#default))
 
 ## 💥 Breaking changes
 
@@ -61,6 +61,23 @@ property of the response.
 output type (with the raw item(s) replaced by the mapped model item(s)) instead of redeclaring a subset of its fields.
 All other fields of the SDK output (e.g. `ScannedCount`, `LastEvaluatedKey`, `ItemCollectionMetrics`) are therefore
 available on the typed response as well.
+
+### `null` values are persisted as `NULL`
+
+Previously, properties with a `null` value were silently dropped when mapping to DynamoDB, and `NULL` attributes were
+dropped when mapping from DynamoDB. Now `null` is mapped to `{ NULL: true }` and back to `null`, on all levels
+(top-level properties, nested objects and list items). This also applies to properties with an explicit type or a custom
+mapper (the custom mapper is not called for `null` / `NULL`), and to expression values, so `update(...).set(null)` and
+`attribute(...).equals(null)` now work as expected.
+
+- `undefined` values are still omitted. Use `undefined` (or `remove()` in update expressions) if an attribute should not
+  be written.
+- `null` values of partition / sort key properties still throw.
+- `null` values of index key properties (GSI / LSI) are still omitted, because DynamoDB rejects `NULL` for index key
+  attributes. This keeps sparse indexes working.
+- A design type of `Object` (what TypeScript emits for `any`, interfaces and union types like `string | null` or
+  `MyModel | null`) is no longer treated as an explicit type, the type is derived from the value instead. Before, such
+  properties were mapped with the object mapper.
 
 ## Useful Links
 

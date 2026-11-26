@@ -40,53 +40,37 @@ type BuildFilterFn = (
  */
 
 /**
- * Will walk the object tree recursively and removes all items that do not satisfy the filterFn
+ * Will walk the object tree recursively and removes all items that do not satisfy the filterFn.
+ * Removed items are signaled with `undefined` so `null` values are kept (if the filterFn allows them)
  * @param obj
  * @param {(value: any) => boolean} filterFn
  * @returns {any}
  * @hidden
  */
-export function deepFilter(obj: any, filterFn: (value: any) => boolean): any {
-  if (Array.isArray(obj)) {
-    const returnArr: any[] = []
-    obj.forEach((i) => {
-      const item = deepFilter(i, filterFn)
-      if (item !== null) {
+export function deepFilter(obj: unknown, filterFn: (value: unknown) => boolean): any {
+  if (Array.isArray(obj) || obj instanceof Set) {
+    const returnArr: unknown[] = []
+    for (const i of obj) {
+      const item: unknown = deepFilter(i, filterFn)
+      if (item !== undefined) {
         returnArr.push(item)
       }
-    })
+    }
 
-    return returnArr
-  } else if (obj instanceof Set) {
-    const returnArr: any[] = []
-    Array.from(obj).forEach((i) => {
-      const item = deepFilter(i, filterFn)
-      if (item !== null) {
-        returnArr.push(item)
-      }
-    })
-
-    return returnArr.length ? new Set(returnArr) : null
+    return Array.isArray(obj) ? returnArr : new Set(returnArr)
   } else if (isPlainObject(obj)) {
-    const returnObj: Record<string, any> = {}
+    const returnObj: Record<string, unknown> = {}
 
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        const value = obj[key]
-        const item = deepFilter(value, filterFn)
-        if (item !== null) {
-          returnObj[key] = item
-        }
+    for (const [key, value] of Object.entries(<Record<string, unknown>>obj)) {
+      const item: unknown = deepFilter(value, filterFn)
+      if (item !== undefined) {
+        returnObj[key] = item
       }
     }
 
     return returnObj
   } else {
-    if (filterFn(obj)) {
-      return obj
-    } else {
-      return null
-    }
+    return filterFn(obj) ? obj : undefined
   }
 }
 

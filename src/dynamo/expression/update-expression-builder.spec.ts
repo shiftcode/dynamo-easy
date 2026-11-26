@@ -1,3 +1,4 @@
+import { ModelWithNullValues } from '../../../test/models/model-with-null-values.model'
 import { SimpleWithPartitionKeyModel, UpdateModel } from '../../../test/models'
 import { SpecialCasesModel } from '../../../test/models/special-cases-model.model'
 import { metadataForModel } from '../../decorator/metadata/metadata-for-model.function'
@@ -6,6 +7,22 @@ import { buildUpdateExpression } from './update-expression-builder'
 
 describe('buildUpdateExpression', () => {
   const metaDataS = metadataForModel(SimpleWithPartitionKeyModel)
+
+  it('should set null value as NULL attribute', () => {
+    const exp = buildUpdateExpression(
+      'name',
+      new UpdateActionDef('SET', 'set'),
+      [null],
+      [],
+      metadataForModel(ModelWithNullValues),
+    )
+    expect(exp).toEqual({
+      attributeNames: { '#name': 'name' },
+      attributeValues: { ':name': { NULL: true } },
+      statement: '#name = :name',
+      type: 'SET',
+    })
+  })
   const metaDataU = metadataForModel(UpdateModel)
 
   it('should throw when operation.action is unknown', () => {
